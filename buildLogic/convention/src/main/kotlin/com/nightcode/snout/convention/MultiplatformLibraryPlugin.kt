@@ -15,6 +15,7 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(libs.findPlugin("androidMultiplatformLibrary").id)
                 apply(libs.findPlugin("kotlinMultiplatform").id)
+                apply(libs.findPlugin("kotlinSerialization").id)
             }
 
             configure<KotlinMultiplatformExtension> {
