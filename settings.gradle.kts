@@ -2,6 +2,8 @@ rootProject.name = "snout"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("buildLogic")
+
     repositories {
         google {
             mavenContent {

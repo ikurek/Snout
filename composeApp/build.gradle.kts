@@ -1,20 +1,11 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidMultiplatformLibrary)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.snout.multiplatform.library)
+    alias(libs.plugins.snout.multiplatform.compose)
 }
 
 kotlin {
     android {
         namespace = "com.nightcode.snout.composeapp"
-        compileSdk = libs.versions.android.targetSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
         androidResources { enable = true }
     }
 
