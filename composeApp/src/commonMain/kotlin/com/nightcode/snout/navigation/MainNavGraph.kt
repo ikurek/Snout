@@ -5,31 +5,16 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.SavedStateConfiguration
-import com.nightcode.snout.App
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-
-@Serializable
-data object AppKey : NavKey
-
-private val DefaultSavedStateConfiguration = SavedStateConfiguration {
-    serializersModule = SerializersModule {
-        polymorphic(NavKey::class) {
-            subclass(AppKey::class, AppKey.serializer())
-        }
-    }
-}
+import com.nightcode.snout.features.home.HomeNavKey
+import com.nightcode.snout.features.home.HomeRoute
 
 @Composable
-fun MainNavGraph() {
-    val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, AppKey)
+internal fun MainNavGraph() {
+    val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, HomeNavKey)
 
     NavDisplay(
         backStack = backStack,
@@ -51,9 +36,7 @@ fun MainNavGraph() {
                 slideOutHorizontally(targetOffsetX = { it })
         },
         entryProvider = entryProvider {
-            entry<AppKey> {
-                App()
-            }
+            entry(HomeNavKey) { HomeRoute() }
         },
     )
 }

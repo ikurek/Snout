@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.compose)
+    alias(libs.plugins.snout.multiplatform.koin)
 }
 
 kotlin {
@@ -24,6 +25,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
         }
         commonMain.dependencies {
+            // Compose
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -34,6 +36,11 @@ kotlin {
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.compose.navigation3.ui)
             implementation(libs.compose.lifecycle.viewmodel.navigation3)
+            // Koin
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
+            // Kotlin
             implementation(libs.kotlin.serialization.json)
         }
         commonTest.dependencies {

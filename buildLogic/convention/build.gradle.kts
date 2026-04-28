@@ -23,5 +23,9 @@ gradlePlugin {
             id = "com.nightcode.snout.multiplatform.compose"
             implementationClass = "com.nightcode.snout.convention.MultiplatformComposePlugin"
         }
+        register("multiplatformKoin") {
+            id = "com.nightcode.snout.multiplatform.koin"
+            implementationClass = "com.nightcode.snout.convention.MultiplatformKoinPlugin"
+        }
     }
 }
