@@ -1,0 +1,33 @@
+config:
+  validation: true
+  warningsAsErrors: false
+  checkExhaustiveness: false
+
+console-reports:
+  active: true
+
+# Compose hacks
+naming:
+  FunctionNaming:
+    ignoreAnnotated: [ 'Composable', 'Preview', 'PreviewLightDark' ]
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+  MatchingDeclarationName:
+    active: false
+
+complexity:
+  TooManyFunctions:
+    allowedFunctionsPerFile: 16
+  LongParameterList:
+    ignoreDefaultParameters: true
+    ignoreAnnotated: [ 'Composable' ]
+
+style:
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotated: [ 'Preview', 'PreviewLightDark' ]
+  ForbiddenComment:
+    active: false
+  MaxLineLength:
+    maxLineLength: 120
