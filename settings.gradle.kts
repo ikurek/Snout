@@ -33,5 +33,10 @@ dependencyResolutionManagement {
 include(":androidApp")
 include(":composeApp")
 
+// Auth
+include(":shared:data:auth")
+include(":shared:domain:data:auth")
+include(":shared:domain:model:auth")
+
 // Storage
 include(":shared:storage:datastore")

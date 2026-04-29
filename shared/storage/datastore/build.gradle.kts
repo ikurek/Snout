@@ -10,8 +10,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.datastore)
-            api(libs.datastore.preferences)
+            implementation(libs.datastore)
+            implementation(libs.datastore.preferences)
         }
     }
 }
