@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
         }
         commonMain.dependencies {
+            implementation(projects.shared)
             // Compose
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
