@@ -27,9 +27,11 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-
     }
 }
 
 include(":androidApp")
 include(":composeApp")
+
+// Storage
+include(":shared:storage:datastore")

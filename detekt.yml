@@ -12,6 +12,8 @@ naming:
     ignoreAnnotated: [ 'Composable', 'Preview', 'PreviewLightDark' ]
   TopLevelPropertyNaming:
     constantPattern: '[A-Z][A-Za-z0-9]*'
+    propertyPattern: '[A-Z][A-Za-z0-9]*'
+    privatePropertyPattern: '[A-Z][A-Za-z0-9]*'
   MatchingDeclarationName:
     active: false
 
@@ -31,3 +33,7 @@ style:
     active: false
   MaxLineLength:
     maxLineLength: 120
+
+ktlint:
+  PropertyName:
+    constantNamingStyle: 'pascal_case'

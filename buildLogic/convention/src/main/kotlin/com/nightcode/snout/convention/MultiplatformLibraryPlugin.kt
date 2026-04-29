@@ -6,6 +6,7 @@ import com.nightcode.snout.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -27,6 +28,16 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                     minSdk = libs.findVersion("android.minSdk").get().toString().toInt()
                     compilerOptions {
                         jvmTarget.set(JvmTarget.JVM_11)
+                    }
+                }
+
+                sourceSets {
+                    androidMain.dependencies {
+                        implementation(libs.findLibrary("coroutines-android").get())
+                    }
+                    commonMain.dependencies {
+                        implementation(libs.findLibrary("coroutines-core").get())
+                        implementation(libs.findLibrary("arrow-core").get())
                     }
                 }
             }

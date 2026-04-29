@@ -8,6 +8,9 @@ compose-multiplatform = "1.11.0-beta03"
 compose-multiplatform-lifecycle = "2.11.0-alpha03"
 compose-multiplatform-material3 = "1.11.0-alpha07"
 compose-multiplatform-navigation3 = "1.1.0"
+arrow = "2.2.2.1"
+coroutines = "1.10.2"
+datastore = "1.2.1"
 detekt = "2.0.0-alpha.3"
 koin = "4.2.1"
 koin-plugin = "1.0.0-RC2"
@@ -24,6 +27,14 @@ detekt-ktlint = { group = "dev.detekt", name = "detekt-rules-ktlint-wrapper", ve
 # Kotlin
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+
+# Arrow
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+
+# DataStore
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # Android
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
