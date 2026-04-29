@@ -1,7 +1,7 @@
 package com.nightcode.snout
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.navigation.MainNavGraph
 import com.nightcode.snout.shared.di.SharedModule
 import org.koin.compose.KoinApplication
@@ -15,7 +15,7 @@ fun App() = KoinApplication(
         module<SharedModule>()
     },
 ) {
-    MaterialTheme {
+    SnoutTheme {
         MainNavGraph()
     }
 }
