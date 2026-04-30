@@ -10,6 +10,8 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.auth)
+        api(projects.shared.domain.model.user)
         api(projects.shared.domain.usecase.auth)
+        api(projects.shared.domain.usecase.user)
     }
 }
