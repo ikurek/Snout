@@ -5,16 +5,19 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
+import com.nightcode.snout.features.login.LoginNavKey
+import com.nightcode.snout.features.login.LoginRoute
 
 @Composable
-internal fun MainNavGraph() {
-    val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, HomeNavKey)
+internal fun MainNavGraph(initial: NavKey) {
+    val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
 
     NavDisplay(
         backStack = backStack,
@@ -37,6 +40,7 @@ internal fun MainNavGraph() {
         },
         entryProvider = entryProvider {
             entry(HomeNavKey) { HomeRoute() }
+            entry(LoginNavKey) { LoginRoute() }
         },
     )
 }

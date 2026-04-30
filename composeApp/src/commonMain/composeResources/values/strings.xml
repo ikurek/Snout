@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Snout</string>
+    <string name="login_screen_app_name_subtitle">PostHog · pocket-sized</string>
+    <string name="login_screen_header">Connect your PostHog project.</string>
+    <string name="login_screen_description">Paste a personal API key. Snout connects directly to your instance — we never see your data.</string>
+    <string name="login_screen_instance_url_input_label">Instance URL</string>
+    <string name="login_screen_instance_url_input_placeholder">https://eu.posthog.com</string>
+    <string name="login_screen_instance_url_input_empty_error">This field can not be empty</string>
+    <string name="login_screen_instance_url_input_invalid_error">Value is not a valid HTTPS url</string>
+    <string name="login_screen_personal_api_key_input_label">Personal API key</string>
+    <string name="login_screen_personal_api_key_input_placeholder">phx_...</string>
+    <string name="login_screen_personal_api_key_input_empty_error">This field can not be empty</string>
+    <string name="login_screen_personal_api_key_input_unable_to_connect_error">Unable to connect with provided API key</string>
+    <string name="login_screen_personal_api_key_create_in_web_button">Create a new API key</string>
+    <string name="login_screen_connect_button_text">Connect</string>
+    <string name="url_posthog_api_keys_url">https://us.posthog.com/settings/user-api-keys</string>
+</resources>
