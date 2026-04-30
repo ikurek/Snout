@@ -16,6 +16,7 @@ koin = "4.2.1"
 koin-plugin = "1.0.0-RC2"
 kotlin = "2.3.21"
 kotlin-serialization = "1.11.0"
+ktor = "3.4.3"
 
 [libraries]
 # Gradle plugins (for buildLogic compileOnly)
@@ -28,6 +29,7 @@ detekt-ktlint = { group = "dev.detekt", name = "detekt-rules-ktlint-wrapper", ve
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # Arrow
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
@@ -62,6 +64,13 @@ koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-view
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin" }
 
+# Networking
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -73,6 +82,7 @@ detekt = { id = "dev.detekt", version.ref = "detekt" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koinCompiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
+
 # Convention plugins
 snout-android-application = { id = "com.nightcode.snout.android.application" }
 snout-multiplatform-library = { id = "com.nightcode.snout.multiplatform.library" }

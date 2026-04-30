@@ -34,6 +34,10 @@ include(":androidApp")
 include(":composeApp")
 include(":shared")
 
+// API
+include(":shared:api")
+include(":shared:api:users")
+
 // Auth
 include(":shared:data:auth")
 include(":shared:domain:data:auth")
