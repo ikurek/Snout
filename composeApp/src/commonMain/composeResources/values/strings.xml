@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Snout</string>
-    <string name="initial_project_screen_title">Welcome, %1$s</string>
-    <string name="initial_project_screen_subtitle">PostHog member since %1$s</string>
+    <string name="initial_project_screen_title">Select project</string>
+    <string name="initial_project_screen_subtitle">You can always switch between organizations and projects later</string>
     <string name="login_screen_app_name_subtitle">PostHog · pocket-sized</string>
     <string name="login_screen_header">Connect your PostHog project.</string>
     <string name="login_screen_description">Paste a personal API key. Snout connects directly to your instance — we never see your data.</string>
@@ -29,4 +29,14 @@
     <string name="month_december">December</string>
     <string name="snackbar_generic_error_message">An unexpected error has occurred. Please try again later.</string>
     <string name="url_posthog_api_keys_url">https://us.posthog.com/settings/user-api-keys</string>
+    <string name="initial_project_screen_project_count">Active projects: %1$d</string>
+    <string name="placeholder_generic_error_title">Something went wrong</string>
+    <string name="placeholder_generic_error_subtitle">An unexpected error occurred. Please try again.</string>
+    <string name="placeholder_generic_error_retry">Try again</string>
+    <string name="placeholder_permission_denied_title">Access denied</string>
+    <string name="placeholder_permission_denied_subtitle">Your API key doesn't have permission to access this data.</string>
+    <string name="placeholder_permission_denied_retry">Try again</string>
+    <string name="placeholder_nothing_found_title">Nothing here</string>
+    <string name="placeholder_nothing_found_subtitle">There's nothing to show at the moment.</string>
+    <string name="placeholder_nothing_found_retry">Refresh</string>
 </resources>
