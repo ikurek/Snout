@@ -36,16 +36,21 @@ include(":shared")
 
 // API
 include(":shared:api")
+include(":shared:api:organizations")
 include(":shared:api:users")
 
 // Auth
 include(":shared:data:auth")
+include(":shared:data:organization")
 include(":shared:data:user")
 include(":shared:domain:data:auth")
+include(":shared:domain:data:organization")
 include(":shared:domain:data:user")
 include(":shared:domain:model:auth")
+include(":shared:domain:model:organization")
 include(":shared:domain:model:user")
 include(":shared:domain:usecase:auth")
+include(":shared:domain:usecase:organization")
 include(":shared:domain:usecase:user")
 
 // Storage

@@ -2,6 +2,8 @@ package com.nightcode.snout.shared.data.user
 
 import arrow.core.Either
 import com.nightcode.snout.shared.api.users.UsersApi
+import com.nightcode.snout.shared.data.user.mapper.toGetCurrentUserError
+import com.nightcode.snout.shared.data.user.mapper.toUser
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
 import com.nightcode.snout.shared.domain.model.user.User

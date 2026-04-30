@@ -4,13 +4,8 @@ sealed interface NetworkError {
 
     val message: String
 
-    data class Api(
-        val statusCode: Int,
-        val type: String,
-        val code: String,
-        val detail: String,
-        val attr: String?
-    ) : NetworkError {
+    data class Api(val statusCode: Int, val type: String, val code: String, val detail: String, val attr: String?) :
+        NetworkError {
         override val message: String = "API Error - $type: $code - $detail"
     }
 
