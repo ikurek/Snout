@@ -14,13 +14,12 @@ import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.snackbar_generic_error_message
 import snout.composeapp.generated.resources.url_posthog_api_keys_url
-import kotlin.time.Instant
 
 @Serializable
 internal data object LoginNavKey : NavKey
 
 @Composable
-internal fun LoginRoute(onUserAuthorized: (firstName: String, dateJoined: Instant) -> Unit) {
+internal fun LoginRoute(onUserAuthorized: () -> Unit) {
     val viewModel = koinViewModel<LoginViewModel>()
     val instanceUrlValidationError by
         viewModel.instanceUrlValidationError.collectAsStateWithLifecycle()
@@ -35,10 +34,7 @@ internal fun LoginRoute(onUserAuthorized: (firstName: String, dateJoined: Instan
     LaunchedEffect(viewModel.sideEffects) {
         viewModel.sideEffects.collect { sideEffect ->
             when (sideEffect) {
-                is LoginSideEffect.UserAuthorized -> onUserAuthorized(
-                    sideEffect.firstName,
-                    sideEffect.dateJoined,
-                )
+                is LoginSideEffect.UserAuthorized -> onUserAuthorized()
 
                 is LoginSideEffect.UserAuthorizationFailed -> snackbarHostState.showSnackbar(
                     snackbarErrorMessage,

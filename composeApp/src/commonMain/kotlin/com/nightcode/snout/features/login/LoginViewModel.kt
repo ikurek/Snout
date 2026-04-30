@@ -84,7 +84,7 @@ internal class LoginViewModel(
             }
             _isConnecting.value = false
         }.onRight { user ->
-            _sideEffects.send(LoginSideEffect.UserAuthorized(user.firstName, user.dateJoined))
+            _sideEffects.send(LoginSideEffect.UserAuthorized)
             _isConnecting.value = false
         }
     }

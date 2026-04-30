@@ -1,10 +1,9 @@
 package com.nightcode.snout.features.login
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -15,29 +14,28 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.atoms.AppIcon
-import com.nightcode.snout.designsystem.atoms.HorizontalSpacer
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
@@ -116,32 +114,19 @@ internal fun LoginScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TopBar() {
-    Row(
-        modifier = Modifier.padding(all = 24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AppIcon()
-        HorizontalSpacer(16.dp)
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-            Text(
-                text = stringResource(Res.string.app_name),
-                style = SnoutTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            VerticalSpacer(4.dp)
-            Text(
-                text = stringResource(Res.string.login_screen_app_name_subtitle),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = SnoutTheme.monoTypography.titleSmall,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
-        }
-    }
+    TopAppBar(
+        navigationIcon = {
+            Box(modifier = Modifier.padding(start = 12.dp, end = 10.dp)) { AppIcon() }
+        },
+        title = { Text(text = stringResource(Res.string.app_name)) },
+        subtitle = { Text(text = stringResource(Res.string.login_screen_app_name_subtitle)) },
+    )
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun Content(
     contentPadding: PaddingValues,
@@ -156,9 +141,11 @@ private fun Content(
         modifier = Modifier
             .padding(contentPadding)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 16.dp)
             .imePadding(),
     ) {
+        VerticalSpacer(24.dp)
+
         Text(
             stringResource(Res.string.login_screen_header),
             style = SnoutTheme.typography.displaySmall,
@@ -223,7 +210,7 @@ private fun BottomBar(isConnecting: Boolean, isConnectEnabled: Boolean, onClick:
         onClick = onClick,
         loading = isConnecting,
         enabled = isConnectEnabled,
-        modifier = Modifier.fillMaxWidth().padding(all = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp, horizontal = 16.dp),
         icon = {
             Icon(
                 painter = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
@@ -233,7 +220,7 @@ private fun BottomBar(isConnecting: Boolean, isConnectEnabled: Boolean, onClick:
     )
 }
 
-private val InstanceUrlValidationError.textFieldError: TextFieldError?
+private val InstanceUrlValidationError.textFieldError: TextFieldError
     @Composable
     @ReadOnlyComposable
     get() = TextFieldError.Resource(
@@ -246,7 +233,7 @@ private val InstanceUrlValidationError.textFieldError: TextFieldError?
         },
     )
 
-private val PersonalApiKeyValidationError.textFieldError: TextFieldError?
+private val PersonalApiKeyValidationError.textFieldError: TextFieldError
     @Composable
     @ReadOnlyComposable
     get() = TextFieldError.Resource(

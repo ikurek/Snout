@@ -14,13 +14,13 @@ import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
 import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectRoute
-import com.nightcode.snout.features.intialproject.toInitialProject
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.login.LoginRoute
 
 @Composable
 internal fun MainNavGraph(initial: NavKey) {
-    val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
+    val backStack =
+        rememberNavBackStack(DefaultSavedStateConfiguration, initial, InitialProjectNavKey)
 
     NavDisplay(
         backStack = backStack,
@@ -31,20 +31,31 @@ internal fun MainNavGraph(initial: NavKey) {
         ),
         transitionSpec = {
             slideInHorizontally(initialOffsetX = { it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { -it })
+                    slideOutHorizontally(targetOffsetX = { -it })
         },
         popTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
+                    slideOutHorizontally(targetOffsetX = { it })
         },
         predictivePopTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
+                    slideOutHorizontally(targetOffsetX = { it })
         },
         entryProvider = entryProvider {
             entry<HomeNavKey> { HomeRoute() }
-            entry<LoginNavKey> { LoginRoute(onUserAuthorized = backStack::toInitialProject) }
-            entry<InitialProjectNavKey> { entry -> InitialProjectRoute(entry) }
+            entry<LoginNavKey> {
+                LoginRoute(
+                    onUserAuthorized = { backStack.add(InitialProjectNavKey) },
+                )
+            }
+            entry<InitialProjectNavKey> {
+                InitialProjectRoute(
+                    onProjectSelected = {
+                        backStack.clear()
+                        backStack.add(HomeNavKey)
+                    },
+                )
+            }
         },
     )
 }

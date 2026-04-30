@@ -1,24 +1,34 @@
 package com.nightcode.snout.features.intialproject
 
 import androidx.compose.runtime.Composable
-import androidx.navigation3.runtime.NavBackStack
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
 
 @Serializable
-internal data class InitialProjectNavKey(val firstName: String, val dateJoined: Instant) : NavKey
+internal data object InitialProjectNavKey : NavKey
 
-fun NavBackStack<NavKey>.toInitialProject(firstName: String, dateJoined: Instant) =
-    add(InitialProjectNavKey(firstName, dateJoined))
-
+@OptIn(ExperimentalUuidApi::class)
 @Composable
-internal fun InitialProjectRoute(key: InitialProjectNavKey) {
+internal fun InitialProjectRoute(onProjectSelected: () -> Unit) {
     val viewModel = koinViewModel<InitialProjectViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffects.collect { sideEffect ->
+            when (sideEffect) {
+                InitialProjectSideEffect.ProjectSelected -> onProjectSelected()
+            }
+        }
+    }
 
     InitialProjectScreen(
-        firstName = key.firstName,
-        dateJoined = key.dateJoined,
+        state = state,
+        onRetry = viewModel::load,
+        onProjectSelected = viewModel::onProjectSelected,
     )
 }
