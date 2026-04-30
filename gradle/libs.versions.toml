@@ -16,6 +16,7 @@ koin = "4.2.1"
 koin-plugin = "1.0.0-RC2"
 kotlin = "2.3.21"
 kotlin-serialization = "1.11.0"
+kotlin-datetime = "0.8.0-rc02"
 ktor = "3.4.3"
 
 [libraries]
@@ -28,6 +29,7 @@ detekt-ktlint = { group = "dev.detekt", name = "detekt-rules-ktlint-wrapper", ve
 # Kotlin
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 

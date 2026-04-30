@@ -12,6 +12,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
+import com.nightcode.snout.features.intialproject.InitialProjectNavKey
+import com.nightcode.snout.features.intialproject.InitialProjectRoute
+import com.nightcode.snout.features.intialproject.toInitialProject
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.login.LoginRoute
 
@@ -39,8 +42,9 @@ internal fun MainNavGraph(initial: NavKey) {
                 slideOutHorizontally(targetOffsetX = { it })
         },
         entryProvider = entryProvider {
-            entry(HomeNavKey) { HomeRoute() }
-            entry(LoginNavKey) { LoginRoute() }
+            entry<HomeNavKey> { HomeRoute() }
+            entry<LoginNavKey> { LoginRoute(onUserAuthorized = backStack::toInitialProject) }
+            entry<InitialProjectNavKey> { entry -> InitialProjectRoute(entry) }
         },
     )
 }

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Snout</string>
+    <string name="initial_project_screen_title">Welcome, %1$s</string>
+    <string name="initial_project_screen_subtitle">PostHog member since %1$s</string>
     <string name="login_screen_app_name_subtitle">PostHog · pocket-sized</string>
     <string name="login_screen_header">Connect your PostHog project.</string>
     <string name="login_screen_description">Paste a personal API key. Snout connects directly to your instance — we never see your data.</string>
@@ -13,5 +15,18 @@
     <string name="login_screen_personal_api_key_input_unable_to_connect_error">Unable to connect with provided API key</string>
     <string name="login_screen_personal_api_key_create_in_web_button">Create a new API key</string>
     <string name="login_screen_connect_button_text">Connect</string>
+    <string name="month_january">January</string>
+    <string name="month_february">February</string>
+    <string name="month_march">March</string>
+    <string name="month_april">April</string>
+    <string name="month_may">May</string>
+    <string name="month_june">June</string>
+    <string name="month_july">July</string>
+    <string name="month_august">August</string>
+    <string name="month_september">September</string>
+    <string name="month_october">October</string>
+    <string name="month_november">November</string>
+    <string name="month_december">December</string>
+    <string name="snackbar_generic_error_message">An unexpected error has occurred. Please try again later.</string>
     <string name="url_posthog_api_keys_url">https://us.posthog.com/settings/user-api-keys</string>
 </resources>

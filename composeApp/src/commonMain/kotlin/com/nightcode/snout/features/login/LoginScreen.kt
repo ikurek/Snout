@@ -17,10 +17,13 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +66,7 @@ import snout.composeapp.generated.resources.login_screen_personal_api_key_input_
 
 @Composable
 internal fun LoginScreen(
+    snackbarHostState: SnackbarHostState,
     instanceUrlValidationError: InstanceUrlValidationError?,
     personalApiKeyValidationError: PersonalApiKeyValidationError?,
     isConnectEnabled: Boolean,
@@ -85,6 +89,7 @@ internal fun LoginScreen(
 
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { TopBar() },
         bottomBar = {
             BottomBar(
@@ -258,6 +263,7 @@ private val PersonalApiKeyValidationError.textFieldError: TextFieldError?
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 internal fun LoginScreenEmptyPreview() = LoginScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     instanceUrlValidationError = null,
     personalApiKeyValidationError = null,
     isConnectEnabled = true,

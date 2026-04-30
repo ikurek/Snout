@@ -36,8 +36,9 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                         implementation(libs.findLibrary("coroutines-android").get())
                     }
                     commonMain.dependencies {
-                        implementation(libs.findLibrary("coroutines-core").get())
                         implementation(libs.findLibrary("arrow-core").get())
+                        implementation(libs.findLibrary("coroutines-core").get())
+                        implementation(libs.findLibrary("kotlin-datetime").get())
                     }
                 }
             }
