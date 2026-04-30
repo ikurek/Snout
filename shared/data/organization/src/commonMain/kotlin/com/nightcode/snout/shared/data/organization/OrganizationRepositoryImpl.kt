@@ -14,10 +14,7 @@ internal class OrganizationRepositoryImpl(
     private val authDataStore: AuthDataStore,
 ) : OrganizationRepository {
 
-    override suspend fun getOrganizations(): Either<GetOrganizationsError, List<Organization>> {
-        val instanceUrl = authDataStore.getInstanceUrl().orEmpty()
-        return api.getOrganizations()
-            .mapLeft { it.toGetOrganizationsError() }
-            .map { response -> response.results.map { it.toOrganization(instanceUrl) } }
-    }
+    override suspend fun getOrganizations(): Either<GetOrganizationsError, List<Organization>> = api.getOrganizations()
+        .mapLeft { it.toGetOrganizationsError() }
+        .map { response -> response.results.map { it.toOrganization(authDataStore.getInstanceUrl()!!) } }
 }

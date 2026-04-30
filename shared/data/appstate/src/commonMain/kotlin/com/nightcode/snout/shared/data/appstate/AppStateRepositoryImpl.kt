@@ -1,0 +1,22 @@
+package com.nightcode.snout.shared.data.appstate
+
+import arrow.core.raise.either
+import arrow.core.raise.ensureNotNull
+import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
+import com.nightcode.snout.shared.storage.datastore.AppStateDataStore
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+@OptIn(ExperimentalUuidApi::class)
+internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) : AppStateRepository {
+
+    override suspend fun saveSelectedProject(organizationId: Uuid, projectId: Long) =
+        dataStore.saveSelectedProject(organizationId.toString(), projectId)
+
+    override suspend fun getSelectedProject(): SelectedProject? = either {
+        val organizationId = ensureNotNull(dataStore.getSelectedOrganizationId()) {}
+        val projectId = ensureNotNull(dataStore.getSelectedProjectId()) {}
+        SelectedProject(organizationId = Uuid.parse(organizationId), projectId = projectId)
+    }.getOrNull()
+}

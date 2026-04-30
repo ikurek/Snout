@@ -12,6 +12,9 @@ class DataStoreModule {
 
     @Single
     fun authDataStore(dateStore: DataStore<Preferences>) = AuthDataStore(dateStore)
+
+    @Single
+    fun appStateDataStore(dataStore: DataStore<Preferences>) = AppStateDataStore(dataStore)
 }
 
 @Module
