@@ -72,14 +72,15 @@ internal class LoginViewModel(
         }
         validateAndSaveUserAuth(token = personalApiKey, instanceUrl = instanceUrl).onLeft { error ->
             when (error) {
-                GetCurrentUserError.AuthorizationFailed ->
+                GetCurrentUserError.Unauthorized,
+                GetCurrentUserError.Forbidden,
+                ->
                     _personalApiKeyValidationError.value =
                         PersonalApiKeyValidationError.ServerValidationFailed
 
-                GetCurrentUserError.ConnectionError ->
-                    _sideEffects.send(LoginSideEffect.UserAuthorizationFailed)
-
-                GetCurrentUserError.UnexpectedError ->
+                GetCurrentUserError.ConnectionError,
+                GetCurrentUserError.UnexpectedError,
+                ->
                     _sideEffects.send(LoginSideEffect.UserAuthorizationFailed)
             }
             _isConnecting.value = false

@@ -101,12 +101,12 @@ private fun LoadingContent() {
 @Composable
 private fun ErrorContent(error: GetOrganizationsError, onRetry: () -> Unit) {
     when (error) {
-        GetOrganizationsError.AuthorizationFailed ->
+        GetOrganizationsError.Forbidden ->
             PermissionDeniedPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
 
         GetOrganizationsError.ConnectionError,
         GetOrganizationsError.UnexpectedError,
-            ->
+        ->
             GenericErrorPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
     }
 }
