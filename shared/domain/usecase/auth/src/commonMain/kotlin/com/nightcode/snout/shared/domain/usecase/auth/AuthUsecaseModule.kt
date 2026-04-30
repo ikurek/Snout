@@ -21,4 +21,10 @@ class AuthUsecaseModule {
     @Single
     fun validateUserAuth(authRepository: AuthRepository, userRepository: UserRepository) =
         ValidateAndSaveUserAuth(authRepository, userRepository)
+
+    @Single
+    fun logout(repository: AuthRepository) = Logout(repository)
+
+    @Single
+    fun shouldReturnToLogin(repository: AuthRepository) = ShouldReturnToLogin(repository)
 }
