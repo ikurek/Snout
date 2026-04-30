@@ -37,6 +37,9 @@ kotlin {
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.compose.navigation3.ui)
             implementation(libs.compose.lifecycle.viewmodel.navigation3)
+            // Coil
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
             // Koin
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
