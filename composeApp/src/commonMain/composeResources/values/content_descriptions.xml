@@ -1,0 +1,4 @@
+<resources>
+    <string name="settings_icon_content_description">Open settings</string>
+    <string name="navigate_back_content_description">Navigate back</string>
+</resources>
