@@ -34,6 +34,7 @@ import com.nightcode.snout.designsystem.organisms.GenericErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.organisms.PermissionDeniedPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.model.organization.Project
@@ -106,7 +107,7 @@ private fun ErrorContent(error: GetOrganizationsError, onRetry: () -> Unit) {
 
         GetOrganizationsError.ConnectionError,
         GetOrganizationsError.UnexpectedError,
-        ->
+            ->
             GenericErrorPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
     }
 }
@@ -187,33 +188,12 @@ private fun ProjectItem(project: Project, onClick: () -> Unit) {
     }
 }
 
+@OptIn(TestData::class)
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 private fun InitialProjectScreenLoadedPreview() = InitialProjectScreen(
-    state = InitialProjectUiState.Loaded(
-        organizations = listOf(
-            Organization(
-                id = Uuid.random(),
-                name = "Nightcode",
-                slug = "nightcode",
-                logoUrl = null,
-                projects = listOf(
-                    Project(id = 1, name = "Production"),
-                    Project(id = 2, name = "Staging"),
-                ),
-            ),
-            Organization(
-                id = Uuid.random(),
-                name = "Personal",
-                slug = "personal",
-                logoUrl = null,
-                projects = listOf(
-                    Project(id = 3, name = "My App"),
-                ),
-            ),
-        ),
-    ),
+    state = TestInitialProjectUiStateLoaded,
     onRetry = {},
     onProjectSelected = { _, _ -> },
 )
