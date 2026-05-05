@@ -14,6 +14,7 @@ kotlin {
             implementation(projects.shared.api.organizations)
             implementation(projects.shared.domain.data.organization)
             implementation(projects.shared.storage.datastore)
+            implementation(projects.shared.storage.database)
         }
     }
 }

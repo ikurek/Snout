@@ -8,5 +8,8 @@ import org.koin.core.annotation.Single
 @Module(includes = [OrganizationDataModule::class])
 class OrganizationUsecaseModule {
     @Single
-    fun getOrganizations(repository: OrganizationRepository) = GetOrganizations(repository)
+    fun observeOrganizations(repository: OrganizationRepository) = ObserveOrganizations(repository)
+
+    @Single
+    fun refreshOrganizations(repository: OrganizationRepository) = RefreshOrganizations(repository)
 }
