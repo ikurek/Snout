@@ -7,6 +7,7 @@ group = "com.nightcode.snout.buildlogic"
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.multiplatform.gradlePlugin)
+    compileOnly(libs.sqldelight.gradlePlugin)
 }
 
 gradlePlugin {

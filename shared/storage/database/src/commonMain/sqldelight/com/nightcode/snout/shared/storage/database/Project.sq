@@ -1,0 +1,17 @@
+CREATE TABLE Project (
+    id INTEGER NOT NULL PRIMARY KEY,
+    organization_id TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+upsert:
+INSERT OR REPLACE INTO Project(id, organization_id, name) VALUES (?, ?, ?);
+
+selectAll:
+SELECT * FROM Project;
+
+selectByOrganizationId:
+SELECT * FROM Project WHERE organization_id = ?;
+
+deleteAll:
+DELETE FROM Project;

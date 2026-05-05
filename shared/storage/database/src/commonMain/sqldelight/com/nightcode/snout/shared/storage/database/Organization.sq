@@ -1,0 +1,15 @@
+CREATE TABLE Organization (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    logo_url TEXT
+);
+
+upsert:
+INSERT OR REPLACE INTO Organization(id, name, slug, logo_url) VALUES (?, ?, ?, ?);
+
+selectAll:
+SELECT * FROM Organization;
+
+deleteAll:
+DELETE FROM Organization;
