@@ -1,6 +1,7 @@
 package com.nightcode.snout
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
@@ -13,3 +14,6 @@ val Project.libs
 
 val Optional<Provider<PluginDependency>>.id
     get(): String = get().get().pluginId
+
+fun VersionCatalog.library(name: String): Provider<MinimalExternalModuleDependency> =
+    findLibrary(name).get()

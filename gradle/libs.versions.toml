@@ -20,6 +20,8 @@ kotlin-serialization = "1.11.0"
 kotlin-datetime = "0.8.0-rc02"
 ktor = "3.4.3"
 sqldelight = "2.3.2"
+kotest = "6.1.11"
+mokkery = "3.3.0"
 
 [libraries]
 # Gradle plugins (for buildLogic compileOnly)
@@ -28,6 +30,7 @@ kotlin-multiplatform-gradlePlugin = { group = "org.jetbrains.kotlin.multiplatfor
 detekt-gradlePlugin = { group = "dev.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
 detekt-ktlint = { group = "dev.detekt", name = "detekt-rules-ktlint-wrapper", version.ref = "detekt" }
 sqldelight-gradlePlugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+kotest-gradlePlugin = { group = "io.kotest", name = "io.kotest.gradle.plugin", version.ref = "kotest" }
 
 # Kotlin
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -79,6 +82,12 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 
+# Kotest
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-assertions-arrow = { module = "io.kotest:kotest-assertions-arrow", version.ref = "kotest" }
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+
 # Networking
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -98,9 +107,12 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koinCompiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+kotest = { id = "io.kotest", version.ref = "kotest" }
+mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 
 # Convention plugins
 snout-android-application = { id = "com.nightcode.snout.android.application" }
 snout-multiplatform-library = { id = "com.nightcode.snout.multiplatform.library" }
 snout-multiplatform-compose = { id = "com.nightcode.snout.multiplatform.compose" }
 snout-multiplatform-koin = { id = "com.nightcode.snout.multiplatform.koin" }
+snout-multiplatform-unittest = { id = "com.nightcode.snout.multiplatform.unittest" }

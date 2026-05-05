@@ -28,5 +28,9 @@ gradlePlugin {
             id = "com.nightcode.snout.multiplatform.koin"
             implementationClass = "com.nightcode.snout.convention.MultiplatformKoinPlugin"
         }
+        register("multiplatformUnitTest") {
+            id = "com.nightcode.snout.multiplatform.unittest"
+            implementationClass = "com.nightcode.snout.convention.MultiplatformUnitTestPlugin"
+        }
     }
 }
