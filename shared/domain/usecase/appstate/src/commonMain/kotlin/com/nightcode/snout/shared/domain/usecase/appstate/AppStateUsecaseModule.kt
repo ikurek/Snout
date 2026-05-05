@@ -18,4 +18,7 @@ class AppStateUsecaseModule {
     @Single
     fun determineInitialLocation(authRepository: AuthRepository, appStateRepository: AppStateRepository) =
         DetermineInitialLocation(authRepository, appStateRepository)
+
+    @Single
+    fun observeSelectedProject(repository: AppStateRepository) = ObserveSelectedProject(repository)
 }

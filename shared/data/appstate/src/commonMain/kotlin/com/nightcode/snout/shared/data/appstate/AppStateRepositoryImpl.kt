@@ -5,6 +5,8 @@ import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.storage.datastore.AppStateDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -19,4 +21,13 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
         val projectId = ensureNotNull(dataStore.getSelectedProjectId()) {}
         SelectedProject(organizationId = Uuid.parse(organizationId), projectId = projectId)
     }.getOrNull()
+
+    override fun observeSelectedProject(): Flow<SelectedProject?> =
+        dataStore.observeSelectedProject().map { (orgIdStr, projectId) ->
+            if (orgIdStr == null || projectId == null) {
+                null
+            } else {
+                SelectedProject(organizationId = Uuid.parse(orgIdStr), projectId = projectId)
+            }
+        }
 }
