@@ -57,5 +57,9 @@ include(":shared:domain:usecase:auth")
 include(":shared:domain:usecase:organization")
 include(":shared:domain:usecase:user")
 
+// Common
+include(":shared:common:coroutines")
+
 // Storage
 include(":shared:storage:datastore")
+include(":shared:storage:database")
