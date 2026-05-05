@@ -44,4 +44,6 @@
     <string name="settings_screen_title">Settings</string>
     <string name="dashboard_screen_title">Dashboard</string>
     <string name="analytics_screen_title">Analytics</string>
+    <string name="switch_project_bottom_sheet_title">Switch project</string>
+    <string name="switch_project_bottom_sheet_nothing_found_title">No projects found</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.nightcode.snout.features.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,6 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.features.analytics.AnalyticsRoute
 import com.nightcode.snout.features.dashboard.DashboardRoute
 import org.jetbrains.compose.resources.painterResource
@@ -26,13 +30,29 @@ import snout.composeapp.generated.resources.settings_icon_content_description
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun HomeScreen(onNavigateToSettings: () -> Unit) {
+internal fun HomeScreen(
+    currentProjectName: String,
+    onOpenProjectSwitcher: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+) {
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Dashboard) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(currentDestination.label)) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onOpenProjectSwitcher,
+                        modifier = Modifier.size(48.dp),
+                    ) {
+                        Crossfade(
+                            targetState = currentProjectName,
+                        ) {
+                            AvatarBox(name = currentProjectName, size = 32.dp)
+                        }
+                    }
+                },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
