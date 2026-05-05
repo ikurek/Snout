@@ -17,6 +17,8 @@ import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectRoute
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.login.LoginRoute
+import com.nightcode.snout.features.settings.SettingsNavKey
+import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
 import org.koin.compose.koinInject
 
@@ -44,18 +46,22 @@ internal fun MainNavGraph(initial: NavKey) {
         ),
         transitionSpec = {
             slideInHorizontally(initialOffsetX = { it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { -it })
+                    slideOutHorizontally(targetOffsetX = { -it })
         },
         popTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
+                    slideOutHorizontally(targetOffsetX = { it })
         },
         predictivePopTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
+                    slideOutHorizontally(targetOffsetX = { it })
         },
         entryProvider = entryProvider {
-            entry<HomeNavKey> { HomeRoute() }
+            entry<HomeNavKey> {
+                HomeRoute(
+                    onNavigateToSettings = { backStack.add(SettingsNavKey) },
+                )
+            }
             entry<LoginNavKey> {
                 LoginRoute(
                     onUserAuthorized = { backStack.add(InitialProjectNavKey) },
@@ -67,6 +73,11 @@ internal fun MainNavGraph(initial: NavKey) {
                         backStack.clear()
                         backStack.add(HomeNavKey)
                     },
+                )
+            }
+            entry<SettingsNavKey> {
+                SettingsRoute(
+                    onNavigateBack = { backStack.removeLastOrNull() },
                 )
             }
         },
