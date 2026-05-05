@@ -59,6 +59,7 @@ include(":shared:domain:usecase:user")
 
 // Common
 include(":shared:common:coroutines")
+include(":shared:common:testdata")
 
 // Storage
 include(":shared:storage:datastore")

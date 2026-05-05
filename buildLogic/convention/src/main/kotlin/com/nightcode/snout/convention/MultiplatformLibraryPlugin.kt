@@ -29,6 +29,7 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                     compilerOptions {
                         jvmTarget.set(JvmTarget.JVM_11)
                     }
+                    withHostTest {}
                 }
 
                 sourceSets {
@@ -36,6 +37,7 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                         implementation(libs.findLibrary("coroutines-android").get())
                     }
                     commonMain.dependencies {
+                        implementation(project(":shared:common:testdata"))
                         implementation(libs.findLibrary("arrow-core").get())
                         implementation(libs.findLibrary("coroutines-core").get())
                         implementation(libs.findLibrary("kotlin-datetime").get())
