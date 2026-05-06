@@ -7,9 +7,8 @@ import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
-import kotlin.uuid.ExperimentalUuidApi
 
-@OptIn(TestData::class, ExperimentalUuidApi::class)
+@OptIn(TestData::class)
 class SaveSelectedProjectTest :
     ShouldSpec({
         val repository = mock<AppStateRepository>(autoUnit)

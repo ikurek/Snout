@@ -20,6 +20,10 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
             }
 
             configure<KotlinMultiplatformExtension> {
+                compilerOptions {
+                    freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+                }
+
                 iosArm64()
                 iosSimulatorArm64()
 

@@ -7,12 +7,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.uuid.ExperimentalUuidApi
 
 @Serializable
 internal data object InitialProjectNavKey : NavKey
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 internal fun InitialProjectRoute(onProjectSelected: () -> Unit) {
     val viewModel = koinViewModel<InitialProjectViewModel>()

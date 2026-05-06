@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @KoinViewModel
@@ -60,7 +59,6 @@ internal class InitialProjectViewModel(
         isLoading.value = false
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun onProjectSelected(organizationId: Uuid, projectId: Long) = viewModelScope.launch {
         saveSelectedProject(organizationId = organizationId, projectId = projectId)
         _sideEffects.send(InitialProjectSideEffect.ProjectSelected)

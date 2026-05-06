@@ -1,10 +1,8 @@
 package com.nightcode.snout.shared.domain.usecase.appstate
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 class SaveSelectedProject(private val repository: AppStateRepository) {
     suspend operator fun invoke(organizationId: Uuid, projectId: Long) =
         repository.saveSelectedProject(organizationId, projectId)

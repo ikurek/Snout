@@ -9,12 +9,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.uuid.ExperimentalUuidApi
 
 @Serializable
 internal data object HomeNavKey : NavKey
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
 internal fun HomeRoute(onNavigateToSettings: () -> Unit) {
     val viewModel = koinViewModel<ProjectSwitcherViewModel>()

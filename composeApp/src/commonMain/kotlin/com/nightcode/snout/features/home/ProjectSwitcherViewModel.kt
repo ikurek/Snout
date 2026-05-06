@@ -14,10 +14,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 @KoinViewModel
 internal class ProjectSwitcherViewModel(
     private val observeOrganizations: ObserveOrganizations,
@@ -65,7 +63,6 @@ internal class ProjectSwitcherViewModel(
     }
 }
 
-@OptIn(ExperimentalUuidApi::class)
 private fun List<Organization>.findProject(organizationId: Uuid, projectId: Long) =
     firstOrNull { it.id == organizationId }
         ?.projects

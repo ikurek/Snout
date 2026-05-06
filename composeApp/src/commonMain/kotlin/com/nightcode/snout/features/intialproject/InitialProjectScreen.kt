@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalUuidApi::class)
 
 package com.nightcode.snout.features.intialproject
 
@@ -43,7 +42,6 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.initial_project_screen_project_count
 import snout.composeapp.generated.resources.initial_project_screen_subtitle
 import snout.composeapp.generated.resources.initial_project_screen_title
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
