@@ -53,6 +53,12 @@ kotlin {
     }
 }
 
+composeCompiler {
+    stabilityConfigurationFiles.add(
+        rootProject.layout.projectDirectory.file("compose_stability_config.conf")
+    )
+}
+
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 }
