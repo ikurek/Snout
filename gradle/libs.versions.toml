@@ -1,27 +1,26 @@
 [versions]
-agp = "9.2.1"
+agp = "9.4.1"
 android-minSdk = "24"
 android-targetSdk = "37"
 androidx-activity = "1.13.0"
-androidx-appcompat = "1.7.1"
-compose-multiplatform = "1.11.0-rc01"
-compose-multiplatform-lifecycle = "2.11.0-beta01"
-compose-multiplatform-material3 = "1.11.0-alpha07"
-compose-multiplatform-navigation3 = "1.1.1"
-arrow = "2.2.2.1"
-coil = "3.4.0"
-coroutines = "1.10.2"
+compose-multiplatform = "1.12.1"
+compose-multiplatform-lifecycle = "2.11.0"
+compose-multiplatform-material3 = "1.12.0-alpha03"
+compose-multiplatform-navigation3 = "1.1.2"
+arrow = "2.2.3"
+coil = "3.6.3"
+coroutines = "1.11.0"
 datastore = "1.2.1"
-detekt = "2.0.0-alpha.3"
-koin = "4.2.1"
-koin-plugin = "1.0.0-RC2"
-kotlin = "2.3.21"
+detekt = "2.0.0-alpha.6"
+koin = "4.2.2"
+koin-plugin = "1.2.1"
+kotlin = "2.4.20"
 kotlin-serialization = "1.11.0"
-kotlin-datetime = "0.8.0-rc02"
-ktor = "3.4.3"
-sqldelight = "2.3.2"
-kotest = "6.1.11"
-mokkery = "3.3.0"
+kotlin-datetime = "0.8.0"
+ktor = "3.6.0"
+sqldelight = "2.4.0"
+kotest = "6.2.5"
+mokkery = "3.5.1"
 
 [libraries]
 # Gradle plugins (for buildLogic compileOnly)
@@ -47,7 +46,6 @@ datastore = { module = "androidx.datastore:datastore", version.ref = "datastore"
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # Android
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
 # Compose
