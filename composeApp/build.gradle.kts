@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.kotlin.serialization.json)
         }
         commonTest.dependencies {
+            implementation(projects.shared.domain.data.analytics)
             implementation(projects.shared.domain.data.appstate)
             implementation(projects.shared.domain.data.auth)
             implementation(projects.shared.domain.data.organization)

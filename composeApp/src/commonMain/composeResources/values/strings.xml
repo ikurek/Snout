@@ -88,6 +88,23 @@
     <string name="inline_error_retry">Retry</string>
     <string name="dashboard_screen_title">Dashboard</string>
     <string name="analytics_screen_title">Analytics</string>
+    <string name="analytics_range_today">Today</string>
+    <string name="analytics_range_7d">7 days</string>
+    <string name="analytics_range_30d">30 days</string>
+    <string name="analytics_range_90d">90 days</string>
+    <string name="analytics_metric_visitors">Visitors</string>
+    <string name="analytics_metric_views">Page views</string>
+    <string name="analytics_metric_sessions">Sessions</string>
+    <string name="analytics_metric_session_duration">Session duration</string>
+    <string name="analytics_metric_bounce_rate">Bounce rate</string>
+    <string name="analytics_metric_previous">vs</string>
+    <string name="analytics_visitors_trend">Visitors over time</string>
+    <string name="analytics_breakdown_pages">Top pages</string>
+    <string name="analytics_breakdown_sources">Top sources</string>
+    <string name="analytics_breakdown_country">Top countries</string>
+    <string name="analytics_breakdown_device">Devices</string>
+    <string name="analytics_breakdown_views">views</string>
+    <string name="analytics_no_data">No data for this period.</string>
     <string name="switch_project_bottom_sheet_title">Switch project</string>
     <string name="switch_project_bottom_sheet_nothing_found_title">No projects found</string>
 </resources>
