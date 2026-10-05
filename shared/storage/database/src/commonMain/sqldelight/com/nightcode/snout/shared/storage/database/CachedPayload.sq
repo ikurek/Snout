@@ -1,0 +1,14 @@
+CREATE TABLE CachedPayload (
+    key TEXT NOT NULL PRIMARY KEY,
+    payload TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+selectByKey:
+SELECT payload, updated_at FROM CachedPayload WHERE key = ?;
+
+upsert:
+INSERT OR REPLACE INTO CachedPayload(key, payload, updated_at) VALUES (?, ?, ?);
+
+deleteAll:
+DELETE FROM CachedPayload;

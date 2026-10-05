@@ -15,6 +15,7 @@ kotlin {
         api(projects.shared.domain.model.user)
         implementation(projects.shared.data.appstate)
         implementation(projects.shared.data.auth)
+        implementation(projects.shared.data.common)
         implementation(projects.shared.data.organization)
         implementation(projects.shared.data.user)
         implementation(projects.shared.domain.data.appstate)

@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
@@ -41,6 +42,7 @@ class SettingsViewModelTest :
         val authRepository = mock<AuthRepository>(autoUnit)
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
+        val cacheRepository = mock<CacheRepository>(autoUnit)
 
         fun subject(): SettingsViewModel {
             everySuspend { authRepository.getInstanceUrl() } returns "https://eu.posthog.com"
@@ -51,7 +53,10 @@ class SettingsViewModelTest :
                 getCurrentUser = GetCurrentUser(userRepository),
                 getInstanceUrl = GetInstanceUrl(authRepository),
                 saveThemeMode = SaveThemeMode(appStateRepository),
-                logout = Logout(authRepository, ClearLocalData(appStateRepository, organizationRepository)),
+                logout = Logout(
+                    authRepository,
+                    ClearLocalData(appStateRepository, organizationRepository, cacheRepository),
+                ),
                 observeOrganizations = ObserveOrganizations(organizationRepository),
                 observeSelectedProject = ObserveSelectedProject(appStateRepository),
                 observeThemeMode = ObserveThemeMode(appStateRepository),
