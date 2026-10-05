@@ -27,4 +27,14 @@ class AppStateUsecaseModule {
 
     @Single
     fun saveThemeMode(repository: AppStateRepository) = SaveThemeMode(repository)
+
+    @Single
+    fun getSelectedProjectId(repository: AppStateRepository) = GetSelectedProjectId(repository)
+
+    @Single
+    fun observeSelectedProjectId(repository: AppStateRepository) = ObserveSelectedProjectId(repository)
+
+    @Single
+    fun getPostHogUrl(authRepository: AuthRepository, appStateRepository: AppStateRepository) =
+        GetPostHogUrl(authRepository, appStateRepository)
 }
