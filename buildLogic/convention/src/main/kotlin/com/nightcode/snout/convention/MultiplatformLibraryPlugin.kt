@@ -21,7 +21,7 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
 
             configure<KotlinMultiplatformExtension> {
                 compilerOptions {
-                    freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+                    freeCompilerArgs.addAll("-opt-in=kotlin.uuid.ExperimentalUuidApi", "-Xexpect-actual-classes")
                 }
 
                 iosArm64()
