@@ -6,16 +6,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/** Screen state for a cache-first list: cached items render immediately while a refresh runs. */
-internal sealed interface ListUiState<out T> {
-    data object Loading : ListUiState<Nothing>
+/** Screen state for cache-first data: cached content renders immediately while a refresh runs. */
+internal sealed interface CachedUiState<out T> {
+    data object Loading : CachedUiState<Nothing>
 
-    data class Error(val error: DataError) : ListUiState<Nothing>
+    data class Error(val error: DataError) : CachedUiState<Nothing>
 
-    data class Empty(val isRefreshing: Boolean) : ListUiState<Nothing>
+    data class Empty(val isRefreshing: Boolean) : CachedUiState<Nothing>
 
-    data class Content<T>(val items: List<T>, val isRefreshing: Boolean, val refreshError: DataError? = null) :
-        ListUiState<T>
+    data class Content<T>(val data: T, val isRefreshing: Boolean, val refreshError: DataError? = null) :
+        CachedUiState<T>
 }
 
 internal sealed interface RefreshStatus {
@@ -26,19 +26,28 @@ internal sealed interface RefreshStatus {
     data class Failed(val error: DataError) : RefreshStatus
 }
 
-internal fun <T> listUiState(cached: List<T>?, refresh: RefreshStatus): ListUiState<T> = when {
-    cached == null && refresh is RefreshStatus.Failed -> ListUiState.Error(refresh.error)
+internal fun <T> cachedUiState(
+    cached: T?,
+    refresh: RefreshStatus,
+    isEmpty: (T) -> Boolean = {
+        false
+    },
+): CachedUiState<T> = when {
+    cached == null && refresh is RefreshStatus.Failed -> CachedUiState.Error(refresh.error)
 
-    cached == null -> ListUiState.Loading
+    cached == null -> CachedUiState.Loading
 
-    cached.isEmpty() -> ListUiState.Empty(isRefreshing = refresh is RefreshStatus.Refreshing)
+    isEmpty(cached) -> CachedUiState.Empty(isRefreshing = refresh is RefreshStatus.Refreshing)
 
-    else -> ListUiState.Content(
-        items = cached,
+    else -> CachedUiState.Content(
+        data = cached,
         isRefreshing = refresh is RefreshStatus.Refreshing,
         refreshError = (refresh as? RefreshStatus.Failed)?.error,
     )
 }
+
+internal fun <T> listUiState(cached: List<T>?, refresh: RefreshStatus): CachedUiState<List<T>> =
+    cachedUiState(cached, refresh) { it.isEmpty() }
 
 /** Tracks a single in-flight refresh; starts as refreshing because screens refresh on open. */
 internal class RefreshController {

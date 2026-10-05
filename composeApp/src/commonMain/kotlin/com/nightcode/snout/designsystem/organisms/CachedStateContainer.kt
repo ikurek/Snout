@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.nightcode.snout.common.state.ListUiState
+import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.molecules.InlineError
 import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.stringResource
@@ -23,31 +23,25 @@ import snout.composeapp.generated.resources.refresh_failed_generic
 import snout.composeapp.generated.resources.refresh_failed_offline
 import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
-/** Renders loading, error, empty and content states of a cache-first list with pull to refresh. */
+/** Renders loading, error, empty and content states of cache-first data with pull to refresh. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun <T> ListStateContainer(
-    state: ListUiState<T>,
+internal fun <T> CachedStateContainer(
+    state: CachedUiState<T>,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     emptyContent: @Composable () -> Unit = {
-        NothingFoundPlaceholder(
-            onRetry = onRefresh,
-            modifier = Modifier.fillMaxSize(),
-        )
+        NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
     },
-    content: @Composable (items: List<T>) -> Unit,
+    content: @Composable (data: T) -> Unit,
 ) {
     when (state) {
-        ListUiState.Loading -> LoadingIndicator(modifier)
+        CachedUiState.Loading -> LoadingIndicator(modifier)
 
-        is ListUiState.Error -> ErrorPlaceholder(
-            error = state.error,
-            onRetry = onRefresh,
-            modifier = modifier.fillMaxSize(),
-        )
+        is CachedUiState.Error ->
+            ErrorPlaceholder(error = state.error, onRetry = onRefresh, modifier = modifier.fillMaxSize())
 
-        is ListUiState.Empty -> PullToRefreshBox(
+        is CachedUiState.Empty -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = modifier,
@@ -55,7 +49,7 @@ internal fun <T> ListStateContainer(
             Box(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) { emptyContent() }
         }
 
-        is ListUiState.Content -> PullToRefreshBox(
+        is CachedUiState.Content -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = modifier,
@@ -67,7 +61,7 @@ internal fun <T> ListStateContainer(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }
-                content(state.items)
+                content(state.data)
             }
         }
     }
