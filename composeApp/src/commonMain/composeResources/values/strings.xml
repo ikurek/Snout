@@ -124,6 +124,7 @@
     <string name="analytics_metric_previous">vs</string>
     <string name="analytics_visitors_trend">Visitors over time</string>
     <string name="analytics_breakdown_pages">Top pages</string>
+    <string name="analytics_breakdown_screens">Top screens</string>
     <string name="analytics_breakdown_sources">Top sources</string>
     <string name="analytics_breakdown_country">Top countries</string>
     <string name="analytics_breakdown_device">Devices</string>

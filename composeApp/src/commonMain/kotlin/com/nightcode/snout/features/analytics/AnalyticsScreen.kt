@@ -45,6 +45,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.analytics_breakdown_country
 import snout.composeapp.generated.resources.analytics_breakdown_device
 import snout.composeapp.generated.resources.analytics_breakdown_pages
+import snout.composeapp.generated.resources.analytics_breakdown_screens
 import snout.composeapp.generated.resources.analytics_breakdown_sources
 import snout.composeapp.generated.resources.analytics_breakdown_views
 import snout.composeapp.generated.resources.analytics_metric_bounce_rate
@@ -92,7 +93,8 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot) {
     ) {
         OverviewGrid(snapshot.overview)
         snapshot.visitorsTrend?.let { VisitorsTrendCard(it) }
-        snapshot.breakdowns.forEach { BreakdownCard(it) }
+        // Web projects have no screens and mobile projects have no pages; only show what has data.
+        snapshot.breakdowns.filter { it.rows.isNotEmpty() }.forEach { BreakdownCard(it) }
         VerticalSpacer(8.dp)
     }
 }
@@ -141,19 +143,15 @@ private fun VisitorsTrendCard(trend: TimeSeries) {
 private fun BreakdownCard(table: BreakdownTable) {
     val viewsLabel = stringResource(Res.string.analytics_breakdown_views)
     SectionCard(title = table.breakdown.label()) {
-        if (table.rows.isEmpty()) {
-            EmptyNote()
-        } else {
-            RankedBarList(
-                rows = table.rows.map { row ->
-                    RankedBarRow(
-                        label = row.label,
-                        value = row.visitors,
-                        secondary = row.views?.let { "${it.formatCompact()} $viewsLabel" },
-                    )
-                },
-            )
-        }
+        RankedBarList(
+            rows = table.rows.map { row ->
+                RankedBarRow(
+                    label = row.label,
+                    value = row.visitors,
+                    secondary = row.views?.let { "${it.formatCompact()} $viewsLabel" },
+                )
+            },
+        )
     }
 }
 
@@ -186,6 +184,7 @@ private fun OverviewMetric.label(): String = when (key) {
 private fun WebBreakdown.label(): String = stringResource(
     when (this) {
         WebBreakdown.Page -> Res.string.analytics_breakdown_pages
+        WebBreakdown.Screen -> Res.string.analytics_breakdown_screens
         WebBreakdown.ReferringDomain -> Res.string.analytics_breakdown_sources
         WebBreakdown.Country -> Res.string.analytics_breakdown_country
         WebBreakdown.DeviceType -> Res.string.analytics_breakdown_device

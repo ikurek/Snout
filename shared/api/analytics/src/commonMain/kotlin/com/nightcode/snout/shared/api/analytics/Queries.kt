@@ -28,17 +28,20 @@ internal fun pageviewTrendQuery(dateFrom: String, interval: String): JsonObject 
     put("kind", "TrendsQuery")
     putDateRange(dateFrom)
     put("interval", interval)
+    // Web projects fire $pageview, mobile projects fire $screen; web analytics counts both as visits.
     put(
         "series",
         buildJsonArray {
-            add(
-                buildJsonObject {
-                    put("kind", "EventsNode")
-                    put("event", "\$pageview")
-                    put("name", "\$pageview")
-                    put("math", "dau")
-                },
-            )
+            listOf("\$pageview", "\$screen").forEach { event ->
+                add(
+                    buildJsonObject {
+                        put("kind", "EventsNode")
+                        put("event", event)
+                        put("name", event)
+                        put("math", "dau")
+                    },
+                )
+            }
         },
     )
     putJsonObject("trendsFilter") { put("display", "ActionsLineGraph") }

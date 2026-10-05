@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 enum class WebBreakdown(val apiValue: String) {
     Page("Page"),
+    Screen("ScreenName"),
     ReferringDomain("InitialReferringDomain"),
     Country("Country"),
     DeviceType("DeviceType"),

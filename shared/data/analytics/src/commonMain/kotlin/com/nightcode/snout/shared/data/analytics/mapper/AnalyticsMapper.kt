@@ -49,11 +49,15 @@ internal fun WebOverviewItemDto.toOverviewMetric(): OverviewMetric = OverviewMet
     isIncreaseBad = isIncreaseBad ?: false,
 )
 
+/** Sums the per-event visitor series; a project rarely has both page views and screens on the same day. */
 internal fun QueryResponseDto.toTimeSeries(json: Json): TimeSeries? {
-    val first = json.decodeFromJsonElement<List<TrendResultDto>>(results).firstOrNull() ?: return null
-    val values = first.data.orEmpty()
-    val labels = first.days ?: first.labels ?: emptyList()
-    return TimeSeries(values.mapIndexed { index, value -> TimeSeriesPoint(labels.getOrNull(index).orEmpty(), value) })
+    val series = json.decodeFromJsonElement<List<TrendResultDto>>(results).filter { it.data != null }
+    val longest = series.maxByOrNull { it.data.orEmpty().size } ?: return null
+    val labels = longest.days ?: longest.labels ?: emptyList()
+    val points = longest.data.orEmpty().indices.map { index ->
+        TimeSeriesPoint(labels.getOrNull(index).orEmpty(), series.sumOf { it.data?.getOrNull(index) ?: 0.0 })
+    }
+    return TimeSeries(points)
 }
 
 internal fun QueryResponseDto.toBreakdownTable(breakdown: WebBreakdown): BreakdownTable {
@@ -63,8 +67,10 @@ internal fun QueryResponseDto.toBreakdownTable(breakdown: WebBreakdown): Breakdo
     val viewsIndex = columns.indexOf(ViewsColumn)
     val rows = (results as? JsonArray).orEmpty().mapNotNull { row ->
         val cells = row as? JsonArray ?: return@mapNotNull null
+        // A null breakdown is the "everything else" bucket; it says nothing in a top list.
+        val label = cells.getOrNull(labelIndex).asLabel() ?: return@mapNotNull null
         BreakdownRow(
-            label = cells.getOrNull(labelIndex).asLabel(),
+            label = label,
             visitors = cells.getOrNull(visitorsIndex).firstNumber() ?: 0.0,
             views = cells.getOrNull(viewsIndex).firstNumber(),
         )
@@ -80,9 +86,9 @@ private fun JsonElement?.firstNumber(): Double? = when (this) {
     else -> null
 }
 
-private fun JsonElement?.asLabel(): String = when (this) {
-    null, JsonNull -> "(none)"
-    is JsonPrimitive -> contentOrNull ?: "(none)"
+private fun JsonElement?.asLabel(): String? = when (this) {
+    null, JsonNull -> null
+    is JsonPrimitive -> contentOrNull
     is JsonArray -> jsonArray.joinToString(" ") { (it as? JsonPrimitive)?.contentOrNull.orEmpty() }
     else -> toString()
 }
