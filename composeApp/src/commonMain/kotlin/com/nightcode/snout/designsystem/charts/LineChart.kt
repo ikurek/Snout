@@ -27,11 +27,10 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-private const val GridLines = 2
 private const val FillAlpha = 0.2f
 
 /**
- * Multi-series line chart with a 0..max y axis, horizontal grid lines and first/middle/last x labels.
+ * Multi-series line chart with horizontal grid lines and first/middle/last x labels.
  * [xLabels] are already formatted for display.
  */
 @Composable
@@ -50,9 +49,9 @@ internal fun LineChart(
 
     Column(modifier = modifier) {
         Canvas(modifier = Modifier.fillMaxWidth().height(height)) {
-            val maxValue = niceCeiling(series.maxOfOrNull { s -> s.values.maxOrNull() ?: 0.0 } ?: 0.0)
-            val plot = drawAxes(textMeasurer, labelStyle, gridColor, maxValue, xLabels, valueFormatter)
-            series.forEach { drawLineSeries(it, plot, maxValue, fill) }
+            val range = axisRange(series.flatMap { it.values })
+            val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
+            series.forEach { drawLineSeries(it, plot, range, fill) }
         }
         if (showLegend) {
             ChartLegend(entries = series.map { it.name to it.color }, modifier = Modifier.fillMaxWidth())
@@ -65,11 +64,11 @@ internal fun DrawScope.drawAxes(
     textMeasurer: TextMeasurer,
     labelStyle: TextStyle,
     gridColor: Color,
-    maxValue: Double,
+    range: AxisRange,
     xLabels: List<String>,
     valueFormatter: (Double) -> String,
 ): Rect {
-    val yLabels = (0..GridLines).map { maxValue * it / GridLines }
+    val yLabels = range.gridValues
     val yLabelLayouts = yLabels.map { textMeasurer.measure(valueFormatter(it), labelStyle) }
     val yLabelWidth = yLabelLayouts.maxOf { it.size.width } + 8.dp.toPx()
     val xLabelHeight = textMeasurer.measure("0", labelStyle).size.height + 6.dp.toPx()
@@ -80,7 +79,7 @@ internal fun DrawScope.drawAxes(
         bottom = size.height - xLabelHeight,
     )
     yLabels.forEachIndexed { index, value ->
-        val y = plot.bottom - (value / maxValue).toFloat() * plot.height
+        val y = plot.yFor(value, range)
         drawLine(gridColor, Offset(plot.left, y), Offset(plot.right, y), strokeWidth = 1.dp.toPx())
         val layout = yLabelLayouts[index]
         drawText(layout, topLeft = Offset(0f, (y - layout.size.height / 2).coerceAtLeast(0f)))
@@ -96,7 +95,7 @@ internal fun DrawScope.drawAxes(
             else -> x - layout.size.width / 2
         }
         drawText(
-            layout,
+            textLayoutResult = layout,
             topLeft = Offset(left.coerceIn(plot.left, plot.right - layout.size.width), plot.bottom + 4.dp.toPx()),
         )
     }
@@ -106,19 +105,22 @@ internal fun DrawScope.drawAxes(
 internal fun Rect.xFor(index: Int, count: Int): Float =
     if (count <= 1) left + width / 2 else left + width * index / (count - 1)
 
-private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, maxValue: Double, fill: Boolean) {
+internal fun Rect.yFor(value: Double, range: AxisRange): Float = bottom - range.fraction(value) * height
+
+private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: AxisRange, fill: Boolean) {
     if (series.values.isEmpty()) return
     val path = Path()
     series.values.forEachIndexed { index, value ->
         val x = plot.xFor(index, series.values.size)
-        val y = plot.bottom - (value / maxValue).toFloat() * plot.height
+        val y = plot.yFor(value, range)
         if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
     }
     if (fill) {
+        val zero = plot.yFor(0.0, range)
         val area = Path().apply {
             addPath(path)
-            lineTo(plot.xFor(series.values.lastIndex, series.values.size), plot.bottom)
-            lineTo(plot.xFor(0, series.values.size), plot.bottom)
+            lineTo(plot.xFor(series.values.lastIndex, series.values.size), zero)
+            lineTo(plot.xFor(0, series.values.size), zero)
             close()
         }
         drawPath(
@@ -126,7 +128,7 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, maxValue: 
             brush = Brush.verticalGradient(
                 colors = listOf(series.color.copy(alpha = FillAlpha), Color.Transparent),
                 startY = plot.top,
-                endY = plot.bottom,
+                endY = zero,
             ),
         )
     }
@@ -135,7 +137,7 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, maxValue: 
         drawCircle(
             series.color,
             radius = 4.dp.toPx(),
-            center = Offset(plot.xFor(0, 1), plot.bottom - (series.values[0] / maxValue).toFloat() * plot.height),
+            center = Offset(plot.xFor(0, 1), plot.yFor(series.values[0], range)),
         )
     }
 }
