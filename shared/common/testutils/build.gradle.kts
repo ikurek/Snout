@@ -16,6 +16,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotest.framework.engine)
+            implementation(libs.coroutines.core)
+            implementation(libs.coroutines.test)
         }
     }
 }

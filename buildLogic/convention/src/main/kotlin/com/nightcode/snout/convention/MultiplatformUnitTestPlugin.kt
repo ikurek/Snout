@@ -22,6 +22,7 @@ class MultiplatformUnitTestPlugin : Plugin<Project> {
                     implementation(libs.library("kotest.assertions.arrow"))
                     implementation(libs.library("kotest.assertions.core"))
                     implementation(libs.library("kotest.framework.engine"))
+                    implementation(libs.library("coroutines.test"))
                 }
                 sourceSets.named("androidHostTest").dependencies {
                     implementation(libs.library("kotest.runner.junit5"))
