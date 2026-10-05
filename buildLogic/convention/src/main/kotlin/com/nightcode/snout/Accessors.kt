@@ -15,5 +15,4 @@ val Project.libs
 val Optional<Provider<PluginDependency>>.id
     get(): String = get().get().pluginId
 
-fun VersionCatalog.library(name: String): Provider<MinimalExternalModuleDependency> =
-    findLibrary(name).get()
+fun VersionCatalog.library(name: String): Provider<MinimalExternalModuleDependency> = findLibrary(name).get()

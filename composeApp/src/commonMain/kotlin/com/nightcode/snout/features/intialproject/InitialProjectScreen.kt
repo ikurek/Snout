@@ -105,7 +105,7 @@ private fun ErrorContent(error: GetOrganizationsError, onRetry: () -> Unit) {
 
         GetOrganizationsError.ConnectionError,
         GetOrganizationsError.UnexpectedError,
-            ->
+        ->
             GenericErrorPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
     }
 }

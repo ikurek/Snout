@@ -4,12 +4,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
-data class User(
-    val dateJoined: Instant,
-    val uuid: Uuid,
-    val firstName: String,
-    val lastName: String
-)
+data class User(val dateJoined: Instant, val uuid: Uuid, val firstName: String, val lastName: String)
 
 @TestData
 val TestUser = User(
