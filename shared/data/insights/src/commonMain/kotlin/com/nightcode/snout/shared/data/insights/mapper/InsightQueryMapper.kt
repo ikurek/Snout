@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.data.insights.mapper
 
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -60,5 +61,17 @@ private fun JsonObject?.displayOrDefault(default: InsightDisplay): InsightDispla
         "ActionsTable", "WorldMap" -> InsightDisplay.Table
         else -> InsightDisplay.Unsupported
     }
+
+/** "custom name · event" of the query series, used when an insight was never named. */
+internal fun JsonElement?.seriesTitle(): String? {
+    val series = sourceNode()?.get("series") as? JsonArray ?: return null
+    return series.mapNotNull { node ->
+        (node as? JsonObject)?.let {
+            it.stringValue(
+                "custom_name",
+            ) ?: it.stringValue("name") ?: it.stringValue("event")
+        }
+    }.distinct().joinToString(" · ").ifBlank { null }
+}
 
 internal fun JsonObject.stringValue(key: String): String? = (get(key) as? JsonPrimitive)?.contentOrNull

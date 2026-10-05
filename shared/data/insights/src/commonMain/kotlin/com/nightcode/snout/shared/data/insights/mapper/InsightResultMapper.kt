@@ -38,11 +38,18 @@ private fun JsonElement.toSeries(): InsightResult {
         TrendSeries(
             label = entry.seriesLabel(),
             values = entry["data"].numbers(),
-            periods = entry["days"].strings().ifEmpty { entry["labels"].strings() },
+            periods = entry.periods(),
             aggregatedValue = entry["aggregated_value"].number() ?: entry.countWithoutData(),
         )
     }
     return InsightResult.Series(series)
+}
+
+/** Trends send ISO dates in `days`; stickiness sends day counts there and the readable text in `labels`. */
+private fun JsonObject.periods(): List<String> {
+    val days = get("days") as? JsonArray
+    val allStrings = days != null && days.all { (it as? JsonPrimitive)?.isString == true }
+    return if (allStrings) days.strings().ifEmpty { get("labels").strings() } else get("labels").strings()
 }
 
 private fun JsonObject.countWithoutData(): Double? = get("count").number().takeIf { get("data") == null }

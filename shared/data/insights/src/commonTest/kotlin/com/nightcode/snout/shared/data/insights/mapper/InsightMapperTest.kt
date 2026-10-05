@@ -41,6 +41,15 @@ class InsightMapperTest :
             series[0].periods shouldBe listOf("2026-10-01", "2026-10-02")
         }
 
+        should("use readable labels for stickiness periods") {
+            val dto = json.decodeFromString<InsightDto>(
+                """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"StickinessQuery"}},
+                "result":[{"label":"${'$'}screen","data":[12,1],"days":[1,2],"labels":["1 day","2 days"]}]}""",
+            )
+            dto.toDetail().result.shouldBeInstanceOf<InsightResult.Series>().series.single().periods shouldBe
+                listOf("1 day", "2 days")
+        }
+
         should("map funnel steps with conversion relative to first step") {
             val dto = json.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"FunnelsQuery"}},

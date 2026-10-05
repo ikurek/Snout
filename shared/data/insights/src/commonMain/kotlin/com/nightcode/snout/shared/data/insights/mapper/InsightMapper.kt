@@ -16,7 +16,10 @@ internal fun InsightDto.toSummary(): InsightSummary {
     return InsightSummary(
         id = id,
         shortId = shortId,
-        name = name?.takeIf { it.isNotBlank() } ?: derivedName?.takeIf { it.isNotBlank() } ?: "Untitled insight",
+        name = name?.takeIf { it.isNotBlank() }
+            ?: derivedName?.takeIf { it.isNotBlank() }
+            ?: query.seriesTitle()
+            ?: "Untitled insight",
         description = description?.takeIf { it.isNotBlank() },
         favorited = favorited,
         lastModifiedAt = lastModifiedAt,
