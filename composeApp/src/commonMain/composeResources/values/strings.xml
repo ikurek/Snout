@@ -47,6 +47,14 @@
     <string name="placeholder_rate_limited_retry">Try again</string>
     <string name="bottom_nav_dashboard">Dashboard</string>
     <string name="bottom_nav_analytics">Analytics</string>
+    <string name="refresh_failed_generic">Couldn\'t refresh. Showing cached data.</string>
+    <string name="refresh_failed_offline">You\'re offline. Showing cached data.</string>
+    <string name="refresh_failed_rate_limited">Rate limited by PostHog. Showing cached data.</string>
+    <string name="refresh_failed_forbidden">Your API key can\'t read this data. Showing cached data.</string>
+    <string name="relative_time_just_now">just now</string>
+    <string name="relative_time_minutes_ago">%1$d min ago</string>
+    <string name="relative_time_hours_ago">%1$d h ago</string>
+    <string name="relative_time_days_ago">%1$d d ago</string>
     <string name="settings_screen_title">Settings</string>
     <string name="settings_account_section">Account</string>
     <string name="settings_account_member_since">Member since %1$s</string>
