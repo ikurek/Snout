@@ -1,5 +1,6 @@
 package com.nightcode.snout.shared.di
 
+import com.nightcode.snout.shared.domain.usecase.analytics.AnalyticsUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.appstate.AppStateUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.auth.AuthUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.organization.OrganizationUsecaseModule
@@ -8,6 +9,7 @@ import org.koin.core.annotation.Module
 
 @Module(
     includes = [
+        AnalyticsUsecaseModule::class,
         AppStateUsecaseModule::class,
         AuthUsecaseModule::class,
         OrganizationUsecaseModule::class,
