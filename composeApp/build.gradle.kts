@@ -17,6 +17,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "com.nightcode.snout.composeapp")
         }
     }
 
@@ -55,7 +56,7 @@ kotlin {
 
 composeCompiler {
     stabilityConfigurationFiles.add(
-        rootProject.layout.projectDirectory.file("compose_stability_config.conf")
+        rootProject.layout.projectDirectory.file("compose_stability_config.conf"),
     )
 }
 
