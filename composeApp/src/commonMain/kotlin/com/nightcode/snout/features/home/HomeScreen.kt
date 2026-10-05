@@ -19,7 +19,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nightcode.snout.common.compose.rememberOpenInPostHog
 import com.nightcode.snout.designsystem.atoms.AvatarBox
+import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.features.analytics.AnalyticsRoute
 import com.nightcode.snout.features.dashboards.DashboardsRoute
 import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
@@ -80,6 +82,7 @@ internal fun HomeScreen(
                     }
                 },
                 actions = {
+                    OpenInPostHogIconButton(onClick = rememberOpenInPostHog(currentDestination.resource))
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_settings_24dp),
