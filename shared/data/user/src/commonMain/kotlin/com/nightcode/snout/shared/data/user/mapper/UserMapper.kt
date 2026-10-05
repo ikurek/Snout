@@ -9,4 +9,5 @@ internal fun UserDto.toUser(): User = User(
     uuid = Uuid.parse(uuid),
     firstName = firstName,
     lastName = lastName,
+    email = email,
 )

@@ -4,7 +4,15 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
-data class User(val dateJoined: Instant, val uuid: Uuid, val firstName: String, val lastName: String)
+data class User(
+    val dateJoined: Instant,
+    val uuid: Uuid,
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+) {
+    val fullName: String get() = listOf(firstName, lastName).filter { it.isNotBlank() }.joinToString(" ")
+}
 
 @TestData
 val TestUser = User(
@@ -12,4 +20,5 @@ val TestUser = User(
     uuid = Uuid.parse("00000000-0000-0000-0000-000000000002"),
     firstName = "John",
     lastName = "Doe",
+    email = "john.doe@example.com",
 )
