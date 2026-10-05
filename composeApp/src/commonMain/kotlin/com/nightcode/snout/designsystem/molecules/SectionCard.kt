@@ -15,42 +15,57 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** Card with a title row used for charts and tables. */
+/** Card with a title row used for charts and tables; clickable when [onClick] is given. */
 @Composable
 internal fun SectionCard(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     trailing: (@Composable () -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = SnoutTheme.shapes.medium,
-        color = SnoutTheme.colors.surfaceContainer,
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Column(modifier = Modifier.weight(1f)) {
+    val shape = SnoutTheme.shapes.medium
+    val color = SnoutTheme.colors.surfaceContainer
+    if (onClick != null) {
+        Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, color = color) {
+            SectionCardContent(title, subtitle, trailing, content)
+        }
+    } else {
+        Surface(modifier = modifier.fillMaxWidth(), shape = shape, color = color) {
+            SectionCardContent(title, subtitle, trailing, content)
+        }
+    }
+}
+
+@Composable
+private fun SectionCardContent(
+    title: String,
+    subtitle: String?,
+    trailing: (@Composable () -> Unit)?,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = SnoutTheme.typography.titleSmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                subtitle?.let {
                     Text(
-                        text = title,
-                        style = SnoutTheme.typography.titleSmall,
+                        text = it,
+                        style = SnoutTheme.typography.bodySmall,
+                        color = SnoutTheme.colors.onSurfaceVariant,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    subtitle?.let {
-                        Text(
-                            text = it,
-                            style = SnoutTheme.typography.bodySmall,
-                            color = SnoutTheme.colors.onSurfaceVariant,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
                 }
-                trailing?.invoke()
             }
-            content()
+            trailing?.invoke()
         }
+        content()
     }
 }

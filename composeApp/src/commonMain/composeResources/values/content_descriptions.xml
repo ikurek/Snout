@@ -3,4 +3,5 @@
     <string name="navigate_back_content_description">Navigate back</string>
     <string name="switch_project_icon_content_description">Switch project</string>
     <string name="open_in_posthog_content_description">Open in PostHog</string>
+    <string name="clear_search_content_description">Clear search</string>
 </resources>
