@@ -21,6 +21,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.refresh_failed_forbidden
 import snout.composeapp.generated.resources.refresh_failed_generic
 import snout.composeapp.generated.resources.refresh_failed_offline
+import snout.composeapp.generated.resources.refresh_failed_payment_required
 import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
 /** Renders loading, error, empty and content states of cache-first data with pull to refresh. */
@@ -76,6 +77,7 @@ internal fun LoadingIndicator(modifier: Modifier = Modifier) {
 
 private fun DataError.refreshMessage() = when (this) {
     DataError.Forbidden -> Res.string.refresh_failed_forbidden
+    DataError.PaymentRequired -> Res.string.refresh_failed_payment_required
     DataError.RateLimited -> Res.string.refresh_failed_rate_limited
     DataError.ConnectionError -> Res.string.refresh_failed_offline
     DataError.NotFound, DataError.UnexpectedError -> Res.string.refresh_failed_generic

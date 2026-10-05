@@ -45,6 +45,9 @@
     <string name="placeholder_rate_limited_title">Too many requests</string>
     <string name="placeholder_rate_limited_subtitle">PostHog is rate limiting this API key. Wait a minute before trying again.</string>
     <string name="placeholder_rate_limited_retry">Try again</string>
+    <string name="placeholder_payment_required_title">Paid plan required</string>
+    <string name="placeholder_payment_required_subtitle">PostHog only offers this feature on a paid plan for this project.</string>
+    <string name="placeholder_payment_required_retry">Try again</string>
     <string name="bottom_nav_analytics">Analytics</string>
     <string name="bottom_nav_dashboards">Dashboards</string>
     <string name="bottom_nav_insights">Insights</string>
@@ -59,6 +62,7 @@
     <string name="refresh_failed_generic">Couldn\'t refresh. Showing cached data.</string>
     <string name="refresh_failed_offline">You\'re offline. Showing cached data.</string>
     <string name="refresh_failed_rate_limited">Rate limited by PostHog. Showing cached data.</string>
+    <string name="refresh_failed_payment_required">This feature needs a paid PostHog plan. Showing cached data.</string>
     <string name="refresh_failed_forbidden">Your API key can\'t read this data. Showing cached data.</string>
     <string name="relative_time_just_now">just now</string>
     <string name="relative_time_minutes_ago">%1$d min ago</string>

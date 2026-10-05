@@ -145,6 +145,11 @@ private fun AnnotationDatePickerDialog(initialDate: LocalDate, onConfirm: (Local
 private fun DataError.createMessage() = when (this) {
     DataError.Forbidden -> Res.string.annotation_create_error_forbidden
 
-    DataError.NotFound, DataError.RateLimited, DataError.ConnectionError, DataError.UnexpectedError ->
+    DataError.NotFound,
+    DataError.PaymentRequired,
+    DataError.RateLimited,
+    DataError.ConnectionError,
+    DataError.UnexpectedError,
+    ->
         Res.string.annotation_create_error_generic
 }

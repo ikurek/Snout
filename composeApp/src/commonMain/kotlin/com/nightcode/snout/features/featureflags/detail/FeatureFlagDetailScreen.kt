@@ -314,7 +314,7 @@ private fun DataError.toggleMessage() = when (this) {
 
     DataError.RateLimited -> Res.string.feature_flag_toggle_error_rate_limited
 
-    DataError.NotFound, DataError.ConnectionError, DataError.UnexpectedError ->
+    DataError.NotFound, DataError.PaymentRequired, DataError.ConnectionError, DataError.UnexpectedError ->
         Res.string.feature_flag_toggle_error_generic
 }
 

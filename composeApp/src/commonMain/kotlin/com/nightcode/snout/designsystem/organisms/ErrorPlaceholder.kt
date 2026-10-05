@@ -9,6 +9,8 @@ internal fun ErrorPlaceholder(error: DataError, onRetry: () -> Unit, modifier: M
     when (error) {
         DataError.Forbidden -> PermissionDeniedPlaceholder(onRetry = onRetry, modifier = modifier)
 
+        DataError.PaymentRequired -> PaymentRequiredPlaceholder(onRetry = onRetry, modifier = modifier)
+
         DataError.RateLimited -> RateLimitedPlaceholder(onRetry = onRetry, modifier = modifier)
 
         DataError.NotFound -> NothingFoundPlaceholder(onRetry = onRetry, modifier = modifier)

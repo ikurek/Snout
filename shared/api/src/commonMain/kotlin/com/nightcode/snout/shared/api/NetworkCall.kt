@@ -16,6 +16,7 @@ suspend fun <T> networkCall(call: suspend () -> T): Either<NetworkError, T> = ei
             when (e.response.status) {
                 HttpStatusCode.Unauthorized -> NetworkError.Api.Unauthorized
                 HttpStatusCode.Forbidden -> NetworkError.Api.Forbidden
+                HttpStatusCode.PaymentRequired -> NetworkError.Api.PaymentRequired
                 HttpStatusCode.NotFound -> NetworkError.Api.NotFound
                 HttpStatusCode.TooManyRequests -> NetworkError.Api.RateLimited
                 else -> NetworkError.Api.Other(e.response.status.value)
