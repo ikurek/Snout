@@ -15,7 +15,12 @@ import org.koin.compose.viewmodel.koinViewModel
 internal data object HomeNavKey : NavKey
 
 @Composable
-internal fun HomeRoute(onNavigateToSettings: () -> Unit, onMoreItemClick: (MoreItem) -> Unit) {
+internal fun HomeRoute(
+    onNavigateToSettings: () -> Unit,
+    onOpenDashboard: (dashboardId: Long) -> Unit,
+    onOpenInsight: (insightId: Long) -> Unit,
+    onMoreItemClick: (MoreItem) -> Unit,
+) {
     val viewModel = koinViewModel<ProjectSwitcherViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showProjectSwitcher by rememberSaveable { mutableStateOf(false) }
@@ -24,6 +29,8 @@ internal fun HomeRoute(onNavigateToSettings: () -> Unit, onMoreItemClick: (MoreI
         currentProjectName = uiState.currentProjectName,
         onOpenProjectSwitcher = { showProjectSwitcher = true },
         onNavigateToSettings = onNavigateToSettings,
+        onOpenDashboard = onOpenDashboard,
+        onOpenInsight = onOpenInsight,
         onMoreItemClick = onMoreItemClick,
     )
 

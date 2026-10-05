@@ -86,7 +86,16 @@
     <string name="settings_logout_dialog_confirm">Log out</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="inline_error_retry">Retry</string>
-    <string name="dashboard_screen_title">Dashboard</string>
+    <string name="dashboards_last_viewed">Viewed %1$s</string>
+    <string name="dashboard_title_placeholder">Dashboard</string>
+    <string name="dashboard_tile_error">Couldn\'t compute this insight.</string>
+    <string name="insights_search_placeholder">Search insights</string>
+    <string name="insights_favorite_failed">Couldn\'t update favorite. Check the key has insight:write scope.</string>
+    <string name="insight_title_placeholder">Insight</string>
+    <string name="insight_detail_kind">Type</string>
+    <string name="insight_detail_last_modified">Last modified</string>
+    <string name="insight_detail_tags">Tags</string>
+    <string name="insight_result_pending">PostHog is still computing this insight. Pull to refresh in a moment.</string>
     <string name="insight_result_empty">No data for this period.</string>
     <string name="insight_result_unsupported">This visualization isn\'t supported in Snout yet. Open it in PostHog to see it.</string>
     <string name="insight_result_median">median</string>

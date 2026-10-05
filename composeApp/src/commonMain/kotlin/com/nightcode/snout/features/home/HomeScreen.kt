@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.features.analytics.AnalyticsRoute
-import com.nightcode.snout.features.dashboard.DashboardRoute
+import com.nightcode.snout.features.dashboards.DashboardsRoute
 import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
 import com.nightcode.snout.features.insights.InsightsRoute
 import com.nightcode.snout.features.more.MoreItem
@@ -57,6 +57,8 @@ internal fun HomeScreen(
     currentProjectName: String,
     onOpenProjectSwitcher: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onOpenDashboard: (dashboardId: Long) -> Unit,
+    onOpenInsight: (insightId: Long) -> Unit,
     onMoreItemClick: (MoreItem) -> Unit,
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Analytics) }
@@ -98,8 +100,8 @@ internal fun HomeScreen(
         ) { destination ->
             when (destination) {
                 HomeDestination.Analytics -> AnalyticsRoute()
-                HomeDestination.Dashboards -> DashboardRoute()
-                HomeDestination.Insights -> InsightsRoute()
+                HomeDestination.Dashboards -> DashboardsRoute(onOpenDashboard = onOpenDashboard)
+                HomeDestination.Insights -> InsightsRoute(onOpenInsight = onOpenInsight)
                 HomeDestination.FeatureFlags -> FeatureFlagsRoute()
                 HomeDestination.More -> MoreScreen(onItemClick = onMoreItemClick)
             }
