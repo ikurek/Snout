@@ -36,5 +36,8 @@ class AuthUsecaseModule {
     fun logout(repository: AuthRepository, clearLocalData: ClearLocalData) = Logout(repository, clearLocalData)
 
     @Single
+    fun getInstanceUrl(repository: AuthRepository) = GetInstanceUrl(repository)
+
+    @Single
     fun shouldReturnToLogin(repository: AuthRepository) = ShouldReturnToLogin(repository)
 }

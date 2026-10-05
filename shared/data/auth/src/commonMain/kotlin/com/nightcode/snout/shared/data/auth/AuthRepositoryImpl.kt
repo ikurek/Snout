@@ -14,6 +14,8 @@ internal class AuthRepositoryImpl(private val dataStore: AuthDataStore) : AuthRe
 
     override suspend fun saveInstanceUrl(url: String) = dataStore.saveInstanceUrl(url)
 
+    override suspend fun getInstanceUrl(): String? = dataStore.getInstanceUrl()
+
     override suspend fun clear() = dataStore.clear()
 
     override fun observePersonalApiKey(): Flow<String?> = dataStore.observePersonalApiKey()
