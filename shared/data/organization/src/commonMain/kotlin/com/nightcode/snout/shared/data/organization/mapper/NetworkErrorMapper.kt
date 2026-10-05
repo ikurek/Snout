@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsErro
 
 internal fun NetworkError.toGetOrganizationsError(): GetOrganizationsError = when (this) {
     NetworkError.Api.Forbidden -> GetOrganizationsError.Forbidden
+    NetworkError.Api.RateLimited -> GetOrganizationsError.RateLimited
     NetworkError.NoConnection -> GetOrganizationsError.ConnectionError
     else -> GetOrganizationsError.UnexpectedError
 }

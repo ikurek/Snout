@@ -32,6 +32,7 @@ import com.nightcode.snout.designsystem.molecules.OrganizationLogo
 import com.nightcode.snout.designsystem.organisms.GenericErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.organisms.PermissionDeniedPlaceholder
+import com.nightcode.snout.designsystem.organisms.RateLimitedPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
@@ -102,6 +103,9 @@ private fun ErrorContent(error: GetOrganizationsError, onRetry: () -> Unit) {
     when (error) {
         GetOrganizationsError.Forbidden ->
             PermissionDeniedPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
+
+        GetOrganizationsError.RateLimited ->
+            RateLimitedPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
 
         GetOrganizationsError.ConnectionError,
         GetOrganizationsError.UnexpectedError,

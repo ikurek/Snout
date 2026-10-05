@@ -78,6 +78,7 @@ internal class LoginViewModel(
                     _personalApiKeyValidationError.value =
                         PersonalApiKeyValidationError.ServerValidationFailed
 
+                GetCurrentUserError.RateLimited,
                 GetCurrentUserError.ConnectionError,
                 GetCurrentUserError.UnexpectedError,
                 ->
