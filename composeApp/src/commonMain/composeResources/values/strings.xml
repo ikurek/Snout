@@ -48,6 +48,8 @@
     <string name="bottom_nav_dashboard">Dashboard</string>
     <string name="bottom_nav_analytics">Analytics</string>
     <string name="settings_screen_title">Settings</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="inline_error_retry">Retry</string>
     <string name="dashboard_screen_title">Dashboard</string>
     <string name="analytics_screen_title">Analytics</string>
     <string name="switch_project_bottom_sheet_title">Switch project</string>
