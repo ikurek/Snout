@@ -7,4 +7,5 @@
     <string name="favorite_content_description">Add to favorites</string>
     <string name="unfavorite_content_description">Remove from favorites</string>
     <string name="clear_search_content_description">Clear search</string>
+    <string name="add_annotation_content_description">Add annotation</string>
 </resources>
