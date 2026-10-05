@@ -19,6 +19,7 @@ internal fun HomeRoute(
     onNavigateToSettings: () -> Unit,
     onOpenDashboard: (dashboardId: Long) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
+    onOpenFeatureFlag: (flagId: Long) -> Unit,
     onMoreItemClick: (MoreItem) -> Unit,
 ) {
     val viewModel = koinViewModel<ProjectSwitcherViewModel>()
@@ -31,6 +32,7 @@ internal fun HomeRoute(
         onNavigateToSettings = onNavigateToSettings,
         onOpenDashboard = onOpenDashboard,
         onOpenInsight = onOpenInsight,
+        onOpenFeatureFlag = onOpenFeatureFlag,
         onMoreItemClick = onMoreItemClick,
     )
 

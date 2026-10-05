@@ -61,6 +61,7 @@ internal fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onOpenDashboard: (dashboardId: Long) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
+    onOpenFeatureFlag: (flagId: Long) -> Unit,
     onMoreItemClick: (MoreItem) -> Unit,
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Analytics) }
@@ -105,7 +106,7 @@ internal fun HomeScreen(
                 HomeDestination.Analytics -> AnalyticsRoute()
                 HomeDestination.Dashboards -> DashboardsRoute(onOpenDashboard = onOpenDashboard)
                 HomeDestination.Insights -> InsightsRoute(onOpenInsight = onOpenInsight)
-                HomeDestination.FeatureFlags -> FeatureFlagsRoute()
+                HomeDestination.FeatureFlags -> FeatureFlagsRoute(onOpenFlag = onOpenFeatureFlag)
                 HomeDestination.More -> MoreScreen(onItemClick = onMoreItemClick)
             }
         }

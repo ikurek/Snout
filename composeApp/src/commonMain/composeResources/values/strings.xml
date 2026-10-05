@@ -125,6 +125,43 @@
     <string name="analytics_breakdown_device">Devices</string>
     <string name="analytics_breakdown_views">views</string>
     <string name="analytics_no_data">No data for this period.</string>
+    <string name="feature_flags_search_placeholder">Search flags by key</string>
+    <string name="feature_flag_title_placeholder">Feature flag</string>
+    <string name="feature_flag_status_active">Active</string>
+    <string name="feature_flag_status_inactive">Inactive</string>
+    <string name="feature_flag_status_stale">Stale</string>
+    <string name="feature_flag_status_unknown">Unknown</string>
+    <string name="feature_flag_rollout_everyone">100% of users</string>
+    <string name="feature_flag_rollout_percent">%1$d%%</string>
+    <string name="feature_flag_rollout_remote_config">Remote configuration</string>
+    <string name="feature_flag_enabled_label">Enabled</string>
+    <string name="feature_flag_read_only_note">Your account can\'t edit this flag in PostHog.</string>
+    <string name="feature_flag_conditions_section">Release conditions</string>
+    <string name="feature_flag_condition_title">Condition %1$d</string>
+    <string name="feature_flag_condition_everyone">Matches all users</string>
+    <string name="feature_flag_condition_variant">Variant override: %1$s</string>
+    <string name="feature_flag_variants_section">Variants</string>
+    <string name="feature_flag_details_section">Details</string>
+    <string name="feature_flag_created_by">Created by</string>
+    <string name="feature_flag_created_on">Created on</string>
+    <string name="feature_flag_tags">Tags</string>
+    <string name="feature_flag_dialog_title_enable">Enable flag?</string>
+    <string name="feature_flag_dialog_title_disable">Disable flag?</string>
+    <string name="feature_flag_dialog_text_enable">%1$s will start evaluating for users matching its release conditions.</string>
+    <string name="feature_flag_dialog_text_disable">%1$s will be off for everyone until you enable it again.</string>
+    <string name="feature_flag_dialog_confirm_enable">Enable</string>
+    <string name="feature_flag_dialog_confirm_disable">Disable</string>
+    <string name="feature_flag_toggle_error_forbidden">Your API key can\'t change flags. Add the feature_flag:write scope in PostHog.</string>
+    <string name="feature_flag_toggle_error_rate_limited">Rate limited by PostHog. Try again in a minute.</string>
+    <string name="feature_flag_toggle_error_generic">Couldn\'t update the flag. Try again.</string>
     <string name="switch_project_bottom_sheet_title">Switch project</string>
     <string name="switch_project_bottom_sheet_nothing_found_title">No projects found</string>
+    <plurals name="feature_flag_rollout_variants">
+        <item quantity="one">A/B test · %1$d variant</item>
+        <item quantity="other">A/B test · %1$d variants</item>
+    </plurals>
+    <plurals name="feature_flag_rollout_conditions">
+        <item quantity="one">%1$d release condition</item>
+        <item quantity="other">%1$d release conditions</item>
+    </plurals>
 </resources>

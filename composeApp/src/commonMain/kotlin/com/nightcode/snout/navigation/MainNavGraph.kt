@@ -17,6 +17,8 @@ import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailNavKey
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailRoute
+import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailNavKey
+import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailRoute
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
@@ -78,8 +80,12 @@ internal fun MainNavGraph(initial: NavKey) {
                     onNavigateToSettings = { backStack.add(SettingsNavKey) },
                     onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
                     onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
+                    onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
                     onMoreItemClick = { },
                 )
+            }
+            entry<FeatureFlagDetailNavKey> { key ->
+                FeatureFlagDetailRoute(navKey = key, onNavigateBack = { backStack.removeLastOrNull() })
             }
             entry<DashboardDetailNavKey> { key ->
                 DashboardDetailRoute(
