@@ -4,6 +4,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
+import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.storage.datastore.AppStateDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,4 +31,10 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
         }
 
     override suspend fun clearSelectedProject() = dataStore.clearSelectedProject()
+
+    override fun observeThemeMode(): Flow<ThemeMode> = dataStore.observeThemeMode().map { stored ->
+        ThemeMode.entries.firstOrNull { it.name == stored } ?: ThemeMode.System
+    }
+
+    override suspend fun saveThemeMode(themeMode: ThemeMode) = dataStore.saveThemeMode(themeMode.name)
 }

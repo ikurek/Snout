@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 
 private val SelectedOrganizationIdKey = stringPreferencesKey("selected_organization_id")
 private val SelectedProjectIdKey = longPreferencesKey("selected_project_id")
+private val ThemeModeKey = stringPreferencesKey("theme_mode")
 
 class AppStateDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
 
@@ -31,6 +32,12 @@ class AppStateDataStore internal constructor(private val dataStore: DataStore<Pr
             it[SelectedOrganizationIdKey] = organizationId
             it[SelectedProjectIdKey] = projectId
         }
+    }
+
+    fun observeThemeMode(): Flow<String?> = dataStore.data.map { it[ThemeModeKey] }
+
+    suspend fun saveThemeMode(themeMode: String) {
+        dataStore.edit { it[ThemeModeKey] = themeMode }
     }
 
     suspend fun clearSelectedProject() {

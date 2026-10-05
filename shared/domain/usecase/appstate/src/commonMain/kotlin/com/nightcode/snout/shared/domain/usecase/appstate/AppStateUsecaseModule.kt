@@ -21,4 +21,10 @@ class AppStateUsecaseModule {
 
     @Single
     fun observeSelectedProject(repository: AppStateRepository) = ObserveSelectedProject(repository)
+
+    @Single
+    fun observeThemeMode(repository: AppStateRepository) = ObserveThemeMode(repository)
+
+    @Single
+    fun saveThemeMode(repository: AppStateRepository) = SaveThemeMode(repository)
 }
