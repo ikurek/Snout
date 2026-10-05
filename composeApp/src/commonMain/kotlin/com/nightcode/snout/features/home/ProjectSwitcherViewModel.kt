@@ -34,16 +34,14 @@ internal class ProjectSwitcherViewModel(
         )
 
         if (organizations.isEmpty()) {
-            ProjectSwitcherUiState.NotFound(
+            ProjectSwitcherUiState.NotFound(currentProjectName = currentProject?.name.orEmpty())
+        } else {
+            ProjectSwitcherUiState.Loaded(
                 currentProjectName = currentProject?.name.orEmpty(),
+                organizations = organizations,
+                selectedProject = selected,
             )
         }
-
-        ProjectSwitcherUiState.Loaded(
-            currentProjectName = currentProject?.name.orEmpty(),
-            organizations = organizations,
-            selectedProject = selected,
-        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
