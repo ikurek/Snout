@@ -87,6 +87,17 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="inline_error_retry">Retry</string>
     <string name="dashboard_screen_title">Dashboard</string>
+    <string name="insight_result_empty">No data for this period.</string>
+    <string name="insight_result_unsupported">This visualization isn\'t supported in Snout yet. Open it in PostHog to see it.</string>
+    <string name="insight_result_median">median</string>
+    <string name="insight_kind_trends">Trends</string>
+    <string name="insight_kind_funnels">Funnel</string>
+    <string name="insight_kind_retention">Retention</string>
+    <string name="insight_kind_paths">Paths</string>
+    <string name="insight_kind_stickiness">Stickiness</string>
+    <string name="insight_kind_lifecycle">Lifecycle</string>
+    <string name="insight_kind_sql">SQL</string>
+    <string name="insight_kind_other">Other</string>
     <string name="analytics_screen_title">Analytics</string>
     <string name="analytics_range_today">Today</string>
     <string name="analytics_range_7d">7 days</string>
