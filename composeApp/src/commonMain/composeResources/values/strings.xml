@@ -187,6 +187,9 @@
     <string name="annotation_create_save">Add annotation</string>
     <string name="annotation_create_error_forbidden">Your API key can\'t create annotations. Add the annotation:write scope in PostHog.</string>
     <string name="annotation_create_error_generic">Couldn\'t save the annotation. Try again.</string>
+    <string name="activity_system_actor">PostHog</string>
+    <string name="activity_more_changes">+%1$d more changes</string>
+    <string name="activity_change_empty_value">empty</string>
     <string name="dialog_ok">OK</string>
     <string name="switch_project_bottom_sheet_title">Switch project</string>
     <string name="switch_project_bottom_sheet_nothing_found_title">No projects found</string>
