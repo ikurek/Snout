@@ -15,6 +15,9 @@
     <string name="login_screen_personal_api_key_input_unable_to_connect_error">Unable to connect with provided API key</string>
     <string name="login_screen_personal_api_key_create_in_web_button">Create a new API key</string>
     <string name="login_screen_connect_button_text">Connect</string>
+    <string name="login_screen_cloud_us_chip">PostHog Cloud US</string>
+    <string name="login_screen_cloud_eu_chip">PostHog Cloud EU</string>
+    <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add feature_flag:write and annotation:write to toggle flags and add annotations from Snout.</string>
     <string name="month_january">January</string>
     <string name="month_february">February</string>
     <string name="month_march">March</string>
@@ -28,7 +31,7 @@
     <string name="month_november">November</string>
     <string name="month_december">December</string>
     <string name="snackbar_generic_error_message">An unexpected error has occurred. Please try again later.</string>
-    <string name="url_posthog_api_keys_url">https://us.posthog.com/settings/user-api-keys</string>
+    <string name="snackbar_rate_limited_message">PostHog is rate limiting this API key. Wait a minute and try again.</string>
     <string name="initial_project_screen_project_count">Active projects: %1$d</string>
     <string name="placeholder_generic_error_title">Something went wrong</string>
     <string name="placeholder_generic_error_subtitle">An unexpected error occurred. Please try again.</string>

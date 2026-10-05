@@ -1,9 +1,11 @@
 package com.nightcode.snout.features.login
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -13,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -38,8 +41,10 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.atoms.AppIcon
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
+import com.nightcode.snout.designsystem.atoms.chips.ActionChip
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
+import com.nightcode.snout.designsystem.molecules.InfoNote
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
@@ -49,6 +54,8 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.app_name
 import snout.composeapp.generated.resources.ic_arrow_right_alt_24dp
 import snout.composeapp.generated.resources.login_screen_app_name_subtitle
+import snout.composeapp.generated.resources.login_screen_cloud_eu_chip
+import snout.composeapp.generated.resources.login_screen_cloud_us_chip
 import snout.composeapp.generated.resources.login_screen_connect_button_text
 import snout.composeapp.generated.resources.login_screen_description
 import snout.composeapp.generated.resources.login_screen_header
@@ -61,6 +68,7 @@ import snout.composeapp.generated.resources.login_screen_personal_api_key_input_
 import snout.composeapp.generated.resources.login_screen_personal_api_key_input_label
 import snout.composeapp.generated.resources.login_screen_personal_api_key_input_placeholder
 import snout.composeapp.generated.resources.login_screen_personal_api_key_input_unable_to_connect_error
+import snout.composeapp.generated.resources.login_screen_scopes_hint
 
 @Composable
 internal fun LoginScreen(
@@ -71,7 +79,7 @@ internal fun LoginScreen(
     isConnecting: Boolean,
     onInstanceUrlChange: (instanceUrl: String) -> Unit,
     onPersonalApiKeyChange: (personalApiKey: String) -> Unit,
-    onApiKeysLinkClick: () -> Unit,
+    onApiKeysLinkClick: (instanceUrl: String) -> Unit,
     onConnectClick: (instanceUrl: String, personalApiKey: String) -> Unit,
 ) {
     val instanceUrlTextFieldState: TextFieldState = rememberTextFieldState()
@@ -109,7 +117,7 @@ internal fun LoginScreen(
             personalApiKeyTextFieldState = personalApiKeyTextFieldState,
             personalApiKeyTextFieldError = personalApiKeyValidationError?.textFieldError,
             isConnecting = isConnecting,
-            onApiKeysLinkClick = onApiKeysLinkClick,
+            onApiKeysLinkClick = { onApiKeysLinkClick(instanceUrlTextFieldState.text.toString()) },
         )
     }
 }
@@ -173,7 +181,20 @@ private fun Content(
                 imeAction = ImeAction.Done,
             ),
         )
-        VerticalSpacer(24.dp)
+        VerticalSpacer(8.dp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ActionChip(
+                text = stringResource(Res.string.login_screen_cloud_us_chip),
+                enabled = isConnecting.not(),
+                onClick = { instanceUrlTextFieldState.setTextAndPlaceCursorAtEnd(PostHogCloudUsUrl) },
+            )
+            ActionChip(
+                text = stringResource(Res.string.login_screen_cloud_eu_chip),
+                enabled = isConnecting.not(),
+                onClick = { instanceUrlTextFieldState.setTextAndPlaceCursorAtEnd(PostHogCloudEuUrl) },
+            )
+        }
+        VerticalSpacer(16.dp)
 
         PrimaryTextField(
             state = personalApiKeyTextFieldState,
@@ -200,6 +221,10 @@ private fun Content(
             style = SnoutTheme.typography.labelMedium,
             color = SnoutTheme.colors.primary,
         )
+
+        VerticalSpacer(16.dp)
+        InfoNote(text = stringResource(Res.string.login_screen_scopes_hint))
+        VerticalSpacer(24.dp)
     }
 }
 

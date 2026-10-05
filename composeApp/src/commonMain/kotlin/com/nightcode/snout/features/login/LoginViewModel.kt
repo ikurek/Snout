@@ -18,6 +18,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
+import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.snackbar_generic_error_message
+import snout.composeapp.generated.resources.snackbar_rate_limited_message
+
+internal const val PostHogCloudUsUrl = "https://us.posthog.com"
+internal const val PostHogCloudEuUrl = "https://eu.posthog.com"
+private const val ApiKeysSettingsPath = "/settings/user-api-keys"
 
 @KoinViewModel
 internal class LoginViewModel(
@@ -58,10 +65,17 @@ internal class LoginViewModel(
         }
     }
 
+    fun onCreateApiKeyClick(instanceUrl: String) = viewModelScope.launch {
+        val baseUrl = validateInstanceUrl(instanceUrl).getOrNull() ?: PostHogCloudUsUrl
+        _sideEffects.send(LoginSideEffect.OpenUrl(baseUrl + ApiKeysSettingsPath))
+    }
+
     fun onConnectClick(instanceUrl: String, personalApiKey: String) = viewModelScope.launch {
         _isConnecting.value = true
-        validateInstanceUrl(instanceUrl).onLeft {
-            _instanceUrlValidationError.value = it
+        val normalizedUrl = validateInstanceUrl(instanceUrl)
+            .onLeft { _instanceUrlValidationError.value = it }
+            .getOrNull()
+        if (normalizedUrl == null) {
             _isConnecting.value = false
             return@launch
         }
@@ -70,24 +84,25 @@ internal class LoginViewModel(
             _isConnecting.value = false
             return@launch
         }
-        validateAndSaveUserAuth(token = personalApiKey, instanceUrl = instanceUrl).onLeft { error ->
-            when (error) {
-                GetCurrentUserError.Unauthorized,
-                GetCurrentUserError.Forbidden,
-                ->
-                    _personalApiKeyValidationError.value =
-                        PersonalApiKeyValidationError.ServerValidationFailed
+        validateAndSaveUserAuth(token = personalApiKey.trim(), instanceUrl = normalizedUrl)
+            .onLeft { error ->
+                when (error) {
+                    GetCurrentUserError.Unauthorized,
+                    GetCurrentUserError.Forbidden,
+                    ->
+                        _personalApiKeyValidationError.value =
+                            PersonalApiKeyValidationError.ServerValidationFailed
 
-                GetCurrentUserError.RateLimited,
-                GetCurrentUserError.ConnectionError,
-                GetCurrentUserError.UnexpectedError,
-                ->
-                    _sideEffects.send(LoginSideEffect.UserAuthorizationFailed)
+                    GetCurrentUserError.RateLimited ->
+                        _sideEffects.send(LoginSideEffect.ShowError(Res.string.snackbar_rate_limited_message))
+
+                    GetCurrentUserError.ConnectionError,
+                    GetCurrentUserError.UnexpectedError,
+                    ->
+                        _sideEffects.send(LoginSideEffect.ShowError(Res.string.snackbar_generic_error_message))
+                }
             }
-            _isConnecting.value = false
-        }.onRight { user ->
-            _sideEffects.send(LoginSideEffect.UserAuthorized)
-            _isConnecting.value = false
-        }
+            .onRight { _sideEffects.send(LoginSideEffect.UserAuthorized) }
+        _isConnecting.value = false
     }
 }
