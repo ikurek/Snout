@@ -27,4 +27,6 @@ internal class OrganizationRepositoryImpl(
 
     override fun observeOrganizations(): Flow<List<Organization>> =
         database.observe().map { entities -> entities.map { it.toOrganization() } }
+
+    override suspend fun clear() = database.replaceAll(emptyList())
 }

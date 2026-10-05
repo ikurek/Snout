@@ -32,4 +32,11 @@ class AppStateDataStore internal constructor(private val dataStore: DataStore<Pr
             it[SelectedProjectIdKey] = projectId
         }
     }
+
+    suspend fun clearSelectedProject() {
+        dataStore.edit {
+            it.remove(SelectedOrganizationIdKey)
+            it.remove(SelectedProjectIdKey)
+        }
+    }
 }

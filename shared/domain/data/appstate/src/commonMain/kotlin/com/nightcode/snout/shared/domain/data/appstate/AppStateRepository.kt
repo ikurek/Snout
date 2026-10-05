@@ -8,4 +8,5 @@ interface AppStateRepository {
     suspend fun saveSelectedProject(organizationId: Uuid, projectId: Long)
     suspend fun getSelectedProject(): SelectedProject?
     fun observeSelectedProject(): Flow<SelectedProject?>
+    suspend fun clearSelectedProject()
 }

@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface OrganizationRepository {
     suspend fun refreshOrganizations(): Either<GetOrganizationsError, Unit>
     fun observeOrganizations(): Flow<List<Organization>>
+    suspend fun clear()
 }

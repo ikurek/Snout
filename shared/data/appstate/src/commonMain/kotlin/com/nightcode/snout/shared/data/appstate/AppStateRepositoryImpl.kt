@@ -28,4 +28,6 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
                 SelectedProject(organizationId = Uuid.parse(orgIdStr), projectId = projectId)
             }
         }
+
+    override suspend fun clearSelectedProject() = dataStore.clearSelectedProject()
 }
