@@ -1,5 +1,7 @@
 package com.nightcode.snout.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -10,6 +12,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
@@ -22,6 +25,14 @@ import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
 import org.koin.compose.koinInject
+
+private val PushTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
+    slideInHorizontally(initialOffsetX = { it }) togetherWith slideOutHorizontally(targetOffsetX = { -it })
+}
+
+private val PopTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
+    slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(targetOffsetX = { it })
+}
 
 @Composable
 internal fun MainNavGraph(initial: NavKey) {
@@ -47,22 +58,14 @@ internal fun MainNavGraph(initial: NavKey) {
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
         ),
-        transitionSpec = {
-            slideInHorizontally(initialOffsetX = { it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { -it })
-        },
-        popTransitionSpec = {
-            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
-        },
-        predictivePopTransitionSpec = {
-            slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                slideOutHorizontally(targetOffsetX = { it })
-        },
+        transitionSpec = PushTransition,
+        popTransitionSpec = PopTransition,
+        predictivePopTransitionSpec = { PopTransition() },
         entryProvider = entryProvider {
             entry<HomeNavKey> {
                 HomeRoute(
                     onNavigateToSettings = { backStack.add(SettingsNavKey) },
+                    onMoreItemClick = { },
                 )
             }
             entry<LoginNavKey> {

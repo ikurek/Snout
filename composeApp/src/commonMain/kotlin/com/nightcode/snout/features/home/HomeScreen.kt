@@ -22,11 +22,34 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.features.analytics.AnalyticsRoute
 import com.nightcode.snout.features.dashboard.DashboardRoute
+import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
+import com.nightcode.snout.features.insights.InsightsRoute
+import com.nightcode.snout.features.more.MoreItem
+import com.nightcode.snout.features.more.MoreScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_settings_24dp
 import snout.composeapp.generated.resources.settings_icon_content_description
+
+@Composable
+private fun HomeNavigationBar(current: HomeDestination, onSelect: (HomeDestination) -> Unit) {
+    NavigationBar {
+        HomeDestination.entries.forEach { destination ->
+            NavigationBarItem(
+                selected = destination == current,
+                onClick = { onSelect(destination) },
+                icon = {
+                    Icon(
+                        painter = painterResource(destination.icon),
+                        contentDescription = stringResource(destination.label),
+                    )
+                },
+                label = { Text(stringResource(destination.label)) },
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +57,9 @@ internal fun HomeScreen(
     currentProjectName: String,
     onOpenProjectSwitcher: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onMoreItemClick: (MoreItem) -> Unit,
 ) {
-    var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Dashboard) }
+    var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Analytics) }
 
     Scaffold(
         topBar = {
@@ -64,21 +88,7 @@ internal fun HomeScreen(
             )
         },
         bottomBar = {
-            NavigationBar {
-                HomeDestination.entries.forEach { destination ->
-                    NavigationBarItem(
-                        selected = destination == currentDestination,
-                        onClick = { currentDestination = destination },
-                        icon = {
-                            Icon(
-                                painter = painterResource(destination.icon),
-                                contentDescription = stringResource(destination.label),
-                            )
-                        },
-                        label = { Text(stringResource(destination.label)) },
-                    )
-                }
-            }
+            HomeNavigationBar(current = currentDestination, onSelect = { currentDestination = it })
         },
     ) { innerPadding ->
         AnimatedContent(
@@ -87,8 +97,11 @@ internal fun HomeScreen(
             modifier = Modifier.padding(innerPadding),
         ) { destination ->
             when (destination) {
-                HomeDestination.Dashboard -> DashboardRoute()
                 HomeDestination.Analytics -> AnalyticsRoute()
+                HomeDestination.Dashboards -> DashboardRoute()
+                HomeDestination.Insights -> InsightsRoute()
+                HomeDestination.FeatureFlags -> FeatureFlagsRoute()
+                HomeDestination.More -> MoreScreen(onItemClick = onMoreItemClick)
             }
         }
     }
