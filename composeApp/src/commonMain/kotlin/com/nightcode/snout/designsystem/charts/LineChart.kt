@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -27,7 +26,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-private const val FillAlpha = 0.2f
+private const val FillAlpha = 0.14f
 
 /**
  * Multi-series line chart with horizontal grid lines and first/middle/last x labels.
@@ -44,7 +43,7 @@ internal fun LineChart(
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val labelStyle = SnoutTheme.typography.labelSmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
+    val labelStyle = SnoutTheme.typography.bodySmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
     val gridColor = SnoutTheme.colors.outlineVariant
 
     Column(modifier = modifier) {
@@ -123,14 +122,7 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: Axi
             lineTo(plot.xFor(0, series.values.size), zero)
             close()
         }
-        drawPath(
-            path = area,
-            brush = Brush.verticalGradient(
-                colors = listOf(series.color.copy(alpha = FillAlpha), Color.Transparent),
-                startY = plot.top,
-                endY = zero,
-            ),
-        )
+        drawPath(path = area, color = series.color.copy(alpha = FillAlpha))
     }
     drawPath(path, series.color, style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     if (series.values.size == 1) {

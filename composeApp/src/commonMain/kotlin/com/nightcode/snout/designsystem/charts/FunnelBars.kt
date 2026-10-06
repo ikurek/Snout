@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +24,9 @@ import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
+/** Series indices used for the first three steps: orange, blue, violet; later steps continue down the palette. */
+private val StepColorIndices = listOf(0, 1, 3)
+
 @Immutable
 internal data class FunnelBarStep(
     val label: String,
@@ -30,17 +35,17 @@ internal data class FunnelBarStep(
     val caption: String? = null,
 )
 
-/** Funnel steps as full-width bars whose fill is the share of the first step. */
+/** Funnel steps as full-width 8dp bars whose fill is the share of the first step, on a `surfaceContainerHigh` track. */
 @Composable
 internal fun FunnelBars(
     steps: List<FunnelBarStep>,
     modifier: Modifier = Modifier,
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         steps.forEachIndexed { index, step ->
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${index + 1}. ${step.label}",
                         style = SnoutTheme.typography.bodyMedium,
@@ -48,31 +53,32 @@ internal fun FunnelBars(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    Text(text = valueFormatter(step.value), style = SnoutTheme.code.medium)
+                    Text(text = valueFormatter(step.value), style = SnoutTheme.typography.titleSmall)
                     Text(
                         text = step.fraction.formatPercent(isFraction = true),
-                        style = SnoutTheme.typography.labelLarge,
+                        style = SnoutTheme.typography.titleSmall,
                         color = SnoutTheme.colors.onSurfaceVariant,
                     )
                 }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(12.dp)
-                        .clip(SnoutTheme.shapes.extraSmall)
-                        .background(SnoutTheme.colors.surfaceContainerHighest),
+                        .height(8.dp)
+                        .clip(CircleShape)
+                        .background(SnoutTheme.colors.surfaceContainerHigh),
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(step.fraction.toFloat().coerceIn(0f, 1f))
-                            .background(chartColor(index)),
+                            .clip(CircleShape)
+                            .background(chartColor(StepColorIndices.getOrElse(index) { index })),
                     )
                 }
                 step.caption?.let {
                     Text(
                         text = it,
-                        style = SnoutTheme.typography.labelSmall,
+                        style = SnoutTheme.typography.bodySmall,
                         color = SnoutTheme.colors.onSurfaceVariant,
                     )
                 }

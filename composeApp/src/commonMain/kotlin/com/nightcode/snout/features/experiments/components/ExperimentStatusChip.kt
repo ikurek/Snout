@@ -1,8 +1,8 @@
 package com.nightcode.snout.features.experiments.components
 
 import androidx.compose.runtime.Composable
-import com.nightcode.snout.designsystem.atoms.LabelChip
-import com.nightcode.snout.designsystem.atoms.LabelChipTone
+import com.nightcode.snout.designsystem.LabelChip
+import com.nightcode.snout.designsystem.LabelChipTone
 import com.nightcode.snout.shared.domain.model.experiments.ExperimentStatus
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res

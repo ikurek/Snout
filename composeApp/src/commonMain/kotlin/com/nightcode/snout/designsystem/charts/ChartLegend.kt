@@ -28,7 +28,7 @@ internal fun ChartLegend(entries: List<Pair<String, Color>>, modifier: Modifier 
                 Box(modifier = Modifier.size(8.dp).clip(SnoutTheme.shapes.extraSmall).background(color))
                 Text(
                     text = name,
-                    style = SnoutTheme.typography.labelSmall,
+                    style = SnoutTheme.typography.bodySmall,
                     color = SnoutTheme.colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

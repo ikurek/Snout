@@ -33,7 +33,7 @@ internal fun BarChart(
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
     val textMeasurer = rememberTextMeasurer()
-    val labelStyle = SnoutTheme.typography.labelSmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
+    val labelStyle = SnoutTheme.typography.bodySmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
     val gridColor = SnoutTheme.colors.outlineVariant
 
     Column(modifier = modifier) {

@@ -13,6 +13,7 @@ import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.dialog_cancel
 
+/** Title as the question, one sentence, Cancel plus one confirm verb; red when [destructive]. */
 @Composable
 internal fun ConfirmationDialog(
     title: String,
@@ -24,17 +25,17 @@ internal fun ConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = { Text(text) },
-        shape = SnoutTheme.shapes.extraLarge,
+        title = { Text(title, style = SnoutTheme.typography.titleLarge) },
+        text = { Text(text, style = SnoutTheme.typography.bodyMedium, color = SnoutTheme.colors.onSurfaceVariant) },
+        shape = SnoutTheme.shapes.large,
+        containerColor = SnoutTheme.colors.surfaceContainerHigh,
+        titleContentColor = SnoutTheme.colors.onSurface,
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
-                colors = if (destructive) {
-                    ButtonDefaults.textButtonColors(contentColor = SnoutTheme.colors.error)
-                } else {
-                    ButtonDefaults.textButtonColors()
-                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = if (destructive) SnoutTheme.colors.error else SnoutTheme.colors.primary,
+                ),
             ) {
                 Text(confirmLabel)
             }

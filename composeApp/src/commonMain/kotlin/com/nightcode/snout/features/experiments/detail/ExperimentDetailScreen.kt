@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.atoms.SectionTitle
+import com.nightcode.snout.designsystem.SectionTitle
 import com.nightcode.snout.designsystem.molecules.EntityRow
-import com.nightcode.snout.designsystem.molecules.InfoNote
+import com.nightcode.snout.designsystem.InfoNote
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
-import com.nightcode.snout.designsystem.organisms.LoadingIndicator
+import com.nightcode.snout.designsystem.LoadingIndicator
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.experiments.components.ExperimentStatusChip
 import com.nightcode.snout.shared.common.testdata.TestData

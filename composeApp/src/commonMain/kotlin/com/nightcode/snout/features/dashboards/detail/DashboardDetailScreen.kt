@@ -25,10 +25,10 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.atoms.LabelChip
+import com.nightcode.snout.designsystem.LabelChip
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
-import com.nightcode.snout.designsystem.molecules.InlineError
+import com.nightcode.snout.designsystem.InlineError
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder

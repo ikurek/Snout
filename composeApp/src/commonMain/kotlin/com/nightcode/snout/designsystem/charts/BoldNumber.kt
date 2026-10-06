@@ -24,7 +24,6 @@ internal fun BoldNumber(value: String, modifier: Modifier = Modifier, label: Str
         Text(
             text = value,
             style = SnoutTheme.typography.displaySmall,
-            color = SnoutTheme.colors.primary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
@@ -32,7 +31,7 @@ internal fun BoldNumber(value: String, modifier: Modifier = Modifier, label: Str
         label?.let {
             Text(
                 text = it,
-                style = SnoutTheme.typography.labelMedium,
+                style = SnoutTheme.typography.bodySmall,
                 color = SnoutTheme.colors.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

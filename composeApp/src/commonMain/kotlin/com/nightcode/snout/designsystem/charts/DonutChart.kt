@@ -63,7 +63,7 @@ internal fun DonutChart(
                     start += sweep
                 }
             }
-            Text(text = valueFormatter(total), style = SnoutTheme.code.medium)
+            Text(text = valueFormatter(total), style = SnoutTheme.typography.headlineMedium)
         }
         Column(
             modifier = Modifier.weight(1f).padding(start = 16.dp),
@@ -74,7 +74,7 @@ internal fun DonutChart(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Box(modifier = Modifier.size(10.dp).background(slice.color, SnoutTheme.shapes.extraSmall))
+                    Box(modifier = Modifier.size(8.dp).background(slice.color, SnoutTheme.shapes.extraSmall))
                     Text(
                         text = slice.label,
                         style = SnoutTheme.typography.bodySmall,
@@ -84,7 +84,7 @@ internal fun DonutChart(
                     )
                     Text(
                         text = (slice.value / total).formatPercent(isFraction = true),
-                        style = SnoutTheme.code.small,
+                        style = SnoutTheme.typography.bodySmall,
                         color = SnoutTheme.colors.onSurfaceVariant,
                     )
                 }

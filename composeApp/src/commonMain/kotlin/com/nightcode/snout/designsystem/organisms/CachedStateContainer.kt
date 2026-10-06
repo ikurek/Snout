@@ -9,15 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.molecules.InlineError
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
+import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -29,7 +28,7 @@ import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
 /**
  * Renders loading, error, empty and content states of cache-first data with pull to refresh.
- * Every state fills the available space so placeholders are centered regardless of what sits above.
+ * Loading is skeleton rows, never a spinner; a failed refresh keeps the cached content under an inline banner.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,13 +36,14 @@ internal fun <T> CachedStateContainer(
     state: CachedUiState<T>,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    loadingContent: @Composable () -> Unit = { SkeletonRows() },
     emptyContent: @Composable () -> Unit = {
         NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
     },
     content: @Composable (data: T) -> Unit,
 ) {
     when (state) {
-        CachedUiState.Loading -> LoadingIndicator(modifier.fillMaxSize())
+        CachedUiState.Loading -> Box(modifier = modifier.fillMaxSize()) { loadingContent() }
 
         is CachedUiState.Error ->
             ErrorPlaceholder(error = state.error, onRetry = onRefresh, modifier = modifier.fillMaxSize())
@@ -69,7 +69,7 @@ internal fun <T> CachedStateContainer(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 state.refreshError?.let { error ->
-                    InlineError(
+                    InlineErrorBanner(
                         text = stringResource(error.refreshMessage()),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
@@ -77,13 +77,6 @@ internal fun <T> CachedStateContainer(
                 content(state.data)
             }
         }
-    }
-}
-
-@Composable
-internal fun LoadingIndicator(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
     }
 }
 

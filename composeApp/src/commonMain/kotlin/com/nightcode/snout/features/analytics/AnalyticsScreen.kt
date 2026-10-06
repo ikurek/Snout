@@ -25,9 +25,9 @@ import com.nightcode.snout.designsystem.charts.LineChart
 import com.nightcode.snout.designsystem.charts.RankedBarList
 import com.nightcode.snout.designsystem.charts.RankedBarRow
 import com.nightcode.snout.designsystem.charts.chartColor
-import com.nightcode.snout.designsystem.molecules.MetricCard
+import com.nightcode.snout.designsystem.MetricCard
 import com.nightcode.snout.designsystem.molecules.SectionCard
-import com.nightcode.snout.designsystem.molecules.SegmentedChoice
+import com.nightcode.snout.designsystem.SegmentedChoice
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData

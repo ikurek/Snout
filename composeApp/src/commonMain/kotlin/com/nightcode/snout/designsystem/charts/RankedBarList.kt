@@ -24,17 +24,17 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-private const val BarAlpha = 0.18f
+private const val BarAlpha = 0.14f
 
 @Immutable
 internal data class RankedBarRow(val label: String, val value: Double, val secondary: String? = null)
 
-/** Rows with a proportional background bar; the readable alternative to a horizontal bar chart on a phone. */
+/** Rows with a proportional background bar; labels are paths or event names, so they read in code style. */
 @Composable
 internal fun RankedBarList(
     rows: List<RankedBarRow>,
     modifier: Modifier = Modifier,
-    color: Color = SnoutTheme.colors.primary,
+    color: Color = chartColor(0),
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
     val max = rows.maxOfOrNull { it.value }?.takeIf { it > 0 } ?: 1.0
@@ -54,7 +54,7 @@ internal fun RankedBarList(
                 ) {
                     Text(
                         text = row.label,
-                        style = SnoutTheme.typography.bodyMedium,
+                        style = SnoutTheme.code.medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
@@ -62,11 +62,11 @@ internal fun RankedBarList(
                     row.secondary?.let {
                         Text(
                             text = it,
-                            style = SnoutTheme.typography.labelSmall,
+                            style = SnoutTheme.typography.bodySmall,
                             color = SnoutTheme.colors.onSurfaceVariant,
                         )
                     }
-                    Text(text = valueFormatter(row.value), style = SnoutTheme.code.medium)
+                    Text(text = valueFormatter(row.value), style = SnoutTheme.typography.titleSmall)
                 }
             }
         }

@@ -28,7 +28,7 @@ import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
-import com.nightcode.snout.designsystem.organisms.LoadingIndicator
+import com.nightcode.snout.designsystem.LoadingIndicator
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.insights.FavoriteIconButton
 import com.nightcode.snout.features.insights.components.InsightResultView
