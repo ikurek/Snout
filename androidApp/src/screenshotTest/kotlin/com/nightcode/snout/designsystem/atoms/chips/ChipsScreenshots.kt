@@ -15,3 +15,9 @@ import com.nightcode.snout.common.compose.ScreenshotEnvironment
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ActionChipPreviewShot() = ScreenshotEnvironment { ActionChipPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ChoiceChipPreviewShot() = ScreenshotEnvironment { ChoiceChipPreview() }
