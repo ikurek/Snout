@@ -95,7 +95,7 @@ private fun NumberView(series: List<TrendSeries>) {
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    Text(text = s.total.formatCompact(), style = SnoutTheme.code.medium)
+                    Text(text = s.total.formatCompact(), style = SnoutTheme.typography.headlineMedium)
                 }
             }
         }
@@ -123,5 +123,5 @@ private fun FunnelView(result: InsightResult.Funnel) {
 
 @Composable
 private fun Note(text: String) {
-    Text(text = text, style = SnoutTheme.typography.bodySmall, color = SnoutTheme.colors.onSurfaceVariant)
+    Text(text = text, style = SnoutTheme.typography.bodyMedium, color = SnoutTheme.colors.onSurfaceVariant)
 }

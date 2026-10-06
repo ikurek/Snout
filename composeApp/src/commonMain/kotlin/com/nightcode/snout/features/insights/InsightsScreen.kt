@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,11 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.LabelChip
+import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
+import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -40,6 +43,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.favorite_content_description
 import snout.composeapp.generated.resources.ic_star_24dp
 import snout.composeapp.generated.resources.ic_star_border_24dp
+import snout.composeapp.generated.resources.insights_search_empty_title
 import snout.composeapp.generated.resources.insights_search_placeholder
 import snout.composeapp.generated.resources.unfavorite_content_description
 
@@ -62,11 +66,26 @@ internal fun InsightsScreen(
                 placeholder = stringResource(Res.string.insights_search_placeholder),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
-            CachedStateContainer(state = state.insights, onRefresh = onRefresh) { insights ->
+            CachedStateContainer(
+                state = state.insights,
+                onRefresh = onRefresh,
+                emptyContent = {
+                    if (state.query.isBlank()) {
+                        NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
+                    } else {
+                        NoSearchResultsPlaceholder(
+                            title = stringResource(Res.string.insights_search_empty_title),
+                            onClearSearch = { searchState.clearText() },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                },
+            ) { insights ->
                 LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                    items(insights, key = { it.id }) { insight ->
+                    itemsIndexed(insights, key = { _, insight -> insight.id }) { index, insight ->
                         InsightRow(
                             insight = insight,
+                            divider = index < insights.lastIndex,
                             onClick = { onOpenInsight(insight.id) },
                             onFavoriteToggle = { onFavoriteToggle(insight) },
                         )
@@ -79,13 +98,14 @@ internal fun InsightsScreen(
 }
 
 @Composable
-internal fun InsightRow(insight: InsightSummary, onClick: () -> Unit, onFavoriteToggle: () -> Unit) {
+private fun InsightRow(insight: InsightSummary, divider: Boolean, onClick: () -> Unit, onFavoriteToggle: () -> Unit) {
     EntityRow(
         title = insight.name,
         subtitle = insight.description,
+        divider = divider,
         onClick = onClick,
         meta = {
-            LabelChip(text = insight.kind.label())
+            Tag(text = insight.kind.label())
             insight.lastModifiedAt?.let { MetaText(it.formatRelative()) }
         },
         trailing = {
@@ -99,6 +119,7 @@ internal fun InsightRow(insight: InsightSummary, onClick: () -> Unit, onFavorite
     )
 }
 
+/** Star outline in `onSurfaceVariant`, filled `primary` once favourited. */
 @Composable
 internal fun FavoriteIconButton(favorited: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     IconButton(onClick = onClick, modifier = modifier) {
