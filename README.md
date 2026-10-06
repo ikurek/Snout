@@ -51,8 +51,10 @@ Android: `./gradlew :androidApp:assembleDebug`. iOS: open `iosApp` in Xcode (the
 Checks: `./gradlew testAndroidHostTest detekt`.
 
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
-`androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Verify with
-`./gradlew :androidApp:validateDebugScreenshotTest`; after an intended UI change, regenerate the reference
-images with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
+generated wrappers in `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Wrappers are
+grouped per preview package, so the reference images under `androidApp/src/screenshotTestDebug/reference`
+mirror the package tree. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
+renaming previews run `scripts/generate_screenshot_tests.py`; after an intended UI change regenerate the
+references with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
 
 If Gradle cannot find the Android SDK, add a `local.properties` with `sdk.dir=/path/to/Android/sdk`.
