@@ -3,6 +3,7 @@ package com.nightcode.snout.designsystem.molecules
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,14 +36,16 @@ internal fun KeyValueRow(
     valueIsCode: Boolean = false,
     leadingIcon: Painter? = null,
     valueMaxLines: Int = 2,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     onClick: (() -> Unit)? = null,
+    showChevron: Boolean = true,
     trailing: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -71,7 +74,8 @@ internal fun KeyValueRow(
         }
         when {
             trailing != null -> trailing()
-            onClick != null -> Icon(
+
+            onClick != null && showChevron -> Icon(
                 painter = painterResource(Res.drawable.ic_chevron_right_24dp),
                 contentDescription = null,
                 tint = SnoutTheme.colors.onSurfaceVariant,
@@ -88,4 +92,9 @@ fun KeyValueRowPreview() = KeyValueRow(label = "Instance", value = "https://eu.p
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun KeyValueRowCodePreview() = KeyValueRow(label = "Feature flag", value = "new-checkout", valueIsCode = true, onClick = {})
+fun KeyValueRowCodePreview() = KeyValueRow(
+    label = "Feature flag",
+    value = "new-checkout",
+    valueIsCode = true,
+    onClick = {},
+)

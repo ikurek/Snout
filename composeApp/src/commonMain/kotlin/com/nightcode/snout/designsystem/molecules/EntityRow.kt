@@ -31,6 +31,7 @@ import com.nightcode.snout.designsystem.tokens.SnoutTheme
  *
  * Rows sit directly on the background with 16dp sides and 12dp vertical padding, separated by an
  * `outlineVariant` hairline. No card per row. Only the trailing control may carry accent or status colour.
+ * [headline] replaces the plain title text when a row needs rich content there (activity log sentences).
  */
 @Composable
 internal fun EntityRow(
@@ -47,6 +48,7 @@ internal fun EntityRow(
     trailing: (@Composable () -> Unit)? = null,
     meta: (@Composable RowScope.() -> Unit)? = null,
     supporting: (@Composable ColumnScope.() -> Unit)? = null,
+    headline: (@Composable () -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -59,7 +61,11 @@ internal fun EntityRow(
         ) {
             leading?.invoke()
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(text = title, style = titleStyle, maxLines = titleMaxLines, overflow = TextOverflow.Ellipsis)
+                if (headline != null) {
+                    headline()
+                } else {
+                    Text(text = title, style = titleStyle, maxLines = titleMaxLines, overflow = TextOverflow.Ellipsis)
+                }
                 subtitle?.let {
                     Text(
                         text = it,

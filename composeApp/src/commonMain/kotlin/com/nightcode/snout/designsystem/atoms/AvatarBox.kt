@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** Initials on a `primaryContainer` square; the same 32dp avatar sits in the app bar, project rows and the activity log. */
+/** Initials on a `primaryContainer` square; the same 32dp avatar sits in the app bar, project rows and activity log. */
 @Composable
 internal fun AvatarBox(name: String, modifier: Modifier = Modifier, size: Dp = 32.dp) {
     Box(

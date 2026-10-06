@@ -1,30 +1,28 @@
-
 package com.nightcode.snout.features.intialproject
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
+import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.organisms.GenericErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.organisms.PermissionDeniedPlaceholder
 import com.nightcode.snout.designsystem.organisms.RateLimitedPlaceholder
-import com.nightcode.snout.features.projects.OrganizationRow
-import com.nightcode.snout.features.projects.ProjectRow
+import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.features.projects.projectEntries
+import com.nightcode.snout.features.projects.toProjectListEntries
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
 import com.nightcode.snout.shared.domain.model.organization.Organization
@@ -34,7 +32,6 @@ import snout.composeapp.generated.resources.initial_project_screen_subtitle
 import snout.composeapp.generated.resources.initial_project_screen_title
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun InitialProjectScreen(
     state: InitialProjectUiState,
@@ -43,7 +40,7 @@ internal fun InitialProjectScreen(
 ) {
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
-        topBar = { TopBar() },
+        topBar = { Header() },
     ) { contentPadding ->
         Box(
             modifier = Modifier
@@ -51,12 +48,9 @@ internal fun InitialProjectScreen(
                 .padding(contentPadding),
         ) {
             when (state) {
-                InitialProjectUiState.Loading -> LoadingContent()
+                InitialProjectUiState.Loading -> SkeletonRows()
 
-                is InitialProjectUiState.Error -> ErrorContent(
-                    error = state.error,
-                    onRetry = onRetry,
-                )
+                is InitialProjectUiState.Error -> ErrorContent(error = state.error, onRetry = onRetry)
 
                 is InitialProjectUiState.Loaded -> LoadedContent(
                     organizations = state.organizations,
@@ -68,22 +62,20 @@ internal fun InitialProjectScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** No app bar on this screen: the headline starts 16dp below the status bar with its intro underneath. */
 @Composable
-private fun TopBar() {
-    TopAppBar(
-        title = { Text(stringResource(Res.string.initial_project_screen_title)) },
-        subtitle = { Text(stringResource(Res.string.initial_project_screen_subtitle)) },
-    )
-}
-
-@Composable
-private fun LoadingContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
+private fun Header() {
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp)) {
+        Text(
+            text = stringResource(Res.string.initial_project_screen_title),
+            style = SnoutTheme.typography.headlineSmall,
+        )
+        VerticalSpacer(4.dp)
+        Text(
+            text = stringResource(Res.string.initial_project_screen_subtitle),
+            style = SnoutTheme.typography.bodyMedium,
+            color = SnoutTheme.colors.onSurfaceVariant,
+        )
     }
 }
 
@@ -109,17 +101,15 @@ private fun LoadedContent(
     onRetry: () -> Unit,
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
 ) {
-    if (organizations.isEmpty() || organizations.all { it.projects.isEmpty() }) {
+    if (organizations.all { it.projects.isEmpty() }) {
         NothingFoundPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
-        return
     } else {
-        LazyColumn(contentPadding = PaddingValues()) {
-            organizations.forEach { org ->
-                item(key = "org_${org.id}") { OrganizationRow(organization = org) }
-                items(items = org.projects, key = { "project_${it.id}" }) { project ->
-                    ProjectRow(project = project, onClick = { onProjectSelected(org.id, project.id) })
-                }
-            }
+        LazyColumn {
+            projectEntries(
+                entries = organizations.toProjectListEntries(),
+                selectedProject = null,
+                onProjectSelected = onProjectSelected,
+            )
         }
     }
 }

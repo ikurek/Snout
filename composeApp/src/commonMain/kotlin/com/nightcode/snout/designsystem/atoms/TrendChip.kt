@@ -48,7 +48,6 @@ internal fun TrendChip(changePercent: Double, modifier: Modifier = Modifier, low
     }
 }
 
-
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable

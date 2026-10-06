@@ -2,6 +2,8 @@ package com.nightcode.snout.features.projects
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,6 +12,7 @@ import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.OrganizationLogo
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.model.organization.Project
 import org.jetbrains.compose.resources.painterResource
@@ -17,26 +20,71 @@ import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_check_24dp
 import snout.composeapp.generated.resources.initial_project_screen_project_count
+import kotlin.uuid.Uuid
 
-/** Organization header shared by project selection and the project switcher. */
+/** Flattened organization → projects hierarchy so both the selection screen and the switcher render one list. */
+internal sealed interface ProjectListEntry {
+    val key: String
+
+    data class OrganizationHeader(val organization: Organization) : ProjectListEntry {
+        override val key: String get() = "org_${organization.id}"
+    }
+
+    data class ProjectItem(val organizationId: Uuid, val project: Project) : ProjectListEntry {
+        override val key: String get() = "project_${project.id}"
+    }
+}
+
+internal fun List<Organization>.toProjectListEntries(): List<ProjectListEntry> = flatMap { organization ->
+    listOf(ProjectListEntry.OrganizationHeader(organization)) +
+        organization.projects.map { ProjectListEntry.ProjectItem(organization.id, it) }
+}
+
+/** Organization headers with their projects indented beneath; the last row has no divider. */
+internal fun LazyListScope.projectEntries(
+    entries: List<ProjectListEntry>,
+    selectedProject: SelectedProject?,
+    onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
+) {
+    itemsIndexed(entries, key = { _, entry -> entry.key }) { index, entry ->
+        val divider = index < entries.lastIndex
+        when (entry) {
+            is ProjectListEntry.OrganizationHeader -> OrganizationRow(
+                organization = entry.organization,
+                divider = divider,
+            )
+
+            is ProjectListEntry.ProjectItem -> ProjectRow(
+                project = entry.project,
+                isSelected = selectedProject?.organizationId == entry.organizationId &&
+                    selectedProject.projectId == entry.project.id,
+                divider = divider,
+                onClick = { onProjectSelected(entry.organizationId, entry.project.id) },
+            )
+        }
+    }
+}
+
+/** Organization header: logo or initials, name and the number of active projects. Not clickable, no chevron. */
 @Composable
-internal fun OrganizationRow(organization: Organization) {
+internal fun OrganizationRow(organization: Organization, divider: Boolean = true) {
     EntityRow(
         title = organization.name,
-        titleStyle = SnoutTheme.typography.titleMedium,
         subtitle = stringResource(Res.string.initial_project_screen_project_count, organization.projects.size),
-        leading = { OrganizationLogo(name = organization.name, logoUrl = organization.logoUrl, size = 48.dp) },
+        divider = divider,
+        leading = { OrganizationLogo(name = organization.name, logoUrl = organization.logoUrl) },
     )
 }
 
-/** Project entry under its organization; indented so the hierarchy reads at a glance. */
+/** Project entry under its organization; indented 12dp so the hierarchy reads at a glance. */
 @Composable
-internal fun ProjectRow(project: Project, onClick: () -> Unit, isSelected: Boolean = false) {
+internal fun ProjectRow(project: Project, onClick: () -> Unit, isSelected: Boolean = false, divider: Boolean = true) {
     EntityRow(
         title = project.name,
         onClick = onClick,
-        modifier = Modifier.padding(start = 16.dp),
-        leading = { AvatarBox(name = project.name, size = 32.dp) },
+        divider = divider,
+        modifier = Modifier.padding(start = 12.dp),
+        leading = { AvatarBox(name = project.name) },
         trailing = if (isSelected) {
             {
                 Icon(

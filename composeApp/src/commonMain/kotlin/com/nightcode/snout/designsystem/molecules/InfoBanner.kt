@@ -61,7 +61,6 @@ internal fun BannerAction(label: String, onClick: () -> Unit, modifier: Modifier
     )
 }
 
-
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable

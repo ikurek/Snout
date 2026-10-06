@@ -45,7 +45,10 @@ internal fun FunnelBars(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         steps.forEachIndexed { index, step ->
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
                         text = "${index + 1}. ${step.label}",
                         style = SnoutTheme.typography.bodyMedium,

@@ -44,7 +44,10 @@ internal fun StatCard(
             Text(text = value, style = SnoutTheme.typography.displaySmall, maxLines = 1)
             if (changePercent != null || comparison != null) {
                 VerticalSpacer(8.dp)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     changePercent?.let { TrendChip(changePercent = it, lowerIsBetter = lowerIsBetter) }
                     comparison?.let {
                         Text(

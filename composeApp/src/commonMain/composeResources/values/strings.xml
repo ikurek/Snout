@@ -3,7 +3,7 @@
     <string name="initial_project_screen_title">Select project</string>
     <string name="initial_project_screen_subtitle">You can always switch between organizations and projects later</string>
     <string name="login_screen_app_name_subtitle">PostHog · pocket-sized</string>
-    <string name="login_screen_header">Connect your PostHog project.</string>
+    <string name="login_screen_header">Connect your PostHog project</string>
     <string name="login_screen_description">Paste a personal API key. Snout connects directly to your instance — we never see your data.</string>
     <string name="login_screen_instance_url_input_label">Instance URL</string>
     <string name="login_screen_instance_url_input_placeholder">https://eu.posthog.com</string>
@@ -15,8 +15,8 @@
     <string name="login_screen_personal_api_key_input_unable_to_connect_error">Unable to connect with provided API key</string>
     <string name="login_screen_personal_api_key_create_in_web_button">Create a new API key</string>
     <string name="login_screen_connect_button_text">Connect</string>
-    <string name="login_screen_cloud_us_chip">PostHog Cloud US</string>
-    <string name="login_screen_cloud_eu_chip">PostHog Cloud EU</string>
+    <string name="login_screen_cloud_us_chip">Cloud US</string>
+    <string name="login_screen_cloud_eu_chip">Cloud EU</string>
     <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add feature_flag:write and annotation:write to toggle flags and add annotations from Snout.</string>
     <string name="month_january">January</string>
     <string name="month_february">February</string>
@@ -48,6 +48,8 @@
     <string name="placeholder_payment_required_title">Paid plan required</string>
     <string name="placeholder_payment_required_subtitle">PostHog only offers this feature on a paid plan for this project.</string>
     <string name="placeholder_payment_required_retry">Try again</string>
+    <string name="placeholder_search_empty_message">Try a different search term.</string>
+    <string name="placeholder_search_empty_action">Clear search</string>
     <string name="bottom_nav_analytics">Analytics</string>
     <string name="bottom_nav_dashboards">Dashboards</string>
     <string name="bottom_nav_insights">Insights</string>
@@ -94,8 +96,10 @@
     <string name="dashboard_title_placeholder">Dashboard</string>
     <string name="dashboard_tile_error">Couldn't compute this insight.</string>
     <string name="insights_search_placeholder">Search insights</string>
+    <string name="insights_search_empty_title">No insights match</string>
     <string name="insights_favorite_failed">Couldn't update favorite. Check the key has insight:write scope.</string>
     <string name="insight_title_placeholder">Insight</string>
+    <string name="insight_detail_section">Details</string>
     <string name="insight_detail_kind">Type</string>
     <string name="insight_detail_last_modified">Last modified</string>
     <string name="insight_detail_tags">Tags</string>
@@ -131,6 +135,7 @@
     <string name="analytics_breakdown_views">views</string>
     <string name="analytics_no_data">No data for this period.</string>
     <string name="feature_flags_search_placeholder">Search flags by key</string>
+    <string name="feature_flags_search_empty_title">No flags match</string>
     <string name="feature_flag_title_placeholder">Feature flag</string>
     <string name="feature_flag_status_active">Active</string>
     <string name="feature_flag_status_inactive">Inactive</string>
@@ -172,6 +177,7 @@
     <string name="experiment_status_stopped">Complete</string>
     <string name="experiment_status_unknown">Unknown</string>
     <string name="experiment_started">Started %1$s</string>
+    <string name="experiment_not_started">Not started</string>
     <string name="experiment_overview_section">Overview</string>
     <string name="experiment_status_label">Status</string>
     <string name="experiment_started_label">Started</string>

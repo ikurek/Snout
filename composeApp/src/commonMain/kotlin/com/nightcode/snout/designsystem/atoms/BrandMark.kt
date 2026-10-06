@@ -21,6 +21,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.brand_snout_logo
 
 private val LargeMarkThreshold = 48.dp
+private const val LogoInsetFraction = 5
 
 /** The Snout logo on a `primary` square: 36dp beside the app name on login, 64dp on the splash screen. */
 @Composable
@@ -37,7 +38,7 @@ internal fun BrandMark(modifier: Modifier = Modifier, size: Dp = 36.dp) {
             painter = painterResource(Res.drawable.brand_snout_logo),
             contentDescription = null,
             tint = SnoutTheme.colors.onPrimary,
-            modifier = Modifier.fillMaxSize().padding(size / 5),
+            modifier = Modifier.fillMaxSize().padding(size / LogoInsetFraction),
         )
     }
 }
