@@ -8,6 +8,8 @@ enum class OverviewMetricKey {
     Sessions,
     SessionDuration,
     BounceRate,
+    WeeklyActiveUsers,
+    MonthlyActiveUsers,
     Other,
 }
 

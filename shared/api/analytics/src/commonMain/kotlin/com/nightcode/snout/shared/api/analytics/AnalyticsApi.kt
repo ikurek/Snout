@@ -15,6 +15,28 @@ import io.ktor.http.contentType
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 
+/** Series names used in trends requests and matched again in results. */
+object TrendSeriesNames {
+    const val Visitors = "visitors"
+    const val Views = "views"
+    const val Sessions = "sessions"
+    const val WeeklyActiveUsers = "wau"
+    const val MonthlyActiveUsers = "mau"
+}
+
+private val MetricTrendSeries = listOf(
+    TrendSeriesSpec(TrendSeriesNames.Visitors, "dau"),
+    TrendSeriesSpec(TrendSeriesNames.Views, "total"),
+    TrendSeriesSpec(TrendSeriesNames.Sessions, "unique_session"),
+)
+
+private val ActiveUserSeries = listOf(
+    TrendSeriesSpec(TrendSeriesNames.WeeklyActiveUsers, "weekly_active"),
+    TrendSeriesSpec(TrendSeriesNames.MonthlyActiveUsers, "monthly_active"),
+)
+
+private val BreakdownSeries = listOf(TrendSeriesSpec(TrendSeriesNames.Visitors, "dau"))
+
 class AnalyticsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getWebOverview(projectId: Long, dateFrom: String) = runQuery(projectId, webOverviewQuery(dateFrom))
@@ -22,8 +44,25 @@ class AnalyticsApi internal constructor(private val client: HttpClient, private 
     suspend fun getWebStatsTable(projectId: Long, dateFrom: String, breakdownBy: String, limit: Int) =
         runQuery(projectId, webStatsTableQuery(dateFrom, breakdownBy, limit))
 
-    suspend fun getPageviewTrend(projectId: Long, dateFrom: String, interval: String) =
-        runQuery(projectId, pageviewTrendQuery(dateFrom, interval))
+    /** Visitors, views and sessions over time, each with the preceding period for comparison. */
+    suspend fun getMetricTrends(projectId: Long, dateFrom: String, interval: String) =
+        runQuery(projectId, trendsQuery(dateFrom, interval, MetricTrendSeries, compare = true))
+
+    /** Rolling weekly and monthly active users per day; the last point is the value "as of" the range end. */
+    suspend fun getActiveUsers(projectId: Long, dateFrom: String) =
+        runQuery(projectId, trendsQuery(dateFrom, interval = "day", series = ActiveUserSeries, compare = true))
+
+    /** Unique visitors per value of an event property over the whole range. */
+    suspend fun getPropertyBreakdown(projectId: Long, dateFrom: String, property: String, limit: Int) = runQuery(
+        projectId,
+        trendsQuery(
+            dateFrom,
+            interval = "day",
+            series = BreakdownSeries,
+            breakdownProperty = property,
+            breakdownLimit = limit,
+        ),
+    )
 
     private suspend fun runQuery(projectId: Long, query: JsonObject): Either<NetworkError, QueryResponseDto> =
         networkCall {

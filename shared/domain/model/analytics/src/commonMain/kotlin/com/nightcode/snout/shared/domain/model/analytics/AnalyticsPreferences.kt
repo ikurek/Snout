@@ -1,14 +1,14 @@
 package com.nightcode.snout.shared.domain.model.analytics
 
 /**
- * What the Analytics tab shows: the range it opens on, which stat cards are visible, whether the visitors
- * chart is drawn, and which breakdown tables appear. Metrics PostHog adds that Snout does not know
- * ([OverviewMetricKey.Other]) are always shown.
+ * What the Analytics tab shows: the range it opens on, which stat cards are visible, whether the trend chart is
+ * drawn, and which breakdown tables appear. Metrics PostHog adds that Snout does not know
+ * ([OverviewMetricKey.Other]) are always shown. Only what is enabled gets queried.
  */
 data class AnalyticsPreferences(
     val defaultRange: AnalyticsRange,
     val metrics: Set<OverviewMetricKey>,
-    val showVisitorsTrend: Boolean,
+    val showTrendChart: Boolean,
     val breakdowns: Set<WebBreakdown>,
 ) {
     fun withMetric(key: OverviewMetricKey, enabled: Boolean): AnalyticsPreferences =
@@ -24,15 +24,15 @@ data class AnalyticsPreferences(
         val Default = AnalyticsPreferences(
             defaultRange = AnalyticsRange.Last7Days,
             metrics = ConfigurableMetrics.toSet(),
-            showVisitorsTrend = true,
+            showTrendChart = true,
             breakdowns = WebBreakdown.entries.toSet(),
         )
     }
 }
 
-/** The snapshot reduced to what [preferences] asks for. */
+/** The snapshot reduced to what [preferences] asks for; a cached snapshot may hold more than is currently enabled. */
 fun AnalyticsSnapshot.applying(preferences: AnalyticsPreferences): AnalyticsSnapshot = copy(
     overview = overview.filter { it.key == OverviewMetricKey.Other || it.key in preferences.metrics },
-    visitorsTrend = visitorsTrend.takeIf { preferences.showVisitorsTrend },
+    trends = if (preferences.showTrendChart) trends else emptyList(),
     breakdowns = breakdowns.filter { it.breakdown in preferences.breakdowns },
 )

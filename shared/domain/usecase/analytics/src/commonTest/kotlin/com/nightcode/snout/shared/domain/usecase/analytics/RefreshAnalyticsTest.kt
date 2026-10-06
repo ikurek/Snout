@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.analytics.AnalyticsRepository
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
@@ -23,9 +24,13 @@ class RefreshAnalyticsTest :
 
         should("refresh snapshot of the selected project") {
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
-            everySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days) } returns
-                Either.Right(Unit)
-            subject(AnalyticsRange.Last7Days).shouldBeRight()
-            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days) }
+            val preferences = AnalyticsPreferences.Default
+            everySuspend {
+                repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
+            } returns Either.Right(Unit)
+            subject(AnalyticsRange.Last7Days, preferences).shouldBeRight()
+            verifySuspend {
+                repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
+            }
         }
     })
