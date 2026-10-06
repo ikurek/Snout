@@ -36,5 +36,21 @@ class FeatureFlagMapperTest :
             val flag = dto.toFeatureFlag()
             flag.status shouldBe FeatureFlagStatus.Inactive
             flag.isReleasedToEveryone shouldBe true
+            flag.payloads shouldBe emptyMap()
+        }
+
+        should("unwrap JSON-encoded payloads into readable text") {
+            val dto = json.decodeFromString<FeatureFlagDto>(
+                """{"id":2,"key":"paywall","active":true,"is_remote_configuration":true,"has_encrypted_payloads":false,
+                "filters":{"groups":[],"payloads":{"true":"{\"free_views\":3,\"offering\":\"lifetime\"}",
+                "control":"\"plain\"","test":"42","raw":{"a":1},"text":"not json"}}}""",
+            )
+            val flag = dto.toFeatureFlag()
+            flag.isRemoteConfiguration shouldBe true
+            flag.booleanPayload shouldBe "{\n  \"free_views\": 3,\n  \"offering\": \"lifetime\"\n}"
+            flag.variantPayload("control") shouldBe "plain"
+            flag.variantPayload("test") shouldBe "42"
+            flag.variantPayload("raw") shouldBe "{\n  \"a\": 1\n}"
+            flag.variantPayload("text") shouldBe "not json"
         }
     })

@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import com.nightcode.snout.shared.domain.model.featureflags.FlagVariant
 import com.nightcode.snout.shared.domain.model.featureflags.PropertyFilter
 import com.nightcode.snout.shared.domain.model.featureflags.ReleaseCondition
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -35,7 +36,26 @@ internal fun FeatureFlagDto.toFeatureFlag(): FeatureFlag = FeatureFlag(
     createdBy = createdBy?.displayName?.takeIf { it.isNotBlank() },
     canEdit = canEdit,
     isRemoteConfiguration = isRemoteConfiguration,
+    payloads = filters?.payloads.orEmpty().mapValues { (_, value) -> value.toPayloadText() },
+    hasEncryptedPayloads = hasEncryptedPayloads,
 )
+
+private val PrettyJson = Json {
+    prettyPrint = true
+    prettyPrintIndent = "  "
+}
+
+/** PostHog stores payloads as JSON-encoded strings; unwrap one level so quoted text reads plain and objects pretty. */
+internal fun JsonElement.toPayloadText(): String {
+    val decoded = (this as? JsonPrimitive)
+        ?.takeIf { it.isString }
+        ?.let { raw -> runCatching { Json.parseToJsonElement(raw.content) }.getOrNull() }
+        ?: this
+    return when (decoded) {
+        is JsonPrimitive -> decoded.contentOrNull ?: decoded.toString()
+        else -> PrettyJson.encodeToString(JsonElement.serializer(), decoded)
+    }
+}
 
 private fun FlagGroupDto.toCondition() = ReleaseCondition(
     rolloutPercentage = rolloutPercentage ?: FullRollout,

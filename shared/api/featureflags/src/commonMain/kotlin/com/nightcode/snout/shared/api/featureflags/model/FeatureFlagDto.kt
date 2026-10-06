@@ -18,6 +18,7 @@ data class FeatureFlagDto(
     @SerialName("tags") val tags: List<String> = emptyList(),
     @SerialName("status") val status: String? = null,
     @SerialName("is_remote_configuration") val isRemoteConfiguration: Boolean = false,
+    @SerialName("has_encrypted_payloads") val hasEncryptedPayloads: Boolean = false,
     @SerialName("can_edit") val canEdit: Boolean = true,
     @SerialName("deleted") val deleted: Boolean = false,
 )
@@ -26,6 +27,11 @@ data class FeatureFlagDto(
 data class FlagFiltersDto(
     @SerialName("groups") val groups: List<FlagGroupDto> = emptyList(),
     @SerialName("multivariate") val multivariate: FlagMultivariateDto? = null,
+    /**
+     * Keyed by `"true"` for boolean and remote configuration flags, or by variant key.
+     * Values are usually JSON-encoded strings.
+     */
+    @SerialName("payloads") val payloads: Map<String, JsonElement>? = null,
 )
 
 @Serializable
