@@ -16,19 +16,22 @@ private val ThemeModeKey = stringPreferencesKey("theme_mode")
 private val NavigationTabsKey = stringPreferencesKey("navigation_tabs")
 private val NavigationLandingKey = stringPreferencesKey("navigation_landing")
 private val AnalyticsDefaultRangeKey = stringPreferencesKey("analytics_default_range")
-private val AnalyticsMetricsKey = stringPreferencesKey("analytics_metrics")
+private val AnalyticsHiddenMetricsKey = stringPreferencesKey("analytics_hidden_metrics")
 private val AnalyticsShowVisitorsTrendKey = booleanPreferencesKey("analytics_show_visitors_trend")
-private val AnalyticsBreakdownsKey = stringPreferencesKey("analytics_breakdowns")
+private val AnalyticsHiddenBreakdownsKey = stringPreferencesKey("analytics_hidden_breakdowns")
 
 /** Raw bottom-navigation settings as stored; `null` means never saved. Lists are comma-separated names. */
 data class StoredNavigationPreferences(val tabs: String?, val landing: String?)
 
-/** Raw analytics settings as stored; `null` means never saved. Lists are comma-separated names. */
+/**
+ * Raw analytics settings as stored; `null` means never saved. Lists are comma-separated names of what the person
+ * switched off, so cards and tables added in later versions show up by default instead of staying hidden.
+ */
 data class StoredAnalyticsPreferences(
     val defaultRange: String?,
-    val metrics: String?,
-    val showVisitorsTrend: Boolean?,
-    val breakdowns: String?,
+    val hiddenMetrics: String?,
+    val showTrendChart: Boolean?,
+    val hiddenBreakdowns: String?,
 )
 
 class AppStateDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
@@ -72,23 +75,23 @@ class AppStateDataStore internal constructor(private val dataStore: DataStore<Pr
     fun observeAnalyticsPreferences(): Flow<StoredAnalyticsPreferences> = dataStore.data.map {
         StoredAnalyticsPreferences(
             defaultRange = it[AnalyticsDefaultRangeKey],
-            metrics = it[AnalyticsMetricsKey],
-            showVisitorsTrend = it[AnalyticsShowVisitorsTrendKey],
-            breakdowns = it[AnalyticsBreakdownsKey],
+            hiddenMetrics = it[AnalyticsHiddenMetricsKey],
+            showTrendChart = it[AnalyticsShowVisitorsTrendKey],
+            hiddenBreakdowns = it[AnalyticsHiddenBreakdownsKey],
         )
     }
 
     suspend fun saveAnalyticsPreferences(
         defaultRange: String,
-        metrics: String,
-        showVisitorsTrend: Boolean,
-        breakdowns: String,
+        hiddenMetrics: String,
+        showTrendChart: Boolean,
+        hiddenBreakdowns: String,
     ) {
         dataStore.edit {
             it[AnalyticsDefaultRangeKey] = defaultRange
-            it[AnalyticsMetricsKey] = metrics
-            it[AnalyticsShowVisitorsTrendKey] = showVisitorsTrend
-            it[AnalyticsBreakdownsKey] = breakdowns
+            it[AnalyticsHiddenMetricsKey] = hiddenMetrics
+            it[AnalyticsShowVisitorsTrendKey] = showTrendChart
+            it[AnalyticsHiddenBreakdownsKey] = hiddenBreakdowns
         }
     }
 

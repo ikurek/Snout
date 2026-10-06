@@ -31,24 +31,24 @@ internal object PreferencesCodec {
 
     fun decodeAnalytics(stored: StoredAnalyticsPreferences): AnalyticsPreferences {
         val defaults = AnalyticsPreferences.Default
-        val metrics = stored.metrics?.decodeList<OverviewMetricKey>()
-            ?.filter { it in AnalyticsPreferences.ConfigurableMetrics }
-            ?.takeIf { it.isNotEmpty() }
-            ?.toSet()
+        val hiddenMetrics = stored.hiddenMetrics.decodeList<OverviewMetricKey>().toSet()
+        // Hiding every stat card is not allowed; a store that says so is treated as hiding none.
+        val metrics = (defaults.metrics - hiddenMetrics).ifEmpty { defaults.metrics }
         return AnalyticsPreferences(
             defaultRange = stored.defaultRange?.let { name -> AnalyticsRange.entries.firstOrNull { it.name == name } }
                 ?: defaults.defaultRange,
-            metrics = metrics ?: defaults.metrics,
-            showVisitorsTrend = stored.showVisitorsTrend ?: defaults.showVisitorsTrend,
-            breakdowns = stored.breakdowns?.decodeList<WebBreakdown>()?.toSet() ?: defaults.breakdowns,
+            metrics = metrics,
+            showTrendChart = stored.showTrendChart ?: defaults.showTrendChart,
+            breakdowns = defaults.breakdowns - stored.hiddenBreakdowns.decodeList<WebBreakdown>().toSet(),
         )
     }
 
-    fun encodeMetrics(preferences: AnalyticsPreferences): String =
-        OverviewMetricKey.entries.filter { it in preferences.metrics }.joinToString(Separator) { it.name }
+    fun encodeHiddenMetrics(preferences: AnalyticsPreferences): String = AnalyticsPreferences.ConfigurableMetrics
+        .filterNot { it in preferences.metrics }
+        .joinToString(Separator) { it.name }
 
-    fun encodeBreakdowns(preferences: AnalyticsPreferences): String =
-        WebBreakdown.entries.filter { it in preferences.breakdowns }.joinToString(Separator) { it.name }
+    fun encodeHiddenBreakdowns(preferences: AnalyticsPreferences): String =
+        WebBreakdown.entries.filterNot { it in preferences.breakdowns }.joinToString(Separator) { it.name }
 
     private fun defaultNav() = NavigationPreferences.Default
 

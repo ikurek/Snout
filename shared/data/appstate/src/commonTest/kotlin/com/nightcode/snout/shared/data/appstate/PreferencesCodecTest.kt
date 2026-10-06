@@ -55,25 +55,38 @@ class PreferencesCodecTest :
                 AnalyticsPreferences.Default
         }
 
-        should("decode analytics preferences and ignore unknown names") {
+        should("decode hidden cards and tables and ignore unknown names") {
             val stored = StoredAnalyticsPreferences(
                 defaultRange = "Last30Days",
-                metrics = "Visitors,Other,Mystery",
-                showVisitorsTrend = false,
-                breakdowns = "Page,Country",
+                hiddenMetrics = "BounceRate,Mystery",
+                showTrendChart = false,
+                hiddenBreakdowns = "Country,Nope",
             )
             PreferencesCodec.decodeAnalytics(stored) shouldBe AnalyticsPreferences(
                 defaultRange = AnalyticsRange.Last30Days,
-                metrics = setOf(OverviewMetricKey.Visitors),
-                showVisitorsTrend = false,
-                breakdowns = setOf(WebBreakdown.Page, WebBreakdown.Country),
+                metrics = AnalyticsPreferences.Default.metrics - OverviewMetricKey.BounceRate,
+                showTrendChart = false,
+                breakdowns = AnalyticsPreferences.Default.breakdowns - WebBreakdown.Country,
             )
         }
 
-        should("keep all metrics when the stored list is empty") {
-            val stored = StoredAnalyticsPreferences(null, "", null, "")
-            val decoded = PreferencesCodec.decodeAnalytics(stored)
-            decoded.metrics shouldBe AnalyticsPreferences.Default.metrics
-            decoded.breakdowns shouldBe emptySet()
+        should("show every stat card when the store claims all of them are hidden") {
+            val allHidden = AnalyticsPreferences.ConfigurableMetrics.joinToString(",") { it.name }
+            PreferencesCodec.decodeAnalytics(StoredAnalyticsPreferences(null, allHidden, null, null)).metrics shouldBe
+                AnalyticsPreferences.Default.metrics
+        }
+
+        should("round-trip analytics preferences through the hidden lists") {
+            val preferences = AnalyticsPreferences.Default
+                .withMetric(OverviewMetricKey.Sessions, enabled = false)
+                .withBreakdown(WebBreakdown.AppVersion, enabled = false)
+                .copy(defaultRange = AnalyticsRange.Today)
+            val stored = StoredAnalyticsPreferences(
+                defaultRange = preferences.defaultRange.name,
+                hiddenMetrics = PreferencesCodec.encodeHiddenMetrics(preferences),
+                showTrendChart = preferences.showTrendChart,
+                hiddenBreakdowns = PreferencesCodec.encodeHiddenBreakdowns(preferences),
+            )
+            PreferencesCodec.decodeAnalytics(stored) shouldBe preferences
         }
     })

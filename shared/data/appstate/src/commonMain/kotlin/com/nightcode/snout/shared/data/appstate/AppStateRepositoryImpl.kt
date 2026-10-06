@@ -55,8 +55,8 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
     override suspend fun saveAnalyticsPreferences(preferences: AnalyticsPreferences) =
         dataStore.saveAnalyticsPreferences(
             defaultRange = preferences.defaultRange.name,
-            metrics = PreferencesCodec.encodeMetrics(preferences),
-            showVisitorsTrend = preferences.showVisitorsTrend,
-            breakdowns = PreferencesCodec.encodeBreakdowns(preferences),
+            hiddenMetrics = PreferencesCodec.encodeHiddenMetrics(preferences),
+            showTrendChart = preferences.showTrendChart,
+            hiddenBreakdowns = PreferencesCodec.encodeHiddenBreakdowns(preferences),
         )
 }
