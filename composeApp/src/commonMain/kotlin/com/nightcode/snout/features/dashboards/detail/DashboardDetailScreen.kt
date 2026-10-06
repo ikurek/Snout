@@ -1,38 +1,29 @@
 package com.nightcode.snout.features.dashboards.detail
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.LabelChip
+import com.nightcode.snout.designsystem.atoms.SkeletonLines
+import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
-import com.nightcode.snout.designsystem.InlineError
+import com.nightcode.snout.designsystem.molecules.InfoBanner
+import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
-import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -45,7 +36,6 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.dashboard_tile_error
 import snout.composeapp.generated.resources.dashboard_title_placeholder
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DashboardDetailScreen(
     state: DashboardDetailUiState,
@@ -59,8 +49,8 @@ internal fun DashboardDetailScreen(
         ?: stringResource(Res.string.dashboard_title_placeholder)
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            SnoutTopAppBar(
+                title = title,
                 navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
                 actions = { OpenInPostHogIconButton(onClick = onOpenInPostHog) },
             )
@@ -98,7 +88,7 @@ private fun TileList(
     ) {
         items(tiles, key = { it.id }) { tile ->
             when (tile) {
-                is DashboardTile.TextTile -> TextTileCard(tile)
+                is DashboardTile.TextTile -> InfoBanner(text = tile.body, showIcon = false)
 
                 is DashboardTile.InsightTile -> InsightTileCard(
                     tile = tile,
@@ -111,17 +101,7 @@ private fun TileList(
     }
 }
 
-@Composable
-private fun TextTileCard(tile: DashboardTile.TextTile) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = SnoutTheme.shapes.medium,
-        color = SnoutTheme.colors.surfaceContainerLow,
-    ) {
-        Text(text = tile.body, style = SnoutTheme.typography.bodyMedium, modifier = Modifier.padding(16.dp))
-    }
-}
-
+/** Insight tile: header with its type tag, then the chart; three skeleton lines while PostHog computes it. */
 @Composable
 private fun InsightTileCard(
     tile: DashboardTile.InsightTile,
@@ -132,21 +112,19 @@ private fun InsightTileCard(
     SectionCard(
         title = tile.insight.name,
         subtitle = tile.insight.description,
-        trailing = { LabelChip(text = tile.insight.kind.label()) },
+        trailing = { Tag(text = tile.insight.kind.label()) },
         onClick = onClick,
     ) {
         val result = tile.result
         when {
             result != null -> InsightResultView(result = result, display = tile.insight.display)
 
-            status is TileStatus.Failed -> InlineError(
+            status is TileStatus.Failed -> InlineErrorBanner(
                 text = stringResource(Res.string.dashboard_tile_error),
-                onRetry = onRetry,
+                onAction = onRetry,
             )
 
-            else -> Box(modifier = Modifier.fillMaxWidth().height(96.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp))
-            }
+            else -> SkeletonLines(modifier = Modifier.padding(vertical = 16.dp))
         }
     }
 }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.LabelChip
+import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
@@ -39,22 +39,27 @@ internal fun DashboardsScreen(
     onOpenDashboard: (dashboardId: Long) -> Unit,
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { dashboards ->
-        LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-            items(dashboards, key = { it.id }) { dashboard ->
-                DashboardRow(dashboard = dashboard, onClick = { onOpenDashboard(dashboard.id) })
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+            itemsIndexed(dashboards, key = { _, dashboard -> dashboard.id }) { index, dashboard ->
+                DashboardRow(
+                    dashboard = dashboard,
+                    divider = index < dashboards.lastIndex,
+                    onClick = { onOpenDashboard(dashboard.id) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun DashboardRow(dashboard: DashboardSummary, onClick: () -> Unit) {
+private fun DashboardRow(dashboard: DashboardSummary, divider: Boolean, onClick: () -> Unit) {
     EntityRow(
         title = dashboard.name,
         subtitle = dashboard.description,
+        divider = divider,
         onClick = onClick,
         meta = {
-            dashboard.tags.take(MaxTags).forEach { LabelChip(text = it) }
+            dashboard.tags.take(MaxTags).forEach { Tag(text = it) }
             dashboard.lastAccessedAt?.let {
                 MetaText(stringResource(Res.string.dashboards_last_viewed, it.formatRelative()))
             }
@@ -82,7 +87,13 @@ fun DashboardsScreenPreview() = DashboardsScreen(
     state = CachedUiState.Content(
         listOf(
             TestDashboardSummary,
-            TestDashboardSummary.copy(id = 2, name = "Marketing", pinned = false, tags = emptyList()),
+            TestDashboardSummary.copy(
+                id = 2,
+                name = "Marketing",
+                description = "Acquisition channels, campaign landing pages and signup conversion.",
+                pinned = false,
+                tags = emptyList(),
+            ),
         ),
         isRefreshing = false,
     ),
