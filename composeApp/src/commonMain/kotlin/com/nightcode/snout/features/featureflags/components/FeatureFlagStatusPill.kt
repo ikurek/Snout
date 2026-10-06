@@ -1,8 +1,8 @@
 package com.nightcode.snout.features.featureflags.components
 
 import androidx.compose.runtime.Composable
-import com.nightcode.snout.designsystem.LabelChip
-import com.nightcode.snout.designsystem.LabelChipTone
+import com.nightcode.snout.designsystem.atoms.StatusPill
+import com.nightcode.snout.designsystem.atoms.StatusTone
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import org.jetbrains.compose.resources.pluralStringResource
@@ -19,14 +19,14 @@ import snout.composeapp.generated.resources.feature_flag_status_stale
 import snout.composeapp.generated.resources.feature_flag_status_unknown
 
 @Composable
-internal fun FeatureFlagStatusChip(status: FeatureFlagStatus) {
+internal fun FeatureFlagStatusPill(status: FeatureFlagStatus) {
     val (label, tone) = when (status) {
-        FeatureFlagStatus.Active -> Res.string.feature_flag_status_active to LabelChipTone.Success
-        FeatureFlagStatus.Inactive -> Res.string.feature_flag_status_inactive to LabelChipTone.Neutral
-        FeatureFlagStatus.Stale -> Res.string.feature_flag_status_stale to LabelChipTone.Warning
-        FeatureFlagStatus.Unknown -> Res.string.feature_flag_status_unknown to LabelChipTone.Neutral
+        FeatureFlagStatus.Active -> Res.string.feature_flag_status_active to StatusTone.Active
+        FeatureFlagStatus.Inactive -> Res.string.feature_flag_status_inactive to StatusTone.Neutral
+        FeatureFlagStatus.Stale -> Res.string.feature_flag_status_stale to StatusTone.Info
+        FeatureFlagStatus.Unknown -> Res.string.feature_flag_status_unknown to StatusTone.Neutral
     }
-    LabelChip(text = stringResource(label), tone = tone)
+    StatusPill(text = stringResource(label), tone = tone)
 }
 
 /** One line describing who gets the flag. */
