@@ -274,7 +274,7 @@ private val PersonalApiKeyValidationError.textFieldError: TextFieldError
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun LoginScreenEmptyPreview() = LoginScreen(
+fun LoginScreenEmptyPreview() = LoginScreen(
     snackbarHostState = remember { SnackbarHostState() },
     instanceUrlValidationError = null,
     personalApiKeyValidationError = null,

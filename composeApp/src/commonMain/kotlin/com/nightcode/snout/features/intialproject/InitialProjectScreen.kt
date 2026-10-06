@@ -194,7 +194,7 @@ private fun ProjectItem(project: Project, onClick: () -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InitialProjectScreenLoadedPreview() = InitialProjectScreen(
+fun InitialProjectScreenLoadedPreview() = InitialProjectScreen(
     state = TestInitialProjectUiStateLoaded,
     onRetry = {},
     onProjectSelected = { _, _ -> },
@@ -203,7 +203,7 @@ private fun InitialProjectScreenLoadedPreview() = InitialProjectScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InitialProjectScreenLoadingPreview() = InitialProjectScreen(
+fun InitialProjectScreenLoadingPreview() = InitialProjectScreen(
     state = InitialProjectUiState.Loading,
     onRetry = {},
     onProjectSelected = { _, _ -> },
@@ -212,7 +212,7 @@ private fun InitialProjectScreenLoadingPreview() = InitialProjectScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InitialProjectScreenErrorPreview() = InitialProjectScreen(
+fun InitialProjectScreenErrorPreview() = InitialProjectScreen(
     state = InitialProjectUiState.Error(GetOrganizationsError.UnexpectedError),
     onRetry = {},
     onProjectSelected = { _, _ -> },

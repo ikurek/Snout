@@ -152,7 +152,7 @@ private fun InsightTileCard(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun DashboardDetailScreenPreview() = DashboardDetailScreen(
+fun DashboardDetailScreenPreview() = DashboardDetailScreen(
     state = TestDashboardDetailUiState,
     onNavigateBack = {},
     onRefresh = {},

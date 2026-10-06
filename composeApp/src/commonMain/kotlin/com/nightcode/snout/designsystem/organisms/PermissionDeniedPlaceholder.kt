@@ -29,4 +29,4 @@ internal fun PermissionDeniedPlaceholder(onRetry: () -> Unit, modifier: Modifier
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun PermissionDeniedPlaceholderPreview() = PermissionDeniedPlaceholder(onRetry = {})
+fun PermissionDeniedPlaceholderPreview() = PermissionDeniedPlaceholder(onRetry = {})

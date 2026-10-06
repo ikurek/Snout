@@ -145,7 +145,7 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: Axi
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun LineChartPreview() = LineChart(
+fun LineChartPreview() = LineChart(
     series = listOf(
         ChartSeries("Visitors", listOf(120.0, 180.0, 90.0, 240.0, 200.0, 310.0, 280.0), chartColor(0)),
         ChartSeries("Signups", listOf(20.0, 35.0, 10.0, 60.0, 45.0, 70.0, 66.0), chartColor(1)),

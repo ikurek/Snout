@@ -137,7 +137,7 @@ internal fun FavoriteIconButton(favorited: Boolean, onClick: () -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InsightsScreenPreview() = InsightsScreen(
+fun InsightsScreenPreview() = InsightsScreen(
     state = TestInsightsUiState,
     snackbarHostState = remember { SnackbarHostState() },
     onQueryChange = {},

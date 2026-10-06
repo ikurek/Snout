@@ -40,4 +40,4 @@ internal fun LabelChip(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun LabelChipPreview() = LabelChip(text = "Trends")
+fun LabelChipPreview() = LabelChip(text = "Trends")

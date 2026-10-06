@@ -139,7 +139,7 @@ private fun String.humanizeScope(): String = replace(Regex("(?<=[a-z])(?=[A-Z])"
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun ActivityLogScreenPreview() = ActivityLogScreen(
+fun ActivityLogScreenPreview() = ActivityLogScreen(
     state = CachedUiState.Content(
         listOf(
             TestActivityEntry,

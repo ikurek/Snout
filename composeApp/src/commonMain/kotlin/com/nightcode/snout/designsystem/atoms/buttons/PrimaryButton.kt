@@ -67,7 +67,7 @@ internal fun PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonEnabledPreview() = PrimaryButton(
+fun PrimaryButtonEnabledPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
 )
@@ -75,7 +75,7 @@ internal fun PrimaryButtonEnabledPreview() = PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonDisabledPreview() = PrimaryButton(
+fun PrimaryButtonDisabledPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
     enabled = false,
@@ -84,7 +84,7 @@ internal fun PrimaryButtonDisabledPreview() = PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonEnabledWithIconPreview() = PrimaryButton(
+fun PrimaryButtonEnabledWithIconPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
     icon = {
@@ -95,7 +95,7 @@ internal fun PrimaryButtonEnabledWithIconPreview() = PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonDisabledWithIconPreview() = PrimaryButton(
+fun PrimaryButtonDisabledWithIconPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
     enabled = false,
@@ -107,7 +107,7 @@ internal fun PrimaryButtonDisabledWithIconPreview() = PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonEnabledLoadingPreview() = PrimaryButton(
+fun PrimaryButtonEnabledLoadingPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
     loading = true,
@@ -116,7 +116,7 @@ internal fun PrimaryButtonEnabledLoadingPreview() = PrimaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryButtonDisabledLoadingPreview() = PrimaryButton(
+fun PrimaryButtonDisabledLoadingPreview() = PrimaryButton(
     text = "Button text",
     onClick = {},
     loading = true,

@@ -133,7 +133,7 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InsightDetailScreenPreview() = InsightDetailScreen(
+fun InsightDetailScreenPreview() = InsightDetailScreen(
     state = CachedUiState.Content(TestInsightDetail, isRefreshing = false),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},

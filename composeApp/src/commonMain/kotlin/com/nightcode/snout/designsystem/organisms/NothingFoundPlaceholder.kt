@@ -29,4 +29,4 @@ internal fun NothingFoundPlaceholder(onRetry: () -> Unit, modifier: Modifier = M
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun NothingFoundPlaceholderPreview() = NothingFoundPlaceholder(onRetry = {})
+fun NothingFoundPlaceholderPreview() = NothingFoundPlaceholder(onRetry = {})

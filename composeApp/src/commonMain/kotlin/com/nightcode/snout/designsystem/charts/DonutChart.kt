@@ -96,7 +96,7 @@ internal fun DonutChart(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun DonutChartPreview() = DonutChart(
+fun DonutChartPreview() = DonutChart(
     slices = listOf(
         ChartSlice("Chrome", 620.0, chartColor(0)),
         ChartSlice("Safari", 280.0, chartColor(1)),

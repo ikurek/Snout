@@ -59,7 +59,7 @@ internal fun PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldEmptyPreview() = PrimaryTextField(
+fun PrimaryTextFieldEmptyPreview() = PrimaryTextField(
     state = rememberTextFieldState(),
     label = "Label",
 )
@@ -67,7 +67,7 @@ internal fun PrimaryTextFieldEmptyPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldEmptyDisabledPreview() = PrimaryTextField(
+fun PrimaryTextFieldEmptyDisabledPreview() = PrimaryTextField(
     state = rememberTextFieldState(),
     label = "Label",
     enabled = false,
@@ -76,7 +76,7 @@ internal fun PrimaryTextFieldEmptyDisabledPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldEmptyWithPlaceholderPreview() = PrimaryTextField(
+fun PrimaryTextFieldEmptyWithPlaceholderPreview() = PrimaryTextField(
     state = rememberTextFieldState(),
     label = "Label",
     placeholder = "Placeholder",
@@ -85,7 +85,7 @@ internal fun PrimaryTextFieldEmptyWithPlaceholderPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldEmptyWithPlaceholderDisabledPreview() = PrimaryTextField(
+fun PrimaryTextFieldEmptyWithPlaceholderDisabledPreview() = PrimaryTextField(
     state = rememberTextFieldState(),
     label = "Label",
     placeholder = "Placeholder",
@@ -95,7 +95,7 @@ internal fun PrimaryTextFieldEmptyWithPlaceholderDisabledPreview() = PrimaryText
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldFilledPreview() = PrimaryTextField(
+fun PrimaryTextFieldFilledPreview() = PrimaryTextField(
     state = rememberTextFieldState(initialText = "Sample text"),
     label = "Label",
 )
@@ -103,7 +103,7 @@ internal fun PrimaryTextFieldFilledPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldFilledDisabledPreview() = PrimaryTextField(
+fun PrimaryTextFieldFilledDisabledPreview() = PrimaryTextField(
     state = rememberTextFieldState(initialText = "Sample text"),
     label = "Label",
     enabled = false,
@@ -112,7 +112,7 @@ internal fun PrimaryTextFieldFilledDisabledPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldFilledWithIconsPreview() = PrimaryTextField(
+fun PrimaryTextFieldFilledWithIconsPreview() = PrimaryTextField(
     state = rememberTextFieldState(initialText = "Sample text"),
     label = "Label",
     leadingIcon = {
@@ -126,7 +126,7 @@ internal fun PrimaryTextFieldFilledWithIconsPreview() = PrimaryTextField(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun PrimaryTextFieldFilledErrorPreview() = PrimaryTextField(
+fun PrimaryTextFieldFilledErrorPreview() = PrimaryTextField(
     state = rememberTextFieldState(initialText = "Sample text"),
     label = "Label",
     error = TextFieldError.Text("Error"),

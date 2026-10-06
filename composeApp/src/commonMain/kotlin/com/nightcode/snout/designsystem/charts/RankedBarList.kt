@@ -76,7 +76,7 @@ internal fun RankedBarList(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun RankedBarListPreview() = RankedBarList(
+fun RankedBarListPreview() = RankedBarList(
     rows = listOf(
         RankedBarRow("/", 8200.0, "20.1k views"),
         RankedBarRow("/pricing", 3100.0, "5.4k views"),

@@ -30,4 +30,4 @@ internal fun ActionChip(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun ActionChipPreview() = ActionChip(text = "PostHog Cloud EU", onClick = {})
+fun ActionChipPreview() = ActionChip(text = "PostHog Cloud EU", onClick = {})

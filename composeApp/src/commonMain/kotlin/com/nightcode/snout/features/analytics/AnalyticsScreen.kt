@@ -205,7 +205,7 @@ private fun AnalyticsRange.label(): String = stringResource(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun AnalyticsScreenPreview() = AnalyticsScreen(
+fun AnalyticsScreenPreview() = AnalyticsScreen(
     state = TestAnalyticsUiState,
     onRangeSelected = {},
     onRefresh = {},
@@ -214,7 +214,7 @@ private fun AnalyticsScreenPreview() = AnalyticsScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
+fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
     state = AnalyticsUiState(snapshot = CachedUiState.Error(DataError.Forbidden)),
     onRangeSelected = {},
     onRefresh = {},

@@ -48,4 +48,4 @@ internal fun SearchField(state: TextFieldState, placeholder: String, modifier: M
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SearchFieldPreview() = SearchField(state = rememberTextFieldState("daily"), placeholder = "Search insights")
+fun SearchFieldPreview() = SearchField(state = rememberTextFieldState("daily"), placeholder = "Search insights")

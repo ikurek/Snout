@@ -84,7 +84,7 @@ internal fun FunnelBars(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun FunnelBarsPreview() = FunnelBars(
+fun FunnelBarsPreview() = FunnelBars(
     steps = listOf(
         FunnelBarStep("Visited pricing", 1200.0, 1.0),
         FunnelBarStep("Started checkout", 480.0, 0.4, "median 1m 35s"),

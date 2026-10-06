@@ -257,7 +257,7 @@ private fun GetCurrentUserError.message() = when (this) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SettingsScreenPreview() = SettingsScreen(
+fun SettingsScreenPreview() = SettingsScreen(
     state = TestSettingsUiState,
     onNavigateBack = {},
     onRetryAccount = {},
@@ -270,7 +270,7 @@ private fun SettingsScreenPreview() = SettingsScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SettingsScreenAccountErrorPreview() = SettingsScreen(
+fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     state = TestSettingsUiState.copy(account = AccountUiState.Error(GetCurrentUserError.ConnectionError)),
     onNavigateBack = {},
     onRetryAccount = {},

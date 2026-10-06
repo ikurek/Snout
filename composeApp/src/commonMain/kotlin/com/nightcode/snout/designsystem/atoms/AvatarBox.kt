@@ -47,4 +47,4 @@ internal fun avatarColorForName(name: String): Color {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun AvatarBoxPreview() = AvatarBox(name = "Production")
+fun AvatarBoxPreview() = AvatarBox(name = "Production")

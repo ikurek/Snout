@@ -29,4 +29,4 @@ internal fun PaymentRequiredPlaceholder(onRetry: () -> Unit, modifier: Modifier 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun PaymentRequiredPlaceholderPreview() = PaymentRequiredPlaceholder(onRetry = {})
+fun PaymentRequiredPlaceholderPreview() = PaymentRequiredPlaceholder(onRetry = {})

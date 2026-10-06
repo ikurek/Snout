@@ -49,4 +49,4 @@ internal fun InfoNote(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InfoNotePreview() = InfoNote(text = "Use a personal API key with read access to this project.")
+fun InfoNotePreview() = InfoNote(text = "Use a personal API key with read access to this project.")

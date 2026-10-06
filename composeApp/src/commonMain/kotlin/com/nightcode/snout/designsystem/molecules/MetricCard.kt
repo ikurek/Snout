@@ -100,7 +100,7 @@ private fun TrendDelta(changePercent: Double, isIncreaseBad: Boolean, secondary:
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun MetricCardPreview() = MetricCard(
+fun MetricCardPreview() = MetricCard(
     label = "Visitors",
     value = "12.4k",
     changePercent = 12.8,

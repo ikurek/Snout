@@ -185,7 +185,7 @@ private fun MetricRow(name: String) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun ExperimentDetailScreenPreview() = ExperimentDetailScreen(
+fun ExperimentDetailScreenPreview() = ExperimentDetailScreen(
     state = CachedUiState.Content(TestExperiment, isRefreshing = false),
     onNavigateBack = {},
     onRetry = {},

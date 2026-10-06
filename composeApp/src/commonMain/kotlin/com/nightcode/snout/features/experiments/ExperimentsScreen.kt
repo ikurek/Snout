@@ -101,7 +101,7 @@ private fun ExperimentRow(experiment: Experiment, onClick: () -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun ExperimentsScreenPreview() = ExperimentsScreen(
+fun ExperimentsScreenPreview() = ExperimentsScreen(
     state = CachedUiState.Content(
         listOf(
             TestExperiment,

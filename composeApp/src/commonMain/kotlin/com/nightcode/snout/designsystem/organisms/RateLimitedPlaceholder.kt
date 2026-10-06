@@ -29,4 +29,4 @@ internal fun RateLimitedPlaceholder(onRetry: () -> Unit, modifier: Modifier = Mo
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun RateLimitedPlaceholderPreview() = RateLimitedPlaceholder(onRetry = {})
+fun RateLimitedPlaceholderPreview() = RateLimitedPlaceholder(onRetry = {})

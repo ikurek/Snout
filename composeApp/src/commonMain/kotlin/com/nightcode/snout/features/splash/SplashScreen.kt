@@ -23,4 +23,4 @@ internal fun SplashScreen() {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SplashScreenPreview() = SplashScreen()
+fun SplashScreenPreview() = SplashScreen()

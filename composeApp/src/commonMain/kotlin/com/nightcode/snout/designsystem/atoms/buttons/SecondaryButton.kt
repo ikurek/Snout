@@ -59,9 +59,9 @@ internal fun SecondaryButton(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SecondaryButtonPreview() = SecondaryButton(text = "Button text", onClick = {})
+fun SecondaryButtonPreview() = SecondaryButton(text = "Button text", onClick = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SecondaryButtonDestructivePreview() = SecondaryButton(text = "Log out", onClick = {}, destructive = true)
+fun SecondaryButtonDestructivePreview() = SecondaryButton(text = "Log out", onClick = {}, destructive = true)

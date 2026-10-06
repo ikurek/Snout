@@ -35,4 +35,4 @@ internal fun AppIcon() {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-internal fun AppIconPreview() = AppIcon()
+fun AppIconPreview() = AppIcon()

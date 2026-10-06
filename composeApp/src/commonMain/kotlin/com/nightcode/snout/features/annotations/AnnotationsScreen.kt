@@ -136,7 +136,7 @@ private fun AnnotationScope.label(): String? = when (this) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun AnnotationsScreenPreview() = AnnotationsScreen(
+fun AnnotationsScreenPreview() = AnnotationsScreen(
     state = TestAnnotationsUiState,
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
@@ -151,7 +151,7 @@ private fun AnnotationsScreenPreview() = AnnotationsScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
+fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
     state = AnnotationsUiState(annotations = CachedUiState.Empty(isRefreshing = false)),
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,

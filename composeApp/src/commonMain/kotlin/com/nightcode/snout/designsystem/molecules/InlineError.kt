@@ -56,4 +56,4 @@ internal fun InlineError(text: String, modifier: Modifier = Modifier, onRetry: (
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun InlineErrorPreview() = InlineError(text = "Couldn't load your account.", onRetry = {})
+fun InlineErrorPreview() = InlineError(text = "Couldn't load your account.", onRetry = {})

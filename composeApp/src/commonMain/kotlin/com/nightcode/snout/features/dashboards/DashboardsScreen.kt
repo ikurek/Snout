@@ -109,7 +109,7 @@ private fun DashboardRow(dashboard: DashboardSummary, onClick: () -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun DashboardsScreenPreview() = DashboardsScreen(
+fun DashboardsScreenPreview() = DashboardsScreen(
     state = CachedUiState.Content(
         listOf(
             TestDashboardSummary,

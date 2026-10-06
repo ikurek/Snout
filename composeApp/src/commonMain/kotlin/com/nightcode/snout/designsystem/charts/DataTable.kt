@@ -57,7 +57,7 @@ internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun DataTablePreview() = DataTable(
+fun DataTablePreview() = DataTable(
     columns = listOf("event", "count", "users"),
     rows = listOf(listOf("\$pageview", "4200", "900"), listOf("sign up", "120", "118")),
 )

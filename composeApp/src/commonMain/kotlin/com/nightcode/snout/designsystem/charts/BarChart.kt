@@ -69,7 +69,7 @@ internal fun BarChart(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun BarChartPreview() = BarChart(
+fun BarChartPreview() = BarChart(
     series = listOf(
         ChartSeries("New", listOf(12.0, 18.0, 9.0, 24.0, 20.0, 31.0, 28.0), chartColor(0)),
         ChartSeries("Dormant", listOf(-4.0, -3.0, -8.0, -2.0, -5.0, -1.0, -6.0), chartColor(3)),

@@ -48,7 +48,7 @@ internal fun ConfirmationDialog(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun ConfirmationDialogPreview() = ConfirmationDialog(
+fun ConfirmationDialogPreview() = ConfirmationDialog(
     title = "Log out?",
     text = "Your API key and cached data will be removed from this device.",
     confirmLabel = "Log out",

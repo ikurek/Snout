@@ -66,4 +66,4 @@ internal fun MoreScreen(onItemClick: (MoreItem) -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun MoreScreenPreview() = MoreScreen(onItemClick = {})
+fun MoreScreenPreview() = MoreScreen(onItemClick = {})

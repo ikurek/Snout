@@ -29,4 +29,4 @@ internal fun GenericErrorPlaceholder(onRetry: () -> Unit, modifier: Modifier = M
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun GenericErrorPlaceholderPreview() = GenericErrorPlaceholder(onRetry = {})
+fun GenericErrorPlaceholderPreview() = GenericErrorPlaceholder(onRetry = {})

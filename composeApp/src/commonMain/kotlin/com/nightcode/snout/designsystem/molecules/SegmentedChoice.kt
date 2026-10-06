@@ -35,7 +35,7 @@ internal fun <T> SegmentedChoice(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun SegmentedChoicePreview() = SegmentedChoice(
+fun SegmentedChoicePreview() = SegmentedChoice(
     options = listOf("System", "Light", "Dark"),
     selected = "System",
     onSelect = {},

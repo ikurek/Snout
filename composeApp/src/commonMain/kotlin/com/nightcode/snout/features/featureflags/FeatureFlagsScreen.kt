@@ -98,7 +98,7 @@ private fun FeatureFlagRow(flag: FeatureFlag, onClick: () -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
+fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
     state = TestFeatureFlagsUiState,
     onQueryChange = {},
     onRefresh = {},

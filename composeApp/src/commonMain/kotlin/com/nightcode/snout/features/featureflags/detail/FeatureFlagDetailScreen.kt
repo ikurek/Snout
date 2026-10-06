@@ -322,7 +322,7 @@ private fun DataError.toggleMessage() = when (this) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
+fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
     state = TestFeatureFlagDetailUiState,
     onNavigateBack = {},
     onRetry = {},
@@ -335,7 +335,7 @@ private fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
+fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
     state = TestFeatureFlagDetailUiState.copy(toggle = ToggleStatus.Failed(DataError.Forbidden)),
     onNavigateBack = {},
     onRetry = {},

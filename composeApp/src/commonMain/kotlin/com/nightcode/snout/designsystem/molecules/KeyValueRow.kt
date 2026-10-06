@@ -68,4 +68,4 @@ internal fun KeyValueRow(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun KeyValueRowPreview() = KeyValueRow(label = "Instance", value = "https://eu.posthog.com")
+fun KeyValueRowPreview() = KeyValueRow(label = "Instance", value = "https://eu.posthog.com")

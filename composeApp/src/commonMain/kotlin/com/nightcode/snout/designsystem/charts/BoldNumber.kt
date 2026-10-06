@@ -45,4 +45,4 @@ internal fun BoldNumber(value: String, modifier: Modifier = Modifier, label: Str
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-private fun BoldNumberPreview() = BoldNumber(value = "48.2k", label = "Pageviews · last 7 days")
+fun BoldNumberPreview() = BoldNumber(value = "48.2k", label = "Pageviews · last 7 days")
