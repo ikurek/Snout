@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.annotations
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -60,6 +61,8 @@ internal fun AnnotationsScreen(
 ) {
     Scaffold(
         containerColor = Color.Transparent,
+        // The surrounding screen already handled the system bars; applying them again leaves a gap under the app bar.
+        contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = { AddAnnotationButton(onClick = onAddClick) },
     ) { innerPadding ->
