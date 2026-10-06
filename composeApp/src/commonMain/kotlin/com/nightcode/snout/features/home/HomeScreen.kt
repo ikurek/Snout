@@ -19,43 +19,47 @@ import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.organisms.BottomNavigation
 import com.nightcode.snout.designsystem.organisms.BottomNavigationItem
 import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
-import com.nightcode.snout.features.analytics.AnalyticsRoute
-import com.nightcode.snout.features.dashboards.DashboardsRoute
-import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
-import com.nightcode.snout.features.insights.InsightsRoute
-import com.nightcode.snout.features.more.MoreItem
 import com.nightcode.snout.features.more.MoreScreen
+import com.nightcode.snout.shared.domain.model.appstate.HomeSection
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.bottom_nav_more
+import snout.composeapp.generated.resources.ic_more_horiz_24dp
 import snout.composeapp.generated.resources.ic_settings_24dp
 import snout.composeapp.generated.resources.settings_icon_content_description
 
+/** The home shell: four preference-driven tabs plus More. `null` as the current section means More. */
 @Composable
 internal fun HomeScreen(
+    preferences: NavigationPreferences,
     currentProjectName: String,
     onOpenProjectSwitcher: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onOpenDashboard: (dashboardId: Long) -> Unit,
-    onOpenInsight: (insightId: Long) -> Unit,
-    onOpenFeatureFlag: (flagId: Long) -> Unit,
-    onMoreItemClick: (MoreItem) -> Unit,
+    onOpenSection: (HomeSection) -> Unit,
     onOpenInPostHog: (PostHogResource) -> Unit,
+    navigation: SectionNavigation,
 ) {
-    var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.Analytics) }
+    var selected by rememberSaveable { mutableStateOf<HomeSection?>(preferences.landing) }
+    // A tab removed in settings while it was open falls back to More rather than showing a bar with nothing lit.
+    val current = selected?.takeIf { it in preferences.tabs }
+    val title = current?.let { stringResource(it.label) } ?: stringResource(Res.string.bottom_nav_more)
 
     Scaffold(
         topBar = {
             SnoutTopAppBar(
-                title = stringResource(currentDestination.label),
+                title = title,
                 navigationIcon = {
                     IconButton(onClick = onOpenProjectSwitcher, modifier = Modifier.size(48.dp)) {
                         Crossfade(targetState = currentProjectName) { AvatarBox(name = it) }
                     }
                 },
                 actions = {
-                    OpenInPostHogIconButton(onClick = { onOpenInPostHog(currentDestination.resource) })
+                    OpenInPostHogIconButton(
+                        onClick = { onOpenInPostHog(current?.resource ?: PostHogResource.Project) },
+                    )
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_settings_24dp),
@@ -67,25 +71,26 @@ internal fun HomeScreen(
         },
         bottomBar = {
             BottomNavigation(
-                items = HomeDestination.entries.map {
+                items = preferences.tabs.map {
                     BottomNavigationItem(label = stringResource(it.label), icon = painterResource(it.icon))
-                },
-                selectedIndex = currentDestination.ordinal,
-                onSelect = { currentDestination = HomeDestination.entries[it] },
+                } + BottomNavigationItem(
+                    label = stringResource(Res.string.bottom_nav_more),
+                    icon = painterResource(Res.drawable.ic_more_horiz_24dp),
+                ),
+                selectedIndex = current?.let { preferences.tabs.indexOf(it) } ?: preferences.tabs.size,
+                onSelect = { index -> selected = preferences.tabs.getOrNull(index) },
             )
         },
     ) { innerPadding ->
         AnimatedContent(
-            targetState = currentDestination,
+            targetState = current,
             label = "HomeTabContent",
             modifier = Modifier.padding(innerPadding),
-        ) { destination ->
-            when (destination) {
-                HomeDestination.Analytics -> AnalyticsRoute()
-                HomeDestination.Dashboards -> DashboardsRoute(onOpenDashboard = onOpenDashboard)
-                HomeDestination.Insights -> InsightsRoute(onOpenInsight = onOpenInsight)
-                HomeDestination.FeatureFlags -> FeatureFlagsRoute(onOpenFlag = onOpenFeatureFlag)
-                HomeDestination.More -> MoreScreen(onItemClick = onMoreItemClick)
+        ) { section ->
+            if (section == null) {
+                MoreScreen(sections = preferences.hidden, onItemClick = onOpenSection)
+            } else {
+                HomeSectionContent(section = section, navigation = navigation)
             }
         }
     }

@@ -2,7 +2,6 @@ package com.nightcode.snout.features.experiments
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
@@ -27,34 +25,22 @@ import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.experiment_not_started
 import snout.composeapp.generated.resources.experiment_started
-import snout.composeapp.generated.resources.more_experiments_title
 
+/** Section body only; the home shell or [com.nightcode.snout.features.home.SectionRoute] supplies the chrome. */
 @Composable
 internal fun ExperimentsScreen(
     state: CachedUiState<List<Experiment>>,
-    onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     onOpenExperiment: (experimentId: Long) -> Unit,
-    onOpenInPostHog: () -> Unit,
 ) {
-    ListScreenScaffold(
-        title = stringResource(Res.string.more_experiments_title),
-        onNavigateBack = onNavigateBack,
-        onOpenInPostHog = onOpenInPostHog,
-    ) { innerPadding ->
-        CachedStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-        ) { experiments ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
-                    ExperimentRow(
-                        experiment = experiment,
-                        divider = index < experiments.lastIndex,
-                        onClick = { onOpenExperiment(experiment.id) },
-                    )
-                }
+    CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { experiments ->
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+            itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
+                ExperimentRow(
+                    experiment = experiment,
+                    divider = index < experiments.lastIndex,
+                    onClick = { onOpenExperiment(experiment.id) },
+                )
             }
         }
     }
@@ -89,10 +75,8 @@ fun ExperimentsScreenPreview() = ExperimentsScreen(
         ),
         isRefreshing = false,
     ),
-    onNavigateBack = {},
     onRefresh = {},
     onOpenExperiment = {},
-    onOpenInPostHog = {},
 )
 
 @PreviewLightDark
@@ -100,8 +84,6 @@ fun ExperimentsScreenPreview() = ExperimentsScreen(
 @Composable
 fun ExperimentsScreenEmptyPreview() = ExperimentsScreen(
     state = CachedUiState.Empty(isRefreshing = false),
-    onNavigateBack = {},
     onRefresh = {},
     onOpenExperiment = {},
-    onOpenInPostHog = {},
 )

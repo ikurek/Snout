@@ -16,29 +16,29 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
-import com.nightcode.snout.features.activitylog.ActivityLogNavKey
-import com.nightcode.snout.features.activitylog.ActivityLogRoute
-import com.nightcode.snout.features.annotations.AnnotationsNavKey
-import com.nightcode.snout.features.annotations.AnnotationsRoute
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailNavKey
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailRoute
-import com.nightcode.snout.features.experiments.ExperimentsNavKey
-import com.nightcode.snout.features.experiments.ExperimentsRoute
 import com.nightcode.snout.features.experiments.detail.ExperimentDetailNavKey
 import com.nightcode.snout.features.experiments.detail.ExperimentDetailRoute
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailNavKey
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailRoute
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
+import com.nightcode.snout.features.home.SectionNavKey
+import com.nightcode.snout.features.home.SectionNavigation
+import com.nightcode.snout.features.home.SectionRoute
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailRoute
 import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectRoute
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.login.LoginRoute
-import com.nightcode.snout.features.more.MoreItem
 import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.SettingsRoute
+import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
+import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
+import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
+import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
 import org.koin.compose.koinInject
@@ -89,6 +89,12 @@ private fun ReturnToLoginOnSessionExpiry(backStack: NavBackStack<NavKey>) {
 
 private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> {
     val back: () -> Unit = { backStack.removeLastOrNull() }
+    val sectionNavigation = SectionNavigation(
+        onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
+        onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
+        onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
+        onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
+    )
     return entryProvider {
         entry<LoginNavKey> { LoginRoute(onUserAuthorized = { backStack.add(InitialProjectNavKey) }) }
         entry<InitialProjectNavKey> {
@@ -102,13 +108,22 @@ private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         entry<HomeNavKey> {
             HomeRoute(
                 onNavigateToSettings = { backStack.add(SettingsNavKey) },
-                onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
-                onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
-                onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
-                onMoreItemClick = { item -> backStack.add(item.navKey()) },
+                onOpenSection = { backStack.add(SectionNavKey(it)) },
+                navigation = sectionNavigation,
             )
         }
-        entry<SettingsNavKey> { SettingsRoute(onNavigateBack = back) }
+        entry<SectionNavKey> { key ->
+            SectionRoute(section = key.section, onNavigateBack = back, navigation = sectionNavigation)
+        }
+        entry<SettingsNavKey> {
+            SettingsRoute(
+                onNavigateBack = back,
+                onOpenNavigationSettings = { backStack.add(NavigationSettingsNavKey) },
+                onOpenAnalyticsSettings = { backStack.add(AnalyticsSettingsNavKey) },
+            )
+        }
+        entry<NavigationSettingsNavKey> { NavigationSettingsRoute(onNavigateBack = back) }
+        entry<AnalyticsSettingsNavKey> { AnalyticsSettingsRoute(onNavigateBack = back) }
         entry<DashboardDetailNavKey> { key ->
             DashboardDetailRoute(
                 navKey = key,
@@ -118,9 +133,6 @@ private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         }
         entry<InsightDetailNavKey> { key -> InsightDetailRoute(navKey = key, onNavigateBack = back) }
         entry<FeatureFlagDetailNavKey> { key -> FeatureFlagDetailRoute(navKey = key, onNavigateBack = back) }
-        entry<ExperimentsNavKey> {
-            ExperimentsRoute(onNavigateBack = back, onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) })
-        }
         entry<ExperimentDetailNavKey> { key ->
             ExperimentDetailRoute(
                 navKey = key,
@@ -128,13 +140,5 @@ private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
                 onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
             )
         }
-        entry<AnnotationsNavKey> { AnnotationsRoute(onNavigateBack = back) }
-        entry<ActivityLogNavKey> { ActivityLogRoute(onNavigateBack = back) }
     }
-}
-
-private fun MoreItem.navKey(): NavKey = when (this) {
-    MoreItem.Experiments -> ExperimentsNavKey
-    MoreItem.Annotations -> AnnotationsNavKey
-    MoreItem.ActivityLog -> ActivityLogNavKey
 }

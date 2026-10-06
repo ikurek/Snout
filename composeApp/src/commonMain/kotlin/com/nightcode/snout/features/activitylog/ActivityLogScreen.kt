@@ -31,7 +31,6 @@ import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityChange
@@ -43,32 +42,17 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.activity_change_empty_value
 import snout.composeapp.generated.resources.activity_more_changes
 import snout.composeapp.generated.resources.activity_system_actor
-import snout.composeapp.generated.resources.more_activity_log_title
 
 private const val CollapsedChanges = 2
 private const val Arrow = "→"
 
+/** Section body only; the home shell or [com.nightcode.snout.features.home.SectionRoute] supplies the chrome. */
 @Composable
-internal fun ActivityLogScreen(
-    state: CachedUiState<List<ActivityEntry>>,
-    onNavigateBack: () -> Unit,
-    onRefresh: () -> Unit,
-    onOpenInPostHog: () -> Unit,
-) {
-    ListScreenScaffold(
-        title = stringResource(Res.string.more_activity_log_title),
-        onNavigateBack = onNavigateBack,
-        onOpenInPostHog = onOpenInPostHog,
-    ) { innerPadding ->
-        CachedStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-        ) { entries ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
-                    ActivityRow(entry = entry, divider = index < entries.lastIndex)
-                }
+internal fun ActivityLogScreen(state: CachedUiState<List<ActivityEntry>>, onRefresh: () -> Unit) {
+    CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { entries ->
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+            itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
+                ActivityRow(entry = entry, divider = index < entries.lastIndex)
             }
         }
     }
@@ -163,9 +147,7 @@ fun ActivityLogScreenPreview() = ActivityLogScreen(
         ),
         isRefreshing = false,
     ),
-    onNavigateBack = {},
     onRefresh = {},
-    onOpenInPostHog = {},
 )
 
 @PreviewLightDark
@@ -173,7 +155,5 @@ fun ActivityLogScreenPreview() = ActivityLogScreen(
 @Composable
 fun ActivityLogScreenPaymentRequiredPreview() = ActivityLogScreen(
     state = CachedUiState.Error(DataError.PaymentRequired),
-    onNavigateBack = {},
     onRefresh = {},
-    onOpenInPostHog = {},
 )

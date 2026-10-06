@@ -9,20 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.annotations_created_snackbar
 
-@Serializable
-internal data object AnnotationsNavKey : NavKey
-
 @Composable
-internal fun AnnotationsRoute(onNavigateBack: () -> Unit) {
+internal fun AnnotationsRoute() {
     val viewModel = koinViewModel<AnnotationsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -43,7 +36,6 @@ internal fun AnnotationsRoute(onNavigateBack: () -> Unit) {
         state = state,
         snackbarHostState = snackbarHostState,
         showCreateSheet = showCreateSheet,
-        onNavigateBack = onNavigateBack,
         onRefresh = viewModel::refresh,
         onAddClick = { showCreateSheet = true },
         onCreateDismiss = {
@@ -51,6 +43,5 @@ internal fun AnnotationsRoute(onNavigateBack: () -> Unit) {
             viewModel.dismissCreateError()
         },
         onCreate = viewModel::onCreate,
-        onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Annotations),
     )
 }

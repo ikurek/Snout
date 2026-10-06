@@ -9,12 +9,15 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
@@ -26,7 +29,6 @@ import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.annotations.Annotation
@@ -41,28 +43,24 @@ import snout.composeapp.generated.resources.annotation_scope_insight
 import snout.composeapp.generated.resources.annotation_scope_organization
 import snout.composeapp.generated.resources.annotation_scope_project
 import snout.composeapp.generated.resources.ic_add_24dp
-import snout.composeapp.generated.resources.more_annotations_title
 import kotlin.time.Instant
 
 private val DateColumnWidth = 78.dp
 
+/** Section body with its own FAB and snackbar; the home shell or the section route supplies the app bar. */
 @Composable
 internal fun AnnotationsScreen(
     state: AnnotationsUiState,
     snackbarHostState: SnackbarHostState,
     showCreateSheet: Boolean,
-    onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     onAddClick: () -> Unit,
     onCreateDismiss: () -> Unit,
     onCreate: (content: String, dateMarker: Instant) -> Unit,
-    onOpenInPostHog: () -> Unit,
 ) {
-    ListScreenScaffold(
-        title = stringResource(Res.string.more_annotations_title),
-        onNavigateBack = onNavigateBack,
-        onOpenInPostHog = onOpenInPostHog,
-        snackbarHostState = snackbarHostState,
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = { AddAnnotationButton(onClick = onAddClick) },
     ) { innerPadding ->
         CachedStateContainer(
@@ -149,12 +147,10 @@ fun AnnotationsScreenPreview() = AnnotationsScreen(
     state = TestAnnotationsUiState,
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
-    onNavigateBack = {},
     onRefresh = {},
     onAddClick = {},
     onCreateDismiss = {},
     onCreate = { _, _ -> },
-    onOpenInPostHog = {},
 )
 
 @PreviewLightDark
@@ -164,10 +160,8 @@ fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
     state = AnnotationsUiState(annotations = CachedUiState.Empty(isRefreshing = false)),
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
-    onNavigateBack = {},
     onRefresh = {},
     onAddClick = {},
     onCreateDismiss = {},
     onCreate = { _, _ -> },
-    onOpenInPostHog = {},
 )

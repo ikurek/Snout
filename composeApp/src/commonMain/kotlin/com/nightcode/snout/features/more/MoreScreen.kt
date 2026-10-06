@@ -14,49 +14,29 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
+import com.nightcode.snout.features.home.description
+import com.nightcode.snout.features.home.icon
+import com.nightcode.snout.features.home.label
+import com.nightcode.snout.shared.domain.model.appstate.HomeSection
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_chevron_right_24dp
-import snout.composeapp.generated.resources.ic_history_24dp
-import snout.composeapp.generated.resources.ic_science_24dp
-import snout.composeapp.generated.resources.ic_sticky_note_24dp
-import snout.composeapp.generated.resources.more_activity_log_subtitle
-import snout.composeapp.generated.resources.more_activity_log_title
-import snout.composeapp.generated.resources.more_annotations_subtitle
-import snout.composeapp.generated.resources.more_annotations_title
-import snout.composeapp.generated.resources.more_experiments_subtitle
-import snout.composeapp.generated.resources.more_experiments_title
 
-internal enum class MoreItem(val title: StringResource, val subtitle: StringResource, val icon: DrawableResource) {
-    Experiments(Res.string.more_experiments_title, Res.string.more_experiments_subtitle, Res.drawable.ic_science_24dp),
-    Annotations(
-        Res.string.more_annotations_title,
-        Res.string.more_annotations_subtitle,
-        Res.drawable.ic_sticky_note_24dp,
-    ),
-    ActivityLog(
-        Res.string.more_activity_log_title,
-        Res.string.more_activity_log_subtitle,
-        Res.drawable.ic_history_24dp,
-    ),
-}
-
-/** Navigation rows to the secondary sections: 20dp leading icon, title, description, trailing chevron. */
+/** Every section that did not get a bottom-bar slot: 20dp leading icon, title, description, trailing chevron. */
 @Composable
-internal fun MoreScreen(onItemClick: (MoreItem) -> Unit) {
+internal fun MoreScreen(sections: List<HomeSection>, onItemClick: (HomeSection) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        MoreItem.entries.forEachIndexed { index, item ->
+        sections.forEachIndexed { index, section ->
             EntityRow(
-                title = stringResource(item.title),
-                subtitle = stringResource(item.subtitle),
-                divider = index < MoreItem.entries.lastIndex,
-                onClick = { onItemClick(item) },
+                title = stringResource(section.label),
+                subtitle = stringResource(section.description),
+                divider = index < sections.lastIndex,
+                onClick = { onItemClick(section) },
                 leading = {
                     Icon(
-                        painter = painterResource(item.icon),
+                        painter = painterResource(section.icon),
                         contentDescription = null,
                         tint = SnoutTheme.colors.onSurfaceVariant,
                         modifier = Modifier.size(20.dp),
@@ -77,4 +57,4 @@ internal fun MoreScreen(onItemClick: (MoreItem) -> Unit) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun MoreScreenPreview() = MoreScreen(onItemClick = {})
+fun MoreScreenPreview() = MoreScreen(sections = NavigationPreferences.Default.hidden, onItemClick = {})
