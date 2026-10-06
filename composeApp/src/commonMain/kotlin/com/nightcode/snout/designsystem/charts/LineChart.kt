@@ -10,6 +10,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -27,6 +28,8 @@ import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
 private const val FillAlpha = 0.14f
+private const val DashLength = 8f
+private const val GapLength = 6f
 
 /**
  * Multi-series line chart with horizontal grid lines and first/middle/last x labels.
@@ -38,7 +41,7 @@ internal fun LineChart(
     xLabels: List<String>,
     modifier: Modifier = Modifier,
     height: Dp = 180.dp,
-    fill: Boolean = series.size == 1,
+    fill: Boolean = series.count { it.filled } == 1,
     showLegend: Boolean = series.size > 1,
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
@@ -114,7 +117,7 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: Axi
         val y = plot.yFor(value, range)
         if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
     }
-    if (fill) {
+    if (fill && series.filled) {
         val zero = plot.yFor(0.0, range)
         val area = Path().apply {
             addPath(path)
@@ -124,7 +127,16 @@ private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: Axi
         }
         drawPath(path = area, color = series.color.copy(alpha = FillAlpha))
     }
-    drawPath(path, series.color, style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+    val dash = if (series.dashed) {
+        PathEffect.dashPathEffect(floatArrayOf(DashLength * density, GapLength * density))
+    } else {
+        null
+    }
+    drawPath(
+        path = path,
+        color = series.color,
+        style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round, pathEffect = dash),
+    )
     if (series.values.size == 1) {
         drawCircle(
             series.color,

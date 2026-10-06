@@ -30,7 +30,7 @@ internal class AnalyticsSettingsViewModel(
         current.withMetric(key, enabled).takeIf { it.metrics.isNotEmpty() } ?: current
     }
 
-    fun onVisitorsTrendToggled(enabled: Boolean) = update { it.copy(showVisitorsTrend = enabled) }
+    fun onTrendChartToggled(enabled: Boolean) = update { it.copy(showTrendChart = enabled) }
 
     fun onBreakdownToggled(breakdown: WebBreakdown, enabled: Boolean) = update { it.withBreakdown(breakdown, enabled) }
 

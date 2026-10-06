@@ -20,7 +20,7 @@ internal fun AnalyticsSettingsRoute(onNavigateBack: () -> Unit) {
         onNavigateBack = onNavigateBack,
         onDefaultRangeSelected = viewModel::onDefaultRangeSelected,
         onMetricToggled = viewModel::onMetricToggled,
-        onVisitorsTrendToggled = viewModel::onVisitorsTrendToggled,
+        onTrendChartToggled = viewModel::onTrendChartToggled,
         onBreakdownToggled = viewModel::onBreakdownToggled,
         onReset = viewModel::onReset,
     )

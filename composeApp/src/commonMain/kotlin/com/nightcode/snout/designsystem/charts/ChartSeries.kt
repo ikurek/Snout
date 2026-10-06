@@ -5,8 +5,15 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
+/** [dashed] draws a comparison line (previous period); [filled] opts a series out of the area fill. */
 @Immutable
-internal data class ChartSeries(val name: String, val values: List<Double>, val color: Color)
+internal data class ChartSeries(
+    val name: String,
+    val values: List<Double>,
+    val color: Color,
+    val dashed: Boolean = false,
+    val filled: Boolean = true,
+)
 
 @Composable
 internal fun chartColor(index: Int): Color {

@@ -30,8 +30,8 @@ import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.analytics_visitors_trend
 import snout.composeapp.generated.resources.settings_analytics_breakdowns_section
+import snout.composeapp.generated.resources.settings_analytics_chart_label
 import snout.composeapp.generated.resources.settings_analytics_chart_section
 import snout.composeapp.generated.resources.settings_analytics_metrics_section
 import snout.composeapp.generated.resources.settings_analytics_range_section
@@ -46,7 +46,7 @@ internal fun AnalyticsSettingsScreen(
     onNavigateBack: () -> Unit,
     onDefaultRangeSelected: (AnalyticsRange) -> Unit,
     onMetricToggled: (OverviewMetricKey, Boolean) -> Unit,
-    onVisitorsTrendToggled: (Boolean) -> Unit,
+    onTrendChartToggled: (Boolean) -> Unit,
     onBreakdownToggled: (WebBreakdown, Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
@@ -67,7 +67,7 @@ internal fun AnalyticsSettingsScreen(
                 modifier = modifier,
                 onDefaultRangeSelected = onDefaultRangeSelected,
                 onMetricToggled = onMetricToggled,
-                onVisitorsTrendToggled = onVisitorsTrendToggled,
+                onTrendChartToggled = onTrendChartToggled,
                 onBreakdownToggled = onBreakdownToggled,
                 onReset = onReset,
             )
@@ -81,7 +81,7 @@ private fun AnalyticsSettingsContent(
     modifier: Modifier,
     onDefaultRangeSelected: (AnalyticsRange) -> Unit,
     onMetricToggled: (OverviewMetricKey, Boolean) -> Unit,
-    onVisitorsTrendToggled: (Boolean) -> Unit,
+    onTrendChartToggled: (Boolean) -> Unit,
     onBreakdownToggled: (WebBreakdown, Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
@@ -112,10 +112,10 @@ private fun AnalyticsSettingsContent(
 
         SectionLabel(stringResource(Res.string.settings_analytics_chart_section))
         SwitchRow(
-            title = stringResource(Res.string.analytics_visitors_trend),
-            checked = preferences.showVisitorsTrend,
+            title = stringResource(Res.string.settings_analytics_chart_label),
+            checked = preferences.showTrendChart,
             divider = false,
-            onCheckedChange = onVisitorsTrendToggled,
+            onCheckedChange = onTrendChartToggled,
         )
 
         SectionLabel(stringResource(Res.string.settings_analytics_breakdowns_section))
@@ -166,7 +166,7 @@ fun AnalyticsSettingsScreenPreview() = AnalyticsSettingsScreen(
     onNavigateBack = {},
     onDefaultRangeSelected = {},
     onMetricToggled = { _, _ -> },
-    onVisitorsTrendToggled = {},
+    onTrendChartToggled = {},
     onBreakdownToggled = { _, _ -> },
     onReset = {},
 )

@@ -13,6 +13,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
@@ -26,6 +30,7 @@ import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonBlock
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
+import com.nightcode.snout.designsystem.atoms.chips.ChoiceChip
 import com.nightcode.snout.designsystem.charts.ChartSeries
 import com.nightcode.snout.designsystem.charts.LineChart
 import com.nightcode.snout.designsystem.charts.RankedBarList
@@ -40,18 +45,21 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
+import com.nightcode.snout.shared.domain.model.analytics.MetricTrend
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetric
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKind
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
-import com.nightcode.snout.shared.domain.model.analytics.TimeSeries
+import com.nightcode.snout.shared.domain.model.analytics.TrendMetric
 import com.nightcode.snout.shared.domain.model.common.DataError
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.analytics_breakdown_views
 import snout.composeapp.generated.resources.analytics_metric_previous
-import snout.composeapp.generated.resources.analytics_metric_visitors
 import snout.composeapp.generated.resources.analytics_no_data
-import snout.composeapp.generated.resources.analytics_visitors_trend
+import snout.composeapp.generated.resources.analytics_trend_current
+import snout.composeapp.generated.resources.analytics_trend_previous
+import snout.composeapp.generated.resources.analytics_trend_title
 
 private const val SkeletonStatRows = 2
 private const val SkeletonLabelWidth = 0.5f
@@ -93,7 +101,7 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         OverviewGrid(snapshot.overview)
-        snapshot.visitorsTrend?.let { VisitorsTrendCard(it) }
+        if (snapshot.trends.isNotEmpty()) TrendCard(snapshot.trends)
         // Web projects have no screens and mobile projects have no pages; only show what has data.
         snapshot.breakdowns.filter { it.rows.isNotEmpty() }.forEach { BreakdownCard(it) }
         VerticalSpacer(8.dp)
@@ -154,21 +162,46 @@ private fun SkeletonStatCard(modifier: Modifier = Modifier) {
     }
 }
 
+/** One chart for visitors, views or sessions, with the preceding period dashed behind it. */
 @Composable
-private fun VisitorsTrendCard(trend: TimeSeries) {
-    SectionCard(title = stringResource(Res.string.analytics_visitors_trend)) {
-        if (trend.points.isEmpty()) {
+private fun TrendCard(trends: List<MetricTrend>) {
+    var selected by rememberSaveable { mutableStateOf(TrendMetric.Visitors) }
+    val trend = trends.firstOrNull { it.metric == selected } ?: trends.first()
+    SectionCard(title = stringResource(Res.string.analytics_trend_title, trend.metric.label())) {
+        if (trends.size > 1) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                trends.forEach { option ->
+                    ChoiceChip(
+                        text = option.metric.label(),
+                        selected = option.metric == trend.metric,
+                        onClick = { selected = option.metric },
+                    )
+                }
+            }
+        }
+        if (trend.current.points.isEmpty()) {
             EmptyNote()
         } else {
+            val previous = trend.previous?.takeIf { it.points.isNotEmpty() }
             LineChart(
-                series = listOf(
+                series = listOfNotNull(
                     ChartSeries(
-                        name = stringResource(Res.string.analytics_metric_visitors),
-                        values = trend.points.map { it.value },
+                        name = stringResource(Res.string.analytics_trend_current),
+                        values = trend.current.points.map { it.value },
                         color = chartColor(0),
                     ),
+                    previous?.let {
+                        ChartSeries(
+                            name = stringResource(Res.string.analytics_trend_previous),
+                            values = it.points.map { point -> point.value },
+                            color = SnoutTheme.colors.onSurfaceVariant,
+                            dashed = true,
+                            filled = false,
+                        )
+                    },
                 ),
-                xLabels = trend.points.map { it.label.formatChartLabel() },
+                xLabels = trend.current.points.map { it.label.formatChartLabel() },
+                fill = true,
             )
         }
     }
@@ -176,19 +209,20 @@ private fun VisitorsTrendCard(trend: TimeSeries) {
 
 @Composable
 private fun BreakdownCard(table: BreakdownTable) {
-    val viewsLabel = stringResource(Res.string.analytics_breakdown_views)
     SectionCard(title = table.breakdown.label()) {
         RankedBarList(
+            labelIsCode = table.breakdown.labelIsCode,
             rows = table.rows.map { row ->
-                RankedBarRow(
-                    label = row.label,
-                    value = row.visitors,
-                    secondary = row.views?.let { "${it.formatCompact()} $viewsLabel" },
-                )
+                RankedBarRow(label = row.label, value = row.visitors, secondary = row.views?.let { viewsLabel(it) })
             },
         )
     }
 }
+
+/** "1 view", "47 views", "1.2k views"; only an exact single view takes the singular. */
+@Composable
+private fun viewsLabel(views: Double): String =
+    pluralStringResource(Res.plurals.analytics_breakdown_views, if (views == 1.0) 1 else 2, views.formatCompact())
 
 @Composable
 private fun EmptyNote() {

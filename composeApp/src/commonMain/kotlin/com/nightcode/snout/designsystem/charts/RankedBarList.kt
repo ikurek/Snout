@@ -29,12 +29,13 @@ private const val BarAlpha = 0.14f
 @Immutable
 internal data class RankedBarRow(val label: String, val value: Double, val secondary: String? = null)
 
-/** Rows with a proportional background bar; labels are paths or event names, so they read in code style. */
+/** Rows with a proportional background bar; paths and event names read in code style, plain names do not. */
 @Composable
 internal fun RankedBarList(
     rows: List<RankedBarRow>,
     modifier: Modifier = Modifier,
     color: Color = chartColor(0),
+    labelIsCode: Boolean = true,
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
     val max = rows.maxOfOrNull { it.value }?.takeIf { it > 0 } ?: 1.0
@@ -54,7 +55,7 @@ internal fun RankedBarList(
                 ) {
                     Text(
                         text = row.label,
-                        style = SnoutTheme.code.medium,
+                        style = if (labelIsCode) SnoutTheme.code.medium else SnoutTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),

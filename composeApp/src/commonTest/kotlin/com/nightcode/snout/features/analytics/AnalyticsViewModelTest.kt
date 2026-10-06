@@ -29,7 +29,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
@@ -41,11 +40,13 @@ class AnalyticsViewModelTest :
         val repository = mock<AnalyticsRepository>()
         val cached = MutableStateFlow(TestAnalyticsSnapshot)
         val preferences = MutableStateFlow(AnalyticsPreferences.Default)
+        val selectedProject = MutableStateFlow(TestSelectedProject)
 
         fun subject(): AnalyticsViewModel {
             preferences.value = AnalyticsPreferences.Default
+            selectedProject.value = TestSelectedProject
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
-            every { appStateRepository.observeSelectedProject() } returns flowOf(TestSelectedProject)
+            every { appStateRepository.observeSelectedProject() } returns selectedProject
             every { appStateRepository.observeAnalyticsPreferences() } returns preferences
             every { repository.observeSnapshot(any(), any()) } returns cached
             return AnalyticsViewModel(
@@ -57,32 +58,38 @@ class AnalyticsViewModelTest :
         }
 
         should("refresh default range on start and expose cached snapshot") {
-            everySuspend { repository.refreshSnapshot(any(), any()) } returns Either.Right(Unit)
+            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
 
             viewModel.uiState.value.range shouldBe AnalyticsRange.Last7Days
             viewModel.uiState.value.snapshot shouldBe CachedUiState.Content(TestAnalyticsSnapshot, isRefreshing = false)
-            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days) }
+            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, any()) }
             collector.cancel()
         }
 
         should("refresh again when range changes") {
-            everySuspend { repository.refreshSnapshot(any(), any()) } returns Either.Right(Unit)
+            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
 
             viewModel.onRangeSelected(AnalyticsRange.Last30Days)
             viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
-            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
+            verifySuspend {
+                repository.refreshSnapshot(
+                    TestSelectedProject.projectId,
+                    AnalyticsRange.Last30Days,
+                    any(),
+                )
+            }
             collector.cancel()
         }
 
         should("open on the preferred range and hide deselected cards and tables") {
-            everySuspend { repository.refreshSnapshot(any(), any()) } returns Either.Right(Unit)
+            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
             val viewModel = subject()
             preferences.value = AnalyticsPreferences.Default
-                .copy(defaultRange = AnalyticsRange.Last30Days, showVisitorsTrend = false)
+                .copy(defaultRange = AnalyticsRange.Last30Days, showTrendChart = false)
                 .withMetric(OverviewMetricKey.BounceRate, enabled = false)
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
 
@@ -94,14 +101,40 @@ class AnalyticsViewModelTest :
                 OverviewMetricKey.Views,
                 OverviewMetricKey.Sessions,
                 OverviewMetricKey.SessionDuration,
+                OverviewMetricKey.WeeklyActiveUsers,
+                OverviewMetricKey.MonthlyActiveUsers,
             )
-            data.visitorsTrend shouldBe null
-            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
+            data.trends shouldBe emptyList()
+            verifySuspend {
+                repository.refreshSnapshot(
+                    TestSelectedProject.projectId,
+                    AnalyticsRange.Last30Days,
+                    any(),
+                )
+            }
+            collector.cancel()
+        }
+
+        should("refresh again when the selected project changes") {
+            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
+            val viewModel = subject()
+            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
+
+            val otherProject = TestSelectedProject.copy(projectId = 42L)
+            everySuspend { appStateRepository.getSelectedProject() } returns otherProject
+            selectedProject.value = otherProject
+            verifySuspend { repository.refreshSnapshot(42L, AnalyticsRange.Last7Days, any()) }
             collector.cancel()
         }
 
         should("keep cached content and surface refresh error") {
-            everySuspend { repository.refreshSnapshot(any(), any()) } returns Either.Left(DataError.ConnectionError)
+            everySuspend {
+                repository.refreshSnapshot(
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns Either.Left(DataError.ConnectionError)
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
 

@@ -98,6 +98,7 @@
     <string name="settings_analytics_range_section">Default range</string>
     <string name="settings_analytics_metrics_section">Stat cards</string>
     <string name="settings_analytics_chart_section">Chart</string>
+    <string name="settings_analytics_chart_label">Trend over time (visitors, views, sessions)</string>
     <string name="settings_analytics_breakdowns_section">Tables</string>
     <string name="settings_analytics_reset">Reset to default</string>
     <string name="settings_appearance_section">Appearance</string>
@@ -145,15 +146,25 @@
     <string name="analytics_metric_sessions">Sessions</string>
     <string name="analytics_metric_session_duration">Session duration</string>
     <string name="analytics_metric_bounce_rate">Bounce rate</string>
+    <string name="analytics_metric_wau">Weekly active users</string>
+    <string name="analytics_metric_mau">Monthly active users</string>
     <string name="analytics_metric_other">Other</string>
     <string name="analytics_metric_previous">vs</string>
-    <string name="analytics_visitors_trend">Visitors over time</string>
+    <string name="analytics_trend_title">%1$s over time</string>
+    <string name="analytics_trend_current">This period</string>
+    <string name="analytics_trend_previous">Previous period</string>
     <string name="analytics_breakdown_pages">Top pages</string>
     <string name="analytics_breakdown_screens">Top screens</string>
+    <string name="analytics_breakdown_entry_pages">Entry pages</string>
+    <string name="analytics_breakdown_exit_pages">Exit pages</string>
+    <string name="analytics_breakdown_channels">Channels</string>
     <string name="analytics_breakdown_sources">Top sources</string>
+    <string name="analytics_breakdown_campaigns">Campaigns</string>
     <string name="analytics_breakdown_country">Top countries</string>
     <string name="analytics_breakdown_device">Devices</string>
-    <string name="analytics_breakdown_views">views</string>
+    <string name="analytics_breakdown_browsers">Browsers</string>
+    <string name="analytics_breakdown_operating_systems">Operating systems</string>
+    <string name="analytics_breakdown_app_versions">App versions</string>
     <string name="analytics_no_data">No data for this period.</string>
     <string name="feature_flags_search_placeholder">Search flags by key</string>
     <string name="feature_flags_search_empty_title">No flags match</string>
@@ -230,6 +241,10 @@
     <string name="dialog_ok">OK</string>
     <string name="switch_project_bottom_sheet_title">Switch project</string>
     <string name="switch_project_bottom_sheet_nothing_found_title">No projects found</string>
+    <plurals name="analytics_breakdown_views">
+        <item quantity="one">%1$s view</item>
+        <item quantity="other">%1$s views</item>
+    </plurals>
     <plurals name="feature_flag_rollout_variants">
         <item quantity="one">A/B test · %1$d variant</item>
         <item quantity="other">A/B test · %1$d variants</item>

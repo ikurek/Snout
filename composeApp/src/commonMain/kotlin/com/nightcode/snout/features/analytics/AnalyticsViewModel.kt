@@ -53,8 +53,12 @@ internal class AnalyticsViewModel(
 
     init {
         viewModelScope.launch {
-            combine(range, observeSelectedProjectId()) { range, _ -> range }
-                .collectLatest { range -> refresh.run { refreshAnalytics(range) } }
+            // Refresh whenever the project, the range or what the preferences ask to query changes.
+            combine(range, preferences, observeSelectedProjectId()) { range, preferences, projectId ->
+                Triple(range, preferences, projectId)
+            }
+                .distinctUntilChanged()
+                .collectLatest { (range, preferences, _) -> refresh.run { refreshAnalytics(range, preferences) } }
         }
     }
 
@@ -62,5 +66,5 @@ internal class AnalyticsViewModel(
         selectedRange.value = selected
     }
 
-    fun refresh() = viewModelScope.launch { refresh.run { refreshAnalytics(range.first()) } }
+    fun refresh() = viewModelScope.launch { refresh.run { refreshAnalytics(range.first(), preferences.first()) } }
 }

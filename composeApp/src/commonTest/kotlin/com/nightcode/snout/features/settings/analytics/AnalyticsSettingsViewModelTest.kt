@@ -49,9 +49,9 @@ class AnalyticsSettingsViewModelTest :
                     AnalyticsPreferences.Default.withMetric(OverviewMetricKey.BounceRate, enabled = false),
                 )
             }
-            viewModel.onVisitorsTrendToggled(false)
+            viewModel.onTrendChartToggled(false)
             verifySuspend {
-                repository.saveAnalyticsPreferences(AnalyticsPreferences.Default.copy(showVisitorsTrend = false))
+                repository.saveAnalyticsPreferences(AnalyticsPreferences.Default.copy(showTrendChart = false))
             }
             viewModel.onBreakdownToggled(WebBreakdown.Country, enabled = false)
             verifySuspend {
