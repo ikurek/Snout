@@ -43,6 +43,7 @@ import com.nightcode.snout.shared.domain.model.user.User
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.ic_chevron_right_24dp
 import snout.composeapp.generated.resources.ic_logout_24dp
 import snout.composeapp.generated.resources.ic_open_in_new_24dp
 import snout.composeapp.generated.resources.open_in_posthog_content_description
@@ -52,13 +53,18 @@ import snout.composeapp.generated.resources.settings_account_error_permission
 import snout.composeapp.generated.resources.settings_account_error_rate_limited
 import snout.composeapp.generated.resources.settings_account_member_since
 import snout.composeapp.generated.resources.settings_account_section
+import snout.composeapp.generated.resources.settings_analytics_description
+import snout.composeapp.generated.resources.settings_analytics_title
 import snout.composeapp.generated.resources.settings_appearance_section
 import snout.composeapp.generated.resources.settings_connection_section
+import snout.composeapp.generated.resources.settings_customise_section
 import snout.composeapp.generated.resources.settings_instance_label
 import snout.composeapp.generated.resources.settings_logout_button
 import snout.composeapp.generated.resources.settings_logout_dialog_confirm
 import snout.composeapp.generated.resources.settings_logout_dialog_text
 import snout.composeapp.generated.resources.settings_logout_dialog_title
+import snout.composeapp.generated.resources.settings_navigation_description
+import snout.composeapp.generated.resources.settings_navigation_title
 import snout.composeapp.generated.resources.settings_project_label
 import snout.composeapp.generated.resources.settings_project_not_selected
 import snout.composeapp.generated.resources.settings_screen_title
@@ -74,6 +80,8 @@ internal fun SettingsScreen(
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
+    onOpenNavigationSettings: () -> Unit,
+    onOpenAnalyticsSettings: () -> Unit,
     onLogoutConfirmed: () -> Unit,
 ) {
     var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
@@ -92,6 +100,8 @@ internal fun SettingsScreen(
             onRetryAccount = onRetryAccount,
             onOpenInstance = onOpenInstance,
             onThemeModeSelected = onThemeModeSelected,
+            onOpenNavigationSettings = onOpenNavigationSettings,
+            onOpenAnalyticsSettings = onOpenAnalyticsSettings,
             onLogoutClick = { showLogoutDialog = true },
         )
     }
@@ -118,6 +128,8 @@ private fun SettingsContent(
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
+    onOpenNavigationSettings: () -> Unit,
+    onOpenAnalyticsSettings: () -> Unit,
     onLogoutClick: () -> Unit,
 ) {
     val themeLabels = ThemeMode.entries.associateWith { it.label() }
@@ -131,6 +143,9 @@ private fun SettingsContent(
 
         SectionLabel(stringResource(Res.string.settings_connection_section))
         ConnectionSection(state, onOpenInstance)
+
+        SectionLabel(stringResource(Res.string.settings_customise_section))
+        CustomiseSection(onOpenNavigationSettings, onOpenAnalyticsSettings)
 
         SectionLabel(stringResource(Res.string.settings_appearance_section))
         SegmentedControl(
@@ -215,6 +230,35 @@ private fun ConnectionSection(state: SettingsUiState, onOpenInstance: (url: Stri
     KeyValueRow(label = stringResource(Res.string.settings_project_label), value = projectValue)
 }
 
+/** Entry points to the sub-screens that shape the bottom bar and the Analytics tab. */
+@Composable
+private fun CustomiseSection(onOpenNavigationSettings: () -> Unit, onOpenAnalyticsSettings: () -> Unit) {
+    EntityRow(
+        title = stringResource(Res.string.settings_navigation_title),
+        subtitle = stringResource(Res.string.settings_navigation_description),
+        subtitleStyle = SnoutTheme.typography.bodySmall,
+        onClick = onOpenNavigationSettings,
+        trailing = { Chevron() },
+    )
+    EntityRow(
+        title = stringResource(Res.string.settings_analytics_title),
+        subtitle = stringResource(Res.string.settings_analytics_description),
+        subtitleStyle = SnoutTheme.typography.bodySmall,
+        divider = false,
+        onClick = onOpenAnalyticsSettings,
+        trailing = { Chevron() },
+    )
+}
+
+@Composable
+private fun Chevron() {
+    Icon(
+        painter = painterResource(Res.drawable.ic_chevron_right_24dp),
+        contentDescription = null,
+        tint = SnoutTheme.colors.onSurfaceVariant,
+    )
+}
+
 @Composable
 private fun ThemeMode.label(): String = stringResource(
     when (this) {
@@ -240,6 +284,8 @@ fun SettingsScreenPreview() = SettingsScreen(
     onRetryAccount = {},
     onOpenInstance = {},
     onThemeModeSelected = {},
+    onOpenNavigationSettings = {},
+    onOpenAnalyticsSettings = {},
     onLogoutConfirmed = {},
 )
 
@@ -253,5 +299,7 @@ fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     onRetryAccount = {},
     onOpenInstance = {},
     onThemeModeSelected = {},
+    onOpenNavigationSettings = {},
+    onOpenAnalyticsSettings = {},
     onLogoutConfirmed = {},
 )

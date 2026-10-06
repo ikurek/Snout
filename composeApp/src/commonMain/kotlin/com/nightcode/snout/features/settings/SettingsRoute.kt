@@ -12,7 +12,11 @@ import org.koin.compose.viewmodel.koinViewModel
 internal data object SettingsNavKey : NavKey
 
 @Composable
-internal fun SettingsRoute(onNavigateBack: () -> Unit) {
+internal fun SettingsRoute(
+    onNavigateBack: () -> Unit,
+    onOpenNavigationSettings: () -> Unit,
+    onOpenAnalyticsSettings: () -> Unit,
+) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -23,6 +27,8 @@ internal fun SettingsRoute(onNavigateBack: () -> Unit) {
         onRetryAccount = viewModel::loadAccount,
         onOpenInstance = { url -> uriHandler.openUri(url) },
         onThemeModeSelected = viewModel::onThemeModeSelected,
+        onOpenNavigationSettings = onOpenNavigationSettings,
+        onOpenAnalyticsSettings = onOpenAnalyticsSettings,
         onLogoutConfirmed = viewModel::onLogoutConfirmed,
     )
 }
