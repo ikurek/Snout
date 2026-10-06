@@ -6,13 +6,17 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.analytics.AnalyticsRepository
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
+import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.RefreshAnalytics
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -36,15 +40,19 @@ class AnalyticsViewModelTest :
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<AnalyticsRepository>()
         val cached = MutableStateFlow(TestAnalyticsSnapshot)
+        val preferences = MutableStateFlow(AnalyticsPreferences.Default)
 
         fun subject(): AnalyticsViewModel {
+            preferences.value = AnalyticsPreferences.Default
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
             every { appStateRepository.observeSelectedProject() } returns flowOf(TestSelectedProject)
+            every { appStateRepository.observeAnalyticsPreferences() } returns preferences
             every { repository.observeSnapshot(any(), any()) } returns cached
             return AnalyticsViewModel(
                 refreshAnalytics = RefreshAnalytics(GetSelectedProjectId(appStateRepository), repository),
                 observeAnalytics = ObserveAnalytics(ObserveSelectedProjectId(appStateRepository), repository),
                 observeSelectedProjectId = ObserveSelectedProjectId(appStateRepository),
+                observeAnalyticsPreferences = ObserveAnalyticsPreferences(appStateRepository),
             )
         }
 
@@ -66,6 +74,28 @@ class AnalyticsViewModelTest :
 
             viewModel.onRangeSelected(AnalyticsRange.Last30Days)
             viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
+            verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
+            collector.cancel()
+        }
+
+        should("open on the preferred range and hide deselected cards and tables") {
+            everySuspend { repository.refreshSnapshot(any(), any()) } returns Either.Right(Unit)
+            val viewModel = subject()
+            preferences.value = AnalyticsPreferences.Default
+                .copy(defaultRange = AnalyticsRange.Last30Days, showVisitorsTrend = false)
+                .withMetric(OverviewMetricKey.BounceRate, enabled = false)
+            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
+
+            viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
+            val snapshot = viewModel.uiState.value.snapshot.shouldBeInstanceOf<CachedUiState.Content<*>>()
+            val data = snapshot.data.shouldBeInstanceOf<AnalyticsSnapshot>()
+            data.overview.map { it.key } shouldBe listOf(
+                OverviewMetricKey.Visitors,
+                OverviewMetricKey.Views,
+                OverviewMetricKey.Sessions,
+                OverviewMetricKey.SessionDuration,
+            )
+            data.visitorsTrend shouldBe null
             verifySuspend { repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
             collector.cancel()
         }

@@ -1,0 +1,43 @@
+package com.nightcode.snout.features.settings.analytics
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
+import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveAnalyticsPreferences
+import com.nightcode.snout.shared.domain.usecase.appstate.SaveAnalyticsPreferences
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import org.koin.core.annotation.KoinViewModel
+
+@KoinViewModel
+internal class AnalyticsSettingsViewModel(
+    private val saveAnalyticsPreferences: SaveAnalyticsPreferences,
+    observeAnalyticsPreferences: ObserveAnalyticsPreferences,
+) : ViewModel() {
+
+    val uiState: StateFlow<AnalyticsPreferences?> = observeAnalyticsPreferences()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun onDefaultRangeSelected(range: AnalyticsRange) = update { it.copy(defaultRange = range) }
+
+    /** The last visible stat card cannot be switched off; the screen disables it, this guards the data. */
+    fun onMetricToggled(key: OverviewMetricKey, enabled: Boolean) = update { current ->
+        current.withMetric(key, enabled).takeIf { it.metrics.isNotEmpty() } ?: current
+    }
+
+    fun onVisitorsTrendToggled(enabled: Boolean) = update { it.copy(showVisitorsTrend = enabled) }
+
+    fun onBreakdownToggled(breakdown: WebBreakdown, enabled: Boolean) = update { it.withBreakdown(breakdown, enabled) }
+
+    fun onReset() = viewModelScope.launch { saveAnalyticsPreferences(AnalyticsPreferences.Default) }
+
+    private fun update(transform: (AnalyticsPreferences) -> AnalyticsPreferences) {
+        val current = uiState.value ?: return
+        viewModelScope.launch { saveAnalyticsPreferences(transform(current)) }
+    }
+}

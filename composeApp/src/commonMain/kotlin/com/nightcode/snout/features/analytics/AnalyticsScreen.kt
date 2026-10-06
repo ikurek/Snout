@@ -41,31 +41,16 @@ import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetric
-import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKind
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.TimeSeries
-import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.analytics_breakdown_country
-import snout.composeapp.generated.resources.analytics_breakdown_device
-import snout.composeapp.generated.resources.analytics_breakdown_pages
-import snout.composeapp.generated.resources.analytics_breakdown_screens
-import snout.composeapp.generated.resources.analytics_breakdown_sources
 import snout.composeapp.generated.resources.analytics_breakdown_views
-import snout.composeapp.generated.resources.analytics_metric_bounce_rate
 import snout.composeapp.generated.resources.analytics_metric_previous
-import snout.composeapp.generated.resources.analytics_metric_session_duration
-import snout.composeapp.generated.resources.analytics_metric_sessions
-import snout.composeapp.generated.resources.analytics_metric_views
 import snout.composeapp.generated.resources.analytics_metric_visitors
 import snout.composeapp.generated.resources.analytics_no_data
-import snout.composeapp.generated.resources.analytics_range_30d
-import snout.composeapp.generated.resources.analytics_range_7d
-import snout.composeapp.generated.resources.analytics_range_90d
-import snout.composeapp.generated.resources.analytics_range_today
 import snout.composeapp.generated.resources.analytics_visitors_trend
 
 private const val SkeletonStatRows = 2
@@ -219,37 +204,6 @@ private fun OverviewMetricKind.format(value: Double): String = when (this) {
     OverviewMetricKind.DurationSeconds -> value.formatDurationSeconds()
     OverviewMetricKind.Percentage -> value.formatPercent(isFraction = value <= 1.0)
 }
-
-@Composable
-private fun OverviewMetric.label(): String = when (key) {
-    OverviewMetricKey.Visitors -> stringResource(Res.string.analytics_metric_visitors)
-    OverviewMetricKey.Views -> stringResource(Res.string.analytics_metric_views)
-    OverviewMetricKey.Sessions -> stringResource(Res.string.analytics_metric_sessions)
-    OverviewMetricKey.SessionDuration -> stringResource(Res.string.analytics_metric_session_duration)
-    OverviewMetricKey.BounceRate -> stringResource(Res.string.analytics_metric_bounce_rate)
-    OverviewMetricKey.Other -> label.replaceFirstChar { it.uppercase() }
-}
-
-@Composable
-private fun WebBreakdown.label(): String = stringResource(
-    when (this) {
-        WebBreakdown.Page -> Res.string.analytics_breakdown_pages
-        WebBreakdown.Screen -> Res.string.analytics_breakdown_screens
-        WebBreakdown.ReferringDomain -> Res.string.analytics_breakdown_sources
-        WebBreakdown.Country -> Res.string.analytics_breakdown_country
-        WebBreakdown.DeviceType -> Res.string.analytics_breakdown_device
-    },
-)
-
-@Composable
-private fun AnalyticsRange.label(): String = stringResource(
-    when (this) {
-        AnalyticsRange.Today -> Res.string.analytics_range_today
-        AnalyticsRange.Last7Days -> Res.string.analytics_range_7d
-        AnalyticsRange.Last30Days -> Res.string.analytics_range_30d
-        AnalyticsRange.Last90Days -> Res.string.analytics_range_90d
-    },
-)
 
 @OptIn(TestData::class)
 @PreviewLightDark
