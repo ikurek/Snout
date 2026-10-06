@@ -8,40 +8,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import kotlin.math.abs
 
+/** Initials on a `primaryContainer` square; the same 32dp avatar sits in the app bar, project rows and the activity log. */
 @Composable
-internal fun AvatarBox(
-    name: String,
-    modifier: Modifier = Modifier,
-    color: Color = avatarColorForName(name),
-    size: Dp = 40.dp,
-) {
+internal fun AvatarBox(name: String, modifier: Modifier = Modifier, size: Dp = 32.dp) {
     Box(
         modifier = modifier
             .size(size)
-            .clip(SnoutTheme.shapes.small)
-            .background(color),
+            .clip(SnoutTheme.shapes.medium)
+            .background(SnoutTheme.colors.primaryContainer),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = name.take(2).uppercase(),
-            style = SnoutTheme.code.medium,
+            style = SnoutTheme.typography.labelSmall,
+            color = SnoutTheme.colors.onPrimaryContainer,
         )
     }
-}
-
-@Composable
-internal fun avatarColorForName(name: String): Color {
-    val colors = SnoutTheme.extendedColors.chart
-    return colors[abs(name.hashCode()) % colors.size]
 }
 
 @PreviewLightDark

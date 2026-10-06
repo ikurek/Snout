@@ -4,8 +4,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
@@ -13,11 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import org.jetbrains.compose.resources.painterResource
+import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import org.jetbrains.compose.resources.stringResource
-import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.ic_arrow_right_alt_24dp
 
+/** Form input with its label above the box; outlined so forms stay distinct from the tonal [SearchField]. */
 @Composable
 internal fun PrimaryTextField(
     state: TextFieldState,
@@ -28,31 +27,41 @@ internal fun PrimaryTextField(
     error: TextFieldError? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         state = state,
         modifier = modifier,
         enabled = enabled,
-        label = { Text(label) },
+        label = {
+            Text(text = label, style = SnoutTheme.typography.bodySmall, color = SnoutTheme.colors.onSurfaceVariant)
+        },
+        labelPosition = TextFieldLabelPosition.Above(),
         isError = error != null,
         lineLimits = lineLimits,
         keyboardOptions = keyboardOptions,
+        shape = SnoutTheme.shapes.medium,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = SnoutTheme.colors.surfaceContainerLowest,
+            unfocusedContainerColor = SnoutTheme.colors.surfaceContainerLowest,
+            errorContainerColor = SnoutTheme.colors.surfaceContainerLowest,
+            focusedBorderColor = SnoutTheme.colors.primary,
+            unfocusedBorderColor = SnoutTheme.colors.outline,
+            errorBorderColor = SnoutTheme.colors.error,
+            focusedPlaceholderColor = SnoutTheme.colors.onSurfaceVariant,
+            unfocusedPlaceholderColor = SnoutTheme.colors.onSurfaceVariant,
+        ),
         supportingText = error?.let {
             {
                 Text(
-                    when (it) {
+                    text = when (it) {
                         is TextFieldError.Resource -> stringResource(it.value)
                         is TextFieldError.Text -> it.value
                     },
+                    style = SnoutTheme.typography.bodySmall,
                 )
             }
         },
-        labelPosition = TextFieldLabelPosition.Above(),
-        placeholder = placeholder?.let { { Text(it) } },
-        leadingIcon = leadingIcon,
-        trailingIcon = trailingIcon,
+        placeholder = placeholder?.let { { Text(it, style = SnoutTheme.typography.bodyLarge) } },
     )
 }
 
@@ -61,73 +70,32 @@ internal fun PrimaryTextField(
 @Composable
 fun PrimaryTextFieldEmptyPreview() = PrimaryTextField(
     state = rememberTextFieldState(),
-    label = "Label",
-)
-
-@PreviewLightDark
-@PreviewWrapper(ThemePreviewWrapper::class)
-@Composable
-fun PrimaryTextFieldEmptyDisabledPreview() = PrimaryTextField(
-    state = rememberTextFieldState(),
-    label = "Label",
-    enabled = false,
-)
-
-@PreviewLightDark
-@PreviewWrapper(ThemePreviewWrapper::class)
-@Composable
-fun PrimaryTextFieldEmptyWithPlaceholderPreview() = PrimaryTextField(
-    state = rememberTextFieldState(),
-    label = "Label",
-    placeholder = "Placeholder",
-)
-
-@PreviewLightDark
-@PreviewWrapper(ThemePreviewWrapper::class)
-@Composable
-fun PrimaryTextFieldEmptyWithPlaceholderDisabledPreview() = PrimaryTextField(
-    state = rememberTextFieldState(),
-    label = "Label",
-    placeholder = "Placeholder",
-    enabled = false,
+    label = "Instance URL",
+    placeholder = "https://eu.posthog.com",
 )
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun PrimaryTextFieldFilledPreview() = PrimaryTextField(
-    state = rememberTextFieldState(initialText = "Sample text"),
-    label = "Label",
+    state = rememberTextFieldState(initialText = "https://eu.posthog.com"),
+    label = "Instance URL",
 )
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun PrimaryTextFieldFilledDisabledPreview() = PrimaryTextField(
-    state = rememberTextFieldState(initialText = "Sample text"),
-    label = "Label",
+fun PrimaryTextFieldDisabledPreview() = PrimaryTextField(
+    state = rememberTextFieldState(initialText = "https://eu.posthog.com"),
+    label = "Instance URL",
     enabled = false,
 )
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun PrimaryTextFieldFilledWithIconsPreview() = PrimaryTextField(
-    state = rememberTextFieldState(initialText = "Sample text"),
-    label = "Label",
-    leadingIcon = {
-        Icon(painterResource(Res.drawable.ic_arrow_right_alt_24dp), contentDescription = null)
-    },
-    trailingIcon = {
-        Icon(painterResource(Res.drawable.ic_arrow_right_alt_24dp), contentDescription = null)
-    },
-)
-
-@PreviewLightDark
-@PreviewWrapper(ThemePreviewWrapper::class)
-@Composable
-fun PrimaryTextFieldFilledErrorPreview() = PrimaryTextField(
-    state = rememberTextFieldState(initialText = "Sample text"),
-    label = "Label",
-    error = TextFieldError.Text("Error"),
+fun PrimaryTextFieldErrorPreview() = PrimaryTextField(
+    state = rememberTextFieldState(initialText = "eu.posthog"),
+    label = "Instance URL",
+    error = TextFieldError.Text("Value is not a valid HTTPS url"),
 )

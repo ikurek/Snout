@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -38,13 +37,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.designsystem.atoms.AppIcon
+import com.nightcode.snout.designsystem.atoms.BrandMark
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.chips.ActionChip
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
-import com.nightcode.snout.designsystem.molecules.InfoNote
+import com.nightcode.snout.designsystem.InfoNote
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
@@ -127,7 +126,7 @@ internal fun LoginScreen(
 private fun TopBar() {
     TopAppBar(
         navigationIcon = {
-            Box(modifier = Modifier.padding(start = 12.dp, end = 10.dp)) { AppIcon() }
+            Box(modifier = Modifier.padding(start = 12.dp, end = 10.dp)) { BrandMark() }
         },
         title = { Text(text = stringResource(Res.string.app_name)) },
         subtitle = { Text(text = stringResource(Res.string.login_screen_app_name_subtitle)) },
@@ -236,12 +235,7 @@ private fun BottomBar(isConnecting: Boolean, isConnectEnabled: Boolean, onClick:
         loading = isConnecting,
         enabled = isConnectEnabled,
         modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp, horizontal = 16.dp),
-        icon = {
-            Icon(
-                painter = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
-                contentDescription = null,
-            )
-        },
+        icon = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
     )
 }
 

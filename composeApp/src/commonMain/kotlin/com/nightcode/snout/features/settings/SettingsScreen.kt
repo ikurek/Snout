@@ -32,13 +32,13 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatMonthYear
 import com.nightcode.snout.common.platform.appVersionName
 import com.nightcode.snout.designsystem.atoms.AvatarBox
-import com.nightcode.snout.designsystem.atoms.SectionTitle
+import com.nightcode.snout.designsystem.SectionTitle
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
-import com.nightcode.snout.designsystem.molecules.InlineError
+import com.nightcode.snout.designsystem.InlineError
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
-import com.nightcode.snout.designsystem.molecules.SegmentedChoice
+import com.nightcode.snout.designsystem.SegmentedChoice
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -162,7 +162,7 @@ private fun SettingsContent(
             loading = state.isLoggingOut,
             destructive = true,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            icon = { Icon(painterResource(Res.drawable.ic_logout_24dp), contentDescription = null) },
+            icon = painterResource(Res.drawable.ic_logout_24dp),
         )
         VerticalSpacer(32.dp)
     }
