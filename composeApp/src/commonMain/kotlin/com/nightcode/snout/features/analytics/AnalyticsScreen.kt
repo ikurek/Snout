@@ -37,6 +37,7 @@ import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetric
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKind
+import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.TimeSeries
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -216,6 +217,31 @@ fun AnalyticsScreenPreview() = AnalyticsScreen(
 @Composable
 fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
     state = AnalyticsUiState(snapshot = CachedUiState.Error(DataError.Forbidden)),
+    onRangeSelected = {},
+    onRefresh = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
+    state = AnalyticsUiState(
+        snapshot = CachedUiState.Content(
+            TestAnalyticsSnapshot,
+            isRefreshing = false,
+            refreshError = DataError.ConnectionError,
+        ),
+    ),
+    onRangeSelected = {},
+    onRefresh = {},
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun AnalyticsScreenLoadingPreview() = AnalyticsScreen(
+    state = AnalyticsUiState(snapshot = CachedUiState.Loading),
     onRangeSelected = {},
     onRefresh = {},
 )

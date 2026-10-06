@@ -36,7 +36,10 @@ import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.DashboardTile
+import com.nightcode.snout.shared.domain.model.insights.TestDashboard
+import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.dashboard_tile_error
@@ -154,6 +157,44 @@ private fun InsightTileCard(
 @Composable
 fun DashboardDetailScreenPreview() = DashboardDetailScreen(
     state = TestDashboardDetailUiState,
+    onNavigateBack = {},
+    onRefresh = {},
+    onRetryTile = {},
+    onOpenInsight = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun DashboardDetailScreenTilesPendingPreview() = DashboardDetailScreen(
+    state = TestDashboardDetailUiState.copy(
+        dashboard = CachedUiState.Content(
+            TestDashboard.copy(
+                tiles = TestDashboard.tiles.map { tile ->
+                    if (tile is DashboardTile.InsightTile) tile.copy(result = null) else tile
+                },
+            ),
+            isRefreshing = false,
+        ),
+        tiles = mapOf(
+            TestInsightSummary.id to TileStatus.Loading,
+            11L to TileStatus.Failed(DataError.RateLimited),
+        ),
+    ),
+    onNavigateBack = {},
+    onRefresh = {},
+    onRetryTile = {},
+    onOpenInsight = {},
+    onOpenInPostHog = {},
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun DashboardDetailScreenErrorPreview() = DashboardDetailScreen(
+    state = DashboardDetailUiState(dashboard = CachedUiState.Error(DataError.NotFound)),
     onNavigateBack = {},
     onRefresh = {},
     onRetryTile = {},

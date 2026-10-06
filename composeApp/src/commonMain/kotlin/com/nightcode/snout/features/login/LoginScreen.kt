@@ -285,3 +285,33 @@ fun LoginScreenEmptyPreview() = LoginScreen(
     onApiKeysLinkClick = {},
     onConnectClick = { _, _ -> },
 )
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun LoginScreenErrorsPreview() = LoginScreen(
+    snackbarHostState = remember { SnackbarHostState() },
+    instanceUrlValidationError = InstanceUrlValidationError.UrlIsInvalid,
+    personalApiKeyValidationError = PersonalApiKeyValidationError.ServerValidationFailed,
+    isConnectEnabled = true,
+    isConnecting = false,
+    onInstanceUrlChange = {},
+    onPersonalApiKeyChange = {},
+    onApiKeysLinkClick = {},
+    onConnectClick = { _, _ -> },
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun LoginScreenConnectingPreview() = LoginScreen(
+    snackbarHostState = remember { SnackbarHostState() },
+    instanceUrlValidationError = null,
+    personalApiKeyValidationError = null,
+    isConnectEnabled = false,
+    isConnecting = true,
+    onInstanceUrlChange = {},
+    onPersonalApiKeyChange = {},
+    onApiKeysLinkClick = {},
+    onConnectClick = { _, _ -> },
+)
