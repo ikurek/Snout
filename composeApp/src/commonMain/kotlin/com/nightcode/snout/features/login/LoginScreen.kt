@@ -2,7 +2,6 @@ package com.nightcode.snout.features.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,18 +16,17 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,7 +41,7 @@ import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.chips.ActionChip
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
-import com.nightcode.snout.designsystem.InfoNote
+import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
@@ -95,7 +93,6 @@ internal fun LoginScreen(
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { TopBar() },
         bottomBar = {
             BottomBar(
                 isConnecting = isConnecting,
@@ -121,16 +118,20 @@ internal fun LoginScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+/** Brand mark beside the app name and tagline; replaces an app bar on this screen. */
 @Composable
-private fun TopBar() {
-    TopAppBar(
-        navigationIcon = {
-            Box(modifier = Modifier.padding(start = 12.dp, end = 10.dp)) { BrandMark() }
-        },
-        title = { Text(text = stringResource(Res.string.app_name)) },
-        subtitle = { Text(text = stringResource(Res.string.login_screen_app_name_subtitle)) },
-    )
+private fun BrandRow() {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        BrandMark()
+        Column {
+            Text(text = stringResource(Res.string.app_name), style = SnoutTheme.typography.titleMedium)
+            Text(
+                text = stringResource(Res.string.login_screen_app_name_subtitle),
+                style = SnoutTheme.typography.bodySmall,
+                color = SnoutTheme.colors.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 @Suppress("LongMethod")
@@ -151,16 +152,15 @@ private fun Content(
             .padding(horizontal = 16.dp)
             .imePadding(),
     ) {
+        VerticalSpacer(16.dp)
+        BrandRow()
         VerticalSpacer(24.dp)
 
-        Text(
-            stringResource(Res.string.login_screen_header),
-            style = SnoutTheme.typography.displaySmall,
-        )
+        Text(stringResource(Res.string.login_screen_header), style = SnoutTheme.typography.headlineSmall)
         VerticalSpacer(8.dp)
         Text(
             stringResource(Res.string.login_screen_description),
-            style = SnoutTheme.typography.bodyLarge,
+            style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
         )
 
@@ -217,12 +217,13 @@ private fun Content(
             text = stringResource(Res.string.login_screen_personal_api_key_create_in_web_button),
             modifier = Modifier.align(Alignment.End).clickable(onClick = onApiKeysLinkClick),
             textAlign = TextAlign.End,
-            style = SnoutTheme.typography.labelMedium,
+            style = SnoutTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
             color = SnoutTheme.colors.primary,
         )
 
         VerticalSpacer(16.dp)
-        InfoNote(text = stringResource(Res.string.login_screen_scopes_hint))
+        InfoBanner(text = stringResource(Res.string.login_screen_scopes_hint))
         VerticalSpacer(24.dp)
     }
 }
@@ -234,7 +235,7 @@ private fun BottomBar(isConnecting: Boolean, isConnectEnabled: Boolean, onClick:
         onClick = onClick,
         loading = isConnecting,
         enabled = isConnectEnabled,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp, horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         icon = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
     )
 }
