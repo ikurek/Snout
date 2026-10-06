@@ -2,7 +2,7 @@ package com.nightcode.snout.features.featureflags.components
 
 import androidx.compose.runtime.Composable
 import com.nightcode.snout.designsystem.atoms.LabelChip
-import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.atoms.LabelChipTone
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import org.jetbrains.compose.resources.pluralStringResource
@@ -20,29 +20,13 @@ import snout.composeapp.generated.resources.feature_flag_status_unknown
 
 @Composable
 internal fun FeatureFlagStatusChip(status: FeatureFlagStatus) {
-    val extended = SnoutTheme.extendedColors
-    val (text, container, content) = when (status) {
-        FeatureFlagStatus.Active ->
-            Triple(Res.string.feature_flag_status_active, extended.successContainer, extended.onSuccessContainer)
-
-        FeatureFlagStatus.Inactive ->
-            Triple(
-                Res.string.feature_flag_status_inactive,
-                SnoutTheme.colors.surfaceContainerHighest,
-                SnoutTheme.colors.onSurfaceVariant,
-            )
-
-        FeatureFlagStatus.Stale ->
-            Triple(Res.string.feature_flag_status_stale, extended.warningContainer, SnoutTheme.colors.onSurface)
-
-        FeatureFlagStatus.Unknown ->
-            Triple(
-                Res.string.feature_flag_status_unknown,
-                SnoutTheme.colors.surfaceContainerHighest,
-                SnoutTheme.colors.onSurfaceVariant,
-            )
+    val (label, tone) = when (status) {
+        FeatureFlagStatus.Active -> Res.string.feature_flag_status_active to LabelChipTone.Success
+        FeatureFlagStatus.Inactive -> Res.string.feature_flag_status_inactive to LabelChipTone.Neutral
+        FeatureFlagStatus.Stale -> Res.string.feature_flag_status_stale to LabelChipTone.Warning
+        FeatureFlagStatus.Unknown -> Res.string.feature_flag_status_unknown to LabelChipTone.Neutral
     }
-    LabelChip(text = stringResource(text), containerColor = container, contentColor = content)
+    LabelChip(text = stringResource(label), tone = tone)
 }
 
 /** One line describing who gets the flag. */
