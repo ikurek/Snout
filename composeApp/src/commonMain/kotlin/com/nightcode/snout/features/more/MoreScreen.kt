@@ -2,6 +2,7 @@ package com.nightcode.snout.features.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -9,8 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.designsystem.molecules.KeyValueRow
+import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -42,15 +44,24 @@ internal enum class MoreItem(val title: StringResource, val subtitle: StringReso
     ),
 }
 
+/** Navigation rows to the secondary sections: 20dp leading icon, title, description, trailing chevron. */
 @Composable
 internal fun MoreScreen(onItemClick: (MoreItem) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        MoreItem.entries.forEach { item ->
-            KeyValueRow(
-                label = stringResource(item.subtitle),
-                value = stringResource(item.title),
-                leadingIcon = painterResource(item.icon),
+        MoreItem.entries.forEachIndexed { index, item ->
+            EntityRow(
+                title = stringResource(item.title),
+                subtitle = stringResource(item.subtitle),
+                divider = index < MoreItem.entries.lastIndex,
                 onClick = { onItemClick(item) },
+                leading = {
+                    Icon(
+                        painter = painterResource(item.icon),
+                        contentDescription = null,
+                        tint = SnoutTheme.colors.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
                 trailing = {
                     Icon(
                         painter = painterResource(Res.drawable.ic_chevron_right_24dp),

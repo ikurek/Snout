@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -13,18 +13,19 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
-import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import com.nightcode.snout.features.experiments.components.ExperimentStatusChip
+import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
 import com.nightcode.snout.shared.domain.model.experiments.ExperimentStatus
 import com.nightcode.snout.shared.domain.model.experiments.TestExperiment
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.experiment_not_started
 import snout.composeapp.generated.resources.experiment_started
 import snout.composeapp.generated.resources.more_experiments_title
 
@@ -45,10 +46,14 @@ internal fun ExperimentsScreen(
             state = state,
             onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-        ) {
-            LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-                items(it, key = { experiment -> experiment.id }) { experiment ->
-                    ExperimentRow(experiment = experiment, onClick = { onOpenExperiment(experiment.id) })
+        ) { experiments ->
+            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
+                    ExperimentRow(
+                        experiment = experiment,
+                        divider = index < experiments.lastIndex,
+                        onClick = { onOpenExperiment(experiment.id) },
+                    )
                 }
             }
         }
@@ -56,16 +61,19 @@ internal fun ExperimentsScreen(
 }
 
 @Composable
-private fun ExperimentRow(experiment: Experiment, onClick: () -> Unit) {
+private fun ExperimentRow(experiment: Experiment, divider: Boolean, onClick: () -> Unit) {
     EntityRow(
         title = experiment.name,
-        subtitle = experiment.featureFlagKey,
-        subtitleStyle = SnoutTheme.code.small,
+        divider = divider,
         onClick = onClick,
-        meta = experiment.startDate?.let {
-            { MetaText(stringResource(Res.string.experiment_started, it.formatShortDate())) }
+        meta = {
+            experiment.featureFlagKey?.let { CodeChip(text = it) }
+            MetaText(
+                text = experiment.startDate?.let { stringResource(Res.string.experiment_started, it.formatShortDate()) }
+                    ?: stringResource(Res.string.experiment_not_started),
+            )
         },
-        trailing = { ExperimentStatusChip(status = experiment.status) },
+        trailing = { ExperimentStatusPill(status = experiment.status) },
     )
 }
 

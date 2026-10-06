@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,20 +14,18 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.SectionTitle
-import com.nightcode.snout.designsystem.molecules.EntityRow
-import com.nightcode.snout.designsystem.InfoNote
+import com.nightcode.snout.designsystem.atoms.SectionLabel
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
+import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
-import com.nightcode.snout.designsystem.LoadingIndicator
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import com.nightcode.snout.features.experiments.components.ExperimentStatusChip
+import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
 import com.nightcode.snout.shared.domain.model.experiments.ExperimentVariant
 import com.nightcode.snout.shared.domain.model.experiments.TestExperiment
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.experiment_conclusion_section
@@ -45,7 +42,8 @@ import snout.composeapp.generated.resources.experiment_status_label
 import snout.composeapp.generated.resources.experiment_title_placeholder
 import snout.composeapp.generated.resources.experiment_variants_section
 import snout.composeapp.generated.resources.feature_flag_rollout_percent
-import snout.composeapp.generated.resources.ic_chevron_right_24dp
+
+private const val LoadingRowCount = 4
 
 @Composable
 internal fun ExperimentDetailScreen(
@@ -63,7 +61,7 @@ internal fun ExperimentDetailScreen(
     ) { innerPadding ->
         val modifier = Modifier.fillMaxSize().padding(innerPadding)
         when (state) {
-            CachedUiState.Loading, is CachedUiState.Empty -> LoadingIndicator(modifier)
+            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
             is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
             is CachedUiState.Content -> ExperimentContent(state.data, onOpenFeatureFlag, modifier)
         }
@@ -87,47 +85,40 @@ private fun ExperimentContent(experiment: Experiment, onOpenFeatureFlag: (flagId
         }
         MetricsSection(experiment)
         experiment.conclusion?.let { conclusion ->
-            SectionTitle(stringResource(Res.string.experiment_conclusion_section))
+            SectionLabel(stringResource(Res.string.experiment_conclusion_section))
             KeyValueRow(
                 label = conclusion.replaceFirstChar { it.uppercase() },
                 value = experiment.conclusionComment.orEmpty(),
             )
         }
+        InfoBanner(
+            text = stringResource(Res.string.experiment_results_note),
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp),
+        )
     }
 }
 
 @Composable
 private fun OverviewSection(experiment: Experiment, onOpenFeatureFlag: (flagId: Long) -> Unit) {
-    SectionTitle(stringResource(Res.string.experiment_overview_section))
+    SectionLabel(stringResource(Res.string.experiment_overview_section))
     KeyValueRow(
         label = stringResource(Res.string.experiment_status_label),
         value = "",
-        trailing = { ExperimentStatusChip(status = experiment.status) },
+        trailing = { ExperimentStatusPill(status = experiment.status) },
     )
     experiment.startDate?.let {
         KeyValueRow(label = stringResource(Res.string.experiment_started_label), value = it.formatShortDate())
     }
     experiment.endDate?.let {
-        KeyValueRow(
-            label = stringResource(Res.string.experiment_ended),
-            value = it.formatShortDate(),
-        )
+        KeyValueRow(label = stringResource(Res.string.experiment_ended), value = it.formatShortDate())
     }
     experiment.featureFlagKey?.let { key ->
         val flagId = experiment.featureFlagId
         KeyValueRow(
             label = stringResource(Res.string.experiment_feature_flag),
             value = key,
+            valueIsCode = true,
             onClick = flagId?.let { id -> { onOpenFeatureFlag(id) } },
-            trailing = flagId?.let {
-                {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_chevron_right_24dp),
-                        contentDescription = null,
-                        tint = SnoutTheme.colors.onSurfaceVariant,
-                    )
-                }
-            },
         )
     }
     experiment.createdBy?.let { KeyValueRow(label = stringResource(Res.string.experiment_created_by), value = it) }
@@ -135,15 +126,16 @@ private fun OverviewSection(experiment: Experiment, onOpenFeatureFlag: (flagId: 
 
 @Composable
 private fun VariantsSection(variants: List<ExperimentVariant>) {
-    SectionTitle(stringResource(Res.string.experiment_variants_section))
+    SectionLabel(stringResource(Res.string.experiment_variants_section))
     variants.forEach { variant ->
         KeyValueRow(
             label = variant.name ?: variant.key,
             value = variant.key,
+            valueIsCode = true,
             trailing = {
                 Text(
                     text = stringResource(Res.string.feature_flag_rollout_percent, variant.rolloutPercentage),
-                    style = SnoutTheme.code.medium,
+                    style = SnoutTheme.typography.titleSmall,
                 )
             },
         )
@@ -152,28 +144,28 @@ private fun VariantsSection(variants: List<ExperimentVariant>) {
 
 @Composable
 private fun MetricsSection(experiment: Experiment) {
-    SectionTitle(stringResource(Res.string.experiment_metrics_primary))
+    SectionLabel(stringResource(Res.string.experiment_metrics_primary))
     if (experiment.metricNames.isEmpty()) {
         Text(
             text = stringResource(Res.string.experiment_no_metrics),
-            style = SnoutTheme.typography.bodySmall,
+            style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
     }
     experiment.metricNames.forEach { MetricRow(it) }
     if (experiment.secondaryMetricNames.isNotEmpty()) {
-        SectionTitle(stringResource(Res.string.experiment_metrics_secondary))
+        SectionLabel(stringResource(Res.string.experiment_metrics_secondary))
         experiment.secondaryMetricNames.forEach { MetricRow(it) }
     }
-    InfoNote(
-        text = stringResource(Res.string.experiment_results_note),
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-    )
 }
 
 @Composable
-private fun MetricRow(name: String) = EntityRow(title = name, titleStyle = SnoutTheme.typography.bodyLarge)
+private fun MetricRow(name: String) = Text(
+    text = name,
+    style = SnoutTheme.typography.bodyLarge,
+    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+)
 
 @OptIn(TestData::class)
 @PreviewLightDark
