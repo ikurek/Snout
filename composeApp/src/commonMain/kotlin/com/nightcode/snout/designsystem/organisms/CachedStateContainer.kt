@@ -1,8 +1,11 @@
 package com.nightcode.snout.designsystem.organisms
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +27,10 @@ import snout.composeapp.generated.resources.refresh_failed_offline
 import snout.composeapp.generated.resources.refresh_failed_payment_required
 import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
-/** Renders loading, error, empty and content states of cache-first data with pull to refresh. */
+/**
+ * Renders loading, error, empty and content states of cache-first data with pull to refresh.
+ * Every state fills the available space so placeholders are centered regardless of what sits above.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun <T> CachedStateContainer(
@@ -37,7 +43,7 @@ internal fun <T> CachedStateContainer(
     content: @Composable (data: T) -> Unit,
 ) {
     when (state) {
-        CachedUiState.Loading -> LoadingIndicator(modifier)
+        CachedUiState.Loading -> LoadingIndicator(modifier.fillMaxSize())
 
         is CachedUiState.Error ->
             ErrorPlaceholder(error = state.error, onRetry = onRefresh, modifier = modifier.fillMaxSize())
@@ -45,15 +51,21 @@ internal fun <T> CachedStateContainer(
         is CachedUiState.Empty -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
-            modifier = modifier,
+            modifier = modifier.fillMaxSize(),
         ) {
-            Box(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) { emptyContent() }
+            // A scrollable child is needed for the pull gesture; size it to the viewport so content stays centered.
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val viewportHeight = maxHeight
+                Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Box(modifier = Modifier.fillMaxWidth().height(viewportHeight)) { emptyContent() }
+                }
+            }
         }
 
         is CachedUiState.Content -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
-            modifier = modifier,
+            modifier = modifier.fillMaxSize(),
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 state.refreshError?.let { error ->
