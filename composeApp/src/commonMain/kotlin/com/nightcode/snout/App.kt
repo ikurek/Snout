@@ -2,11 +2,15 @@ package com.nightcode.snout
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.nightcode.snout.common.platform.SystemBarsAppearance
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectNavKey
@@ -45,9 +49,14 @@ fun App() = KoinApplication(
         ThemeMode.Dark -> true
     }
 
+    SystemBarsAppearance(darkTheme = darkTheme)
     SnoutTheme(darkTheme = darkTheme) {
-        Crossfade(targetState = initial) { key ->
-            if (key == null) SplashScreen() else MainNavGraph(initial = key)
+        // Paint the theme background edge to edge: screens that pad themselves away from the system bars
+        // (login, project selection) would otherwise show the host's default white on iOS.
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Crossfade(targetState = initial) { key ->
+                if (key == null) SplashScreen() else MainNavGraph(initial = key)
+            }
         }
     }
 }
