@@ -15,8 +15,9 @@ import coil3.compose.rememberAsyncImagePainter
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
+/** Organization logo when PostHog has one, otherwise the initials avatar; same 32dp square either way. */
 @Composable
-internal fun OrganizationLogo(name: String, logoUrl: String?, modifier: Modifier = Modifier, size: Dp = 40.dp) {
+internal fun OrganizationLogo(name: String, logoUrl: String?, modifier: Modifier = Modifier, size: Dp = 32.dp) {
     val painter = rememberAsyncImagePainter(model = logoUrl)
     val state by painter.state.collectAsStateWithLifecycle()
 
@@ -27,7 +28,7 @@ internal fun OrganizationLogo(name: String, logoUrl: String?, modifier: Modifier
             contentScale = ContentScale.Crop,
             modifier = modifier
                 .size(size)
-                .clip(SnoutTheme.shapes.small),
+                .clip(SnoutTheme.shapes.medium),
         )
     } else {
         AvatarBox(name = name, modifier = modifier, size = size)

@@ -15,7 +15,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** Card with a title row used for charts and tables; clickable when [onClick] is given. */
+/**
+ * Chart card and dashboard tile: `surfaceContainerLow` on 16dp radius with a title row and 16dp padding.
+ * Clickable when [onClick] is given. Tiers, not borders: no outline, no shadow.
+ */
 @Composable
 internal fun SectionCard(
     title: String,
@@ -25,8 +28,8 @@ internal fun SectionCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = SnoutTheme.shapes.medium
-    val color = SnoutTheme.colors.surfaceContainer
+    val shape = SnoutTheme.shapes.large
+    val color = SnoutTheme.colors.surfaceContainerLow
     if (onClick != null) {
         Surface(onClick = onClick, modifier = modifier.fillMaxWidth(), shape = shape, color = color) {
             SectionCardContent(title, subtitle, trailing, content)
@@ -45,12 +48,12 @@ private fun SectionCardContent(
     trailing: (@Composable () -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = SnoutTheme.typography.titleSmall,
+                    style = SnoutTheme.typography.titleMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -67,5 +70,17 @@ private fun SectionCardContent(
             trailing?.invoke()
         }
         content()
+    }
+}
+
+/** Smaller tonal card (12dp radius, 12dp padding) for the flag Enabled row and release conditions. */
+@Composable
+internal fun TonalCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = SnoutTheme.shapes.medium,
+        color = SnoutTheme.colors.surfaceContainerLow,
+    ) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp), content = content)
     }
 }
