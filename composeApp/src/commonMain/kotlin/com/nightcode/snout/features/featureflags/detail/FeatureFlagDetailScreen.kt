@@ -32,6 +32,7 @@ import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SectionTitle
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
+import com.nightcode.snout.designsystem.molecules.CodeBlock
 import com.nightcode.snout.designsystem.molecules.InfoNote
 import com.nightcode.snout.designsystem.molecules.InlineError
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
@@ -46,8 +47,8 @@ import com.nightcode.snout.features.featureflags.components.rolloutSummary
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
-import com.nightcode.snout.shared.domain.model.featureflags.FlagVariant
 import com.nightcode.snout.shared.domain.model.featureflags.ReleaseCondition
+import com.nightcode.snout.shared.domain.model.featureflags.TestRemoteConfigFeatureFlag
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -65,6 +66,7 @@ import snout.composeapp.generated.resources.feature_flag_dialog_text_enable
 import snout.composeapp.generated.resources.feature_flag_dialog_title_disable
 import snout.composeapp.generated.resources.feature_flag_dialog_title_enable
 import snout.composeapp.generated.resources.feature_flag_enabled_label
+import snout.composeapp.generated.resources.feature_flag_payload_section
 import snout.composeapp.generated.resources.feature_flag_read_only_note
 import snout.composeapp.generated.resources.feature_flag_rollout_percent
 import snout.composeapp.generated.resources.feature_flag_tags
@@ -72,6 +74,10 @@ import snout.composeapp.generated.resources.feature_flag_title_placeholder
 import snout.composeapp.generated.resources.feature_flag_toggle_error_forbidden
 import snout.composeapp.generated.resources.feature_flag_toggle_error_generic
 import snout.composeapp.generated.resources.feature_flag_toggle_error_rate_limited
+import snout.composeapp.generated.resources.feature_flag_value_encrypted_note
+import snout.composeapp.generated.resources.feature_flag_value_read_only_note
+import snout.composeapp.generated.resources.feature_flag_value_section
+import snout.composeapp.generated.resources.feature_flag_variant_payload
 import snout.composeapp.generated.resources.feature_flag_variants_section
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,21 +186,44 @@ private fun FlagContent(
             )
         }
 
-        SectionTitle(stringResource(Res.string.feature_flag_conditions_section))
-        flag.conditions.forEachIndexed { index, condition ->
-            ConditionCard(index = index, condition = condition, modifier = Modifier.padding(horizontal = 16.dp))
+        PayloadSection(flag)
+        // Remote configuration flags serve their value to everyone; PostHog hides release conditions for them too.
+        if (flag.isRemoteConfiguration.not()) {
+            SectionTitle(stringResource(Res.string.feature_flag_conditions_section))
+            flag.conditions.forEachIndexed { index, condition ->
+                ConditionCard(index = index, condition = condition, modifier = Modifier.padding(horizontal = 16.dp))
+            }
         }
         if (flag.isMultivariate) {
-            VariantsSection(flag.variants)
+            VariantsSection(flag)
         }
         DetailsSection(flag)
     }
 }
 
+/** The value a boolean or remote configuration flag serves. Shown read-only; editing payloads is a PostHog web task. */
 @Composable
-private fun VariantsSection(variants: List<FlagVariant>) {
+private fun PayloadSection(flag: FeatureFlag) {
+    val payload = flag.booleanPayload ?: return
+    val title = if (flag.isRemoteConfiguration) {
+        Res.string.feature_flag_value_section
+    } else {
+        Res.string.feature_flag_payload_section
+    }
+    SectionTitle(stringResource(title))
+    CodeBlock(text = payload, modifier = Modifier.padding(horizontal = 16.dp))
+    val note = if (flag.hasEncryptedPayloads) {
+        Res.string.feature_flag_value_encrypted_note
+    } else {
+        Res.string.feature_flag_value_read_only_note
+    }
+    InfoNote(text = stringResource(note), modifier = Modifier.padding(horizontal = 16.dp))
+}
+
+@Composable
+private fun VariantsSection(flag: FeatureFlag) {
     SectionTitle(stringResource(Res.string.feature_flag_variants_section))
-    variants.forEach { variant ->
+    flag.variants.forEach { variant ->
         KeyValueRow(
             label = variant.name?.takeIf { it.isNotBlank() } ?: variant.key,
             value = variant.key,
@@ -205,6 +234,27 @@ private fun VariantsSection(variants: List<FlagVariant>) {
                 )
             },
         )
+        flag.variantPayload(variant.key)?.let { payload ->
+            VariantPayload(payload = payload, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+        }
+    }
+    if (flag.payloads.isNotEmpty()) {
+        InfoNote(
+            text = stringResource(Res.string.feature_flag_value_read_only_note),
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+    }
+}
+
+@Composable
+private fun VariantPayload(payload: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = stringResource(Res.string.feature_flag_variant_payload),
+            style = SnoutTheme.typography.labelMedium,
+            color = SnoutTheme.colors.onSurfaceVariant,
+        )
+        CodeBlock(text = payload)
     }
 }
 
@@ -321,6 +371,19 @@ fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
 @Composable
 fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
     state = TestFeatureFlagDetailUiState.copy(toggle = ToggleStatus.Failed(DataError.Forbidden)),
+    onNavigateBack = {},
+    onRetry = {},
+    onToggleConfirmed = {},
+    onDismissToggleError = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun FeatureFlagDetailScreenRemoteConfigPreview() = FeatureFlagDetailScreen(
+    state = FeatureFlagDetailUiState(flag = CachedUiState.Content(TestRemoteConfigFeatureFlag, isRefreshing = false)),
     onNavigateBack = {},
     onRetry = {},
     onToggleConfirmed = {},

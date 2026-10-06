@@ -36,6 +36,7 @@ import com.nightcode.snout.designsystem.charts.DonutChartPreview
 import com.nightcode.snout.designsystem.charts.FunnelBarsPreview
 import com.nightcode.snout.designsystem.charts.LineChartPreview
 import com.nightcode.snout.designsystem.charts.RankedBarListPreview
+import com.nightcode.snout.designsystem.molecules.CodeBlockPreview
 import com.nightcode.snout.designsystem.molecules.EntityRowPreview
 import com.nightcode.snout.designsystem.molecules.InfoNotePreview
 import com.nightcode.snout.designsystem.molecules.InlineErrorPreview
@@ -72,6 +73,7 @@ import com.nightcode.snout.features.featureflags.FeatureFlagsScreenForbiddenPrev
 import com.nightcode.snout.features.featureflags.FeatureFlagsScreenPreview
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailScreenForbiddenPreview
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailScreenPreview
+import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailScreenRemoteConfigPreview
 import com.nightcode.snout.features.insights.InsightsScreenEmptyPreview
 import com.nightcode.snout.features.insights.InsightsScreenPreview
 import com.nightcode.snout.features.insights.detail.InsightDetailScreenPendingPreview
@@ -266,6 +268,12 @@ fun LineChartPreviewShot() = ScreenshotEnvironment { LineChartPreview() }
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun RankedBarListPreviewShot() = ScreenshotEnvironment { RankedBarListPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CodeBlockPreviewShot() = ScreenshotEnvironment { CodeBlockPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
@@ -483,6 +491,13 @@ fun FeatureFlagDetailScreenForbiddenPreviewShot() = ScreenshotEnvironment { Feat
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun FeatureFlagDetailScreenPreviewShot() = ScreenshotEnvironment { FeatureFlagDetailScreenPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun FeatureFlagDetailScreenRemoteConfigPreviewShot() =
+    ScreenshotEnvironment { FeatureFlagDetailScreenRemoteConfigPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)

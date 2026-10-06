@@ -159,6 +159,11 @@
     <string name="feature_flag_toggle_error_forbidden">Your API key can't change flags. Add the feature_flag:write scope in PostHog.</string>
     <string name="feature_flag_toggle_error_rate_limited">Rate limited by PostHog. Try again in a minute.</string>
     <string name="feature_flag_toggle_error_generic">Couldn't update the flag. Try again.</string>
+    <string name="feature_flag_value_section">Value</string>
+    <string name="feature_flag_payload_section">Payload</string>
+    <string name="feature_flag_variant_payload">Payload</string>
+    <string name="feature_flag_value_read_only_note">Values can only be edited in PostHog. Open the flag there to change it.</string>
+    <string name="feature_flag_value_encrypted_note">This payload is encrypted. PostHog only shows the value in the web app.</string>
     <string name="experiment_title_placeholder">Experiment</string>
     <string name="experiment_status_draft">Draft</string>
     <string name="experiment_status_running">Running</string>

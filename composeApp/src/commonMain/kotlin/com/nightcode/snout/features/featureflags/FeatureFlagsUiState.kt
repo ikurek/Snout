@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import com.nightcode.snout.shared.domain.model.featureflags.TestFeatureFlag
+import com.nightcode.snout.shared.domain.model.featureflags.TestRemoteConfigFeatureFlag
 
 internal data class FeatureFlagsUiState(
     val query: String = "",
@@ -24,6 +25,7 @@ internal val TestFeatureFlagsUiState = FeatureFlagsUiState(
                 active = false,
                 status = FeatureFlagStatus.Inactive,
             ),
+            TestRemoteConfigFeatureFlag,
         ),
         isRefreshing = false,
     ),

@@ -64,10 +64,23 @@ private fun FeatureFlagRow(flag: FeatureFlag, onClick: () -> Unit) {
         titleMaxLines = 1,
         subtitle = flag.description,
         onClick = onClick,
-        meta = { MetaText(flag.rolloutSummary()) },
+        meta = {
+            MetaText(flag.rolloutSummary())
+            if (flag.isRemoteConfiguration) {
+                flag.booleanPayload?.let {
+                    MetaText(
+                        text = it.singleLine(),
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                }
+            }
+        },
         trailing = { FeatureFlagStatusChip(status = flag.status) },
     )
 }
+
+/** Collapses a pretty-printed payload into one line for list previews. */
+private fun String.singleLine(): String = lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
 
 @OptIn(TestData::class)
 @PreviewLightDark
