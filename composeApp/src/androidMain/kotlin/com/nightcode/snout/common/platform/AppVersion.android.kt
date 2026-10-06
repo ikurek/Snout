@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.LocalContext
 internal actual fun appVersionName(): String {
     val context = LocalContext.current
     return remember(context) {
-        context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+        // Preview and screenshot renderers have no real package manager.
+        runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty() }
+            .getOrDefault("1.0")
     }
 }

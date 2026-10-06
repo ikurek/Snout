@@ -7,6 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.features.more.MoreItem
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
@@ -34,6 +35,7 @@ internal fun HomeRoute(
         onOpenInsight = onOpenInsight,
         onOpenFeatureFlag = onOpenFeatureFlag,
         onMoreItemClick = onMoreItemClick,
+        onOpenInPostHog = rememberPostHogOpener(),
     )
 
     ProjectSwitcherBottomSheet(

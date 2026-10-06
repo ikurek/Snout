@@ -8,13 +8,18 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetPostHogUrl
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-/** Returns a click handler that opens [resource] in the PostHog web app of the signed-in instance. */
+/** Returns a function that opens any [PostHogResource] in the web app of the signed-in instance. */
 @Composable
-internal fun rememberOpenInPostHog(resource: PostHogResource): () -> Unit {
+internal fun rememberPostHogOpener(): (PostHogResource) -> Unit {
     val getPostHogUrl = koinInject<GetPostHogUrl>()
     val uriHandler = LocalUriHandler.current
     val scope = rememberCoroutineScope()
-    return {
-        scope.launch { getPostHogUrl(resource)?.let(uriHandler::openUri) }
-    }
+    return { resource -> scope.launch { getPostHogUrl(resource)?.let(uriHandler::openUri) } }
+}
+
+/** Returns a click handler that opens [resource] in the PostHog web app of the signed-in instance. */
+@Composable
+internal fun rememberOpenInPostHog(resource: PostHogResource): () -> Unit {
+    val open = rememberPostHogOpener()
+    return { open(resource) }
 }

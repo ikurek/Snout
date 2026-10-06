@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
 import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.LabelChip
@@ -36,7 +35,6 @@ import com.nightcode.snout.features.insights.FavoriteIconButton
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.TestInsightDetail
 import org.jetbrains.compose.resources.stringResource
@@ -55,6 +53,7 @@ internal fun InsightDetailScreen(
     onNavigateBack: () -> Unit,
     onRetry: () -> Unit,
     onFavoriteToggle: () -> Unit,
+    onOpenInPostHog: () -> Unit,
 ) {
     val detail = (state as? CachedUiState.Content)?.data
     Scaffold(
@@ -72,9 +71,7 @@ internal fun InsightDetailScreen(
                 actions = {
                     if (detail != null) {
                         FavoriteIconButton(favorited = detail.summary.favorited, onClick = onFavoriteToggle)
-                        OpenInPostHogIconButton(
-                            onClick = rememberOpenInPostHog(PostHogResource.Insight(detail.summary.shortId)),
-                        )
+                        OpenInPostHogIconButton(onClick = onOpenInPostHog)
                     }
                 },
             )
@@ -139,4 +136,5 @@ fun InsightDetailScreenPreview() = InsightDetailScreen(
     onNavigateBack = {},
     onRetry = {},
     onFavoriteToggle = {},
+    onOpenInPostHog = {},
 )

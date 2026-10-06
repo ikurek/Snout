@@ -1,6 +1,7 @@
 package com.nightcode.snout.common.format
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.MonthNames
@@ -30,6 +31,9 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
+
+/** Overridable "now" so previews and screenshot tests render stable relative times. */
+val LocalNow = staticCompositionLocalOf<Instant?> { null }
 
 private const val ShortMonthLength = 3
 private const val RelativeDaysLimit = 7
@@ -98,8 +102,8 @@ internal fun Instant.formatDateTime(): String {
 
 /** "just now", "5 min ago", "3 h ago", "2 d ago", otherwise a short date. */
 @Composable
-internal fun Instant.formatRelative(now: Instant = Clock.System.now()): String {
-    val elapsed = now - this
+internal fun Instant.formatRelative(): String {
+    val elapsed = (LocalNow.current ?: Clock.System.now()) - this
     return when {
         elapsed < 1.minutes -> stringResource(Res.string.relative_time_just_now)
         elapsed < 1.hours -> stringResource(Res.string.relative_time_minutes_ago, elapsed.inWholeMinutes)
