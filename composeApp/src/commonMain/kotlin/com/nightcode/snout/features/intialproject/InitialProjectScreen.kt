@@ -1,14 +1,9 @@
 
 package com.nightcode.snout.features.intialproject
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,24 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.designsystem.atoms.AvatarBox
-import com.nightcode.snout.designsystem.atoms.HorizontalSpacer
-import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.molecules.OrganizationLogo
 import com.nightcode.snout.designsystem.organisms.GenericErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.organisms.PermissionDeniedPlaceholder
 import com.nightcode.snout.designsystem.organisms.RateLimitedPlaceholder
-import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.features.projects.OrganizationRow
+import com.nightcode.snout.features.projects.ProjectRow
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
 import com.nightcode.snout.shared.domain.model.organization.Organization
-import com.nightcode.snout.shared.domain.model.organization.Project
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.initial_project_screen_project_count
 import snout.composeapp.generated.resources.initial_project_screen_subtitle
 import snout.composeapp.generated.resources.initial_project_screen_title
 import kotlin.uuid.Uuid
@@ -124,69 +113,14 @@ private fun LoadedContent(
         NothingFoundPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
         return
     } else {
-        LazyColumn(contentPadding = PaddingValues(vertical = 0.dp)) {
+        LazyColumn(contentPadding = PaddingValues()) {
             organizations.forEach { org ->
-                item(key = "org_${org.id}") {
-                    OrgHeader(org = org)
-                }
+                item(key = "org_${org.id}") { OrganizationRow(organization = org) }
                 items(items = org.projects, key = { "project_${it.id}" }) { project ->
-                    ProjectItem(
-                        project = project,
-                        onClick = { onProjectSelected(org.id, project.id) },
-                    )
+                    ProjectRow(project = project, onClick = { onProjectSelected(org.id, project.id) })
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun OrgHeader(org: Organization) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        OrganizationLogo(
-            name = org.name,
-            logoUrl = org.logoUrl,
-            size = 48.dp,
-        )
-        Column(verticalArrangement = Arrangement.Center) {
-            Text(
-                text = org.name,
-                style = SnoutTheme.typography.titleMedium,
-            )
-            VerticalSpacer(4.dp)
-            Text(
-                text = stringResource(
-                    Res.string.initial_project_screen_project_count,
-                    org.projects.size,
-                ),
-                style = SnoutTheme.typography.labelMedium,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ProjectItem(project: Project, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(start = 32.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AvatarBox(name = project.name, size = 32.dp)
-        HorizontalSpacer(16.dp)
-        Text(
-            text = project.name,
-            style = SnoutTheme.typography.titleSmall,
-        )
     }
 }
 

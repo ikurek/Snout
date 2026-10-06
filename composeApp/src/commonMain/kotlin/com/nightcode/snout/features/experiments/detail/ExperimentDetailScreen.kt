@@ -2,7 +2,6 @@ package com.nightcode.snout.features.experiments.detail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +16,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SectionTitle
+import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.InfoNote
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
@@ -173,13 +173,7 @@ private fun MetricsSection(experiment: Experiment) {
 }
 
 @Composable
-private fun MetricRow(name: String) {
-    Text(
-        text = name,
-        style = SnoutTheme.typography.bodyLarge,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-    )
-}
+private fun MetricRow(name: String) = EntityRow(title = name, titleStyle = SnoutTheme.typography.bodyLarge)
 
 @OptIn(TestData::class)
 @PreviewLightDark

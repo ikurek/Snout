@@ -1,13 +1,10 @@
 package com.nightcode.snout.features.activitylog
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +25,8 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.AvatarBox
+import com.nightcode.snout.designsystem.molecules.EntityRow
+import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -35,6 +34,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityChange
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityEntry
 import com.nightcode.snout.shared.domain.model.activitylog.TestActivityEntry
+import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.activity_change_empty_value
@@ -72,45 +72,34 @@ internal fun ActivityLogScreen(
 private fun ActivityRow(entry: ActivityEntry) {
     var expanded by rememberSaveable(entry.id) { mutableStateOf(false) }
     val actor = entry.actor ?: stringResource(Res.string.activity_system_actor)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = entry.changes.size > CollapsedChanges) { expanded = expanded.not() }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        AvatarBox(name = actor, size = 36.dp)
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                text = buildString {
-                    append(actor)
-                    append(' ')
-                    append(entry.activity.replace('_', ' '))
-                    append(' ')
-                    append(entry.scope.humanizeScope())
-                    entry.itemName?.let { append(" · ").append(it) }
-                },
-                style = SnoutTheme.typography.bodyMedium,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = entry.createdAt.formatRelative(),
-                style = SnoutTheme.typography.labelSmall,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
+    val expandable = entry.changes.size > CollapsedChanges
+    EntityRow(
+        title = buildString {
+            append(actor)
+            append(' ')
+            append(entry.activity.replace('_', ' '))
+            append(' ')
+            append(entry.scope.humanizeScope())
+            entry.itemName?.let { append(" · ").append(it) }
+        },
+        titleStyle = SnoutTheme.typography.bodyMedium,
+        titleMaxLines = 3,
+        alignment = Alignment.Top,
+        onClick = if (expandable) ({ expanded = expanded.not() }) else null,
+        leading = { AvatarBox(name = actor, size = 36.dp) },
+        meta = { MetaText(entry.createdAt.formatRelative()) },
+        supporting = {
             val visible = if (expanded) entry.changes else entry.changes.take(CollapsedChanges)
             visible.forEach { ChangeLine(it) }
-            AnimatedVisibility(visible = expanded.not() && entry.changes.size > CollapsedChanges) {
+            AnimatedVisibility(visible = expanded.not() && expandable) {
                 Text(
                     text = stringResource(Res.string.activity_more_changes, entry.changes.size - CollapsedChanges),
                     style = SnoutTheme.typography.labelSmall,
                     color = SnoutTheme.colors.primary,
                 )
             }
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -155,6 +144,16 @@ fun ActivityLogScreenPreview() = ActivityLogScreen(
         ),
         isRefreshing = false,
     ),
+    onNavigateBack = {},
+    onRefresh = {},
+    onOpenInPostHog = {},
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun ActivityLogScreenPaymentRequiredPreview() = ActivityLogScreen(
+    state = CachedUiState.Error(DataError.PaymentRequired),
     onNavigateBack = {},
     onRefresh = {},
     onOpenInPostHog = {},

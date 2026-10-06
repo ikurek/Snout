@@ -1,11 +1,7 @@
 package com.nightcode.snout.features.annotations
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +22,8 @@ import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.LabelChip
+import com.nightcode.snout.designsystem.molecules.EntityRow
+import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -92,36 +90,31 @@ internal fun AnnotationsScreen(
 
 @Composable
 private fun AnnotationRow(annotation: Annotation) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Text(
-            text = annotation.dateMarker.formatShortDate(),
-            style = SnoutTheme.monoTypography.labelMedium,
-            color = SnoutTheme.colors.primary,
-            modifier = Modifier.width(88.dp),
-        )
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(text = annotation.content, style = SnoutTheme.typography.bodyMedium)
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                annotation.scope.label()?.let { LabelChip(text = annotation.targetName ?: it) }
-                val meta = listOfNotNull(
-                    annotation.createdBy?.let { stringResource(Res.string.annotation_by, it) },
-                    annotation.createdAt?.formatRelative(),
-                ).joinToString(" · ")
-                if (meta.isNotEmpty()) {
-                    Text(
-                        text = meta,
-                        style = SnoutTheme.typography.labelSmall,
-                        color = SnoutTheme.colors.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
+    EntityRow(
+        title = annotation.content,
+        titleStyle = SnoutTheme.typography.bodyMedium,
+        titleMaxLines = 4,
+        alignment = Alignment.Top,
+        leading = {
+            Text(
+                text = annotation.dateMarker.formatShortDate(),
+                style = SnoutTheme.monoTypography.labelMedium,
+                color = SnoutTheme.colors.primary,
+                modifier = Modifier.width(DateColumnWidth),
+            )
+        },
+        meta = {
+            annotation.scope.label()?.let { LabelChip(text = annotation.targetName ?: it) }
+            val meta = listOfNotNull(
+                annotation.createdBy?.let { stringResource(Res.string.annotation_by, it) },
+                annotation.createdAt?.formatRelative(),
+            ).joinToString(" · ")
+            if (meta.isNotEmpty()) MetaText(meta)
+        },
+    )
 }
+
+private val DateColumnWidth = 88.dp
 
 @Composable
 private fun AnnotationScope.label(): String? = when (this) {
