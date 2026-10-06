@@ -2,12 +2,12 @@ package com.nightcode.snout.features.activitylog
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,8 +16,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.AvatarBox
+import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
@@ -43,6 +46,7 @@ import snout.composeapp.generated.resources.activity_system_actor
 import snout.composeapp.generated.resources.more_activity_log_title
 
 private const val CollapsedChanges = 2
+private const val Arrow = "→"
 
 @Composable
 internal fun ActivityLogScreen(
@@ -60,42 +64,39 @@ internal fun ActivityLogScreen(
             state = state,
             onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-        ) {
-            LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-                items(it, key = { entry -> entry.id }) { entry -> ActivityRow(entry) }
+        ) { entries ->
+            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
+                    ActivityRow(entry = entry, divider = index < entries.lastIndex)
+                }
             }
         }
     }
 }
 
+/** "Jane Doe updated feature flag `new-checkout`", the age, then one line per change; expands past two changes. */
 @Composable
-private fun ActivityRow(entry: ActivityEntry) {
+private fun ActivityRow(entry: ActivityEntry, divider: Boolean) {
     var expanded by rememberSaveable(entry.id) { mutableStateOf(false) }
     val actor = entry.actor ?: stringResource(Res.string.activity_system_actor)
     val expandable = entry.changes.size > CollapsedChanges
     EntityRow(
-        title = buildString {
-            append(actor)
-            append(' ')
-            append(entry.activity.replace('_', ' '))
-            append(' ')
-            append(entry.scope.humanizeScope())
-            entry.itemName?.let { append(" · ").append(it) }
-        },
-        titleStyle = SnoutTheme.typography.bodyMedium,
-        titleMaxLines = 3,
+        title = actor,
         alignment = Alignment.Top,
+        divider = divider,
         onClick = if (expandable) ({ expanded = expanded.not() }) else null,
-        leading = { AvatarBox(name = actor, size = 36.dp) },
+        leading = { AvatarBox(name = actor) },
+        headline = { ActivitySentence(actor = actor, entry = entry) },
         meta = { MetaText(entry.createdAt.formatRelative()) },
         supporting = {
             val visible = if (expanded) entry.changes else entry.changes.take(CollapsedChanges)
-            visible.forEach { ChangeLine(it) }
+            visible.forEach { ChangeLine(it, modifier = Modifier.padding(top = 6.dp)) }
             AnimatedVisibility(visible = expanded.not() && expandable) {
                 Text(
                     text = stringResource(Res.string.activity_more_changes, entry.changes.size - CollapsedChanges),
-                    style = SnoutTheme.typography.labelSmall,
+                    style = SnoutTheme.typography.bodySmall,
                     color = SnoutTheme.colors.primary,
+                    modifier = Modifier.padding(top = 6.dp),
                 )
             }
         },
@@ -103,21 +104,39 @@ private fun ActivityRow(entry: ActivityEntry) {
 }
 
 @Composable
-private fun ChangeLine(change: ActivityChange) {
+private fun ActivitySentence(actor: String, entry: ActivityEntry) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(actor) }
+                append(' ')
+                append(entry.activity.replace('_', ' '))
+                append(' ')
+                append(entry.scope.humanizeScope())
+            },
+            style = SnoutTheme.typography.bodyMedium,
+        )
+        entry.itemName?.let { CodeChip(text = it) }
+    }
+}
+
+@Composable
+private fun ChangeLine(change: ActivityChange, modifier: Modifier = Modifier) {
     val empty = stringResource(Res.string.activity_change_empty_value)
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            text = change.field.replace('_', ' '),
-            style = SnoutTheme.code.small,
-            fontWeight = FontWeight.Medium,
-        )
-        Text(
-            text = "${change.before ?: empty} → ${change.after ?: empty}",
-            style = SnoutTheme.code.small,
-            color = SnoutTheme.colors.onSurfaceVariant,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+    FlowRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
+        CodeChip(text = change.field.replace('_', ' '))
+        CodeChip(text = change.before ?: empty)
+        Text(text = Arrow, style = SnoutTheme.typography.bodySmall, color = SnoutTheme.colors.onSurfaceVariant)
+        CodeChip(text = change.after ?: empty)
     }
 }
 
