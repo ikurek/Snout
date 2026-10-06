@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -21,7 +22,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.LabelChip
+import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
@@ -43,6 +44,8 @@ import snout.composeapp.generated.resources.ic_add_24dp
 import snout.composeapp.generated.resources.more_annotations_title
 import kotlin.time.Instant
 
+private val DateColumnWidth = 78.dp
+
 @Composable
 internal fun AnnotationsScreen(
     state: AnnotationsUiState,
@@ -60,22 +63,17 @@ internal fun AnnotationsScreen(
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
         snackbarHostState = snackbarHostState,
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick, shape = SnoutTheme.shapes.large) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_add_24dp),
-                    contentDescription = stringResource(Res.string.add_annotation_content_description),
-                )
-            }
-        },
+        floatingActionButton = { AddAnnotationButton(onClick = onAddClick) },
     ) { innerPadding ->
         CachedStateContainer(
             state = state.annotations,
             onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(innerPadding),
         ) { annotations ->
-            LazyColumn(contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp)) {
-                items(annotations, key = { it.id }) { AnnotationRow(it) }
+            LazyColumn(contentPadding = PaddingValues(bottom = 88.dp)) {
+                itemsIndexed(annotations, key = { _, annotation -> annotation.id }) { index, annotation ->
+                    AnnotationRow(annotation = annotation, divider = index < annotations.lastIndex)
+                }
             }
         }
     }
@@ -88,33 +86,51 @@ internal fun AnnotationsScreen(
     )
 }
 
+/** Tonal FAB on `primaryContainer`; elevation is tonal in this design, so no shadow. */
 @Composable
-private fun AnnotationRow(annotation: Annotation) {
+private fun AddAnnotationButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        shape = SnoutTheme.shapes.large,
+        containerColor = SnoutTheme.colors.primaryContainer,
+        contentColor = SnoutTheme.colors.onPrimaryContainer,
+        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.ic_add_24dp),
+            contentDescription = stringResource(Res.string.add_annotation_content_description),
+        )
+    }
+}
+
+/** Date column on the left, then the note, its scope tag and who added it. */
+@Composable
+private fun AnnotationRow(annotation: Annotation, divider: Boolean) {
     EntityRow(
         title = annotation.content,
-        titleStyle = SnoutTheme.typography.bodyMedium,
-        titleMaxLines = 4,
+        titleMaxLines = 3,
         alignment = Alignment.Top,
+        divider = divider,
         leading = {
             Text(
                 text = annotation.dateMarker.formatShortDate(),
-                style = SnoutTheme.code.small,
-                color = SnoutTheme.colors.primary,
+                style = SnoutTheme.typography.bodySmall,
+                color = SnoutTheme.colors.onSurfaceVariant,
                 modifier = Modifier.width(DateColumnWidth),
             )
         },
         meta = {
-            annotation.scope.label()?.let { LabelChip(text = annotation.targetName ?: it) }
+            annotation.scope.label()?.let { Tag(text = annotation.targetName ?: it) }
+        },
+        supporting = {
             val meta = listOfNotNull(
                 annotation.createdBy?.let { stringResource(Res.string.annotation_by, it) },
                 annotation.createdAt?.formatRelative(),
             ).joinToString(" · ")
-            if (meta.isNotEmpty()) MetaText(meta)
+            if (meta.isNotEmpty()) MetaText(meta, modifier = Modifier.padding(top = 4.dp))
         },
     )
 }
-
-private val DateColumnWidth = 88.dp
 
 @Composable
 private fun AnnotationScope.label(): String? = when (this) {

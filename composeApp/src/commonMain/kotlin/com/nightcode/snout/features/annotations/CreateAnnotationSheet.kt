@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.annotations
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -24,7 +25,7 @@ import com.nightcode.snout.designsystem.atoms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
-import com.nightcode.snout.designsystem.InlineError
+import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -71,14 +72,14 @@ internal fun CreateAnnotationSheet(
 
     AnimatedBottomSheet(isVisible = isVisible, onDismissRequest = onDismiss) {
         Column(modifier = Modifier.padding(horizontal = 16.dp).imePadding()) {
-            Text(text = stringResource(Res.string.annotation_create_title), style = SnoutTheme.typography.titleMedium)
+            Text(text = stringResource(Res.string.annotation_create_title), style = SnoutTheme.typography.titleLarge)
             VerticalSpacer(16.dp)
             PrimaryTextField(
                 state = contentState,
                 label = stringResource(Res.string.annotation_create_content_label),
                 placeholder = stringResource(Res.string.annotation_create_content_placeholder),
                 enabled = status !is CreateStatus.Saving,
-                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 2, maxHeightInLines = 5),
+                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3, maxHeightInLines = 6),
                 modifier = Modifier.fillMaxWidth(),
             )
             VerticalSpacer(8.dp)
@@ -87,9 +88,11 @@ internal fun CreateAnnotationSheet(
                 value = dateMarker.formatShortDate(),
                 leadingIcon = painterResource(Res.drawable.ic_schedule_24dp),
                 onClick = { showDatePicker = true },
+                showChevron = false,
+                contentPadding = PaddingValues(vertical = 8.dp),
             )
             if (status is CreateStatus.Failed) {
-                InlineError(text = stringResource(status.error.createMessage()))
+                InlineErrorBanner(text = stringResource(status.error.createMessage()))
                 VerticalSpacer(8.dp)
             }
             VerticalSpacer(16.dp)
