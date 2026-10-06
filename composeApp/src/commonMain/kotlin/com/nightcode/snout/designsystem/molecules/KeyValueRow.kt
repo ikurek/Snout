@@ -54,12 +54,14 @@ internal fun KeyValueRow(
                 style = SnoutTheme.typography.labelMedium,
                 color = SnoutTheme.colors.onSurfaceVariant,
             )
-            Text(
-                text = value,
-                style = SnoutTheme.typography.bodyLarge,
-                maxLines = valueMaxLines,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (value.isNotEmpty()) {
+                Text(
+                    text = value,
+                    style = SnoutTheme.typography.bodyLarge,
+                    maxLines = valueMaxLines,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         trailing?.invoke()
     }

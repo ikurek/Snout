@@ -2,7 +2,6 @@ package com.nightcode.snout.features.insights.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,11 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.atoms.LabelChip
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
+import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.LoadingIndicator
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -109,19 +108,7 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier) {
             KeyValueRow(label = stringResource(Res.string.insight_detail_last_modified), value = it.formatDateTime())
         }
         if (detail.summary.tags.isNotEmpty()) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = stringResource(Res.string.insight_detail_tags),
-                    style = SnoutTheme.typography.labelMedium,
-                    color = SnoutTheme.colors.onSurfaceVariant,
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    detail.summary.tags.forEach { LabelChip(text = it) }
-                }
-            }
+            TagList(label = stringResource(Res.string.insight_detail_tags), tags = detail.summary.tags)
         }
     }
 }
@@ -132,6 +119,19 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier) {
 @Composable
 fun InsightDetailScreenPreview() = InsightDetailScreen(
     state = CachedUiState.Content(TestInsightDetail, isRefreshing = false),
+    snackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack = {},
+    onRetry = {},
+    onFavoriteToggle = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun InsightDetailScreenPendingPreview() = InsightDetailScreen(
+    state = CachedUiState.Content(TestInsightDetail.copy(result = null), isRefreshing = true),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRetry = {},

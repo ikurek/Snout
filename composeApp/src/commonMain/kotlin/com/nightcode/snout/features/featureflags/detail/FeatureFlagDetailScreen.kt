@@ -2,7 +2,6 @@ package com.nightcode.snout.features.featureflags.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.designsystem.atoms.LabelChip
 import com.nightcode.snout.designsystem.atoms.SectionTitle
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
@@ -38,6 +36,7 @@ import com.nightcode.snout.designsystem.molecules.InfoNote
 import com.nightcode.snout.designsystem.molecules.InlineError
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
+import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.LoadingIndicator
@@ -217,22 +216,7 @@ private fun DetailsSection(flag: FeatureFlag) {
         KeyValueRow(label = stringResource(Res.string.feature_flag_created_on), value = it.formatShortDate())
     }
     if (flag.tags.isNotEmpty()) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                text = stringResource(Res.string.feature_flag_tags),
-                style = SnoutTheme.typography.labelMedium,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                flag.tags.forEach { LabelChip(text = it) }
-            }
-        }
+        TagList(label = stringResource(Res.string.feature_flag_tags), tags = flag.tags)
     }
 }
 
