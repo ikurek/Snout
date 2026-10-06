@@ -14,19 +14,7 @@ import com.nightcode.snout.common.compose.ScreenshotEnvironment
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PrimaryButtonDisabledLoadingPreviewShot() = ScreenshotEnvironment { PrimaryButtonDisabledLoadingPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
 fun PrimaryButtonDisabledPreviewShot() = ScreenshotEnvironment { PrimaryButtonDisabledPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PrimaryButtonDisabledWithIconPreviewShot() = ScreenshotEnvironment { PrimaryButtonDisabledWithIconPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)

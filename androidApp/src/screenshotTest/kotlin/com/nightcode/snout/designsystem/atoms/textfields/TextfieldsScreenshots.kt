@@ -14,7 +14,7 @@ import com.nightcode.snout.common.compose.ScreenshotEnvironment
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PrimaryTextFieldEmptyDisabledPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldEmptyDisabledPreview() }
+fun PrimaryTextFieldDisabledPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldDisabledPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
@@ -26,27 +26,7 @@ fun PrimaryTextFieldEmptyPreviewShot() = ScreenshotEnvironment { PrimaryTextFiel
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PrimaryTextFieldEmptyWithPlaceholderDisabledPreviewShot() =
-    ScreenshotEnvironment { PrimaryTextFieldEmptyWithPlaceholderDisabledPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PrimaryTextFieldEmptyWithPlaceholderPreviewShot() =
-    ScreenshotEnvironment { PrimaryTextFieldEmptyWithPlaceholderPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PrimaryTextFieldFilledDisabledPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldFilledDisabledPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PrimaryTextFieldFilledErrorPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldFilledErrorPreview() }
+fun PrimaryTextFieldErrorPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldErrorPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
@@ -58,7 +38,7 @@ fun PrimaryTextFieldFilledPreviewShot() = ScreenshotEnvironment { PrimaryTextFie
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PrimaryTextFieldFilledWithIconsPreviewShot() = ScreenshotEnvironment { PrimaryTextFieldFilledWithIconsPreview() }
+fun SearchFieldEmptyPreviewShot() = ScreenshotEnvironment { SearchFieldEmptyPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)

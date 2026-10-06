@@ -26,6 +26,12 @@ fun GenericErrorPlaceholderPreviewShot() = ScreenshotEnvironment { GenericErrorP
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun NoSearchResultsPlaceholderPreviewShot() = ScreenshotEnvironment { NoSearchResultsPlaceholderPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun NothingFoundPlaceholderPreviewShot() = ScreenshotEnvironment { NothingFoundPlaceholderPreview() }
 
 @PreviewTest

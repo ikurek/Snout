@@ -20,19 +20,31 @@ fun CodeBlockPreviewShot() = ScreenshotEnvironment { CodeBlockPreview() }
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun CodeChipPreviewShot() = ScreenshotEnvironment { CodeChipPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun EntityRowPreviewShot() = ScreenshotEnvironment { EntityRowPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun InfoNotePreviewShot() = ScreenshotEnvironment { InfoNotePreview() }
+fun InfoBannerPreviewShot() = ScreenshotEnvironment { InfoBannerPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun InlineErrorPreviewShot() = ScreenshotEnvironment { InlineErrorPreview() }
+fun InlineErrorBannerPreviewShot() = ScreenshotEnvironment { InlineErrorBannerPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun KeyValueRowCodePreviewShot() = ScreenshotEnvironment { KeyValueRowCodePreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
@@ -44,13 +56,19 @@ fun KeyValueRowPreviewShot() = ScreenshotEnvironment { KeyValueRowPreview() }
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun MetricCardPreviewShot() = ScreenshotEnvironment { MetricCardPreview() }
+fun SegmentedControlPreviewShot() = ScreenshotEnvironment { SegmentedControlPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun SegmentedChoicePreviewShot() = ScreenshotEnvironment { SegmentedChoicePreview() }
+fun StatCardDownPreviewShot() = ScreenshotEnvironment { StatCardDownPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun StatCardPreviewShot() = ScreenshotEnvironment { StatCardPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)

@@ -14,22 +14,58 @@ import com.nightcode.snout.common.compose.ScreenshotEnvironment
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun AppIconPreviewShot() = ScreenshotEnvironment { AppIconPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
 fun AvatarBoxPreviewShot() = ScreenshotEnvironment { AvatarBoxPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun LabelChipPreviewShot() = ScreenshotEnvironment { LabelChipPreview() }
+fun BrandMarkLargePreviewShot() = ScreenshotEnvironment { BrandMarkLargePreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun LabelChipSuccessPreviewShot() = ScreenshotEnvironment { LabelChipSuccessPreview() }
+fun BrandMarkPreviewShot() = ScreenshotEnvironment { BrandMarkPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SectionLabelPreviewShot() = ScreenshotEnvironment { SectionLabelPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SkeletonRowsPreviewShot() = ScreenshotEnvironment { SkeletonRowsPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun StatusPillActivePreviewShot() = ScreenshotEnvironment { StatusPillActivePreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun StatusPillNeutralPreviewShot() = ScreenshotEnvironment { StatusPillNeutralPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun TagPreviewShot() = ScreenshotEnvironment { TagPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun TrendChipDownPreviewShot() = ScreenshotEnvironment { TrendChipDownPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun TrendChipUpPreviewShot() = ScreenshotEnvironment { TrendChipUpPreview() }
