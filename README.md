@@ -16,7 +16,9 @@ except calls to the instance you configure.
 - **Experiments**: status, variants, metrics and conclusion (read-only).
 - **Annotations**: timeline of project annotations and a sheet to add one.
 - **Activity log**: who changed what in the project, with before/after values.
-- **Settings**: account, instance, selected project, light/dark/system theme, log out.
+- **Settings**: account, instance, selected project, light/dark/system theme, log out. Customise which four
+  sections sit in the bottom bar (the rest live under More) and which opens first, and what the Analytics
+  tab shows: default range, stat cards, visitors chart and breakdown tables.
 - Every screen has loading, empty, error, permission-denied and rate-limited states, pull to refresh, offline cache,
   and an "open in PostHog" action.
 
