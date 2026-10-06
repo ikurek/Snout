@@ -108,12 +108,12 @@ private fun ChangeLine(change: ActivityChange) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             text = change.field.replace('_', ' '),
-            style = SnoutTheme.monoTypography.labelSmall,
+            style = SnoutTheme.code.small,
             fontWeight = FontWeight.Medium,
         )
         Text(
             text = "${change.before ?: empty} → ${change.after ?: empty}",
-            style = SnoutTheme.monoTypography.labelSmall,
+            style = SnoutTheme.code.small,
             color = SnoutTheme.colors.onSurfaceVariant,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

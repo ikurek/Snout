@@ -95,7 +95,7 @@ private fun NumberView(series: List<TrendSeries>) {
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    Text(text = s.total.formatCompact(), style = SnoutTheme.monoTypography.titleMedium)
+                    Text(text = s.total.formatCompact(), style = SnoutTheme.code.medium)
                 }
             }
         }

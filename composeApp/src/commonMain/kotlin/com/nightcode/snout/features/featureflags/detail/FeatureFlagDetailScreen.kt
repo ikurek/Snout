@@ -99,7 +99,7 @@ internal fun FeatureFlagDetailScreen(
                 title = {
                     Text(
                         text = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
-                        style = SnoutTheme.monoTypography.titleLarge,
+                        style = SnoutTheme.code.large,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -230,7 +230,7 @@ private fun VariantsSection(flag: FeatureFlag) {
             trailing = {
                 Text(
                     text = stringResource(Res.string.feature_flag_rollout_percent, variant.rolloutPercentage),
-                    style = SnoutTheme.monoTypography.labelLarge,
+                    style = SnoutTheme.code.medium,
                 )
             },
         )
@@ -301,7 +301,7 @@ private fun ConditionCard(index: Int, condition: ReleaseCondition, modifier: Mod
         trailing = {
             Text(
                 text = stringResource(Res.string.feature_flag_rollout_percent, condition.rolloutPercentage),
-                style = SnoutTheme.monoTypography.titleMedium,
+                style = SnoutTheme.code.medium,
                 color = SnoutTheme.colors.primary,
             )
         },
@@ -315,7 +315,7 @@ private fun ConditionCard(index: Int, condition: ReleaseCondition, modifier: Mod
         } else {
             condition.properties.forEach { property ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(text = property.key, style = SnoutTheme.monoTypography.bodySmall)
+                    Text(text = property.key, style = SnoutTheme.code.small)
                     property.operator?.let {
                         Text(
                             text = it,
@@ -325,7 +325,7 @@ private fun ConditionCard(index: Int, condition: ReleaseCondition, modifier: Mod
                     }
                     Text(
                         text = property.value,
-                        style = SnoutTheme.monoTypography.bodySmall,
+                        style = SnoutTheme.code.small,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),

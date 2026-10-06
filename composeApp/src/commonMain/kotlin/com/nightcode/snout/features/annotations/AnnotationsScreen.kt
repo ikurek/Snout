@@ -98,7 +98,7 @@ private fun AnnotationRow(annotation: Annotation) {
         leading = {
             Text(
                 text = annotation.dateMarker.formatShortDate(),
-                style = SnoutTheme.monoTypography.labelMedium,
+                style = SnoutTheme.code.small,
                 color = SnoutTheme.colors.primary,
                 modifier = Modifier.width(DateColumnWidth),
             )

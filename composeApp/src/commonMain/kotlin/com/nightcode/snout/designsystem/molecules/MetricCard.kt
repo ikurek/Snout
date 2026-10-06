@@ -50,7 +50,7 @@ internal fun MetricCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(text = value, style = SnoutTheme.monoTypography.headlineSmall, maxLines = 1)
+            Text(text = value, style = SnoutTheme.typography.headlineMedium, maxLines = 1)
             if (changePercent != null) {
                 TrendDelta(changePercent = changePercent, isIncreaseBad = isIncreaseBad, secondary = secondary)
             } else if (secondary != null) {
@@ -69,9 +69,9 @@ private fun TrendDelta(changePercent: Double, isIncreaseBad: Boolean, secondary:
     val flat = kotlin.math.abs(changePercent) < FlatThresholdPercent
     val positive = if (isIncreaseBad) changePercent < 0 else changePercent > 0
     val color = when {
-        flat -> SnoutTheme.extendedColors.trendFlat
-        positive -> SnoutTheme.extendedColors.trendUp
-        else -> SnoutTheme.extendedColors.trendDown
+        flat -> SnoutTheme.colors.onSurfaceVariant
+        positive -> SnoutTheme.extendedColors.success
+        else -> SnoutTheme.colors.error
     }
     val icon = when {
         flat -> Res.drawable.ic_trending_flat_24dp

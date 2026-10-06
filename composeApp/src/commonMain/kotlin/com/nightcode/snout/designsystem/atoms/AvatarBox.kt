@@ -33,7 +33,7 @@ internal fun AvatarBox(
     ) {
         Text(
             text = name.take(2).uppercase(),
-            style = SnoutTheme.monoTypography.titleMedium,
+            style = SnoutTheme.code.medium,
         )
     }
 }

@@ -48,7 +48,7 @@ internal fun FunnelBars(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    Text(text = valueFormatter(step.value), style = SnoutTheme.monoTypography.labelLarge)
+                    Text(text = valueFormatter(step.value), style = SnoutTheme.code.medium)
                     Text(
                         text = step.fraction.formatPercent(isFraction = true),
                         style = SnoutTheme.typography.labelLarge,

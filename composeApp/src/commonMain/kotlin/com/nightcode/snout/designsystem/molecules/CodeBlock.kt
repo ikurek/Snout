@@ -22,7 +22,7 @@ internal fun CodeBlock(text: String, modifier: Modifier = Modifier) {
         color = SnoutTheme.colors.surfaceContainer,
     ) {
         SelectionContainer {
-            Text(text = text, style = SnoutTheme.monoTypography.bodyMedium, modifier = Modifier.padding(16.dp))
+            Text(text = text, style = SnoutTheme.code.medium, modifier = Modifier.padding(16.dp))
         }
     }
 }

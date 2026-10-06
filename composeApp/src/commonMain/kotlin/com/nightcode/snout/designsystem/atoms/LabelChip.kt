@@ -39,14 +39,14 @@ internal fun LabelChip(text: String, modifier: Modifier = Modifier, tone: LabelC
 
 @Composable
 private fun LabelChipTone.colors(): Pair<Color, Color> {
-    val extended = SnoutTheme.extendedColors
     val colors = SnoutTheme.colors
+    val extended = SnoutTheme.extendedColors
     return when (this) {
         LabelChipTone.Neutral -> colors.surfaceContainerHighest to colors.onSurfaceVariant
         LabelChipTone.Success -> extended.successContainer to extended.onSuccessContainer
-        LabelChipTone.Warning -> extended.warningContainer to colors.onSurface
+        LabelChipTone.Warning -> colors.errorContainer to colors.onErrorContainer
         LabelChipTone.Error -> colors.errorContainer to colors.onErrorContainer
-        LabelChipTone.Info -> colors.primaryContainer to colors.onPrimaryContainer
+        LabelChipTone.Info -> colors.tertiaryContainer to colors.onTertiaryContainer
     }
 }
 

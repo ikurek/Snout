@@ -143,7 +143,7 @@ private fun VariantsSection(variants: List<ExperimentVariant>) {
             trailing = {
                 Text(
                     text = stringResource(Res.string.feature_flag_rollout_percent, variant.rolloutPercentage),
-                    style = SnoutTheme.monoTypography.labelLarge,
+                    style = SnoutTheme.code.medium,
                 )
             },
         )

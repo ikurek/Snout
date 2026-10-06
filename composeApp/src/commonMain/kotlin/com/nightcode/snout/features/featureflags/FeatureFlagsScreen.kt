@@ -60,7 +60,7 @@ internal fun FeatureFlagsScreen(
 private fun FeatureFlagRow(flag: FeatureFlag, onClick: () -> Unit) {
     EntityRow(
         title = flag.key,
-        titleStyle = SnoutTheme.monoTypography.titleSmall,
+        titleStyle = SnoutTheme.code.medium,
         titleMaxLines = 1,
         subtitle = flag.description,
         onClick = onClick,

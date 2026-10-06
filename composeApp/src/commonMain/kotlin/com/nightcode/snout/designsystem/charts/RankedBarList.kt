@@ -66,7 +66,7 @@ internal fun RankedBarList(
                             color = SnoutTheme.colors.onSurfaceVariant,
                         )
                     }
-                    Text(text = valueFormatter(row.value), style = SnoutTheme.monoTypography.labelLarge)
+                    Text(text = valueFormatter(row.value), style = SnoutTheme.code.medium)
                 }
             }
         }

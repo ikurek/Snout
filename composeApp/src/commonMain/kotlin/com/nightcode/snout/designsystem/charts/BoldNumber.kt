@@ -23,7 +23,7 @@ internal fun BoldNumber(value: String, modifier: Modifier = Modifier, label: Str
     ) {
         Text(
             text = value,
-            style = SnoutTheme.monoTypography.displaySmall,
+            style = SnoutTheme.typography.displaySmall,
             color = SnoutTheme.colors.primary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

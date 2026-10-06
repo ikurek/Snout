@@ -43,7 +43,7 @@ internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier
                 columns.indices.forEach { index ->
                     Text(
                         text = row.getOrNull(index).orEmpty(),
-                        style = SnoutTheme.monoTypography.bodySmall,
+                        style = SnoutTheme.code.small,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.width(CellWidth).padding(vertical = 6.dp, horizontal = 4.dp),

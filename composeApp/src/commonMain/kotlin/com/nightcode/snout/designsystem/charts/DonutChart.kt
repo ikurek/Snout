@@ -63,7 +63,7 @@ internal fun DonutChart(
                     start += sweep
                 }
             }
-            Text(text = valueFormatter(total), style = SnoutTheme.monoTypography.titleMedium)
+            Text(text = valueFormatter(total), style = SnoutTheme.code.medium)
         }
         Column(
             modifier = Modifier.weight(1f).padding(start = 16.dp),
@@ -84,7 +84,7 @@ internal fun DonutChart(
                     )
                     Text(
                         text = (slice.value / total).formatPercent(isFraction = true),
-                        style = SnoutTheme.monoTypography.labelSmall,
+                        style = SnoutTheme.code.small,
                         color = SnoutTheme.colors.onSurfaceVariant,
                     )
                 }

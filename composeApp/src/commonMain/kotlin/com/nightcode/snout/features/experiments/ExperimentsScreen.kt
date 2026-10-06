@@ -60,7 +60,7 @@ private fun ExperimentRow(experiment: Experiment, onClick: () -> Unit) {
     EntityRow(
         title = experiment.name,
         subtitle = experiment.featureFlagKey,
-        subtitleStyle = SnoutTheme.monoTypography.bodySmall,
+        subtitleStyle = SnoutTheme.code.small,
         onClick = onClick,
         meta = experiment.startDate?.let {
             { MetaText(stringResource(Res.string.experiment_started, it.formatShortDate())) }

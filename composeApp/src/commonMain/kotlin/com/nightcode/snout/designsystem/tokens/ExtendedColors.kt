@@ -4,56 +4,34 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
+/**
+ * Colors Material 3 has no role for: the success pair used by positive trends and "active" statuses, and the
+ * chart series palette. `chart[0]` equals primary and `chart[1]` equals tertiary so two-series charts read as
+ * orange vs blue rather than red vs green.
+ */
 @Immutable
 data class SnoutExtendedColors(
     val success: Color,
+    val onSuccess: Color,
     val successContainer: Color,
     val onSuccessContainer: Color,
-    val warning: Color,
-    val warningContainer: Color,
-    val info: Color,
-    val trendUp: Color,
-    val trendDown: Color,
-    val trendFlat: Color,
     val chart: List<Color>,
 )
 
 internal val LightExtendedColors = SnoutExtendedColors(
     success = SnoutLightTokens.Success,
+    onSuccess = SnoutLightTokens.OnSuccess,
     successContainer = SnoutLightTokens.SuccessContainer,
     onSuccessContainer = SnoutLightTokens.OnSuccessContainer,
-    warning = SnoutLightTokens.Warning,
-    warningContainer = SnoutLightTokens.WarningContainer,
-    info = SnoutLightTokens.Info,
-    trendUp = SnoutLightTokens.TrendUp,
-    trendDown = SnoutLightTokens.TrendDown,
-    trendFlat = SnoutLightTokens.TrendFlat,
-    chart = listOf(
-        Color(0xFFBB7400),
-        Color(0xFF0074CA),
-        Color(0xFFA95CBB),
-        Color(0xFF269E5F),
-        Color(0xFF00A7B1),
-    ),
+    chart = SnoutLightTokens.Chart,
 )
 
 internal val DarkExtendedColors = SnoutExtendedColors(
     success = SnoutDarkTokens.Success,
+    onSuccess = SnoutDarkTokens.OnSuccess,
     successContainer = SnoutDarkTokens.SuccessContainer,
     onSuccessContainer = SnoutDarkTokens.OnSuccessContainer,
-    warning = SnoutDarkTokens.Warning,
-    warningContainer = SnoutDarkTokens.WarningContainer,
-    info = SnoutDarkTokens.Info,
-    trendUp = SnoutDarkTokens.TrendUp,
-    trendDown = SnoutDarkTokens.TrendDown,
-    trendFlat = SnoutDarkTokens.TrendFlat,
-    chart = listOf(
-        Color(0xFFEBA941),
-        Color(0xFF59AAF8),
-        Color(0xFFD787E9),
-        Color(0xFF5EC386),
-        Color(0xFF00C9D1),
-    ),
+    chart = SnoutDarkTokens.Chart,
 )
 
 internal val LocalSnoutExtendedColors = staticCompositionLocalOf { LightExtendedColors }

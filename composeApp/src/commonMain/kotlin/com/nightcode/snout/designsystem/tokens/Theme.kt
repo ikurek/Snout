@@ -16,35 +16,37 @@ private val LightColors = lightColorScheme(
     onPrimary = SnoutLightTokens.OnPrimary,
     primaryContainer = SnoutLightTokens.PrimaryContainer,
     onPrimaryContainer = SnoutLightTokens.OnPrimaryContainer,
-
-    secondary = SnoutLightTokens.Primary,
-    onSecondary = SnoutLightTokens.OnPrimary,
-    secondaryContainer = SnoutLightTokens.PrimaryContainer,
-    onSecondaryContainer = SnoutLightTokens.OnPrimaryContainer,
-
-    tertiary = SnoutLightTokens.Info,
-    onTertiary = SnoutLightTokens.OnPrimary,
-
-    background = SnoutLightTokens.Surface,
-    onBackground = SnoutLightTokens.OnSurface,
-    surface = SnoutLightTokens.Surface,
-    onSurface = SnoutLightTokens.OnSurface,
-    surfaceVariant = SnoutLightTokens.SurfaceVariant,
-    onSurfaceVariant = SnoutLightTokens.OnSurfaceVariant,
-    surfaceDim = SnoutLightTokens.SurfaceDim,
-    surfaceContainerLowest = SnoutLightTokens.Surface,
-    surfaceContainerLow = SnoutLightTokens.SurfaceContainerLow,
-    surfaceContainer = SnoutLightTokens.SurfaceContainer,
-    surfaceContainerHigh = SnoutLightTokens.SurfaceContainerHigh,
-    surfaceContainerHighest = SnoutLightTokens.SurfaceContainerHighest,
-
-    outline = SnoutLightTokens.Outline,
-    outlineVariant = SnoutLightTokens.OutlineVariant,
-
+    secondary = SnoutLightTokens.Secondary,
+    onSecondary = SnoutLightTokens.OnSecondary,
+    secondaryContainer = SnoutLightTokens.SecondaryContainer,
+    onSecondaryContainer = SnoutLightTokens.OnSecondaryContainer,
+    tertiary = SnoutLightTokens.Tertiary,
+    onTertiary = SnoutLightTokens.OnTertiary,
+    tertiaryContainer = SnoutLightTokens.TertiaryContainer,
+    onTertiaryContainer = SnoutLightTokens.OnTertiaryContainer,
     error = SnoutLightTokens.Error,
     onError = SnoutLightTokens.OnError,
     errorContainer = SnoutLightTokens.ErrorContainer,
     onErrorContainer = SnoutLightTokens.OnErrorContainer,
+    background = SnoutLightTokens.Background,
+    onBackground = SnoutLightTokens.OnBackground,
+    surface = SnoutLightTokens.Surface,
+    onSurface = SnoutLightTokens.OnSurface,
+    surfaceVariant = SnoutLightTokens.SurfaceVariant,
+    onSurfaceVariant = SnoutLightTokens.OnSurfaceVariant,
+    outline = SnoutLightTokens.Outline,
+    outlineVariant = SnoutLightTokens.OutlineVariant,
+    scrim = SnoutLightTokens.Scrim,
+    inverseSurface = SnoutLightTokens.InverseSurface,
+    inverseOnSurface = SnoutLightTokens.InverseOnSurface,
+    inversePrimary = SnoutLightTokens.InversePrimary,
+    surfaceDim = SnoutLightTokens.SurfaceDim,
+    surfaceBright = SnoutLightTokens.SurfaceBright,
+    surfaceContainerLowest = SnoutLightTokens.SurfaceContainerLowest,
+    surfaceContainerLow = SnoutLightTokens.SurfaceContainerLow,
+    surfaceContainer = SnoutLightTokens.SurfaceContainer,
+    surfaceContainerHigh = SnoutLightTokens.SurfaceContainerHigh,
+    surfaceContainerHighest = SnoutLightTokens.SurfaceContainerHighest,
 )
 
 private val DarkColors = darkColorScheme(
@@ -52,35 +54,37 @@ private val DarkColors = darkColorScheme(
     onPrimary = SnoutDarkTokens.OnPrimary,
     primaryContainer = SnoutDarkTokens.PrimaryContainer,
     onPrimaryContainer = SnoutDarkTokens.OnPrimaryContainer,
-
-    secondary = SnoutDarkTokens.Primary,
-    onSecondary = SnoutDarkTokens.OnPrimary,
-    secondaryContainer = SnoutDarkTokens.PrimaryContainer,
-    onSecondaryContainer = SnoutDarkTokens.OnPrimaryContainer,
-
-    tertiary = SnoutDarkTokens.Info,
-    onTertiary = SnoutDarkTokens.OnPrimary,
-
-    background = SnoutDarkTokens.Surface,
-    onBackground = SnoutDarkTokens.OnSurface,
-    surface = SnoutDarkTokens.Surface,
-    onSurface = SnoutDarkTokens.OnSurface,
-    surfaceVariant = SnoutDarkTokens.SurfaceVariant,
-    onSurfaceVariant = SnoutDarkTokens.OnSurfaceVariant,
-    surfaceDim = SnoutDarkTokens.SurfaceDim,
-    surfaceContainerLowest = SnoutDarkTokens.SurfaceDim,
-    surfaceContainerLow = SnoutDarkTokens.SurfaceContainerLow,
-    surfaceContainer = SnoutDarkTokens.SurfaceContainer,
-    surfaceContainerHigh = SnoutDarkTokens.SurfaceContainerHigh,
-    surfaceContainerHighest = SnoutDarkTokens.SurfaceContainerHighest,
-
-    outline = SnoutDarkTokens.Outline,
-    outlineVariant = SnoutDarkTokens.OutlineVariant,
-
+    secondary = SnoutDarkTokens.Secondary,
+    onSecondary = SnoutDarkTokens.OnSecondary,
+    secondaryContainer = SnoutDarkTokens.SecondaryContainer,
+    onSecondaryContainer = SnoutDarkTokens.OnSecondaryContainer,
+    tertiary = SnoutDarkTokens.Tertiary,
+    onTertiary = SnoutDarkTokens.OnTertiary,
+    tertiaryContainer = SnoutDarkTokens.TertiaryContainer,
+    onTertiaryContainer = SnoutDarkTokens.OnTertiaryContainer,
     error = SnoutDarkTokens.Error,
     onError = SnoutDarkTokens.OnError,
     errorContainer = SnoutDarkTokens.ErrorContainer,
     onErrorContainer = SnoutDarkTokens.OnErrorContainer,
+    background = SnoutDarkTokens.Background,
+    onBackground = SnoutDarkTokens.OnBackground,
+    surface = SnoutDarkTokens.Surface,
+    onSurface = SnoutDarkTokens.OnSurface,
+    surfaceVariant = SnoutDarkTokens.SurfaceVariant,
+    onSurfaceVariant = SnoutDarkTokens.OnSurfaceVariant,
+    outline = SnoutDarkTokens.Outline,
+    outlineVariant = SnoutDarkTokens.OutlineVariant,
+    scrim = SnoutDarkTokens.Scrim,
+    inverseSurface = SnoutDarkTokens.InverseSurface,
+    inverseOnSurface = SnoutDarkTokens.InverseOnSurface,
+    inversePrimary = SnoutDarkTokens.InversePrimary,
+    surfaceDim = SnoutDarkTokens.SurfaceDim,
+    surfaceBright = SnoutDarkTokens.SurfaceBright,
+    surfaceContainerLowest = SnoutDarkTokens.SurfaceContainerLowest,
+    surfaceContainerLow = SnoutDarkTokens.SurfaceContainerLow,
+    surfaceContainer = SnoutDarkTokens.SurfaceContainer,
+    surfaceContainerHigh = SnoutDarkTokens.SurfaceContainerHigh,
+    surfaceContainerHighest = SnoutDarkTokens.SurfaceContainerHighest,
 )
 
 @Composable
@@ -90,7 +94,7 @@ fun SnoutTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable 
 
     CompositionLocalProvider(
         LocalSnoutExtendedColors provides extendedColorScheme,
-        LocalSnoutMonoTypography provides SnoutMonoTypography,
+        LocalSnoutCodeTypography provides SnoutCodeStyles,
     ) {
         MaterialTheme(
             colorScheme = materialColorScheme,
@@ -114,9 +118,9 @@ object SnoutTheme {
         @Composable @ReadOnlyComposable
         get() = MaterialTheme.typography
 
-    val monoTypography: Typography
+    val code: SnoutCodeTypography
         @Composable @ReadOnlyComposable
-        get() = LocalSnoutMonoTypography.current
+        get() = LocalSnoutCodeTypography.current
 
     val shapes: Shapes
         @Composable @ReadOnlyComposable
