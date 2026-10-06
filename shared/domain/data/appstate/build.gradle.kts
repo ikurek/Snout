@@ -9,5 +9,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.appstate)
+        api(projects.shared.domain.model.analytics)
     }
 }

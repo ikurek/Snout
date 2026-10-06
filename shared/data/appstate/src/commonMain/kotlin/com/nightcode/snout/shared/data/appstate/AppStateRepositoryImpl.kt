@@ -3,6 +3,8 @@ package com.nightcode.snout.shared.data.appstate
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.storage.datastore.AppStateDataStore
@@ -37,4 +39,24 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
     }
 
     override suspend fun saveThemeMode(themeMode: ThemeMode) = dataStore.saveThemeMode(themeMode.name)
+
+    override fun observeNavigationPreferences(): Flow<NavigationPreferences> =
+        dataStore.observeNavigationPreferences().map(PreferencesCodec::decodeNavigation)
+
+    override suspend fun saveNavigationPreferences(preferences: NavigationPreferences) =
+        dataStore.saveNavigationPreferences(
+            tabs = PreferencesCodec.encodeTabs(preferences),
+            landing = preferences.landing.name,
+        )
+
+    override fun observeAnalyticsPreferences(): Flow<AnalyticsPreferences> =
+        dataStore.observeAnalyticsPreferences().map(PreferencesCodec::decodeAnalytics)
+
+    override suspend fun saveAnalyticsPreferences(preferences: AnalyticsPreferences) =
+        dataStore.saveAnalyticsPreferences(
+            defaultRange = preferences.defaultRange.name,
+            metrics = PreferencesCodec.encodeMetrics(preferences),
+            showVisitorsTrend = preferences.showVisitorsTrend,
+            breakdowns = PreferencesCodec.encodeBreakdowns(preferences),
+        )
 }

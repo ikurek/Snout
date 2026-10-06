@@ -8,6 +8,7 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
 @Module(includes = [AppStateDataModule::class, AuthDataModule::class])
+@Suppress("TooManyFunctions") // one factory per use case; the module is a flat list by design
 class AppStateUsecaseModule {
     @Single
     fun saveSelectedProject(repository: AppStateRepository) = SaveSelectedProject(repository)
@@ -37,4 +38,16 @@ class AppStateUsecaseModule {
     @Single
     fun getPostHogUrl(authRepository: AuthRepository, appStateRepository: AppStateRepository) =
         GetPostHogUrl(authRepository, appStateRepository)
+
+    @Single
+    fun observeNavigationPreferences(repository: AppStateRepository) = ObserveNavigationPreferences(repository)
+
+    @Single
+    fun saveNavigationPreferences(repository: AppStateRepository) = SaveNavigationPreferences(repository)
+
+    @Single
+    fun observeAnalyticsPreferences(repository: AppStateRepository) = ObserveAnalyticsPreferences(repository)
+
+    @Single
+    fun saveAnalyticsPreferences(repository: AppStateRepository) = SaveAnalyticsPreferences(repository)
 }
