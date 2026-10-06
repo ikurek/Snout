@@ -1,29 +1,20 @@
 package com.nightcode.snout.features.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
@@ -32,14 +23,18 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatMonthYear
 import com.nightcode.snout.common.platform.appVersionName
 import com.nightcode.snout.designsystem.atoms.AvatarBox
-import com.nightcode.snout.designsystem.SectionTitle
+import com.nightcode.snout.designsystem.atoms.SectionLabel
+import com.nightcode.snout.designsystem.atoms.SkeletonRow
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
-import com.nightcode.snout.designsystem.InlineError
+import com.nightcode.snout.designsystem.molecules.EntityRow
+import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
-import com.nightcode.snout.designsystem.SegmentedChoice
+import com.nightcode.snout.designsystem.molecules.MetaText
+import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
+import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
@@ -72,7 +67,6 @@ import snout.composeapp.generated.resources.settings_theme_light
 import snout.composeapp.generated.resources.settings_theme_system
 import snout.composeapp.generated.resources.settings_version_label
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(
     state: SettingsUiState,
@@ -86,8 +80,8 @@ internal fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(Res.string.settings_screen_title)) },
+            SnoutTopAppBar(
+                title = stringResource(Res.string.settings_screen_title),
                 navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
             )
         },
@@ -132,29 +126,26 @@ private fun SettingsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        SectionTitle(stringResource(Res.string.settings_account_section))
+        SectionLabel(stringResource(Res.string.settings_account_section))
         AccountSection(state.account, onRetry = onRetryAccount)
 
-        VerticalSpacer(16.dp)
-        SectionTitle(stringResource(Res.string.settings_connection_section))
+        SectionLabel(stringResource(Res.string.settings_connection_section))
         ConnectionSection(state, onOpenInstance)
 
-        VerticalSpacer(16.dp)
-        SectionTitle(stringResource(Res.string.settings_appearance_section))
-        SegmentedChoice(
+        SectionLabel(stringResource(Res.string.settings_appearance_section))
+        SegmentedControl(
             options = ThemeMode.entries,
             selected = state.themeMode,
             onSelect = onThemeModeSelected,
             label = { themeLabels.getValue(it) },
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
 
-        VerticalSpacer(16.dp)
-        SectionTitle(stringResource(Res.string.settings_about_section))
+        SectionLabel(stringResource(Res.string.settings_about_section))
         KeyValueRow(label = stringResource(Res.string.settings_version_label), value = appVersionName())
 
         VerticalSpacer(24.dp)
-        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+        HorizontalDivider(color = SnoutTheme.colors.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
         VerticalSpacer(24.dp)
         SecondaryButton(
             text = stringResource(Res.string.settings_logout_button),
@@ -171,17 +162,12 @@ private fun SettingsContent(
 @Composable
 private fun AccountSection(account: AccountUiState, onRetry: () -> Unit) {
     when (account) {
-        AccountUiState.Loading -> Box(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-        }
+        AccountUiState.Loading -> SkeletonRow(divider = false)
 
-        is AccountUiState.Error -> InlineError(
+        is AccountUiState.Error -> InlineErrorBanner(
             text = stringResource(account.error.message()),
-            onRetry = onRetry,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            onAction = onRetry,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
 
         is AccountUiState.Loaded -> AccountRow(account.user)
@@ -190,26 +176,17 @@ private fun AccountSection(account: AccountUiState, onRetry: () -> Unit) {
 
 @Composable
 private fun AccountRow(user: User) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        AvatarBox(name = user.fullName.ifBlank { user.email }, size = 48.dp)
-        Column {
-            Text(text = user.fullName.ifBlank { user.email }, style = SnoutTheme.typography.titleMedium)
-            Text(
-                text = user.email,
-                style = SnoutTheme.typography.bodyMedium,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
-            Text(
-                text = stringResource(Res.string.settings_account_member_since, user.dateJoined.formatMonthYear()),
-                style = SnoutTheme.typography.labelMedium,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
-        }
-    }
+    val name = user.fullName.ifBlank { user.email }
+    EntityRow(
+        title = name,
+        subtitle = user.email,
+        subtitleStyle = SnoutTheme.typography.bodySmall,
+        divider = false,
+        leading = { AvatarBox(name = name) },
+        supporting = {
+            MetaText(stringResource(Res.string.settings_account_member_since, user.dateJoined.formatMonthYear()))
+        },
+    )
 }
 
 @Composable
