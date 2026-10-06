@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.koinCompiler) apply false
+    alias(libs.plugins.composeScreenshot) apply false
 }
 
 detekt {

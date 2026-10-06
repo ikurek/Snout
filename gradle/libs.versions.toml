@@ -21,6 +21,7 @@ ktor = "3.6.0"
 sqldelight = "2.4.0"
 kotest = "6.2.5"
 mokkery = "3.5.1"
+compose-screenshot = "0.0.1-alpha16"
 
 [libraries]
 # Gradle plugins (for buildLogic compileOnly)
@@ -81,6 +82,9 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 
+# Screenshot testing
+screenshot-validation-api = { module = "com.android.tools.screenshot:screenshot-validation-api", version.ref = "compose-screenshot" }
+
 # Kotest
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-assertions-arrow = { module = "io.kotest:kotest-assertions-arrow", version.ref = "kotest" }
@@ -108,6 +112,7 @@ koinCompiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plug
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
+composeScreenshot = { id = "com.android.compose.screenshot", version.ref = "compose-screenshot" }
 
 # Convention plugins
 snout-android-application = { id = "com.nightcode.snout.android.application" }

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.snout.android.application)
+    alias(libs.plugins.composeScreenshot)
 }
 
 android {
@@ -14,6 +15,8 @@ android {
     buildTypes {
         getByName("release") { isMinifyEnabled = false }
     }
+
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 dependencies {
@@ -21,4 +24,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
+    screenshotTestImplementation(libs.compose.uiTooling)
+    screenshotTestImplementation(libs.screenshot.validation.api)
 }

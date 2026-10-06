@@ -50,4 +50,9 @@ Conventions: Koin annotations for DI, Arrow `Either` for errors, SQLDelight cach
 Android: `./gradlew :androidApp:assembleDebug`. iOS: open `iosApp` in Xcode (the framework is built by Gradle).
 Checks: `./gradlew testAndroidHostTest detekt`.
 
+Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
+`androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Verify with
+`./gradlew :androidApp:validateDebugScreenshotTest`; after an intended UI change, regenerate the reference
+images with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
+
 If Gradle cannot find the Android SDK, add a `local.properties` with `sdk.dir=/path/to/Android/sdk`.
