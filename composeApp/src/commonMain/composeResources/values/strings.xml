@@ -137,7 +137,7 @@
     <string name="feature_flag_status_stale">Stale</string>
     <string name="feature_flag_status_unknown">Unknown</string>
     <string name="feature_flag_rollout_everyone">100% of users</string>
-    <string name="feature_flag_rollout_percent">%1$d%%</string>
+    <string name="feature_flag_rollout_percent">%1$d%</string>
     <string name="feature_flag_rollout_remote_config">Remote configuration</string>
     <string name="feature_flag_enabled_label">Enabled</string>
     <string name="feature_flag_read_only_note">Your account can't edit this flag in PostHog.</string>
