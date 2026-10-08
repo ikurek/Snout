@@ -16,6 +16,12 @@ private const val Phone = "spec:width=411dp,height=891dp"
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun InsightDetailScreenComparisonPreviewShot() = ScreenshotEnvironment { InsightDetailScreenComparisonPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun InsightDetailScreenPendingPreviewShot() = ScreenshotEnvironment { InsightDetailScreenPendingPreview() }
 
 @PreviewTest
