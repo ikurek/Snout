@@ -39,6 +39,7 @@ import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
 import org.koin.compose.koinInject
@@ -52,7 +53,7 @@ private val PopTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> C
 }
 
 @Composable
-internal fun MainNavGraph(initial: NavKey) {
+internal fun MainNavGraph(initial: NavKey, initialNavigationPreferences: NavigationPreferences? = null) {
     val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
     ReturnToLoginOnSessionExpiry(backStack)
 
@@ -66,7 +67,7 @@ internal fun MainNavGraph(initial: NavKey) {
         transitionSpec = PushTransition,
         popTransitionSpec = PopTransition,
         predictivePopTransitionSpec = { PopTransition() },
-        entryProvider = mainEntryProvider(backStack),
+        entryProvider = mainEntryProvider(backStack, initialNavigationPreferences),
     )
 }
 
@@ -87,7 +88,10 @@ private fun ReturnToLoginOnSessionExpiry(backStack: NavBackStack<NavKey>) {
     }
 }
 
-private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> {
+private fun mainEntryProvider(
+    backStack: NavBackStack<NavKey>,
+    initialNavigationPreferences: NavigationPreferences?,
+): (NavKey) -> NavEntry<NavKey> {
     val back: () -> Unit = { backStack.removeLastOrNull() }
     val sectionNavigation = SectionNavigation(
         onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
@@ -107,6 +111,7 @@ private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavE
         }
         entry<HomeNavKey> {
             HomeRoute(
+                initialPreferences = initialNavigationPreferences,
                 onNavigateToSettings = { backStack.add(SettingsNavKey) },
                 onOpenSection = { backStack.add(SectionNavKey(it)) },
                 navigation = sectionNavigation,

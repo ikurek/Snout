@@ -7,7 +7,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.StartupReady
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
@@ -21,6 +20,7 @@ internal data object HomeNavKey : NavKey
 
 @Composable
 internal fun HomeRoute(
+    initialPreferences: NavigationPreferences?,
     onNavigateToSettings: () -> Unit,
     onOpenSection: (HomeSection) -> Unit,
     navigation: SectionNavigation,
@@ -30,12 +30,11 @@ internal fun HomeRoute(
     var showProjectSwitcher by rememberSaveable { mutableStateOf(false) }
 
     val observeNavigationPreferences = koinInject<ObserveNavigationPreferences>()
-    val preferences by observeNavigationPreferences().collectAsStateWithLifecycle(initialValue = null)
+    val preferences by observeNavigationPreferences().collectAsStateWithLifecycle(initialValue = initialPreferences)
 
-    // The bar and the landing tab come from preferences; render nothing for the first few milliseconds
-    // rather than flashing the defaults and then jumping.
+    // The bar and the landing tab come from preferences. On app start they're read up front; when Home is
+    // reached later (after login) render nothing for the first few milliseconds rather than flash the defaults.
     val loaded: NavigationPreferences = preferences ?: return
-    StartupReady()
 
     HomeScreen(
         preferences = loaded,

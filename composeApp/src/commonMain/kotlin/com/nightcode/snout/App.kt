@@ -4,14 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.LocalStartupReady
-import com.nightcode.snout.common.compose.StartupReady
 import com.nightcode.snout.common.platform.SystemBarsAppearance
 import com.nightcode.snout.common.platform.SystemNightMode
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -19,18 +17,24 @@ import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.navigation.MainNavGraph
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.appstate.InitialLocation
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
+import kotlinx.coroutines.flow.first
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import org.koin.dsl.koinConfiguration
 import org.koin.plugin.module.dsl.module
 
+/** Everything the first screen needs from storage, read before anything is drawn. */
+private class Startup(val initial: NavKey, val navigationPreferences: NavigationPreferences)
+
 /**
- * [onReady] fires once the theme is known and the start screen reports content through [StartupReady];
- * Android keeps its system splash up until then, so the app never shows an empty frame of its own.
+ * [onReady] fires once the startup reads and the theme are in and the first screen is composed; Android keeps
+ * its system splash up until then, so the app never shows an empty frame of its own.
  */
 @Composable
 fun App(onReady: () -> Unit = {}) = KoinApplication(
@@ -39,12 +43,17 @@ fun App(onReady: () -> Unit = {}) = KoinApplication(
     },
 ) {
     val determineInitialLocation = koinInject<DetermineInitialLocation>()
-    val initial by produceState<NavKey?>(initialValue = null) {
-        value = when (determineInitialLocation()) {
-            InitialLocation.Login -> LoginNavKey
-            InitialLocation.ProjectSelection -> InitialProjectNavKey
-            InitialLocation.Home -> HomeNavKey
-        }
+    val observeNavigationPreferences = koinInject<ObserveNavigationPreferences>()
+    val startup by produceState<Startup?>(initialValue = null) {
+        value = Startup(
+            initial = when (determineInitialLocation()) {
+                InitialLocation.Login -> LoginNavKey
+                InitialLocation.ProjectSelection -> InitialProjectNavKey
+                InitialLocation.Home -> HomeNavKey
+            },
+            // Home's tabs come from preferences; reading them here lets it draw on its first frame.
+            navigationPreferences = observeNavigationPreferences().first(),
+        )
     }
 
     val observeThemeMode = koinInject<ObserveThemeMode>()
@@ -63,11 +72,10 @@ fun App(onReady: () -> Unit = {}) = KoinApplication(
         // (login, project selection) would otherwise show the host's default white on iOS.
         Surface(modifier = Modifier.fillMaxSize()) {
             // Wait for the theme too, so the first frame is never drawn in the wrong one.
-            val key = initial
-            if (key != null && storedThemeMode != null) {
-                CompositionLocalProvider(LocalStartupReady provides onReady) {
-                    MainNavGraph(initial = key)
-                }
+            val loaded = startup
+            if (loaded != null && storedThemeMode != null) {
+                MainNavGraph(initial = loaded.initial, initialNavigationPreferences = loaded.navigationPreferences)
+                SideEffect(onReady)
             }
         }
     }

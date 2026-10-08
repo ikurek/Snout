@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.StartupReady
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
@@ -25,7 +24,6 @@ internal fun LoginRoute(onUserAuthorized: () -> Unit) {
     val isConnecting by viewModel.isConnecting.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = remember { SnackbarHostState() }
-    StartupReady()
 
     LaunchedEffect(viewModel.sideEffects) {
         viewModel.sideEffects.collect { sideEffect ->
