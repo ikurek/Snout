@@ -1,0 +1,4 @@
+<resources>
+    <!-- Mirrors SnoutDarkTokens.Background. -->
+    <color name="snout_background">#15120E</color>
+</resources>

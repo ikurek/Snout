@@ -23,7 +23,7 @@ import snout.composeapp.generated.resources.brand_snout_logo
 private val LargeMarkThreshold = 48.dp
 private const val LogoInsetFraction = 5
 
-/** The Snout logo on a `primary` square: 36dp beside the app name on login, 64dp on the splash screen. */
+/** The Snout logo on a `primary` square, 36dp beside the app name on login; marks from 48dp get larger corners. */
 @Composable
 internal fun BrandMark(modifier: Modifier = Modifier, size: Dp = 36.dp) {
     val shape = if (size >= LargeMarkThreshold) SnoutTheme.shapes.large else SnoutTheme.shapes.medium

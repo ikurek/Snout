@@ -1,0 +1,6 @@
+<resources>
+    <!-- The window background is what the system splash and the first frames show; match the app's own. -->
+    <style name="Theme.Snout" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/snout_background</item>
+    </style>
+</resources>

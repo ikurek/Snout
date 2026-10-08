@@ -4,4 +4,4 @@ import androidx.compose.runtime.Composable
 
 @Composable
 @Suppress("FunctionNaming")
-fun MainView() = App()
+fun MainView(onReady: () -> Unit = {}) = App(onReady)

@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import com.nightcode.snout.common.compose.StartupReady
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -15,6 +16,7 @@ internal data object InitialProjectNavKey : NavKey
 internal fun InitialProjectRoute(onProjectSelected: () -> Unit) {
     val viewModel = koinViewModel<InitialProjectViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    StartupReady()
 
     LaunchedEffect(Unit) {
         viewModel.sideEffects.collect { sideEffect ->
