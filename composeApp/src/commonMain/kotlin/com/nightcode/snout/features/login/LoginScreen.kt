@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -91,7 +95,8 @@ internal fun LoginScreen(
     }
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+        // safeDrawing includes the IME; the bottom bar takes the bottom side so Connect rides above the keyboard.
+        contentWindowInsets = WindowInsets.safeDrawing,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BottomBar(
@@ -148,9 +153,9 @@ private fun Content(
     Column(
         modifier = Modifier
             .padding(contentPadding)
+            .consumeWindowInsets(contentPadding)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .imePadding(),
+            .padding(horizontal = 16.dp),
     ) {
         VerticalSpacer(16.dp)
         BrandRow()
@@ -235,7 +240,10 @@ private fun BottomBar(isConnecting: Boolean, isConnectEnabled: Boolean, onClick:
         onClick = onClick,
         loading = isConnecting,
         enabled = isConnectEnabled,
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+            .padding(16.dp),
         icon = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
     )
 }
