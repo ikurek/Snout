@@ -23,3 +23,9 @@ fun InsightDetailScreenPendingPreviewShot() = ScreenshotEnvironment { InsightDet
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun InsightDetailScreenPreviewShot() = ScreenshotEnvironment { InsightDetailScreenPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun InsightDetailScreenRetentionPreviewShot() = ScreenshotEnvironment { InsightDetailScreenRetentionPreview() }

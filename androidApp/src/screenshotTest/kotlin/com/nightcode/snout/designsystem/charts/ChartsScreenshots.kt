@@ -51,3 +51,9 @@ fun LineChartPreviewShot() = ScreenshotEnvironment { LineChartPreview() }
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun RankedBarListPreviewShot() = ScreenshotEnvironment { RankedBarListPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun RetentionTablePreviewShot() = ScreenshotEnvironment { RetentionTablePreview() }
