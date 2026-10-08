@@ -30,7 +30,7 @@ internal fun InsightDto.toSummary(): InsightSummary {
 }
 
 internal fun InsightDto.toResult(summary: InsightSummary = toSummary()): InsightResult? =
-    result.toInsightResult(summary.kind, summary.display, columns)
+    result.toInsightResult(query, summary.kind, summary.display, columns)
 
 internal fun InsightDto.toDetail(): InsightDetail {
     val summary = toSummary()

@@ -8,14 +8,28 @@ sealed interface InsightResult {
 
     /** Trends, stickiness and lifecycle: one or more series over the same periods. */
     @Serializable
-    data class Series(val series: List<TrendSeries>) : InsightResult
+    data class Series(val series: List<TrendSeries>, val format: ValueFormat = ValueFormat()) : InsightResult
 
     @Serializable
     data class Funnel(val steps: List<FunnelStep>) : InsightResult
 
-    /** SQL and table displays: already stringified cells. */
+    /** One cohort per start period; [intervals] label the columns ("Day 0", "Day 1", ...). */
     @Serializable
-    data class Table(val columns: List<String>, val rows: List<List<String>>) : InsightResult
+    data class Retention(val intervals: List<String>, val cohorts: List<RetentionCohort>) : InsightResult {
+
+        /** Share of users still active per interval, weighted by cohort size over the cohorts that reached it. */
+        val curve: List<Double>
+            get() = intervals.indices.map { interval ->
+                val reached = cohorts.filter { it.size > 0 && interval < it.counts.size }
+                val total = reached.sumOf { it.size }
+                if (total > 0) reached.sumOf { it.counts[interval] } / total else 0.0
+            }
+    }
+
+    /** SQL and table displays: already stringified cells; [totalRows] counts rows dropped from [rows]. */
+    @Serializable
+    data class Table(val columns: List<String>, val rows: List<List<String>>, val totalRows: Int = rows.size) :
+        InsightResult
 
     @Serializable
     data object Unsupported : InsightResult
@@ -29,6 +43,37 @@ data class TrendSeries(
     val aggregatedValue: Double?,
 ) {
     val total: Double get() = aggregatedValue ?: values.sum()
+}
+
+@Serializable
+data class RetentionCohort(val date: String, val counts: List<Double>) {
+    val size: Double get() = counts.firstOrNull() ?: 0.0
+
+    /** Share of the cohort active in [interval], 0..1. */
+    fun rate(interval: Int): Double? = counts.getOrNull(interval)?.let { if (size > 0) it / size else 0.0 }
+}
+
+/** PostHog's y-axis format: how a value is written, plus the user's prefix, postfix and decimal places. */
+@Serializable
+data class ValueFormat(
+    val unit: ValueUnit = ValueUnit.Numeric,
+    val prefix: String? = null,
+    val postfix: String? = null,
+    val decimalPlaces: Int? = null,
+)
+
+enum class ValueUnit {
+    Numeric,
+
+    /** Seconds. */
+    Duration,
+    DurationMs,
+
+    /** Already in percent, 46 -> 46%. */
+    Percentage,
+
+    /** A fraction, 0.46 -> 46%. */
+    PercentageScaled,
 }
 
 @Serializable
@@ -83,6 +128,17 @@ val TestFunnelResult = InsightResult.Funnel(
         FunnelStep("Visited pricing", 1200.0, 1.0, null),
         FunnelStep("Started checkout", 480.0, 0.4, 95.0),
         FunnelStep("Paid", 210.0, 0.175, 300.0),
+    ),
+)
+
+@TestData
+val TestRetentionResult = InsightResult.Retention(
+    intervals = listOf("Day 0", "Day 1", "Day 2", "Day 3"),
+    cohorts = listOf(
+        RetentionCohort("2026-10-01T00:00:00Z", listOf(400.0, 180.0, 120.0, 96.0)),
+        RetentionCohort("2026-10-02T00:00:00Z", listOf(360.0, 150.0, 100.0)),
+        RetentionCohort("2026-10-03T00:00:00Z", listOf(420.0, 200.0)),
+        RetentionCohort("2026-10-04T00:00:00Z", listOf(380.0)),
     ),
 )
 
