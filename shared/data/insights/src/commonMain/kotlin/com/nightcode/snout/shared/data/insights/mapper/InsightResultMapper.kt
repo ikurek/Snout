@@ -22,6 +22,8 @@ import kotlin.time.Instant
 
 private const val MaxTableRows = 50
 
+private val SummableMath = setOf("total", "dau", "unique_session", "unique_group", "sum")
+
 /** Turns PostHog's kind-specific `result` payload into something the UI can draw; null when not computed yet. */
 internal fun JsonElement?.toInsightResult(
     query: JsonElement?,
@@ -49,16 +51,28 @@ internal fun JsonElement?.toInsightResult(
 
 private fun JsonElement.toSeries(format: ValueFormat): InsightResult {
     val entries = (this as? JsonArray)?.mapNotNull { it as? JsonObject } ?: return InsightResult.Unsupported
-    val current = entries.filter { it.stringValue("compare_label") != "previous" }
+    val (previous, current) = entries.partition { it.stringValue("compare_label") == "previous" }
+    val previousByLabel = previous.groupBy { it.seriesLabel() }
     val series = current.map { entry ->
-        TrendSeries(
-            label = entry.seriesLabel(),
-            values = entry["data"].numbers(),
-            periods = entry.periods(),
-            aggregatedValue = entry["aggregated_value"].number() ?: entry.countWithoutData(),
-        )
+        entry.toTrendSeries(previous = previousByLabel[entry.seriesLabel()]?.firstOrNull()?.toTrendSeries())
     }
     return InsightResult.Series(series, format)
+}
+
+private fun JsonObject.toTrendSeries(previous: TrendSeries? = null): TrendSeries {
+    val values = get("data").numbers()
+    // Counts add up across periods; averages, percentiles and active-user windows don't, so they get a mean.
+    val math = (get("action") as? JsonObject)?.stringValue("math")
+    val summable = math == null || math in SummableMath
+    return TrendSeries(
+        label = seriesLabel(),
+        values = values,
+        periods = periods(),
+        aggregatedValue = get("aggregated_value").number()
+            ?: countWithoutData()
+            ?: values.takeUnless { summable }?.ifEmpty { null }?.average(),
+        previous = previous,
+    )
 }
 
 /** Trends send ISO dates in `days`; stickiness sends day counts there and the readable text in `labels`. */

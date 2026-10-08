@@ -2,6 +2,9 @@ package com.nightcode.snout.shared.domain.model.insights
 
 import com.nightcode.snout.shared.common.testdata.TestData
 import kotlinx.serialization.Serializable
+import kotlin.math.abs
+
+private const val Hundred = 100.0
 
 @Serializable
 sealed interface InsightResult {
@@ -38,14 +41,20 @@ sealed interface InsightResult {
     data object Unsupported : InsightResult
 }
 
+/** [previous] is the same series over the comparison period, when the insight compares to one. */
 @Serializable
 data class TrendSeries(
     val label: String,
     val values: List<Double>,
     val periods: List<String>,
     val aggregatedValue: Double?,
+    val previous: TrendSeries? = null,
 ) {
     val total: Double get() = aggregatedValue ?: values.sum()
+
+    /** Change against [previous] in percent; null without a comparison or when the previous total is zero. */
+    val changePercent: Double?
+        get() = previous?.total?.takeIf { it != 0.0 }?.let { (total - it) / abs(it) * Hundred }
 }
 
 @Serializable
@@ -123,6 +132,31 @@ val TestSeriesResult = InsightResult.Series(
             aggregatedValue = null,
         ),
     ),
+)
+
+private val TestPeriods = listOf("2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05")
+
+/** Twelve browser breakdowns compared to the previous period: more than a chart or a collapsed list shows. */
+@TestData
+val TestComparisonResult = InsightResult.Series(
+    series = listOf(
+        "Chrome" to 120.0, "Safari" to 80.0, "Firefox" to 40.0, "Edge" to 30.0, "Samsung Internet" to 20.0,
+        "Opera" to 12.0, "Brave" to 9.0, "DuckDuckGo" to 7.0, "Vivaldi" to 5.0, "Arc" to 4.0, "Yandex" to 3.0,
+        "UC Browser" to 2.0,
+    ).map { (browser, base) ->
+        TrendSeries(
+            label = "\$pageview · $browser",
+            values = listOf(base, base * 1.2, base * 0.9, base * 1.4, base * 1.1),
+            periods = TestPeriods,
+            aggregatedValue = null,
+            previous = TrendSeries(
+                label = "\$pageview · $browser",
+                values = listOf(base * 0.9, base, base * 0.8, base * 1.1, base),
+                periods = TestPeriods,
+                aggregatedValue = null,
+            ),
+        )
+    },
 )
 
 @TestData

@@ -44,6 +44,36 @@ class InsightMapperTest :
             series[0].periods shouldBe listOf("2026-10-01", "2026-10-02")
         }
 
+        should("attach each previous period series to its current series") {
+            val dto = json.decodeFromString<InsightDto>(
+                """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},
+                "result":[
+                 {"label":"${'$'}pageview","breakdown_value":"Chrome","compare_label":"current","data":[6,6]},
+                 {"label":"${'$'}pageview","breakdown_value":"Safari","compare_label":"current","data":[1,1]},
+                 {"label":"${'$'}pageview","breakdown_value":"Safari","compare_label":"previous","data":[2,2]},
+                 {"label":"${'$'}pageview","breakdown_value":"Chrome","compare_label":"previous","data":[4,4]}
+                ]}""",
+            )
+            val series = dto.toDetail().result.shouldBeInstanceOf<InsightResult.Series>().series
+            series.map { it.label } shouldBe listOf("${'$'}pageview · Chrome", "${'$'}pageview · Safari")
+            series[0].previous?.values shouldBe listOf(4.0, 4.0)
+            series[0].changePercent shouldBe 50.0
+            series[1].previous?.total shouldBe 4.0
+            series[1].changePercent shouldBe -50.0
+        }
+
+        should("average periods instead of summing them for non-additive math") {
+            val dto = json.decodeFromString<InsightDto>(
+                """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},
+                "result":[
+                 {"label":"duration","action":{"math":"avg"},"data":[40,50,60]},
+                 {"label":"views","action":{"math":"total"},"data":[1,2,3]}
+                ]}""",
+            )
+            val series = dto.toDetail().result.shouldBeInstanceOf<InsightResult.Series>().series
+            series.map { it.total } shouldBe listOf(50.0, 6.0)
+        }
+
         should("use readable labels for stickiness periods") {
             val dto = json.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"StickinessQuery"}},
