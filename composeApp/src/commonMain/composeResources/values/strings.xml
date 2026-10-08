@@ -128,6 +128,10 @@
     <string name="insight_result_empty">No data for this period.</string>
     <string name="insight_result_unsupported">This visualization isn't supported in Snout yet. Open it in PostHog to see it.</string>
     <string name="insight_result_median">median</string>
+    <string name="insight_result_retention_curve">Retained users</string>
+    <string name="insight_result_retention_cohort_size">Users</string>
+    <string name="insight_result_more_rows">and %1$d more</string>
+    <string name="insight_result_more_series">+%1$d more series</string>
     <string name="insight_kind_trends">Trends</string>
     <string name="insight_kind_funnels">Funnel</string>
     <string name="insight_kind_retention">Retention</string>

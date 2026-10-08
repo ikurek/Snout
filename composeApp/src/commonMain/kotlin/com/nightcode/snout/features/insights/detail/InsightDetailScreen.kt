@@ -36,7 +36,10 @@ import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
+import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.TestInsightDetail
+import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
+import com.nightcode.snout.shared.domain.model.insights.TestRetentionResult
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.insight_detail_kind
@@ -103,7 +106,12 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
                     color = SnoutTheme.colors.onSurfaceVariant,
                 )
             } else {
-                InsightResultView(result = result, display = detail.summary.display, chartHeight = 240.dp)
+                InsightResultView(
+                    result = result,
+                    display = detail.summary.display,
+                    chartHeight = 240.dp,
+                    detailed = true,
+                )
             }
         }
         SectionLabel(stringResource(Res.string.insight_detail_section))
@@ -123,6 +131,25 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
 @Composable
 fun InsightDetailScreenPreview() = InsightDetailScreen(
     state = CachedUiState.Content(TestInsightDetail, isRefreshing = false),
+    snackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack = {},
+    onRetry = {},
+    onFavoriteToggle = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
+    state = CachedUiState.Content(
+        TestInsightDetail.copy(
+            summary = TestInsightSummary.copy(name = "Day 1 retention", kind = InsightKind.Retention),
+            result = TestRetentionResult,
+        ),
+        isRefreshing = false,
+    ),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRetry = {},

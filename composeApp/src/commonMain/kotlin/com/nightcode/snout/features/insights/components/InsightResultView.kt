@@ -11,8 +11,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.format.formatChartLabel
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDurationSeconds
+import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.charts.BarChart
 import com.nightcode.snout.designsystem.charts.BoldNumber
 import com.nightcode.snout.designsystem.charts.ChartSeries
@@ -24,66 +24,109 @@ import com.nightcode.snout.designsystem.charts.FunnelBars
 import com.nightcode.snout.designsystem.charts.LineChart
 import com.nightcode.snout.designsystem.charts.RankedBarList
 import com.nightcode.snout.designsystem.charts.RankedBarRow
+import com.nightcode.snout.designsystem.charts.RetentionTable
+import com.nightcode.snout.designsystem.charts.RetentionTableRow
 import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.model.insights.TrendSeries
+import com.nightcode.snout.shared.domain.model.insights.ValueFormat
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.insight_result_empty
 import snout.composeapp.generated.resources.insight_result_median
+import snout.composeapp.generated.resources.insight_result_more_rows
+import snout.composeapp.generated.resources.insight_result_more_series
+import snout.composeapp.generated.resources.insight_result_retention_cohort_size
+import snout.composeapp.generated.resources.insight_result_retention_curve
 import snout.composeapp.generated.resources.insight_result_unsupported
 
-private const val MaxSeries = 5
+/** Lines, bars and slices stop being readable past a handful of series. */
+private const val MaxChartSeries = 5
 
-/** Draws an insight result with the closest readable chart for its display type. */
+/** Ranked lists and tables can take more rows before the rest collapses into "and N more". */
+private const val MaxListRows = 10
+
+private const val DateLength = 10
+
+/**
+ * Draws an insight result with the closest readable chart for its display type.
+ * [detailed] adds what only fits on the insight's own screen, such as the retention cohort table.
+ */
 @Composable
-internal fun InsightResultView(result: InsightResult, display: InsightDisplay, chartHeight: Dp = 180.dp) {
+internal fun InsightResultView(
+    result: InsightResult,
+    display: InsightDisplay,
+    chartHeight: Dp = 180.dp,
+    detailed: Boolean = false,
+) {
     when (result) {
         InsightResult.Unsupported -> Note(stringResource(Res.string.insight_result_unsupported))
 
-        is InsightResult.Series -> SeriesView(result.series, display, chartHeight)
+        is InsightResult.Series -> SeriesView(result.series, result.format, display, chartHeight)
 
         is InsightResult.Funnel -> FunnelView(result)
+
+        is InsightResult.Retention -> RetentionView(result, chartHeight, detailed)
 
         is InsightResult.Table -> if (result.rows.isEmpty()) {
             Note(stringResource(Res.string.insight_result_empty))
         } else {
-            DataTable(columns = result.columns, rows = result.rows)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DataTable(columns = result.columns, rows = result.rows.take(MaxListRows))
+                MoreNote(Res.string.insight_result_more_rows, result.totalRows - MaxListRows)
+            }
         }
     }
 }
 
 @Composable
-private fun SeriesView(all: List<TrendSeries>, display: InsightDisplay, chartHeight: Dp) {
-    val series = all.take(MaxSeries)
-    if (series.isEmpty() || series.all { it.values.isEmpty() && it.aggregatedValue == null }) {
+private fun SeriesView(all: List<TrendSeries>, format: ValueFormat, display: InsightDisplay, chartHeight: Dp) {
+    if (all.isEmpty() || all.all { it.values.isEmpty() && it.aggregatedValue == null }) {
         Note(stringResource(Res.string.insight_result_empty))
         return
     }
-    val chartSeries = series.mapIndexed { index, s -> ChartSeries(s.label, s.values, chartColor(index)) }
-    val xLabels = series.maxBy { it.periods.size }.periods.map { it.formatChartLabel() }
-    when (display) {
-        InsightDisplay.Line -> LineChart(series = chartSeries, xLabels = xLabels, height = chartHeight)
+    val formatter: (Double) -> String = { it.formatValue(format) }
+    val charted = all.take(MaxChartSeries)
+    val chartSeries = charted.mapIndexed { index, s -> ChartSeries(s.label, s.values, chartColor(index)) }
+    val xLabels = charted.maxBy { it.periods.size }.periods.map { it.formatChartLabel() }
+    val ranked = all.sortedByDescending { it.total }.take(MaxListRows)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        when (display) {
+            InsightDisplay.Line ->
+                LineChart(series = chartSeries, xLabels = xLabels, height = chartHeight, valueFormatter = formatter)
 
-        InsightDisplay.Bar -> BarChart(series = chartSeries, xLabels = xLabels, height = chartHeight)
+            InsightDisplay.Bar ->
+                BarChart(series = chartSeries, xLabels = xLabels, height = chartHeight, valueFormatter = formatter)
 
-        InsightDisplay.Number -> NumberView(series)
+            InsightDisplay.Pie -> DonutChart(
+                slices = charted.mapIndexed { index, s -> ChartSlice(s.label, s.total, chartColor(index)) },
+                valueFormatter = formatter,
+            )
 
-        InsightDisplay.Pie -> DonutChart(
-            slices = series.mapIndexed { index, s -> ChartSlice(s.label, s.total, chartColor(index)) },
-        )
+            InsightDisplay.Number -> NumberView(ranked, formatter)
 
-        InsightDisplay.BarValue, InsightDisplay.Table, InsightDisplay.Funnel, InsightDisplay.Unsupported ->
-            RankedBarList(rows = series.map { RankedBarRow(label = it.label, value = it.total) })
+            InsightDisplay.BarValue, InsightDisplay.Table, InsightDisplay.Funnel, InsightDisplay.Unsupported ->
+                RankedBarList(
+                    rows = ranked.map { RankedBarRow(label = it.label, value = it.total) },
+                    valueFormatter = formatter,
+                )
+        }
+        when (display) {
+            InsightDisplay.Line, InsightDisplay.Bar, InsightDisplay.Pie ->
+                MoreNote(Res.string.insight_result_more_series, all.size - charted.size)
+
+            else -> MoreNote(Res.string.insight_result_more_rows, all.size - ranked.size)
+        }
     }
 }
 
 @Composable
-private fun NumberView(series: List<TrendSeries>) {
+private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String) {
     if (series.size == 1) {
-        BoldNumber(value = series.single().total.formatCompact(), label = series.single().label)
+        BoldNumber(value = formatter(series.single().total), label = series.single().label.ifEmpty { null })
     } else {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             series.forEach { s ->
@@ -95,11 +138,54 @@ private fun NumberView(series: List<TrendSeries>) {
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    Text(text = s.total.formatCompact(), style = SnoutTheme.typography.headlineMedium)
+                    Text(text = formatter(s.total), style = SnoutTheme.typography.headlineMedium)
                 }
             }
         }
     }
+}
+
+@Composable
+private fun RetentionView(result: InsightResult.Retention, chartHeight: Dp, detailed: Boolean) {
+    if (result.cohorts.isEmpty() || result.intervals.isEmpty()) {
+        Note(stringResource(Res.string.insight_result_empty))
+        return
+    }
+    val percent: (Double) -> String = { it.formatPercent(isFraction = true) }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        LineChart(
+            series = listOf(
+                ChartSeries(stringResource(Res.string.insight_result_retention_curve), result.curve, chartColor(0)),
+            ),
+            xLabels = result.intervals,
+            height = chartHeight,
+            valueFormatter = percent,
+        )
+        if (detailed) {
+            RetentionTable(
+                sizeLabel = stringResource(Res.string.insight_result_retention_cohort_size),
+                intervals = result.intervals,
+                rows = result.cohorts.map { cohort ->
+                    RetentionTableRow(
+                        label = cohort.date.cohortLabel(),
+                        size = cohort.size,
+                        rates = result.intervals.indices.map { cohort.rate(it) },
+                    )
+                },
+            )
+        }
+    }
+}
+
+/** Cohorts start at midnight for daily and longer periods; only hourly cohorts need their time. */
+private fun String.cohortLabel(): String {
+    val midnight = length <= DateLength || drop(DateLength + 1).startsWith("00:00:00")
+    return if (midnight) take(DateLength).formatChartLabel() else formatChartLabel()
+}
+
+@Composable
+private fun MoreNote(text: StringResource, count: Int) {
+    if (count > 0) Note(stringResource(text, count))
 }
 
 @Composable
