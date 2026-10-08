@@ -2,6 +2,7 @@ package com.nightcode.snout.features.analytics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,6 +72,7 @@ internal fun AnalyticsScreen(
     state: AnalyticsUiState,
     onRangeSelected: (AnalyticsRange) -> Unit,
     onRefresh: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val rangeLabels = AnalyticsRange.entries.associateWith { it.label() }
     Column(modifier = Modifier.fillMaxSize()) {
@@ -86,17 +88,18 @@ internal fun AnalyticsScreen(
             onRefresh = onRefresh,
             loadingContent = { SnapshotSkeleton() },
         ) { snapshot ->
-            SnapshotContent(snapshot)
+            SnapshotContent(snapshot, contentPadding)
         }
     }
 }
 
 @Composable
-private fun SnapshotContent(snapshot: AnalyticsSnapshot) {
+private fun SnapshotContent(snapshot: AnalyticsSnapshot, contentPadding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

@@ -1,12 +1,16 @@
 package com.nightcode.snout.features.experiments
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun ExperimentsRoute(onOpenExperiment: (experimentId: Long) -> Unit) {
+internal fun ExperimentsRoute(
+    onOpenExperiment: (experimentId: Long) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     val viewModel = koinViewModel<ExperimentsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -14,5 +18,6 @@ internal fun ExperimentsRoute(onOpenExperiment: (experimentId: Long) -> Unit) {
         state = state,
         onRefresh = viewModel::refresh,
         onOpenExperiment = onOpenExperiment,
+        contentPadding = contentPadding,
     )
 }

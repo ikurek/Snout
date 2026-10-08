@@ -2,6 +2,7 @@ package com.nightcode.snout.features.experiments
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -32,9 +33,10 @@ internal fun ExperimentsScreen(
     state: CachedUiState<List<Experiment>>,
     onRefresh: () -> Unit,
     onOpenExperiment: (experimentId: Long) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { experiments ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
             itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
                 ExperimentRow(
                     experiment = experiment,

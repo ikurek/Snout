@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.clearText
@@ -55,6 +56,7 @@ internal fun InsightsScreen(
     onRefresh: () -> Unit,
     onFavoriteToggle: (InsightSummary) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val searchState = rememberTextFieldState(state.query)
     LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
@@ -81,7 +83,7 @@ internal fun InsightsScreen(
                     }
                 },
             ) { insights ->
-                LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
                     itemsIndexed(insights, key = { _, insight -> insight.id }) { index, insight ->
                         InsightRow(
                             insight = insight,
@@ -93,7 +95,10 @@ internal fun InsightsScreen(
                 }
             }
         }
-        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(contentPadding),
+        )
     }
 }
 

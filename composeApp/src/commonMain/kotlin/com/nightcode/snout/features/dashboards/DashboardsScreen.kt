@@ -2,6 +2,7 @@ package com.nightcode.snout.features.dashboards
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -37,9 +38,10 @@ internal fun DashboardsScreen(
     state: CachedUiState<List<DashboardSummary>>,
     onRefresh: () -> Unit,
     onOpenDashboard: (dashboardId: Long) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { dashboards ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
             itemsIndexed(dashboards, key = { _, dashboard -> dashboard.id }) { index, dashboard ->
                 DashboardRow(
                     dashboard = dashboard,

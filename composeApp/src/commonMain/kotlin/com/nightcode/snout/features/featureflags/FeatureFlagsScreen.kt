@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.clearText
@@ -41,6 +42,7 @@ internal fun FeatureFlagsScreen(
     onQueryChange: (String) -> Unit,
     onRefresh: () -> Unit,
     onOpenFlag: (flagId: Long) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val searchState = rememberTextFieldState(state.query)
     LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
@@ -66,7 +68,7 @@ internal fun FeatureFlagsScreen(
                 }
             },
         ) { flags ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
                 itemsIndexed(flags, key = { _, flag -> flag.id }) { index, flag ->
                     FeatureFlagRow(flag = flag, divider = index < flags.lastIndex, onClick = { onOpenFlag(flag.id) })
                 }

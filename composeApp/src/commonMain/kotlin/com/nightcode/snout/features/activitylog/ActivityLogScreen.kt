@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
@@ -48,9 +49,13 @@ private const val Arrow = "→"
 
 /** Section body only; the home shell or [com.nightcode.snout.features.home.SectionRoute] supplies the chrome. */
 @Composable
-internal fun ActivityLogScreen(state: CachedUiState<List<ActivityEntry>>, onRefresh: () -> Unit) {
+internal fun ActivityLogScreen(
+    state: CachedUiState<List<ActivityEntry>>,
+    onRefresh: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { entries ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
             itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
                 ActivityRow(entry = entry, divider = index < entries.lastIndex)
             }

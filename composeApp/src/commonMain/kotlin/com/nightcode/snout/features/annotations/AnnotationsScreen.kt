@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -23,6 +24,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
@@ -58,20 +61,22 @@ internal fun AnnotationsScreen(
     onAddClick: () -> Unit,
     onCreateDismiss: () -> Unit,
     onCreate: (content: String, dateMarker: Instant) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     Scaffold(
         containerColor = Color.Transparent,
         // The surrounding screen already handled the system bars; applying them again leaves a gap under the app bar.
-        contentWindowInsets = WindowInsets(0),
+        // Only the bottom it hands over is left, so the FAB and snackbar clear the navigation bar.
+        contentWindowInsets = WindowInsets(bottom = contentPadding.calculateBottomPadding()),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = { AddAnnotationButton(onClick = onAddClick) },
     ) { innerPadding ->
         CachedStateContainer(
             state = state.annotations,
             onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
         ) { annotations ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 88.dp)) {
+            LazyColumn(contentPadding = PaddingValues(bottom = 88.dp) + innerPadding.bottomOnly()) {
                 itemsIndexed(annotations, key = { _, annotation -> annotation.id }) { index, annotation ->
                     AnnotationRow(annotation = annotation, divider = index < annotations.lastIndex)
                 }

@@ -1,5 +1,6 @@
 package com.nightcode.snout.features.insights
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +13,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.insights_favorite_failed
 
 @Composable
-internal fun InsightsRoute(onOpenInsight: (insightId: Long) -> Unit) {
+internal fun InsightsRoute(onOpenInsight: (insightId: Long) -> Unit, contentPadding: PaddingValues = PaddingValues()) {
     val viewModel = koinViewModel<InsightsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -33,5 +34,6 @@ internal fun InsightsRoute(onOpenInsight: (insightId: Long) -> Unit) {
         onRefresh = viewModel::refresh,
         onFavoriteToggle = viewModel::onFavoriteToggle,
         onOpenInsight = onOpenInsight,
+        contentPadding = contentPadding,
     )
 }

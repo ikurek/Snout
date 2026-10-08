@@ -1,5 +1,6 @@
 package com.nightcode.snout.features.home
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import com.nightcode.snout.features.activitylog.ActivityLogRoute
 import com.nightcode.snout.features.analytics.AnalyticsRoute
@@ -18,16 +19,32 @@ internal data class SectionNavigation(
     val onOpenExperiment: (experimentId: Long) -> Unit,
 )
 
-/** Body of a section without any chrome, so it renders the same inside the home tabs and as a pushed screen. */
+/**
+ * Body of a section without any chrome, so it renders the same inside the home tabs and as a pushed screen.
+ * [contentPadding] goes inside the scrolling content, letting it scroll behind the navigation bar.
+ */
 @Composable
-internal fun HomeSectionContent(section: HomeSection, navigation: SectionNavigation) {
+internal fun HomeSectionContent(
+    section: HomeSection,
+    navigation: SectionNavigation,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     when (section) {
-        HomeSection.Analytics -> AnalyticsRoute()
-        HomeSection.Dashboards -> DashboardsRoute(onOpenDashboard = navigation.onOpenDashboard)
-        HomeSection.Insights -> InsightsRoute(onOpenInsight = navigation.onOpenInsight)
-        HomeSection.FeatureFlags -> FeatureFlagsRoute(onOpenFlag = navigation.onOpenFeatureFlag)
-        HomeSection.Experiments -> ExperimentsRoute(onOpenExperiment = navigation.onOpenExperiment)
-        HomeSection.Annotations -> AnnotationsRoute()
-        HomeSection.ActivityLog -> ActivityLogRoute()
+        HomeSection.Analytics -> AnalyticsRoute(contentPadding = contentPadding)
+
+        HomeSection.Dashboards ->
+            DashboardsRoute(onOpenDashboard = navigation.onOpenDashboard, contentPadding = contentPadding)
+
+        HomeSection.Insights -> InsightsRoute(onOpenInsight = navigation.onOpenInsight, contentPadding = contentPadding)
+
+        HomeSection.FeatureFlags ->
+            FeatureFlagsRoute(onOpenFlag = navigation.onOpenFeatureFlag, contentPadding = contentPadding)
+
+        HomeSection.Experiments ->
+            ExperimentsRoute(onOpenExperiment = navigation.onOpenExperiment, contentPadding = contentPadding)
+
+        HomeSection.Annotations -> AnnotationsRoute(contentPadding = contentPadding)
+
+        HomeSection.ActivityLog -> ActivityLogRoute(contentPadding = contentPadding)
     }
 }

@@ -1,5 +1,6 @@
 package com.nightcode.snout.features.annotations
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +16,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.annotations_created_snackbar
 
 @Composable
-internal fun AnnotationsRoute() {
+internal fun AnnotationsRoute(contentPadding: PaddingValues = PaddingValues()) {
     val viewModel = koinViewModel<AnnotationsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -43,5 +44,6 @@ internal fun AnnotationsRoute() {
             viewModel.dismissCreateError()
         },
         onCreate = viewModel::onCreate,
+        contentPadding = contentPadding,
     )
 }
