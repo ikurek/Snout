@@ -17,7 +17,7 @@ private const val IsoDateLength = 10
 private val RelativeDate = Regex("""-(\d+)([hdwmy])""")
 private val IsoDate = Regex("""\d{4}-\d{2}-\d{2}.*""")
 
-private val NamedRanges = mapOf(
+private val NamedRanges: Map<String, InsightDateRange> = mapOf(
     "dStart" to InsightDateRange.Today,
     "mStart" to InsightDateRange.MonthToDate,
     "yStart" to InsightDateRange.YearToDate,
