@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.format.formatChartLabel
+import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDurationSeconds
 import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.common.format.formatSigned
@@ -36,6 +37,7 @@ import com.nightcode.snout.designsystem.charts.RetentionTable
 import com.nightcode.snout.designsystem.charts.RetentionTableRow
 import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.shared.domain.model.insights.FunnelBreakdown
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.model.insights.TrendSeries
@@ -43,7 +45,9 @@ import com.nightcode.snout.shared.domain.model.insights.ValueFormat
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.insight_result_breakdown_none
 import snout.composeapp.generated.resources.insight_result_empty
+import snout.composeapp.generated.resources.insight_result_funnel_breakdowns
 import snout.composeapp.generated.resources.insight_result_median
 import snout.composeapp.generated.resources.insight_result_more_rows
 import snout.composeapp.generated.resources.insight_result_more_series
@@ -82,7 +86,7 @@ internal fun InsightResultView(
 
         is InsightResult.Series -> SeriesView(result.series, result.format, display, chartHeight, detailed)
 
-        is InsightResult.Funnel -> FunnelView(result)
+        is InsightResult.Funnel -> FunnelView(result, detailed)
 
         is InsightResult.Retention -> RetentionView(result, chartHeight, detailed)
 
@@ -338,22 +342,50 @@ private fun MoreNote(text: StringResource, count: Int) {
 }
 
 @Composable
-private fun FunnelView(result: InsightResult.Funnel) {
+private fun FunnelView(result: InsightResult.Funnel, detailed: Boolean) {
     if (result.steps.isEmpty()) {
         Note(stringResource(Res.string.insight_result_empty))
         return
     }
     val medianLabel = stringResource(Res.string.insight_result_median)
-    FunnelBars(
-        steps = result.steps.map { step ->
-            FunnelBarStep(
-                label = step.name,
-                value = step.count,
-                fraction = step.conversionRate,
-                caption = step.medianConversionSeconds?.let { "$medianLabel ${it.formatDurationSeconds()}" },
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        FunnelBars(
+            steps = result.steps.map { step ->
+                FunnelBarStep(
+                    label = step.name,
+                    value = step.count,
+                    fraction = step.conversionRate,
+                    caption = step.medianConversionSeconds?.let { "$medianLabel ${it.formatDurationSeconds()}" },
+                )
+            },
+        )
+        if (detailed && result.breakdowns.isNotEmpty()) FunnelBreakdowns(result.breakdowns)
+    }
+}
+
+/** Whole-funnel conversion per breakdown value, largest groups first so tiny ones don't top the list. */
+@Composable
+private fun FunnelBreakdowns(breakdowns: List<FunnelBreakdown>) {
+    val none = stringResource(Res.string.insight_result_breakdown_none)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(Res.string.insight_result_funnel_breakdowns),
+            style = SnoutTheme.typography.titleSmall,
+        )
+        ExpandableRows(items = breakdowns.sortedByDescending { it.entered }, expandable = true) { rows ->
+            RankedBarList(
+                rows = rows.map {
+                    RankedBarRow(
+                        label = it.label.ifEmpty { none },
+                        value = it.conversionRate,
+                        secondary = "${it.entered.formatCompact()} → ${it.converted.formatCompact()}",
+                    )
+                },
+                labelIsCode = false,
+                valueFormatter = { it.formatPercent(isFraction = true) },
             )
-        },
-    )
+        }
+    }
 }
 
 @Composable

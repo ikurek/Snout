@@ -139,6 +139,21 @@
     <string name="insight_result_previous_lines">Dashed lines show the previous period.</string>
     <string name="insight_result_versus">vs %1$s</string>
     <string name="insight_result_previous_of">%1$s (previous)</string>
+    <string name="insight_result_funnel_breakdowns">Conversion by breakdown</string>
+    <string name="insight_result_breakdown_none">None</string>
+    <string name="insight_period_today">Today</string>
+    <string name="insight_period_yesterday">Yesterday</string>
+    <string name="insight_period_month_to_date">This month</string>
+    <string name="insight_period_year_to_date">This year</string>
+    <string name="insight_period_all_time">All time</string>
+    <string name="insight_period_between">%1$s – %2$s</string>
+    <string name="insight_period_since">Since %1$s</string>
+    <string name="insight_period_hourly">hourly</string>
+    <string name="insight_period_daily">daily</string>
+    <string name="insight_period_weekly">weekly</string>
+    <string name="insight_period_monthly">monthly</string>
+    <string name="insight_period_yearly">yearly</string>
+    <string name="insight_period_compared">compared to previous period</string>
     <string name="insight_kind_trends">Trends</string>
     <string name="insight_kind_funnels">Funnel</string>
     <string name="insight_kind_retention">Retention</string>
@@ -255,6 +270,26 @@
     <plurals name="analytics_breakdown_views">
         <item quantity="one">%1$s view</item>
         <item quantity="other">%1$s views</item>
+    </plurals>
+    <plurals name="insight_period_last_hours">
+        <item quantity="one">Last %1$d hour</item>
+        <item quantity="other">Last %1$d hours</item>
+    </plurals>
+    <plurals name="insight_period_last_days">
+        <item quantity="one">Last %1$d day</item>
+        <item quantity="other">Last %1$d days</item>
+    </plurals>
+    <plurals name="insight_period_last_weeks">
+        <item quantity="one">Last %1$d week</item>
+        <item quantity="other">Last %1$d weeks</item>
+    </plurals>
+    <plurals name="insight_period_last_months">
+        <item quantity="one">Last %1$d month</item>
+        <item quantity="other">Last %1$d months</item>
+    </plurals>
+    <plurals name="insight_period_last_years">
+        <item quantity="one">Last %1$d year</item>
+        <item quantity="other">Last %1$d years</item>
     </plurals>
     <plurals name="feature_flag_rollout_variants">
         <item quantity="one">A/B test · %1$d variant</item>

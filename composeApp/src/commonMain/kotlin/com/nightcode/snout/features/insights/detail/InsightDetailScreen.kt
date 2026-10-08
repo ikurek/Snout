@@ -35,9 +35,14 @@ import com.nightcode.snout.features.insights.FavoriteIconButton
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
+import com.nightcode.snout.shared.domain.model.insights.InsightDateRange
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
+import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
+import com.nightcode.snout.shared.domain.model.insights.InsightPeriod
+import com.nightcode.snout.shared.domain.model.insights.PeriodUnit
 import com.nightcode.snout.shared.domain.model.insights.TestComparisonResult
+import com.nightcode.snout.shared.domain.model.insights.TestFunnelResult
 import com.nightcode.snout.shared.domain.model.insights.TestInsightDetail
 import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 import com.nightcode.snout.shared.domain.model.insights.TestRetentionResult
@@ -99,6 +104,13 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
             subtitle = detail.summary.description,
             modifier = Modifier.padding(horizontal = 16.dp),
         ) {
+            detail.summary.period?.let {
+                Text(
+                    text = it.label(),
+                    style = SnoutTheme.typography.bodySmall,
+                    color = SnoutTheme.colors.onSurfaceVariant,
+                )
+            }
             val result = detail.result
             if (result == null) {
                 Text(
@@ -146,7 +158,11 @@ fun InsightDetailScreenPreview() = InsightDetailScreen(
 fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
     state = CachedUiState.Content(
         TestInsightDetail.copy(
-            summary = TestInsightSummary.copy(name = "Day 1 retention", kind = InsightKind.Retention),
+            summary = TestInsightSummary.copy(
+                name = "Day 1 retention",
+                kind = InsightKind.Retention,
+                period = InsightPeriod(InsightDateRange.Last(4, PeriodUnit.Day)),
+            ),
             result = TestRetentionResult,
         ),
         isRefreshing = false,
@@ -165,8 +181,37 @@ fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
 fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
     state = CachedUiState.Content(
         TestInsightDetail.copy(
-            summary = TestInsightSummary.copy(name = "Pageviews by browser", description = null),
+            summary = TestInsightSummary.copy(
+                name = "Pageviews by browser",
+                description = null,
+                period = InsightPeriod(InsightDateRange.Last(5, PeriodUnit.Day), PeriodUnit.Day, compared = true),
+            ),
             result = TestComparisonResult,
+        ),
+        isRefreshing = false,
+    ),
+    snackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack = {},
+    onRetry = {},
+    onFavoriteToggle = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
+    state = CachedUiState.Content(
+        TestInsightDetail.copy(
+            summary = TestInsightSummary.copy(
+                name = "Checkout by browser",
+                description = null,
+                kind = InsightKind.Funnels,
+                display = InsightDisplay.Funnel,
+                period = InsightPeriod(InsightDateRange.Last(30, PeriodUnit.Day)),
+            ),
+            result = TestFunnelResult,
         ),
         isRefreshing = false,
     ),

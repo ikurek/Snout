@@ -2,6 +2,7 @@ package com.nightcode.snout.common.format
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.MonthNames
@@ -81,6 +82,19 @@ internal fun Instant.formatShortDate(): String {
         char(' ')
         year()
     }.format(local())
+}
+
+/** "5 Oct 2026" for a calendar date, which has no time zone to convert. */
+@Composable
+internal fun LocalDate.formatShortDate(): String {
+    val monthNames = shortMonthNames()
+    return LocalDate.Format {
+        day(Padding.NONE)
+        char(' ')
+        monthName(monthNames)
+        char(' ')
+        year()
+    }.format(this)
 }
 
 /** "5 Oct 2026, 14:05" */
