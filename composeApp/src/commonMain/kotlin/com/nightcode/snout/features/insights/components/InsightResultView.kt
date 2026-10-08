@@ -5,7 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -13,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.format.formatChartLabel
 import com.nightcode.snout.common.format.formatDurationSeconds
 import com.nightcode.snout.common.format.formatPercent
+import com.nightcode.snout.common.format.formatSigned
+import com.nightcode.snout.designsystem.atoms.TrendChip
 import com.nightcode.snout.designsystem.charts.BarChart
 import com.nightcode.snout.designsystem.charts.BoldNumber
 import com.nightcode.snout.designsystem.charts.ChartSeries
@@ -39,9 +47,15 @@ import snout.composeapp.generated.resources.insight_result_empty
 import snout.composeapp.generated.resources.insight_result_median
 import snout.composeapp.generated.resources.insight_result_more_rows
 import snout.composeapp.generated.resources.insight_result_more_series
+import snout.composeapp.generated.resources.insight_result_previous_lines
+import snout.composeapp.generated.resources.insight_result_previous_period
 import snout.composeapp.generated.resources.insight_result_retention_cohort_size
 import snout.composeapp.generated.resources.insight_result_retention_curve
+import snout.composeapp.generated.resources.insight_result_show_all
+import snout.composeapp.generated.resources.insight_result_show_fewer
+import snout.composeapp.generated.resources.insight_result_this_period
 import snout.composeapp.generated.resources.insight_result_unsupported
+import snout.composeapp.generated.resources.insight_result_versus
 
 /** Lines, bars and slices stop being readable past a handful of series. */
 private const val MaxChartSeries = 5
@@ -65,7 +79,7 @@ internal fun InsightResultView(
     when (result) {
         InsightResult.Unsupported -> Note(stringResource(Res.string.insight_result_unsupported))
 
-        is InsightResult.Series -> SeriesView(result.series, result.format, display, chartHeight)
+        is InsightResult.Series -> SeriesView(result.series, result.format, display, chartHeight, detailed)
 
         is InsightResult.Funnel -> FunnelView(result)
 
@@ -74,63 +88,155 @@ internal fun InsightResultView(
         is InsightResult.Table -> if (result.rows.isEmpty()) {
             Note(stringResource(Res.string.insight_result_empty))
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DataTable(columns = result.columns, rows = result.rows.take(MaxListRows))
-                MoreNote(Res.string.insight_result_more_rows, result.totalRows - MaxListRows)
+            ExpandableRows(items = result.rows, total = result.totalRows, expandable = detailed) { rows ->
+                DataTable(columns = result.columns, rows = rows)
             }
         }
     }
 }
 
 @Composable
-private fun SeriesView(all: List<TrendSeries>, format: ValueFormat, display: InsightDisplay, chartHeight: Dp) {
+private fun SeriesView(
+    all: List<TrendSeries>,
+    format: ValueFormat,
+    display: InsightDisplay,
+    chartHeight: Dp,
+    detailed: Boolean,
+) {
     if (all.isEmpty() || all.all { it.values.isEmpty() && it.aggregatedValue == null }) {
         Note(stringResource(Res.string.insight_result_empty))
         return
     }
     val formatter: (Double) -> String = { it.formatValue(format) }
     val charted = all.take(MaxChartSeries)
-    val chartSeries = charted.mapIndexed { index, s -> ChartSeries(s.label, s.values, chartColor(index)) }
-    val xLabels = charted.maxBy { it.periods.size }.periods.map { it.formatChartLabel() }
-    val ranked = all.sortedByDescending { it.total }.take(MaxListRows)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        when (display) {
-            InsightDisplay.Line ->
-                LineChart(series = chartSeries, xLabels = xLabels, height = chartHeight, valueFormatter = formatter)
+    val ranked = all.sortedByDescending { it.total }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SeriesChart(charted, ranked, formatter, display, chartHeight, detailed)
+        val chart = display == InsightDisplay.Line || display == InsightDisplay.Bar || display == InsightDisplay.Pie
+        // The legend names each line but not its total; the detail screen lists every series with it.
+        val listAll = detailed && if (display == InsightDisplay.Pie) all.size > charted.size else all.size > 1
+        when {
+            !chart -> Unit
+            listAll -> SeriesList(ranked, formatter, expandable = true)
+            else -> MoreNote(Res.string.insight_result_more_series, all.size - charted.size)
+        }
+    }
+}
 
-            InsightDisplay.Bar ->
-                BarChart(series = chartSeries, xLabels = xLabels, height = chartHeight, valueFormatter = formatter)
+/** The display's own chart; number and list displays take every series in [ranked] order. */
+@Composable
+private fun SeriesChart(
+    charted: List<TrendSeries>,
+    ranked: List<TrendSeries>,
+    formatter: (Double) -> String,
+    display: InsightDisplay,
+    chartHeight: Dp,
+    detailed: Boolean,
+) {
+    val xLabels = charted.maxBy { it.periods.size }.periods.map { it.formatChartLabel() }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        when (display) {
+            InsightDisplay.Line -> {
+                LineChart(
+                    series = lineSeries(charted),
+                    xLabels = xLabels,
+                    height = chartHeight,
+                    valueFormatter = formatter,
+                )
+                if (charted.size > 1 && charted.any { it.previous != null }) {
+                    Note(stringResource(Res.string.insight_result_previous_lines))
+                }
+            }
+
+            InsightDisplay.Bar -> BarChart(
+                series = charted.mapIndexed { index, s -> ChartSeries(s.label, s.values, chartColor(index)) },
+                xLabels = xLabels,
+                height = chartHeight,
+                valueFormatter = formatter,
+            )
 
             InsightDisplay.Pie -> DonutChart(
                 slices = charted.mapIndexed { index, s -> ChartSlice(s.label, s.total, chartColor(index)) },
                 valueFormatter = formatter,
             )
 
-            InsightDisplay.Number -> NumberView(ranked, formatter)
+            InsightDisplay.Number -> NumberView(ranked, formatter, detailed)
 
             InsightDisplay.BarValue, InsightDisplay.Table, InsightDisplay.Funnel, InsightDisplay.Unsupported ->
-                RankedBarList(
-                    rows = ranked.map { RankedBarRow(label = it.label, value = it.total) },
-                    valueFormatter = formatter,
-                )
-        }
-        when (display) {
-            InsightDisplay.Line, InsightDisplay.Bar, InsightDisplay.Pie ->
-                MoreNote(Res.string.insight_result_more_series, all.size - charted.size)
-
-            else -> MoreNote(Res.string.insight_result_more_rows, all.size - ranked.size)
+                SeriesList(ranked, formatter, detailed)
         }
     }
 }
 
+/** Charted series, each followed by its previous period as a dashed line in the same colour. */
 @Composable
-private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String) {
-    if (series.size == 1) {
-        BoldNumber(value = formatter(series.single().total), label = series.single().label.ifEmpty { null })
-    } else {
+private fun lineSeries(charted: List<TrendSeries>): List<ChartSeries> {
+    val single = charted.singleOrNull()
+    val previous = single?.previous
+    if (single != null && previous != null) {
+        return listOf(
+            ChartSeries(stringResource(Res.string.insight_result_this_period), single.values, chartColor(0)),
+            ChartSeries(
+                name = stringResource(Res.string.insight_result_previous_period),
+                values = previous.values,
+                color = SnoutTheme.colors.onSurfaceVariant,
+                dashed = true,
+                filled = false,
+            ),
+        )
+    }
+    return charted.flatMapIndexed { index, s ->
+        val color = chartColor(index)
+        listOfNotNull(
+            ChartSeries(s.label, s.values, color),
+            s.previous?.let { ChartSeries(s.label, it.values, color, dashed = true, filled = false) },
+        )
+    }
+}
+
+@Composable
+private fun SeriesList(ranked: List<TrendSeries>, formatter: (Double) -> String, expandable: Boolean) {
+    ExpandableRows(items = ranked, expandable = expandable) { rows ->
+        RankedBarList(
+            rows = rows.map { RankedBarRow(label = it.label, value = it.total, secondary = it.changeText()) },
+            valueFormatter = formatter,
+        )
+    }
+}
+
+/** "+12.5%" against the previous period, for rows too tight for a [TrendChip]. */
+private fun TrendSeries.changeText(): String? = changePercent?.let { "${it.formatSigned()}%" }
+
+@Composable
+private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String, expandable: Boolean) {
+    val single = series.singleOrNull()
+    if (single != null) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+            BoldNumber(value = formatter(single.total), label = single.label.ifEmpty { null })
+            single.previous?.let { previous ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    single.changePercent?.let { TrendChip(changePercent = it) }
+                    Text(
+                        text = stringResource(Res.string.insight_result_versus, formatter(previous.total)),
+                        style = SnoutTheme.typography.bodySmall,
+                        color = SnoutTheme.colors.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+        return
+    }
+    ExpandableRows(items = series, expandable = expandable) { rows ->
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            series.forEach { s ->
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            rows.forEach { s ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
                     Text(
                         text = s.label,
                         style = SnoutTheme.typography.bodyMedium,
@@ -138,10 +244,41 @@ private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String)
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
+                    s.changePercent?.let { TrendChip(changePercent = it) }
                     Text(text = formatter(s.total), style = SnoutTheme.typography.headlineMedium)
                 }
             }
         }
+    }
+}
+
+/**
+ * The first [MaxListRows] of [items], then either a static "and N more" or, when [expandable], a toggle to show
+ * them all. [total] counts rows PostHog had beyond [items]; those can only be reported, not shown.
+ */
+@Composable
+private fun <T> ExpandableRows(
+    items: List<T>,
+    expandable: Boolean,
+    total: Int = items.size,
+    content: @Composable (List<T>) -> Unit,
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val shown = if (expandable && expanded) items else items.take(MaxListRows)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        content(shown)
+        if (expandable && items.size > MaxListRows) {
+            TextButton(onClick = { expanded = !expanded }) {
+                Text(
+                    if (expanded) {
+                        stringResource(Res.string.insight_result_show_fewer)
+                    } else {
+                        stringResource(Res.string.insight_result_show_all, items.size)
+                    },
+                )
+            }
+        }
+        MoreNote(Res.string.insight_result_more_rows, total - (if (expandable) items.size else shown.size))
     }
 }
 

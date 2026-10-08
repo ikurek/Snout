@@ -19,9 +19,8 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
 private val CellWidth = 132.dp
-private const val MaxRows = 12
 
-/** Horizontally scrollable table for SQL style results. */
+/** Horizontally scrollable table for SQL style results; draws every row it is given. */
 @Composable
 internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
@@ -38,7 +37,7 @@ internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier
             }
         }
         HorizontalDivider(color = SnoutTheme.colors.outlineVariant)
-        rows.take(MaxRows).forEach { row ->
+        rows.forEach { row ->
             Row {
                 columns.indices.forEach { index ->
                     Text(

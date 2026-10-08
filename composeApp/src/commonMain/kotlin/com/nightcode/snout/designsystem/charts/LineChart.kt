@@ -56,7 +56,11 @@ internal fun LineChart(
             series.forEach { drawLineSeries(it, plot, range, fill) }
         }
         if (showLegend) {
-            ChartLegend(entries = series.map { it.name to it.color }, modifier = Modifier.fillMaxWidth())
+            // A comparison line drawn in its series' colour shares that series' legend entry.
+            ChartLegend(
+                entries = series.distinctBy { it.color }.map { it.name to it.color },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

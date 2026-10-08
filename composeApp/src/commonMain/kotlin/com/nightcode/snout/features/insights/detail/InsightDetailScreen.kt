@@ -37,6 +37,7 @@ import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
+import com.nightcode.snout.shared.domain.model.insights.TestComparisonResult
 import com.nightcode.snout.shared.domain.model.insights.TestInsightDetail
 import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 import com.nightcode.snout.shared.domain.model.insights.TestRetentionResult
@@ -147,6 +148,25 @@ fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
         TestInsightDetail.copy(
             summary = TestInsightSummary.copy(name = "Day 1 retention", kind = InsightKind.Retention),
             result = TestRetentionResult,
+        ),
+        isRefreshing = false,
+    ),
+    snackbarHostState = remember { SnackbarHostState() },
+    onNavigateBack = {},
+    onRetry = {},
+    onFavoriteToggle = {},
+    onOpenInPostHog = {},
+)
+
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
+    state = CachedUiState.Content(
+        TestInsightDetail.copy(
+            summary = TestInsightSummary.copy(name = "Pageviews by browser", description = null),
+            result = TestComparisonResult,
         ),
         isRefreshing = false,
     ),

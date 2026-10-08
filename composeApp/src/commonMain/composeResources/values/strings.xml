@@ -132,6 +132,12 @@
     <string name="insight_result_retention_cohort_size">Users</string>
     <string name="insight_result_more_rows">and %1$d more</string>
     <string name="insight_result_more_series">+%1$d more series</string>
+    <string name="insight_result_show_all">Show all %1$d</string>
+    <string name="insight_result_show_fewer">Show fewer</string>
+    <string name="insight_result_this_period">This period</string>
+    <string name="insight_result_previous_period">Previous period</string>
+    <string name="insight_result_previous_lines">Dashed lines show the previous period.</string>
+    <string name="insight_result_versus">vs %1$s</string>
     <string name="insight_kind_trends">Trends</string>
     <string name="insight_kind_funnels">Funnel</string>
     <string name="insight_kind_retention">Retention</string>
