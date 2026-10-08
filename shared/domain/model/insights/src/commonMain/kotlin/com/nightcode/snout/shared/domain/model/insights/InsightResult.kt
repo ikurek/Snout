@@ -13,8 +13,10 @@ sealed interface InsightResult {
     @Serializable
     data class Series(val series: List<TrendSeries>, val format: ValueFormat = ValueFormat()) : InsightResult
 
+    /** [steps] cover everyone; [breakdowns] split them per breakdown value when the funnel has more than one. */
     @Serializable
-    data class Funnel(val steps: List<FunnelStep>) : InsightResult
+    data class Funnel(val steps: List<FunnelStep>, val breakdowns: List<FunnelBreakdown> = emptyList()) :
+        InsightResult
 
     /** One cohort per start period; [intervals] label the columns ("Day 0", "Day 1", ...). */
     @Serializable
@@ -97,6 +99,16 @@ data class FunnelStep(
     val medianConversionSeconds: Double?,
 )
 
+/** One breakdown value's own funnel; [label] is empty when PostHog had no value for it. */
+@Serializable
+data class FunnelBreakdown(val label: String, val steps: List<FunnelStep>) {
+    val entered: Double get() = steps.firstOrNull()?.count ?: 0.0
+    val converted: Double get() = steps.lastOrNull()?.count ?: 0.0
+
+    /** Share that made it through every step, 0..1. */
+    val conversionRate: Double get() = if (entered > 0) converted / entered else 0.0
+}
+
 @Serializable
 data class InsightDetail(val summary: InsightSummary, val result: InsightResult?)
 
@@ -165,6 +177,21 @@ val TestFunnelResult = InsightResult.Funnel(
         FunnelStep("Visited pricing", 1200.0, 1.0, null),
         FunnelStep("Started checkout", 480.0, 0.4, 95.0),
         FunnelStep("Paid", 210.0, 0.175, 300.0),
+    ),
+    breakdowns = listOf(
+        TestFunnelBreakdown("Chrome", 700.0, 300.0, 140.0),
+        TestFunnelBreakdown("Safari", 350.0, 130.0, 50.0),
+        TestFunnelBreakdown("Firefox", 150.0, 50.0, 20.0),
+    ),
+)
+
+@Suppress("FunctionNaming", "MagicNumber")
+private fun TestFunnelBreakdown(label: String, visited: Double, started: Double, paid: Double) = FunnelBreakdown(
+    label = label,
+    steps = listOf(
+        FunnelStep("Visited pricing", visited, 1.0, null),
+        FunnelStep("Started checkout", started, started / visited, 90.0),
+        FunnelStep("Paid", paid, paid / visited, 280.0),
     ),
 )
 

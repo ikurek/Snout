@@ -27,6 +27,44 @@ enum class InsightDisplay {
     Unsupported,
 }
 
+enum class PeriodUnit {
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year,
+}
+
+/** The dates an insight covers, as PostHog's date filter describes them. */
+@Serializable
+sealed interface InsightDateRange {
+    @Serializable
+    data class Last(val amount: Int, val unit: PeriodUnit) : InsightDateRange
+
+    @Serializable
+    data object Today : InsightDateRange
+
+    @Serializable
+    data object Yesterday : InsightDateRange
+
+    @Serializable
+    data object MonthToDate : InsightDateRange
+
+    @Serializable
+    data object YearToDate : InsightDateRange
+
+    @Serializable
+    data object AllTime : InsightDateRange
+
+    /** ISO dates; [to] is null for "until now". */
+    @Serializable
+    data class Between(val from: String, val to: String?) : InsightDateRange
+}
+
+/** What the numbers cover: the date range, how points are bucketed and whether a previous period is drawn. */
+@Serializable
+data class InsightPeriod(val range: InsightDateRange, val interval: PeriodUnit? = null, val compared: Boolean = false)
+
 @Serializable
 data class InsightSummary(
     val id: Long,
@@ -38,6 +76,7 @@ data class InsightSummary(
     val tags: List<String>,
     val kind: InsightKind,
     val display: InsightDisplay,
+    val period: InsightPeriod? = null,
 )
 
 @TestData
@@ -51,4 +90,5 @@ val TestInsightSummary = InsightSummary(
     tags = listOf("growth"),
     kind = InsightKind.Trends,
     display = InsightDisplay.Line,
+    period = InsightPeriod(InsightDateRange.Last(7, PeriodUnit.Day), PeriodUnit.Day),
 )

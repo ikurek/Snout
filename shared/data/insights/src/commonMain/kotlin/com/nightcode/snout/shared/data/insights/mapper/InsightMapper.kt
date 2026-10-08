@@ -28,6 +28,7 @@ internal fun InsightDto.toSummary(): InsightSummary {
         tags = tags,
         kind = kind,
         display = query.insightDisplay(kind),
+        period = query.insightPeriod(kind),
     )
 }
 

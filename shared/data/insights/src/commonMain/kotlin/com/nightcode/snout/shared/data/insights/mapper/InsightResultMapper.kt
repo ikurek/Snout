@@ -1,6 +1,5 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
-import com.nightcode.snout.shared.domain.model.insights.FunnelStep
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
@@ -85,42 +84,11 @@ private fun JsonObject.periods(): List<String> {
 private fun JsonObject.countWithoutData(): Double? = get("count").number().takeIf { get("data") == null }
 
 private fun JsonObject.seriesLabel(): String {
-    val breakdown = get("breakdown_value").let { value ->
-        when (value) {
-            null, JsonNull -> null
-            is JsonPrimitive -> value.contentOrNull
-            is JsonArray -> value.joinToString(" / ") { (it as? JsonPrimitive)?.contentOrNull.orEmpty() }
-            else -> null
-        }
-    }
+    val breakdown = get("breakdown_value").breakdownText()
     val label = stringValue("label")
         ?: (get("action") as? JsonObject)?.let { it.stringValue("custom_name") ?: it.stringValue("name") }
         ?: "Series"
     return if (breakdown != null && breakdown !in label) "$label · $breakdown" else label
-}
-
-private fun JsonElement.toFunnel(): InsightResult {
-    val array = this as? JsonArray ?: return InsightResult.Unsupported
-    // Breakdown funnels nest one step list per breakdown value; their counts add up to the whole funnel.
-    val breakdowns = if (array.firstOrNull() is JsonArray) {
-        array.map { breakdown -> (breakdown as? JsonArray)?.mapNotNull { it as? JsonObject }.orEmpty() }
-    } else {
-        listOf(array.mapNotNull { it as? JsonObject })
-    }
-    val steps = breakdowns.firstOrNull().orEmpty()
-    val counts = steps.indices.map { index -> breakdowns.sumOf { it.getOrNull(index)?.get("count").number() ?: 0.0 } }
-    val first = counts.firstOrNull() ?: 0.0
-    return InsightResult.Funnel(
-        steps.mapIndexed { index, step ->
-            FunnelStep(
-                name = step.stringValue("custom_name") ?: step.stringValue("name") ?: "Step",
-                count = counts[index],
-                conversionRate = if (first > 0) counts[index] / first else 0.0,
-                // Medians of separate breakdowns don't combine into the median of the whole funnel.
-                medianConversionSeconds = if (breakdowns.size == 1) step["median_conversion_time"].number() else null,
-            )
-        },
-    )
 }
 
 private fun JsonElement.toRetention(period: DateTimeUnit, now: Instant): InsightResult {
@@ -208,7 +176,15 @@ private fun JsonElement?.cellText(): String = when (this) {
     else -> toString()
 }
 
-private fun JsonElement?.number(): Double? = (this as? JsonPrimitive)?.doubleOrNull
+internal fun JsonElement?.number(): Double? = (this as? JsonPrimitive)?.doubleOrNull
+
+/** A breakdown value as text; multi-property breakdowns arrive as arrays and read "Chrome / Mac OS X". */
+internal fun JsonElement?.breakdownText(): String? = when (this) {
+    null, JsonNull -> null
+    is JsonPrimitive -> contentOrNull
+    is JsonArray -> joinToString(" / ") { (it as? JsonPrimitive)?.contentOrNull.orEmpty() }
+    else -> null
+}
 
 private fun JsonElement?.numbers(): List<Double> = (this as? JsonArray)?.mapNotNull { it.number() }.orEmpty()
 

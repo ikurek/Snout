@@ -1,9 +1,12 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
 import com.nightcode.snout.shared.api.insights.model.InsightDto
+import com.nightcode.snout.shared.domain.model.insights.InsightDateRange
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
+import com.nightcode.snout.shared.domain.model.insights.InsightPeriod
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
+import com.nightcode.snout.shared.domain.model.insights.PeriodUnit
 import com.nightcode.snout.shared.domain.model.insights.ValueFormat
 import com.nightcode.snout.shared.domain.model.insights.ValueUnit
 import io.kotest.core.spec.style.ShouldSpec
@@ -124,6 +127,35 @@ class InsightMapperTest :
             steps.map { it.count } shouldBe listOf(100.0, 20.0)
             steps[1].conversionRate shouldBe 0.2
             steps[1].medianConversionSeconds shouldBe null
+            val breakdowns = dto.toDetail().result.shouldBeInstanceOf<InsightResult.Funnel>().breakdowns
+            breakdowns.map { it.label } shouldBe listOf("Chrome", "Safari")
+            breakdowns[0].conversionRate shouldBe 0.25
+            breakdowns[1].steps[1].conversionRate shouldBe 0.125
+            breakdowns[1].steps[1].medianConversionSeconds shouldBe 90.0
+        }
+
+        should("describe the period an insight covers") {
+            fun period(kind: String, source: String) = json.decodeFromString<InsightDto>(
+                """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"$kind"$source}}}""",
+            ).toSummary().period
+            period(
+                "TrendsQuery",
+                ""","dateRange":{"date_from":"-14d"},"interval":"week",
+                "compareFilter":{"compare":true}""",
+            ) shouldBe
+                InsightPeriod(InsightDateRange.Last(14, PeriodUnit.Day), PeriodUnit.Week, compared = true)
+            period("TrendsQuery", "") shouldBe InsightPeriod(InsightDateRange.Last(7, PeriodUnit.Day), PeriodUnit.Day)
+            period("FunnelsQuery", ""","dateRange":{"date_from":"-1m"}""") shouldBe
+                InsightPeriod(InsightDateRange.Last(1, PeriodUnit.Month))
+            period("TrendsQuery", ""","dateRange":{"date_from":"-1dStart","date_to":"-1dEnd"}""")?.range shouldBe
+                InsightDateRange.Yesterday
+            period("TrendsQuery", ""","dateRange":{"date_from":"mStart"}""")?.range shouldBe
+                InsightDateRange.MonthToDate
+            period("TrendsQuery", ""","dateRange":{"date_from":"2026-01-01T00:00:00","date_to":"2026-03-31"}""")
+                ?.range shouldBe InsightDateRange.Between("2026-01-01", "2026-03-31")
+            period("RetentionQuery", "") shouldBe null
+            period("TrendsQuery", ""","dateRange":{"date_from":"-30M"}""") shouldBe null
+            period("TrendsQuery", ""","dateRange":{"date_from":"-30d","date_to":"-7d"}""") shouldBe null
         }
 
         should("map retention cohorts and weight the curve by cohort size") {
