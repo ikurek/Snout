@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.settings.analytics
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -58,13 +61,14 @@ internal fun AnalyticsSettingsScreen(
             )
         },
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding)
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         if (preferences == null) {
             SkeletonRows(modifier = modifier, count = LoadingRowCount)
         } else {
             AnalyticsSettingsContent(
                 preferences = preferences,
                 modifier = modifier,
+                contentPadding = innerPadding.bottomOnly(),
                 onDefaultRangeSelected = onDefaultRangeSelected,
                 onMetricToggled = onMetricToggled,
                 onTrendChartToggled = onTrendChartToggled,
@@ -79,6 +83,7 @@ internal fun AnalyticsSettingsScreen(
 private fun AnalyticsSettingsContent(
     preferences: AnalyticsPreferences,
     modifier: Modifier,
+    contentPadding: PaddingValues,
     onDefaultRangeSelected: (AnalyticsRange) -> Unit,
     onMetricToggled: (OverviewMetricKey, Boolean) -> Unit,
     onTrendChartToggled: (Boolean) -> Unit,
@@ -86,7 +91,7 @@ private fun AnalyticsSettingsContent(
     onReset: () -> Unit,
 ) {
     val rangeLabels = AnalyticsRange.entries.associateWith { it.label() }
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
         SectionLabel(stringResource(Res.string.settings_analytics_range_section))
         SegmentedControl(
             options = AnalyticsRange.entries,

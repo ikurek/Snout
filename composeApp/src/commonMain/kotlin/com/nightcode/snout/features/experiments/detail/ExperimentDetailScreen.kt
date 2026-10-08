@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.experiments.detail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +13,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
@@ -59,18 +62,26 @@ internal fun ExperimentDetailScreen(
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding)
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         when (state) {
             CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
+
             is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
-            is CachedUiState.Content -> ExperimentContent(state.data, onOpenFeatureFlag, modifier)
+
+            is CachedUiState.Content ->
+                ExperimentContent(state.data, onOpenFeatureFlag, modifier, innerPadding.bottomOnly())
         }
     }
 }
 
 @Composable
-private fun ExperimentContent(experiment: Experiment, onOpenFeatureFlag: (flagId: Long) -> Unit, modifier: Modifier) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+private fun ExperimentContent(
+    experiment: Experiment,
+    onOpenFeatureFlag: (flagId: Long) -> Unit,
+    modifier: Modifier,
+    contentPadding: PaddingValues,
+) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
         experiment.description?.let {
             Text(
                 text = it,

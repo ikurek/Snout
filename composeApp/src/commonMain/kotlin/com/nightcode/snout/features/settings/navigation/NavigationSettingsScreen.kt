@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.settings.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -69,13 +72,14 @@ internal fun NavigationSettingsScreen(
             )
         },
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding)
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         if (preferences == null) {
             SkeletonRows(modifier = modifier, count = LoadingRowCount)
         } else {
             NavigationContent(
                 preferences = preferences,
                 modifier = modifier,
+                contentPadding = innerPadding.bottomOnly(),
                 onOpenSlotPicker = { openPicker = it },
                 onOpenLandingPicker = { openPicker = LandingPicker },
                 onReset = onReset,
@@ -121,11 +125,12 @@ internal fun NavigationSettingsScreen(
 private fun NavigationContent(
     preferences: NavigationPreferences,
     modifier: Modifier,
+    contentPadding: PaddingValues,
     onOpenSlotPicker: (slot: Int) -> Unit,
     onOpenLandingPicker: () -> Unit,
     onReset: () -> Unit,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
         SectionLabel(stringResource(Res.string.settings_navigation_tabs_section))
         preferences.tabs.forEachIndexed { index, section ->
             KeyValueRow(

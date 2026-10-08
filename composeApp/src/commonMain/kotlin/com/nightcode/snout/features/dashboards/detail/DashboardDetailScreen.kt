@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
@@ -13,6 +14,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.Tag
@@ -59,7 +62,7 @@ internal fun DashboardDetailScreen(
         CachedStateContainer(
             state = state.dashboard,
             onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
         ) { dashboard ->
             if (dashboard.tiles.isEmpty()) {
                 NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
@@ -69,6 +72,7 @@ internal fun DashboardDetailScreen(
                     tiles = dashboard.tiles,
                     onRetryTile = onRetryTile,
                     onOpenInsight = onOpenInsight,
+                    contentPadding = innerPadding.bottomOnly(),
                 )
             }
         }
@@ -81,9 +85,10 @@ private fun TileList(
     tiles: List<DashboardTile>,
     onRetryTile: (insightId: Long) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
+    contentPadding: PaddingValues,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp) + contentPadding,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(tiles, key = { it.id }) { tile ->

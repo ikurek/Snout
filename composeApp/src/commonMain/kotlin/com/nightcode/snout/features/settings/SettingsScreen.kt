@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatMonthYear
 import com.nightcode.snout.common.platform.appVersionName
 import com.nightcode.snout.designsystem.atoms.AvatarBox
@@ -96,7 +99,8 @@ internal fun SettingsScreen(
     ) { innerPadding ->
         SettingsContent(
             state = state,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+            contentPadding = innerPadding.bottomOnly(),
             onRetryAccount = onRetryAccount,
             onOpenInstance = onOpenInstance,
             onThemeModeSelected = onThemeModeSelected,
@@ -125,6 +129,7 @@ internal fun SettingsScreen(
 private fun SettingsContent(
     state: SettingsUiState,
     modifier: Modifier,
+    contentPadding: PaddingValues,
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
@@ -136,7 +141,8 @@ private fun SettingsContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
     ) {
         SectionLabel(stringResource(Res.string.settings_account_section))
         AccountSection(state.account, onRetry = onRetryAccount)

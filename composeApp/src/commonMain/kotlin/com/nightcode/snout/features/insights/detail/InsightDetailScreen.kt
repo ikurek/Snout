@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.insights.detail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.common.compose.bottomOnly
+import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
@@ -70,18 +73,23 @@ internal fun InsightDetailScreen(
             )
         },
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding)
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         when (state) {
             CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
             is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
-            is CachedUiState.Content -> DetailContent(state.data, modifier)
+            is CachedUiState.Content -> DetailContent(state.data, modifier, innerPadding.bottomOnly())
         }
     }
 }
 
 @Composable
-private fun DetailContent(detail: InsightDetail, modifier: Modifier) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(top = 8.dp, bottom = 24.dp)) {
+private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadding: PaddingValues) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(top = 8.dp, bottom = 24.dp),
+    ) {
         SectionCard(
             title = detail.summary.name,
             subtitle = detail.summary.description,
