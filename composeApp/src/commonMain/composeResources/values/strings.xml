@@ -138,6 +138,7 @@
     <string name="insight_result_previous_period">Previous period</string>
     <string name="insight_result_previous_lines">Dashed lines show the previous period.</string>
     <string name="insight_result_versus">vs %1$s</string>
+    <string name="insight_result_previous_of">%1$s (previous)</string>
     <string name="insight_kind_trends">Trends</string>
     <string name="insight_kind_funnels">Funnel</string>
     <string name="insight_kind_retention">Retention</string>

@@ -1,10 +1,13 @@
 package com.nightcode.snout.designsystem.charts
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -33,7 +36,8 @@ private const val GapLength = 6f
 
 /**
  * Multi-series line chart with horizontal grid lines and first/middle/last x labels.
- * [xLabels] are already formatted for display.
+ * [xLabels] are already formatted for display. Tapping or dragging picks a period and shows every series' value
+ * at it; [selectedIndex] picks one up front, for previews.
  */
 @Composable
 internal fun LineChart(
@@ -44,16 +48,37 @@ internal fun LineChart(
     fill: Boolean = series.count { it.filled } == 1,
     showLegend: Boolean = series.size > 1,
     valueFormatter: (Double) -> String = { it.formatCompact() },
+    selectedIndex: Int? = null,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val labelStyle = SnoutTheme.typography.bodySmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
     val gridColor = SnoutTheme.colors.outlineVariant
+    val markerColor = SnoutTheme.colors.onSurfaceVariant
+    val range = axisRange(series.flatMap { it.values })
+    val count = series.maxOfOrNull { it.values.size } ?: 0
+    val selection = remember(series, xLabels) { mutableStateOf(selectedIndex) }
+    val selected = selection.value?.takeIf { it < count }
 
     Column(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxWidth().height(height)) {
-            val range = axisRange(series.flatMap { it.values })
-            val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
-            series.forEach { drawLineSeries(it, plot, range, fill) }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .selectPeriods(selection, key = series) { x, size ->
+                        if (count == 0) {
+                            null
+                        } else {
+                            plotRect(size, textMeasurer, labelStyle, range, valueFormatter)
+                                .lineIndexAt(x, count)
+                        }
+                    },
+            ) {
+                val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
+                series.forEach { drawLineSeries(it, plot, range, fill) }
+                selected?.let { drawLineMarker(it, count, series, plot, range, markerColor) }
+            }
+            selected?.let { PeriodReadout(series, xLabels, it, count, valueFormatter) }
         }
         if (showLegend) {
             // A comparison line drawn in its series' colour shares that series' legend entry.
@@ -76,14 +101,7 @@ internal fun DrawScope.drawAxes(
 ): Rect {
     val yLabels = range.gridValues
     val yLabelLayouts = yLabels.map { textMeasurer.measure(valueFormatter(it), labelStyle) }
-    val yLabelWidth = yLabelLayouts.maxOf { it.size.width } + 8.dp.toPx()
-    val xLabelHeight = textMeasurer.measure("0", labelStyle).size.height + 6.dp.toPx()
-    val plot = Rect(
-        left = yLabelWidth,
-        top = 4.dp.toPx(),
-        right = size.width - 4.dp.toPx(),
-        bottom = size.height - xLabelHeight,
-    )
+    val plot = plotRect(size, textMeasurer, labelStyle, range, valueFormatter)
     yLabels.forEachIndexed { index, value ->
         val y = plot.yFor(value, range)
         drawLine(gridColor, Offset(plot.left, y), Offset(plot.right, y), strokeWidth = 1.dp.toPx())
@@ -112,6 +130,24 @@ internal fun Rect.xFor(index: Int, count: Int): Float =
     if (count <= 1) left + width / 2 else left + width * index / (count - 1)
 
 internal fun Rect.yFor(value: Double, range: AxisRange): Float = bottom - range.fraction(value) * height
+
+/** Vertical guide at the picked period with a dot on every series that has a value there. */
+private fun DrawScope.drawLineMarker(
+    index: Int,
+    count: Int,
+    series: List<ChartSeries>,
+    plot: Rect,
+    range: AxisRange,
+    color: Color,
+) {
+    val x = plot.xFor(index, count)
+    drawLine(color, Offset(x, plot.top), Offset(x, plot.bottom), strokeWidth = 1.dp.toPx())
+    series.forEach { s ->
+        val value = s.values.getOrNull(index) ?: return@forEach
+        val center = Offset(plot.xFor(index, s.values.size), plot.yFor(value, range))
+        drawCircle(s.color, radius = 4.dp.toPx(), center = center)
+    }
+}
 
 private fun DrawScope.drawLineSeries(series: ChartSeries, plot: Rect, range: AxisRange, fill: Boolean) {
     if (series.values.isEmpty()) return
@@ -159,4 +195,22 @@ fun LineChartPreview() = LineChart(
         ChartSeries("Signups", listOf(20.0, 35.0, 10.0, 60.0, 45.0, 70.0, 66.0), chartColor(1)),
     ),
     xLabels = listOf("29 Sep", "30 Sep", "1 Oct", "2 Oct", "3 Oct", "4 Oct", "5 Oct"),
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun LineChartSelectedPreview() = LineChart(
+    series = listOf(
+        ChartSeries("Visitors", listOf(120.0, 180.0, 90.0, 240.0, 200.0, 310.0, 280.0), chartColor(0)),
+        ChartSeries(
+            name = "Previous period",
+            values = listOf(100.0, 150.0, 110.0, 190.0, 170.0, 220.0, 250.0),
+            color = chartColor(1),
+            dashed = true,
+            filled = false,
+        ),
+    ),
+    xLabels = listOf("29 Sep", "30 Sep", "1 Oct", "2 Oct", "3 Oct", "4 Oct", "5 Oct"),
+    selectedIndex = 4,
 )

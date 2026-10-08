@@ -1,10 +1,13 @@
 package com.nightcode.snout.designsystem.charts
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -21,8 +24,12 @@ import kotlin.math.abs
 import kotlin.math.min
 
 private const val GroupFill = 0.7f
+private const val HighlightAlpha = 0.12f
 
-/** Grouped bars per period drawn from the zero line; shares axes with [LineChart]. */
+/**
+ * Grouped bars per period drawn from the zero line; shares axes with [LineChart]. Tapping or dragging picks a
+ * period and shows every series' value at it; [selectedIndex] picks one up front, for previews.
+ */
 @Composable
 internal fun BarChart(
     series: List<ChartSeries>,
@@ -31,34 +38,60 @@ internal fun BarChart(
     height: Dp = 180.dp,
     showLegend: Boolean = series.size > 1,
     valueFormatter: (Double) -> String = { it.formatCompact() },
+    selectedIndex: Int? = null,
 ) {
     val textMeasurer = rememberTextMeasurer()
     val labelStyle = SnoutTheme.typography.bodySmall.copy(color = SnoutTheme.colors.onSurfaceVariant)
     val gridColor = SnoutTheme.colors.outlineVariant
+    val highlightColor = SnoutTheme.colors.onSurface.copy(alpha = HighlightAlpha)
+    val range = axisRange(series.flatMap { it.values })
+    val periods = series.maxOfOrNull { it.values.size } ?: 0
+    val selection = remember(series, xLabels) { mutableStateOf(selectedIndex) }
+    val selected = selection.value?.takeIf { it < periods }
 
     Column(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxWidth().height(height)) {
-            val range = axisRange(series.flatMap { it.values })
-            val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
-            val periods = series.maxOfOrNull { it.values.size } ?: 0
-            if (periods == 0) return@Canvas
-            val groupWidth = plot.width / periods
-            val barWidth = groupWidth * GroupFill / series.size
-            val radius = CornerRadius(2.dp.toPx())
-            val zero = plot.yFor(0.0, range)
-            series.forEachIndexed { seriesIndex, s ->
-                s.values.forEachIndexed { index, value ->
-                    val valueY = plot.yFor(value, range)
-                    val left =
-                        plot.left + index * groupWidth + groupWidth * (1 - GroupFill) / 2 + seriesIndex * barWidth
-                    drawRoundRect(
-                        color = s.color,
-                        topLeft = Offset(left, min(zero, valueY)),
-                        size = Size(barWidth.coerceAtLeast(1f), abs(zero - valueY)),
-                        cornerRadius = radius,
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .selectPeriods(selection, key = series) { x, size ->
+                        if (periods == 0) {
+                            null
+                        } else {
+                            plotRect(size, textMeasurer, labelStyle, range, valueFormatter)
+                                .barIndexAt(x, periods)
+                        }
+                    },
+            ) {
+                val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
+                if (periods == 0) return@Canvas
+                val groupWidth = plot.width / periods
+                selected?.let {
+                    drawRect(
+                        color = highlightColor,
+                        topLeft = Offset(plot.left + it * groupWidth, plot.top),
+                        size = Size(groupWidth, plot.height),
                     )
                 }
+                val barWidth = groupWidth * GroupFill / series.size
+                val radius = CornerRadius(2.dp.toPx())
+                val zero = plot.yFor(0.0, range)
+                series.forEachIndexed { seriesIndex, s ->
+                    s.values.forEachIndexed { index, value ->
+                        val valueY = plot.yFor(value, range)
+                        val left =
+                            plot.left + index * groupWidth + groupWidth * (1 - GroupFill) / 2 + seriesIndex * barWidth
+                        drawRoundRect(
+                            color = s.color,
+                            topLeft = Offset(left, min(zero, valueY)),
+                            size = Size(barWidth.coerceAtLeast(1f), abs(zero - valueY)),
+                            cornerRadius = radius,
+                        )
+                    }
+                }
             }
+            selected?.let { PeriodReadout(series, xLabels, it, periods, valueFormatter) }
         }
         if (showLegend) {
             ChartLegend(entries = series.map { it.name to it.color }, modifier = Modifier.fillMaxWidth())
@@ -75,4 +108,16 @@ fun BarChartPreview() = BarChart(
         ChartSeries("Dormant", listOf(-4.0, -3.0, -8.0, -2.0, -5.0, -1.0, -6.0), chartColor(3)),
     ),
     xLabels = listOf("29 Sep", "30 Sep", "1 Oct", "2 Oct", "3 Oct", "4 Oct", "5 Oct"),
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun BarChartSelectedPreview() = BarChart(
+    series = listOf(
+        ChartSeries("New", listOf(12.0, 18.0, 9.0, 24.0, 20.0, 31.0, 28.0), chartColor(0)),
+        ChartSeries("Dormant", listOf(-4.0, -3.0, -8.0, -2.0, -5.0, -1.0, -6.0), chartColor(3)),
+    ),
+    xLabels = listOf("29 Sep", "30 Sep", "1 Oct", "2 Oct", "3 Oct", "4 Oct", "5 Oct"),
+    selectedIndex = 2,
 )

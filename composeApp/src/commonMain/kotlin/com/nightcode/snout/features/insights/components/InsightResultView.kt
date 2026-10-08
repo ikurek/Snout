@@ -48,6 +48,7 @@ import snout.composeapp.generated.resources.insight_result_median
 import snout.composeapp.generated.resources.insight_result_more_rows
 import snout.composeapp.generated.resources.insight_result_more_series
 import snout.composeapp.generated.resources.insight_result_previous_lines
+import snout.composeapp.generated.resources.insight_result_previous_of
 import snout.composeapp.generated.resources.insight_result_previous_period
 import snout.composeapp.generated.resources.insight_result_retention_cohort_size
 import snout.composeapp.generated.resources.insight_result_retention_curve
@@ -189,7 +190,15 @@ private fun lineSeries(charted: List<TrendSeries>): List<ChartSeries> {
         val color = chartColor(index)
         listOfNotNull(
             ChartSeries(s.label, s.values, color),
-            s.previous?.let { ChartSeries(s.label, it.values, color, dashed = true, filled = false) },
+            s.previous?.let {
+                ChartSeries(
+                    name = stringResource(Res.string.insight_result_previous_of, s.label),
+                    values = it.values,
+                    color = color,
+                    dashed = true,
+                    filled = false,
+                )
+            },
         )
     }
 }
