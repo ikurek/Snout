@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.storage.datastore.DataStoreModule
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -32,6 +33,8 @@ class ApiModule {
         install(ContentNegotiation) {
             json(json)
         }
+        // No defaults: engine timeouts stay as they are; slow endpoints opt into longer ones per request.
+        install(HttpTimeout)
         install(Auth) {
             bearer {
                 cacheTokens = true

@@ -7,6 +7,7 @@ import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
@@ -17,6 +18,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 private const val PageSize = 100
+
+/** PostHog answers `refresh=blocking` only once the query has run; breakdown funnels take well past 10 s. */
+private const val BlockingRefreshTimeoutMillis = 90_000L
 
 class InsightsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
@@ -34,6 +38,10 @@ class InsightsApi internal constructor(private val client: HttpClient, private v
     suspend fun getInsight(projectId: Long, insightId: Long, fromDashboardId: Long? = null) = networkCall<InsightDto> {
         client.get(authDataStore.projectUrl(projectId, "insights/$insightId/")) {
             parameter("refresh", "blocking")
+            timeout {
+                requestTimeoutMillis = BlockingRefreshTimeoutMillis
+                socketTimeoutMillis = BlockingRefreshTimeoutMillis
+            }
             fromDashboardId?.let { parameter("from_dashboard", it) }
         }.body()
     }
