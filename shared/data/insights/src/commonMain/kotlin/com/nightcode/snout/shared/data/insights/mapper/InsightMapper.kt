@@ -10,6 +10,8 @@ import com.nightcode.snout.shared.domain.model.insights.DashboardTile
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 internal fun InsightDto.toSummary(): InsightSummary {
     val kind = query.insightKind()
@@ -29,12 +31,14 @@ internal fun InsightDto.toSummary(): InsightSummary {
     )
 }
 
-internal fun InsightDto.toResult(summary: InsightSummary = toSummary()): InsightResult? =
-    result.toInsightResult(query, summary.kind, summary.display, columns)
+internal fun InsightDto.toResult(
+    summary: InsightSummary = toSummary(),
+    now: Instant = Clock.System.now(),
+): InsightResult? = result.toInsightResult(query, summary.kind, summary.display, columns, now)
 
-internal fun InsightDto.toDetail(): InsightDetail {
+internal fun InsightDto.toDetail(now: Instant = Clock.System.now()): InsightDetail {
     val summary = toSummary()
-    return InsightDetail(summary = summary, result = toResult(summary))
+    return InsightDetail(summary = summary, result = toResult(summary, now))
 }
 
 internal fun DashboardDto.toSummary(): DashboardSummary = DashboardSummary(

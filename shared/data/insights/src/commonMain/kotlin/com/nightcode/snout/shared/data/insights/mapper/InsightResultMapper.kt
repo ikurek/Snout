@@ -7,6 +7,9 @@ import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.model.insights.RetentionCohort
 import com.nightcode.snout.shared.domain.model.insights.TrendSeries
 import com.nightcode.snout.shared.domain.model.insights.ValueFormat
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -14,6 +17,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 private const val MaxTableRows = 50
 
@@ -23,6 +28,7 @@ internal fun JsonElement?.toInsightResult(
     kind: InsightKind,
     display: InsightDisplay,
     columns: List<String>?,
+    now: Instant = Clock.System.now(),
 ): InsightResult? {
     if (this == null || this is JsonNull) return null
     return when {
@@ -30,7 +36,7 @@ internal fun JsonElement?.toInsightResult(
 
         kind == InsightKind.Funnels -> toFunnel()
 
-        kind == InsightKind.Retention -> toRetention()
+        kind == InsightKind.Retention -> toRetention(query.retentionPeriod(), now)
 
         kind == InsightKind.Sql -> toSqlResult(query, display, columns)
 
@@ -103,7 +109,7 @@ private fun JsonElement.toFunnel(): InsightResult {
     )
 }
 
-private fun JsonElement.toRetention(): InsightResult {
+private fun JsonElement.toRetention(period: DateTimeUnit, now: Instant): InsightResult {
     val entries = (this as? JsonArray)?.mapNotNull { it as? JsonObject } ?: return InsightResult.Unsupported
     val values = entries.map { entry -> (entry["values"] as? JsonArray)?.mapNotNull { it as? JsonObject }.orEmpty() }
     val longest = values.maxByOrNull { it.size }.orEmpty()
@@ -113,13 +119,22 @@ private fun JsonElement.toRetention(): InsightResult {
         .groupBy { entries[it].stringValue("date") ?: entries[it].stringValue("label").orEmpty() }
         .map { (date, indices) ->
             val rows = indices.map { index -> values[index].map { it["count"].number() ?: 0.0 } }
-            val size = rows.maxOf { it.size }
+            val size = reachedIntervals(date, rows.maxOf { it.size }, period, now)
             RetentionCohort(
                 date = date,
                 counts = List(size) { interval -> rows.sumOf { it.getOrNull(interval) ?: 0.0 } },
             )
         }
     return InsightResult.Retention(intervals = intervals, cohorts = cohorts)
+}
+
+/**
+ * PostHog pads every cohort to the full interval count with zeros, even for intervals that haven't started yet.
+ * Those aren't drop-offs, so only intervals starting by [now] are kept.
+ */
+private fun reachedIntervals(date: String, size: Int, period: DateTimeUnit, now: Instant): Int {
+    val start = runCatching { Instant.parse(date) }.getOrNull() ?: return size
+    return (0 until size).count { start.plus(it, period, TimeZone.UTC) <= now }
 }
 
 private fun JsonElement.toSqlResult(

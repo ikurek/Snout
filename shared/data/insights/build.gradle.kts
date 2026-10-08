@@ -15,5 +15,6 @@ kotlin {
         implementation(projects.shared.data.common)
         implementation(projects.shared.domain.data.insights)
         implementation(libs.kotlin.serialization.json)
+        implementation(libs.kotlin.datetime)
     }
 }

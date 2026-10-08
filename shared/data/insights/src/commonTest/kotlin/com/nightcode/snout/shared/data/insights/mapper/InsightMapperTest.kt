@@ -10,6 +10,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 class InsightMapperTest :
     ShouldSpec({
@@ -105,7 +106,7 @@ class InsightMapperTest :
                    "values":[{"count":300,"label":"Day 0"},{"count":30,"label":"Day 1"}]}
                 ]}""",
             )
-            val detail = dto.toDetail()
+            val detail = dto.toDetail(now = Instant.parse("2026-10-03T12:00:00Z"))
             detail.summary.display shouldBe InsightDisplay.Line
             val retention = detail.result.shouldBeInstanceOf<InsightResult.Retention>()
             retention.intervals shouldBe listOf("Day 0", "Day 1", "Day 2")
@@ -126,8 +127,27 @@ class InsightMapperTest :
                    "values":[{"count":30,"label":"Day 0"},{"count":6,"label":"Day 1"}]}
                 ]}""",
             )
-            val cohorts = dto.toDetail().result.shouldBeInstanceOf<InsightResult.Retention>().cohorts
+            val cohorts = dto.toDetail(now = Instant.parse("2026-10-08T12:00:00Z"))
+                .result.shouldBeInstanceOf<InsightResult.Retention>().cohorts
             cohorts.single().counts shouldBe listOf(40.0, 10.0)
+        }
+
+        should("drop the zero padding PostHog sends for retention intervals that haven't started") {
+            val dto = json.decodeFromString<InsightDto>(
+                """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"RetentionQuery",
+                "retentionFilter":{"period":"Week"}}},
+                "result":[
+                  {"date":"2026-09-21T00:00:00Z","label":"Week 0",
+                   "values":[{"count":100,"label":"Week 0"},{"count":40,"label":"Week 1"},{"count":0,"label":"Week 2"}]},
+                  {"date":"2026-09-28T00:00:00Z","label":"Week 1",
+                   "values":[{"count":200,"label":"Week 0"},{"count":0,"label":"Week 1"},{"count":0,"label":"Week 2"}]}
+                ]}""",
+            )
+            val retention = dto.toDetail(now = Instant.parse("2026-10-03T12:00:00Z"))
+                .result.shouldBeInstanceOf<InsightResult.Retention>()
+            retention.intervals shouldBe listOf("Week 0", "Week 1", "Week 2")
+            retention.cohorts.map { it.counts } shouldBe listOf(listOf(100.0, 40.0), listOf(200.0))
+            retention.curve shouldBe listOf(1.0, 0.4)
         }
 
         should("carry the trends aggregation axis format") {

@@ -4,6 +4,7 @@ import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.ValueFormat
 import com.nightcode.snout.shared.domain.model.insights.ValueUnit
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -88,6 +89,15 @@ private fun JsonElement?.chartValueFormat(): ValueFormat {
         decimalPlaces = formatting.intValue("decimalPlaces"),
     )
 }
+
+/** How long one retention interval lasts; PostHog defaults to days. */
+internal fun JsonElement?.retentionPeriod(): DateTimeUnit =
+    when ((sourceNode()?.get("retentionFilter") as? JsonObject)?.stringValue("period")) {
+        "Hour" -> DateTimeUnit.HOUR
+        "Week" -> DateTimeUnit.WEEK
+        "Month" -> DateTimeUnit.MONTH
+        else -> DateTimeUnit.DAY
+    }
 
 /** The x column of a SQL visualization's chart settings. */
 internal fun JsonElement?.chartXColumn(): String? =

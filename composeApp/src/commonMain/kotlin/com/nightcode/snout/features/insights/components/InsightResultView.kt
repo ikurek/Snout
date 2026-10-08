@@ -147,29 +147,32 @@ private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String)
 
 @Composable
 private fun RetentionView(result: InsightResult.Retention, chartHeight: Dp, detailed: Boolean) {
-    if (result.cohorts.isEmpty() || result.intervals.isEmpty()) {
+    val curve = result.curve
+    if (curve.isEmpty()) {
         Note(stringResource(Res.string.insight_result_empty))
         return
     }
+    // Intervals no cohort has reached yet would only add empty columns.
+    val intervals = result.intervals.take(curve.size)
     val percent: (Double) -> String = { it.formatPercent(isFraction = true) }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         LineChart(
             series = listOf(
-                ChartSeries(stringResource(Res.string.insight_result_retention_curve), result.curve, chartColor(0)),
+                ChartSeries(stringResource(Res.string.insight_result_retention_curve), curve, chartColor(0)),
             ),
-            xLabels = result.intervals,
+            xLabels = intervals,
             height = chartHeight,
             valueFormatter = percent,
         )
         if (detailed) {
             RetentionTable(
                 sizeLabel = stringResource(Res.string.insight_result_retention_cohort_size),
-                intervals = result.intervals,
+                intervals = intervals,
                 rows = result.cohorts.map { cohort ->
                     RetentionTableRow(
                         label = cohort.date.cohortLabel(),
                         size = cohort.size,
-                        rates = result.intervals.indices.map { cohort.rate(it) },
+                        rates = intervals.indices.map { cohort.rate(it) },
                     )
                 },
             )

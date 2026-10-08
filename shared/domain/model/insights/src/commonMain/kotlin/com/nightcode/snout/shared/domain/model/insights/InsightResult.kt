@@ -17,13 +17,16 @@ sealed interface InsightResult {
     @Serializable
     data class Retention(val intervals: List<String>, val cohorts: List<RetentionCohort>) : InsightResult {
 
-        /** Share of users still active per interval, weighted by cohort size over the cohorts that reached it. */
+        /**
+         * Share of users still active per interval, weighted by cohort size over the cohorts that reached it.
+         * Ends at the last interval any cohort has reached, so it can be shorter than [intervals].
+         */
         val curve: List<Double>
             get() = intervals.indices.map { interval ->
                 val reached = cohorts.filter { it.size > 0 && interval < it.counts.size }
                 val total = reached.sumOf { it.size }
-                if (total > 0) reached.sumOf { it.counts[interval] } / total else 0.0
-            }
+                if (total > 0) reached.sumOf { it.counts[interval] } / total else null
+            }.takeWhile { it != null }.filterNotNull()
     }
 
     /** SQL and table displays: already stringified cells; [totalRows] counts rows dropped from [rows]. */
