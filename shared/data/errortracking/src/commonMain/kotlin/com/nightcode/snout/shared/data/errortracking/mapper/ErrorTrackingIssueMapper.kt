@@ -56,7 +56,7 @@ internal val IssueStatusFilter.apiValue: String
         IssueStatusFilter.Suppressed -> "suppressed"
     }
 
-private fun String?.toIssueStatus(): IssueStatus = when (this) {
+internal fun String?.toIssueStatus(): IssueStatus = when (this) {
     "active" -> IssueStatus.Active
     "resolved" -> IssueStatus.Resolved
     "suppressed" -> IssueStatus.Suppressed

@@ -15,7 +15,7 @@ enum class IssueStatus {
     Unknown,
 }
 
-/** The statuses the issue list can be narrowed to. */
+/** The statuses an issue can be set to, which are also the ones the issue list can be narrowed to. */
 enum class IssueStatusFilter {
     Active,
     Resolved,

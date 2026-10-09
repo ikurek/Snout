@@ -29,4 +29,8 @@ class ErrorTrackingUsecaseModule {
     @Single
     fun getErrorAppVersions(get: GetSelectedProjectId, repository: ErrorTrackingRepository) =
         GetErrorAppVersions(get, repository)
+
+    @Single
+    fun setErrorTrackingIssueStatus(get: GetSelectedProjectId, repository: ErrorTrackingRepository) =
+        SetErrorTrackingIssueStatus(get, repository)
 }

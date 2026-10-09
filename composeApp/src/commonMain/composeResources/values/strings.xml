@@ -267,6 +267,15 @@
     <string name="error_tracking_version_selected">Version %1$s</string>
     <string name="error_tracking_version_empty_title">No issues in %1$s</string>
     <string name="error_tracking_version_empty_subtitle">This version reported no exceptions with this status in the last 7 days.</string>
+    <string name="error_tracking_action_resolve">Resolve</string>
+    <string name="error_tracking_action_suppress">Suppress</string>
+    <string name="error_tracking_action_reopen">Reopen</string>
+    <string name="error_tracking_status_changed_active">Issue reopened</string>
+    <string name="error_tracking_status_changed_resolved">Issue resolved</string>
+    <string name="error_tracking_status_changed_suppressed">Issue suppressed</string>
+    <string name="error_tracking_undo">Undo</string>
+    <string name="error_tracking_status_error_forbidden">Your API key can't change issues. Add the error_tracking:write scope in PostHog.</string>
+    <string name="error_tracking_status_error_generic">Couldn't update the issue. Try again.</string>
     <string name="error_tracking_stack_trace_note">Stack traces and individual occurrences are in PostHog. Open the issue there to see them.</string>
     <string name="experiment_title_placeholder">Experiment</string>
     <string name="experiment_status_draft">Draft</string>

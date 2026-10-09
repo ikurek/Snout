@@ -7,12 +7,15 @@ import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.errortracking.mapper.apiValue
 import com.nightcode.snout.shared.data.errortracking.mapper.toAppVersions
 import com.nightcode.snout.shared.data.errortracking.mapper.toIssue
+import com.nightcode.snout.shared.data.errortracking.mapper.toIssueStatus
 import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi, private val cache: JsonCacheStore) :
     ErrorTrackingRepository {
@@ -37,6 +40,22 @@ internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi, pr
 
     override suspend fun getIssue(projectId: Long, issueId: String): Either<DataError, ErrorTrackingIssue> =
         api.getIssue(projectId, issueId).mapLeft { it.toDataError() }.map { it.toIssue() }
+
+    override suspend fun setStatus(
+        projectId: Long,
+        issueId: String,
+        status: IssueStatusFilter,
+    ): Either<DataError, IssueStatus> = api.setStatus(projectId, issueId, status.apiValue)
+        .mapLeft { it.toDataError() }
+        .map { it.status.toIssueStatus() }
+        .onRight {
+            // The next refresh puts it in the list for its new status; until then it must leave the old one.
+            IssueStatusFilter.entries.forEach { filter ->
+                val key = key(projectId, filter)
+                val cached = cache.observe<List<ErrorTrackingIssue>>(key).first() ?: return@forEach
+                cache.put(key, cached.filterNot { it.id == issueId })
+            }
+        }
 
     override suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>> =
         api.getAppVersions(projectId).mapLeft { it.toDataError() }.map { it.toAppVersions() }

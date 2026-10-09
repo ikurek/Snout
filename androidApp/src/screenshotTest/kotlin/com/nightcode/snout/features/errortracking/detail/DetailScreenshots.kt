@@ -30,3 +30,10 @@ fun ErrorTrackingIssueScreenPreviewShot() = ScreenshotEnvironment { ErrorTrackin
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ErrorTrackingIssueScreenResolvedPreviewShot() = ScreenshotEnvironment { ErrorTrackingIssueScreenResolvedPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ErrorTrackingIssueScreenResolvingPreviewShot() =
+    ScreenshotEnvironment { ErrorTrackingIssueScreenResolvingPreview() }

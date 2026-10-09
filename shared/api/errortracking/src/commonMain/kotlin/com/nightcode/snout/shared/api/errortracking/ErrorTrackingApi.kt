@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -87,6 +88,17 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
                 putDateRange()
             },
         ).body()
+    }
+
+    /**
+     * Sets an issue's status to active, resolved or suppressed. Requires the `error_tracking:write` scope; PostHog
+     * answers 403 otherwise.
+     */
+    suspend fun setStatus(projectId: Long, issueId: String, status: String) = networkCall<ErrorTrackingIssueDto> {
+        client.patch(authDataStore.projectUrl(projectId, "error_tracking/issues/$issueId/")) {
+            contentType(ContentType.Application.Json)
+            setBody(buildJsonObject { put("status", status) })
+        }.body()
     }
 
     /**

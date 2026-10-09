@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingReposit
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
@@ -55,4 +56,12 @@ class GetErrorAppVersions(
 ) {
     suspend operator fun invoke(): Either<DataError, List<AppVersion>> =
         repository.getAppVersions(getSelectedProjectId())
+}
+
+class SetErrorTrackingIssueStatus(
+    private val getSelectedProjectId: GetSelectedProjectId,
+    private val repository: ErrorTrackingRepository,
+) {
+    suspend operator fun invoke(issueId: String, status: IssueStatusFilter): Either<DataError, IssueStatus> =
+        repository.setStatus(getSelectedProjectId(), issueId, status)
 }
