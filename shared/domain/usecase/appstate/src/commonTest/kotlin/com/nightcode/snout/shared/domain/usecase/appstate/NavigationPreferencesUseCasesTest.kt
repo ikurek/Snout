@@ -52,6 +52,7 @@ class NavigationPreferencesUseCasesTest :
             preferences.hidden shouldBe listOf(
                 HomeSection.Analytics,
                 HomeSection.ErrorTracking,
+                HomeSection.Logs,
                 HomeSection.Experiments,
                 HomeSection.ActivityLog,
             )

@@ -11,6 +11,8 @@ import com.nightcode.snout.features.home.SectionNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.login.LoginNavKey
+import com.nightcode.snout.features.logs.entry.LogEntryNavKey
+import com.nightcode.snout.features.logs.service.LogServiceNavKey
 import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
@@ -31,6 +33,8 @@ internal val DefaultSavedStateConfiguration = SavedStateConfiguration {
             subclass(InsightDetailNavKey::class, InsightDetailNavKey.serializer())
             subclass(FeatureFlagDetailNavKey::class, FeatureFlagDetailNavKey.serializer())
             subclass(ErrorTrackingIssueNavKey::class, ErrorTrackingIssueNavKey.serializer())
+            subclass(LogServiceNavKey::class, LogServiceNavKey.serializer())
+            subclass(LogEntryNavKey::class, LogEntryNavKey.serializer())
             subclass(ExperimentDetailNavKey::class, ExperimentDetailNavKey.serializer())
         }
     }

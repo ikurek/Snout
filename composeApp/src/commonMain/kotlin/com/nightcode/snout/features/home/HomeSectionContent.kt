@@ -10,7 +10,9 @@ import com.nightcode.snout.features.errortracking.ErrorTrackingRoute
 import com.nightcode.snout.features.experiments.ExperimentsRoute
 import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
 import com.nightcode.snout.features.insights.InsightsRoute
+import com.nightcode.snout.features.logs.LogsRoute
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
+import com.nightcode.snout.shared.domain.model.logs.LogsRange
 
 /** Navigation callbacks a section may need; the shell and the standalone section screen both provide them. */
 internal data class SectionNavigation(
@@ -18,6 +20,7 @@ internal data class SectionNavigation(
     val onOpenInsight: (insightId: Long) -> Unit,
     val onOpenFeatureFlag: (flagId: Long) -> Unit,
     val onOpenErrorTrackingIssue: (issueId: String) -> Unit,
+    val onOpenLogService: (service: String, range: LogsRange) -> Unit,
     val onOpenExperiment: (experimentId: Long) -> Unit,
 )
 
@@ -44,6 +47,8 @@ internal fun HomeSectionContent(
 
         HomeSection.ErrorTracking ->
             ErrorTrackingRoute(onOpenIssue = navigation.onOpenErrorTrackingIssue, contentPadding = contentPadding)
+
+        HomeSection.Logs -> LogsRoute(onOpenService = navigation.onOpenLogService, contentPadding = contentPadding)
 
         HomeSection.Experiments ->
             ExperimentsRoute(onOpenExperiment = navigation.onOpenExperiment, contentPadding = contentPadding)

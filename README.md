@@ -17,6 +17,9 @@ except calls to the instance you configure.
   (versions that reported exceptions this week), each with its occurrences, users and a 7-day sparkline; open one
   for its impact chart, where it happened and the latest release, and resolve, suppress or reopen it with undo.
   Instances without the error tracking API get an "unavailable" state.
+- **Logs**: services sending OpenTelemetry logs to PostHog with their volume, error rate and a sparkline for the
+  last hour, day or week; open one for its latest lines with search, a level filter and older pages on scroll, and
+  tap a line for its full message, trace ID and attributes.
 - **Experiments**: status, variants, metrics and conclusion (read-only).
 - **Annotations**: timeline of project annotations and a sheet to add one.
 - **Activity log**: who changed what in the project, with before/after values.
@@ -29,7 +32,7 @@ except calls to the instance you configure.
 ## Personal API key scopes
 
 Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `feature_flag`, `experiment`,
-`annotation`, `activity_log`. Add `error_tracking:read` for Errors. Add `feature_flag:write` to toggle flags,
+`annotation`, `activity_log`. Add `error_tracking:read` for Errors and `logs:read` for Logs. Add `feature_flag:write` to toggle flags,
 `annotation:write` to add annotations and `error_tracking:write` to resolve or suppress errors.
 PostHog rate-limits personal keys (240 requests/min); the app surfaces this instead of failing silently.
 

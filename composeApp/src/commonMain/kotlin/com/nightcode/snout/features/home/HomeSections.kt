@@ -10,6 +10,7 @@ import snout.composeapp.generated.resources.bottom_nav_dashboards
 import snout.composeapp.generated.resources.bottom_nav_error_tracking
 import snout.composeapp.generated.resources.bottom_nav_feature_flags
 import snout.composeapp.generated.resources.bottom_nav_insights
+import snout.composeapp.generated.resources.bottom_nav_logs
 import snout.composeapp.generated.resources.ic_analytics_24dp
 import snout.composeapp.generated.resources.ic_bug_report_24dp
 import snout.composeapp.generated.resources.ic_dashboard_24dp
@@ -18,6 +19,7 @@ import snout.composeapp.generated.resources.ic_history_24dp
 import snout.composeapp.generated.resources.ic_insights_24dp
 import snout.composeapp.generated.resources.ic_science_24dp
 import snout.composeapp.generated.resources.ic_sticky_note_24dp
+import snout.composeapp.generated.resources.ic_subject_24dp
 import snout.composeapp.generated.resources.more_activity_log_subtitle
 import snout.composeapp.generated.resources.more_activity_log_title
 import snout.composeapp.generated.resources.more_annotations_subtitle
@@ -29,6 +31,7 @@ import snout.composeapp.generated.resources.section_dashboards_description
 import snout.composeapp.generated.resources.section_error_tracking_description
 import snout.composeapp.generated.resources.section_feature_flags_description
 import snout.composeapp.generated.resources.section_insights_description
+import snout.composeapp.generated.resources.section_logs_description
 
 /** Label used in the bottom bar, app bar and settings. */
 internal val HomeSection.label: StringResource
@@ -38,6 +41,7 @@ internal val HomeSection.label: StringResource
         HomeSection.Insights -> Res.string.bottom_nav_insights
         HomeSection.FeatureFlags -> Res.string.bottom_nav_feature_flags
         HomeSection.ErrorTracking -> Res.string.bottom_nav_error_tracking
+        HomeSection.Logs -> Res.string.bottom_nav_logs
         HomeSection.Experiments -> Res.string.more_experiments_title
         HomeSection.Annotations -> Res.string.more_annotations_title
         HomeSection.ActivityLog -> Res.string.more_activity_log_title
@@ -51,6 +55,7 @@ internal val HomeSection.description: StringResource
         HomeSection.Insights -> Res.string.section_insights_description
         HomeSection.FeatureFlags -> Res.string.section_feature_flags_description
         HomeSection.ErrorTracking -> Res.string.section_error_tracking_description
+        HomeSection.Logs -> Res.string.section_logs_description
         HomeSection.Experiments -> Res.string.more_experiments_subtitle
         HomeSection.Annotations -> Res.string.more_annotations_subtitle
         HomeSection.ActivityLog -> Res.string.more_activity_log_subtitle
@@ -63,6 +68,7 @@ internal val HomeSection.icon: DrawableResource
         HomeSection.Insights -> Res.drawable.ic_insights_24dp
         HomeSection.FeatureFlags -> Res.drawable.ic_flag_24dp
         HomeSection.ErrorTracking -> Res.drawable.ic_bug_report_24dp
+        HomeSection.Logs -> Res.drawable.ic_subject_24dp
         HomeSection.Experiments -> Res.drawable.ic_science_24dp
         HomeSection.Annotations -> Res.drawable.ic_sticky_note_24dp
         HomeSection.ActivityLog -> Res.drawable.ic_history_24dp
@@ -76,6 +82,7 @@ internal val HomeSection.resource: PostHogResource
         HomeSection.Insights -> PostHogResource.Insights
         HomeSection.FeatureFlags -> PostHogResource.FeatureFlags
         HomeSection.ErrorTracking -> PostHogResource.ErrorTracking
+        HomeSection.Logs -> PostHogResource.Logs
         HomeSection.Experiments -> PostHogResource.Experiments
         HomeSection.Annotations -> PostHogResource.Annotations
         HomeSection.ActivityLog -> PostHogResource.ActivityLog

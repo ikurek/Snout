@@ -8,6 +8,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -35,6 +36,10 @@ import com.nightcode.snout.features.intialproject.InitialProjectNavKey
 import com.nightcode.snout.features.intialproject.InitialProjectRoute
 import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.login.LoginRoute
+import com.nightcode.snout.features.logs.entry.LogEntryNavKey
+import com.nightcode.snout.features.logs.entry.LogEntryRoute
+import com.nightcode.snout.features.logs.service.LogServiceNavKey
+import com.nightcode.snout.features.logs.service.LogServiceRoute
 import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
@@ -100,6 +105,7 @@ private fun mainEntryProvider(
         onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
         onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
         onOpenErrorTrackingIssue = { backStack.add(ErrorTrackingIssueNavKey(it)) },
+        onOpenLogService = { service, range -> backStack.add(LogServiceNavKey(service, range)) },
         onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
     )
     return entryProvider {
@@ -142,6 +148,7 @@ private fun mainEntryProvider(
         entry<InsightDetailNavKey> { key -> InsightDetailRoute(navKey = key, onNavigateBack = back) }
         entry<FeatureFlagDetailNavKey> { key -> FeatureFlagDetailRoute(navKey = key, onNavigateBack = back) }
         entry<ErrorTrackingIssueNavKey> { key -> ErrorTrackingIssueRoute(navKey = key, onNavigateBack = back) }
+        logsEntries(backStack, back)
         entry<ExperimentDetailNavKey> { key ->
             ExperimentDetailRoute(
                 navKey = key,
@@ -150,4 +157,12 @@ private fun mainEntryProvider(
             )
         }
     }
+}
+
+/** A service's log lines and a single line, both pushed from the Logs section. */
+private fun EntryProviderScope<NavKey>.logsEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
+    entry<LogServiceNavKey> { key ->
+        LogServiceRoute(navKey = key, onNavigateBack = back, onOpenEntry = { backStack.add(it) })
+    }
+    entry<LogEntryNavKey> { key -> LogEntryRoute(navKey = key, onNavigateBack = back) }
 }

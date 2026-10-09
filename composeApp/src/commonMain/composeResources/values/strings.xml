@@ -17,7 +17,7 @@
     <string name="login_screen_connect_button_text">Connect</string>
     <string name="login_screen_cloud_us_chip">Cloud US</string>
     <string name="login_screen_cloud_eu_chip">Cloud EU</string>
-    <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add error_tracking:read to see errors, and feature_flag:write and annotation:write to toggle flags and add annotations from Snout.</string>
+    <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add error_tracking:read and logs:read to see errors and logs, and feature_flag:write, annotation:write and error_tracking:write to toggle flags, add annotations and resolve errors from Snout.</string>
     <string name="month_january">January</string>
     <string name="month_february">February</string>
     <string name="month_march">March</string>
@@ -277,6 +277,37 @@
     <string name="error_tracking_status_error_forbidden">Your API key can't change issues. Add the error_tracking:write scope in PostHog.</string>
     <string name="error_tracking_status_error_generic">Couldn't update the issue. Try again.</string>
     <string name="error_tracking_stack_trace_note">Stack traces and individual occurrences are in PostHog. Open the issue there to see them.</string>
+    <string name="bottom_nav_logs">Logs</string>
+    <string name="section_logs_description">Services and their latest log lines</string>
+    <string name="logs_range_last_hour">Last hour</string>
+    <string name="logs_range_last_24_hours">Last 24 hours</string>
+    <string name="logs_range_last_7_days">Last 7 days</string>
+    <string name="logs_services_empty_title">No logs</string>
+    <string name="logs_services_empty_subtitle">Nothing was logged in this range. Send logs to PostHog with OpenTelemetry to see them here.</string>
+    <string name="logs_unavailable_title">Logs unavailable</string>
+    <string name="logs_unavailable_subtitle">This PostHog instance doesn't offer the Logs API yet. Self-hosted instances need a recent PostHog version.</string>
+    <string name="logs_error_rate">%1$s errors</string>
+    <string name="logs_search_placeholder">Search log messages</string>
+    <string name="logs_search_empty_title">No logs match</string>
+    <string name="logs_empty_title">No logs</string>
+    <string name="logs_empty_subtitle">This service logged nothing at this level in the selected range.</string>
+    <string name="logs_severity_all">All levels</string>
+    <string name="logs_severity_warnings">Warnings and errors</string>
+    <string name="logs_severity_errors">Errors</string>
+    <string name="logs_load_more_failed">Couldn't load older logs.</string>
+    <string name="logs_load_more_retry">Try again</string>
+    <string name="logs_entry_message">Message</string>
+    <string name="logs_entry_span">Span ID</string>
+    <string name="logs_entry_logger">Logger</string>
+    <string name="logs_entry_event">Event</string>
+    <string name="logs_level_errors">Errors</string>
+    <string name="logs_level_warnings">Warnings</string>
+    <string name="logs_level_info">Info</string>
+    <string name="logs_level_debug">Debug</string>
+    <string name="logs_volume_section">Volume by level</string>
+    <string name="logs_entry_trace">Trace ID</string>
+    <string name="logs_entry_attributes">Attributes</string>
+    <string name="logs_entry_resource">Resource</string>
     <string name="experiment_title_placeholder">Experiment</string>
     <string name="experiment_status_draft">Draft</string>
     <string name="experiment_status_running">Running</string>
@@ -360,5 +391,9 @@
     <plurals name="error_tracking_version_exceptions">
         <item quantity="one">%1$s exception this week</item>
         <item quantity="other">%1$s exceptions this week</item>
+    </plurals>
+    <plurals name="logs_count">
+        <item quantity="one">%1$s log</item>
+        <item quantity="other">%1$s logs</item>
     </plurals>
 </resources>

@@ -26,6 +26,7 @@ class GetPostHogUrl(private val authRepository: AuthRepository, private val appS
         is PostHogResource.FeatureFlag -> "feature_flags/$id"
         PostHogResource.ErrorTracking -> "error_tracking"
         is PostHogResource.ErrorTrackingIssue -> "error_tracking/$id"
+        PostHogResource.Logs -> "logs"
         PostHogResource.Experiments -> "experiments"
         is PostHogResource.Experiment -> "experiments/$id"
         PostHogResource.Annotations -> "data-management/annotations"

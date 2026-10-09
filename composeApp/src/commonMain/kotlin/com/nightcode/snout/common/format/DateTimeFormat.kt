@@ -141,3 +141,42 @@ internal fun lastDaysLabels(count: Int): List<String> {
     val today = (LocalNow.current ?: Clock.System.now()).toLocalDateTime(TimeZone.currentSystemDefault()).date
     return (count - 1 downTo 0).map { format.format(today.minus(it, DateTimeUnit.DAY)) }
 }
+
+/** "11:58:42" for today, "5 Oct, 11:58:42" otherwise: log lines need seconds and rarely the year. */
+@Composable
+internal fun Instant.formatLogTime(): String {
+    val monthNames = shortMonthNames()
+    val zone = TimeZone.currentSystemDefault()
+    val today = (LocalNow.current ?: Clock.System.now()).toLocalDateTime(zone).date
+    val local = toLocalDateTime(zone)
+    return LocalDateTime.Format {
+        if (local.date != today) {
+            day(Padding.NONE)
+            char(' ')
+            monthName(monthNames)
+            chars(", ")
+        }
+        hour()
+        char(':')
+        minute()
+        char(':')
+        second()
+    }.format(local)
+}
+
+/** "14:00", or "3 Oct, 14:00" with [includeDate]: axis labels for time buckets within a day or across several. */
+@Composable
+internal fun Instant.formatChartTime(includeDate: Boolean): String {
+    val monthNames = shortMonthNames()
+    return LocalDateTime.Format {
+        if (includeDate) {
+            day(Padding.NONE)
+            char(' ')
+            monthName(monthNames)
+            chars(", ")
+        }
+        hour()
+        char(':')
+        minute()
+    }.format(local())
+}

@@ -12,6 +12,7 @@ sealed interface PostHogResource {
     data class FeatureFlag(val id: Long) : PostHogResource
     data object ErrorTracking : PostHogResource
     data class ErrorTrackingIssue(val id: String) : PostHogResource
+    data object Logs : PostHogResource
     data object Experiments : PostHogResource
     data class Experiment(val id: Long) : PostHogResource
     data object Annotations : PostHogResource
