@@ -32,6 +32,18 @@ fun EntityRowPreviewShot() = ScreenshotEnvironment { EntityRowPreview() }
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun FilterMenuChipPreviewShot() = ScreenshotEnvironment { FilterMenuChipPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun FilterMenuOptionsPreviewShot() = ScreenshotEnvironment { FilterMenuOptionsPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun InfoBannerPreviewShot() = ScreenshotEnvironment { InfoBannerPreview() }
 
 @PreviewTest
