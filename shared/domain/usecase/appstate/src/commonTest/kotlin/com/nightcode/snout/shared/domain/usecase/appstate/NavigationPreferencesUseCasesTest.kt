@@ -49,6 +49,11 @@ class NavigationPreferencesUseCasesTest :
         should("move the landing section when it leaves the bar") {
             val preferences = NavigationPreferences.Default.withTab(0, HomeSection.Annotations)
             preferences.landing shouldBe HomeSection.Annotations
-            preferences.hidden shouldBe listOf(HomeSection.Analytics, HomeSection.Experiments, HomeSection.ActivityLog)
+            preferences.hidden shouldBe listOf(
+                HomeSection.Analytics,
+                HomeSection.ErrorTracking,
+                HomeSection.Experiments,
+                HomeSection.ActivityLog,
+            )
         }
     })

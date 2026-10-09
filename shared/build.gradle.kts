@@ -11,6 +11,7 @@ kotlin {
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.analytics)
         api(projects.shared.domain.model.experiments)
+        api(projects.shared.domain.model.errortracking)
         api(projects.shared.domain.model.annotations)
         api(projects.shared.domain.model.activitylog)
         api(projects.shared.domain.model.appstate)
@@ -22,6 +23,7 @@ kotlin {
         api(projects.shared.domain.model.organization)
         api(projects.shared.domain.usecase.analytics)
         api(projects.shared.domain.usecase.experiments)
+        api(projects.shared.domain.usecase.errortracking)
         api(projects.shared.domain.usecase.annotations)
         api(projects.shared.domain.usecase.activitylog)
         api(projects.shared.domain.usecase.auth)

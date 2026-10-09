@@ -13,6 +13,10 @@ except calls to the instance you configure.
 - **Insights**: saved insights with server-side search, favorites, and a detail view with the chart and metadata.
 - **Feature flags**: search, status, rollout conditions and variants. Toggle a flag on or off with a confirmation;
   a key without the write scope gets a clear explanation instead of a failure.
+- **Errors**: error tracking issues with search, an active / resolved / suppressed filter and an app version filter
+  (versions that reported exceptions this week), each with its occurrences, users and a 7-day sparkline; open one
+  for its impact chart, where it happened and the latest release (read-only). Instances without the error tracking
+  API get an "unavailable" state.
 - **Experiments**: status, variants, metrics and conclusion (read-only).
 - **Annotations**: timeline of project annotations and a sheet to add one.
 - **Activity log**: who changed what in the project, with before/after values.
@@ -25,7 +29,7 @@ except calls to the instance you configure.
 ## Personal API key scopes
 
 Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `feature_flag`, `experiment`,
-`annotation`, `activity_log`. Add `feature_flag:write` to toggle flags and `annotation:write` to add annotations.
+`annotation`, `activity_log`. Add `error_tracking:read` for Errors, `feature_flag:write` to toggle flags and `annotation:write` to add annotations.
 PostHog rate-limits personal keys (240 requests/min); the app surfaces this instead of failing silently.
 
 ## Project layout

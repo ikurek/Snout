@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.domain.usecase.analytics.AnalyticsUsecaseModul
 import com.nightcode.snout.shared.domain.usecase.annotations.AnnotationsUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.appstate.AppStateUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.auth.AuthUsecaseModule
+import com.nightcode.snout.shared.domain.usecase.errortracking.ErrorTrackingUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.experiments.ExperimentsUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.featureflags.FeatureFlagsUsecaseModule
 import com.nightcode.snout.shared.domain.usecase.insights.InsightsUsecaseModule
@@ -19,6 +20,7 @@ import org.koin.core.annotation.Module
         AnnotationsUsecaseModule::class,
         AppStateUsecaseModule::class,
         AuthUsecaseModule::class,
+        ErrorTrackingUsecaseModule::class,
         ExperimentsUsecaseModule::class,
         FeatureFlagsUsecaseModule::class,
         InsightsUsecaseModule::class,

@@ -6,6 +6,7 @@ import com.nightcode.snout.features.activitylog.ActivityLogRoute
 import com.nightcode.snout.features.analytics.AnalyticsRoute
 import com.nightcode.snout.features.annotations.AnnotationsRoute
 import com.nightcode.snout.features.dashboards.DashboardsRoute
+import com.nightcode.snout.features.errortracking.ErrorTrackingRoute
 import com.nightcode.snout.features.experiments.ExperimentsRoute
 import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
 import com.nightcode.snout.features.insights.InsightsRoute
@@ -16,6 +17,7 @@ internal data class SectionNavigation(
     val onOpenDashboard: (dashboardId: Long) -> Unit,
     val onOpenInsight: (insightId: Long) -> Unit,
     val onOpenFeatureFlag: (flagId: Long) -> Unit,
+    val onOpenErrorTrackingIssue: (issueId: String) -> Unit,
     val onOpenExperiment: (experimentId: Long) -> Unit,
 )
 
@@ -39,6 +41,9 @@ internal fun HomeSectionContent(
 
         HomeSection.FeatureFlags ->
             FeatureFlagsRoute(onOpenFlag = navigation.onOpenFeatureFlag, contentPadding = contentPadding)
+
+        HomeSection.ErrorTracking ->
+            ErrorTrackingRoute(onOpenIssue = navigation.onOpenErrorTrackingIssue, contentPadding = contentPadding)
 
         HomeSection.Experiments ->
             ExperimentsRoute(onOpenExperiment = navigation.onOpenExperiment, contentPadding = contentPadding)

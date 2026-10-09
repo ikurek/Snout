@@ -18,6 +18,8 @@ import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailNavKey
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailRoute
+import com.nightcode.snout.features.errortracking.detail.ErrorTrackingIssueNavKey
+import com.nightcode.snout.features.errortracking.detail.ErrorTrackingIssueRoute
 import com.nightcode.snout.features.experiments.detail.ExperimentDetailNavKey
 import com.nightcode.snout.features.experiments.detail.ExperimentDetailRoute
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailNavKey
@@ -97,6 +99,7 @@ private fun mainEntryProvider(
         onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
         onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
         onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
+        onOpenErrorTrackingIssue = { backStack.add(ErrorTrackingIssueNavKey(it)) },
         onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
     )
     return entryProvider {
@@ -138,6 +141,7 @@ private fun mainEntryProvider(
         }
         entry<InsightDetailNavKey> { key -> InsightDetailRoute(navKey = key, onNavigateBack = back) }
         entry<FeatureFlagDetailNavKey> { key -> FeatureFlagDetailRoute(navKey = key, onNavigateBack = back) }
+        entry<ErrorTrackingIssueNavKey> { key -> ErrorTrackingIssueRoute(navKey = key, onNavigateBack = back) }
         entry<ExperimentDetailNavKey> { key ->
             ExperimentDetailRoute(
                 navKey = key,

@@ -2,12 +2,14 @@ package com.nightcode.snout.common.format
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -125,4 +127,17 @@ internal fun Instant.formatRelative(): String {
         elapsed < RelativeDaysLimit.days -> stringResource(Res.string.relative_time_days_ago, elapsed.inWholeDays)
         else -> formatShortDate()
     }
+}
+
+/** "5 Oct" for each of the [count] days ending today, oldest first: axis labels for per-day buckets. */
+@Composable
+internal fun lastDaysLabels(count: Int): List<String> {
+    val monthNames = shortMonthNames()
+    val format = LocalDate.Format {
+        day(Padding.NONE)
+        char(' ')
+        monthName(monthNames)
+    }
+    val today = (LocalNow.current ?: Clock.System.now()).toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return (count - 1 downTo 0).map { format.format(today.minus(it, DateTimeUnit.DAY)) }
 }

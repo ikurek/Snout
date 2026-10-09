@@ -17,7 +17,7 @@
     <string name="login_screen_connect_button_text">Connect</string>
     <string name="login_screen_cloud_us_chip">Cloud US</string>
     <string name="login_screen_cloud_eu_chip">Cloud EU</string>
-    <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add feature_flag:write and annotation:write to toggle flags and add annotations from Snout.</string>
+    <string name="login_screen_scopes_hint">The key needs read access to project, organization, user, insight, dashboard, query, feature flag, experiment, annotation and activity log. Add error_tracking:read to see errors, and feature_flag:write and annotation:write to toggle flags and add annotations from Snout.</string>
     <string name="month_january">January</string>
     <string name="month_february">February</string>
     <string name="month_march">March</string>
@@ -227,6 +227,47 @@
     <string name="feature_flag_variant_payload">Payload</string>
     <string name="feature_flag_value_read_only_note">Values can only be edited in PostHog. Open the flag there to change it.</string>
     <string name="feature_flag_value_encrypted_note">This payload is encrypted. PostHog only shows the value in the web app.</string>
+    <string name="bottom_nav_error_tracking">Errors</string>
+    <string name="section_error_tracking_description">Exceptions grouped into issues</string>
+    <string name="error_tracking_search_placeholder">Search errors</string>
+    <string name="error_tracking_search_empty_title">No issues match</string>
+    <string name="error_tracking_empty_title">No issues</string>
+    <string name="error_tracking_empty_subtitle">Nothing with this status in the last 7 days.</string>
+    <string name="error_tracking_unavailable_title">Error tracking unavailable</string>
+    <string name="error_tracking_unavailable_subtitle">This PostHog instance doesn't offer the error tracking API yet. Self-hosted instances need a recent PostHog version.</string>
+    <string name="error_tracking_status_active">Active</string>
+    <string name="error_tracking_status_resolved">Resolved</string>
+    <string name="error_tracking_status_suppressed">Suppressed</string>
+    <string name="error_tracking_status_archived">Archived</string>
+    <string name="error_tracking_status_pending_release">Pending release</string>
+    <string name="error_tracking_status_unknown">Unknown</string>
+    <string name="error_tracking_severity_low">Low</string>
+    <string name="error_tracking_severity_medium">Medium</string>
+    <string name="error_tracking_severity_high">High</string>
+    <string name="error_tracking_severity_critical">Critical</string>
+    <string name="error_tracking_issue_title_placeholder">Issue</string>
+    <string name="error_tracking_impact_section">Last 7 days</string>
+    <string name="error_tracking_occurrences">Occurrences</string>
+    <string name="error_tracking_users">Users</string>
+    <string name="error_tracking_sessions">Sessions</string>
+    <string name="error_tracking_overview_section">Overview</string>
+    <string name="error_tracking_status_label">Status</string>
+    <string name="error_tracking_severity_label">Severity</string>
+    <string name="error_tracking_first_seen">First seen</string>
+    <string name="error_tracking_last_seen">Last seen</string>
+    <string name="error_tracking_library">Library</string>
+    <string name="error_tracking_location_section">Where it happened</string>
+    <string name="error_tracking_function">Function</string>
+    <string name="error_tracking_file">File</string>
+    <string name="error_tracking_release_section">Latest release</string>
+    <string name="error_tracking_release_version">Version</string>
+    <string name="error_tracking_release_commit">Commit</string>
+    <string name="error_tracking_release_branch">Branch</string>
+    <string name="error_tracking_version_all">All versions</string>
+    <string name="error_tracking_version_selected">Version %1$s</string>
+    <string name="error_tracking_version_empty_title">No issues in %1$s</string>
+    <string name="error_tracking_version_empty_subtitle">This version reported no exceptions with this status in the last 7 days.</string>
+    <string name="error_tracking_stack_trace_note">Stack traces and individual occurrences are in PostHog. Open the issue there to see them.</string>
     <string name="experiment_title_placeholder">Experiment</string>
     <string name="experiment_status_draft">Draft</string>
     <string name="experiment_status_running">Running</string>
@@ -298,5 +339,17 @@
     <plurals name="feature_flag_rollout_conditions">
         <item quantity="one">%1$d release condition</item>
         <item quantity="other">%1$d release conditions</item>
+    </plurals>
+    <plurals name="error_tracking_occurrences_count">
+        <item quantity="one">%1$s occurrence</item>
+        <item quantity="other">%1$s occurrences</item>
+    </plurals>
+    <plurals name="error_tracking_users_count">
+        <item quantity="one">%1$s user</item>
+        <item quantity="other">%1$s users</item>
+    </plurals>
+    <plurals name="error_tracking_version_exceptions">
+        <item quantity="one">%1$s exception this week</item>
+        <item quantity="other">%1$s exceptions this week</item>
     </plurals>
 </resources>
