@@ -82,6 +82,7 @@ internal fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
+    onSwitchProject: () -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
@@ -103,6 +104,7 @@ internal fun SettingsScreen(
             contentPadding = innerPadding.bottomOnly(),
             onRetryAccount = onRetryAccount,
             onOpenInstance = onOpenInstance,
+            onSwitchProject = onSwitchProject,
             onThemeModeSelected = onThemeModeSelected,
             onOpenNavigationSettings = onOpenNavigationSettings,
             onOpenAnalyticsSettings = onOpenAnalyticsSettings,
@@ -132,6 +134,7 @@ private fun SettingsContent(
     contentPadding: PaddingValues,
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
+    onSwitchProject: () -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
@@ -148,7 +151,7 @@ private fun SettingsContent(
         AccountSection(state.account, onRetry = onRetryAccount)
 
         SectionLabel(stringResource(Res.string.settings_connection_section))
-        ConnectionSection(state, onOpenInstance)
+        ConnectionSection(state, onOpenInstance, onSwitchProject)
 
         SectionLabel(stringResource(Res.string.settings_customise_section))
         CustomiseSection(onOpenNavigationSettings, onOpenAnalyticsSettings)
@@ -211,7 +214,11 @@ private fun AccountRow(user: User) {
 }
 
 @Composable
-private fun ConnectionSection(state: SettingsUiState, onOpenInstance: (url: String) -> Unit) {
+private fun ConnectionSection(
+    state: SettingsUiState,
+    onOpenInstance: (url: String) -> Unit,
+    onSwitchProject: () -> Unit,
+) {
     val projectValue = when {
         state.projectName == null -> stringResource(Res.string.settings_project_not_selected)
         state.organizationName == null -> state.projectName
@@ -233,7 +240,11 @@ private fun ConnectionSection(state: SettingsUiState, onOpenInstance: (url: Stri
             }
         },
     )
-    KeyValueRow(label = stringResource(Res.string.settings_project_label), value = projectValue)
+    KeyValueRow(
+        label = stringResource(Res.string.settings_project_label),
+        value = projectValue,
+        onClick = onSwitchProject,
+    )
 }
 
 /** Entry points to the sub-screens that shape the bottom bar and the Analytics tab. */
@@ -289,6 +300,7 @@ fun SettingsScreenPreview() = SettingsScreen(
     onNavigateBack = {},
     onRetryAccount = {},
     onOpenInstance = {},
+    onSwitchProject = {},
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
@@ -304,6 +316,7 @@ fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     onNavigateBack = {},
     onRetryAccount = {},
     onOpenInstance = {},
+    onSwitchProject = {},
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
