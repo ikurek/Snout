@@ -16,9 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** Verbatim JSON or text the user may copy; scrolls sideways instead of wrapping. One colour, no highlighting. */
+/**
+ * Verbatim JSON or text the user may copy. One colour, no highlighting. Scrolls sideways so indentation survives;
+ * set [wrap] for prose-like text such as log messages, where hidden line ends matter more than alignment.
+ */
 @Composable
-internal fun CodeBlock(text: String, modifier: Modifier = Modifier) {
+internal fun CodeBlock(text: String, modifier: Modifier = Modifier, wrap: Boolean = false) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = SnoutTheme.shapes.medium,
@@ -28,9 +31,9 @@ internal fun CodeBlock(text: String, modifier: Modifier = Modifier) {
             Text(
                 text = text,
                 style = SnoutTheme.code.medium,
-                softWrap = false,
+                softWrap = wrap,
                 modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
+                    .then(if (wrap) Modifier else Modifier.horizontalScroll(rememberScrollState()))
                     .padding(horizontal = 12.dp, vertical = 10.dp),
             )
         }

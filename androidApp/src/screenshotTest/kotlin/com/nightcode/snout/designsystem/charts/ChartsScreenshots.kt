@@ -26,6 +26,12 @@ fun BarChartSelectedPreviewShot() = ScreenshotEnvironment { BarChartSelectedPrev
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun BarChartStackedPreviewShot() = ScreenshotEnvironment { BarChartStackedPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun BoldNumberPreviewShot() = ScreenshotEnvironment { BoldNumberPreview() }
 
 @PreviewTest
@@ -57,6 +63,12 @@ fun LineChartPreviewShot() = ScreenshotEnvironment { LineChartPreview() }
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun LineChartSelectedPreviewShot() = ScreenshotEnvironment { LineChartSelectedPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ProportionBarPreviewShot() = ScreenshotEnvironment { ProportionBarPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
