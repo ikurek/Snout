@@ -2,9 +2,11 @@ package com.nightcode.snout.features.analytics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -111,13 +113,16 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot, contentPadding: Padding
     }
 }
 
-/** Two columns of stat cards with 8dp gaps; an odd last card keeps one column. */
+/**
+ * Two columns of stat cards with 8dp gaps; an odd last card keeps one column. Cards in a row share the taller
+ * one's height, so a metric without a comparison (bounce rate with no sessions) doesn't end up shorter.
+ */
 @Composable
 private fun OverviewGrid(metrics: List<OverviewMetric>) {
     val previousLabel = stringResource(Res.string.analytics_metric_previous)
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         metrics.chunked(2).forEach { pair ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 pair.forEach { metric ->
                     StatCard(
                         label = metric.label(),
@@ -125,7 +130,7 @@ private fun OverviewGrid(metrics: List<OverviewMetric>) {
                         changePercent = metric.changePercent,
                         lowerIsBetter = metric.isIncreaseBad,
                         comparison = metric.previous?.let { "$previousLabel ${metric.kind.format(it)}" },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                 }
                 if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
