@@ -35,6 +35,15 @@ class InsightsApi internal constructor(private val client: HttpClient, private v
         }.body()
     }
 
+    /** Insight links carry the short id; the API filters on it and `basic` skips computing the result. */
+    suspend fun findInsightsByShortId(projectId: Long, shortId: String) =
+        networkCall<PaginatedResponseDto<InsightDto>> {
+            client.get(authDataStore.projectUrl(projectId, "insights/")) {
+                parameter("short_id", shortId)
+                parameter("basic", true)
+            }.body()
+        }
+
     suspend fun getInsight(projectId: Long, insightId: Long, fromDashboardId: Long? = null) = networkCall<InsightDto> {
         client.get(authDataStore.projectUrl(projectId, "insights/$insightId/")) {
             parameter("refresh", "blocking")

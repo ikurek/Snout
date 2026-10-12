@@ -48,4 +48,8 @@ class InsightsUsecaseModule {
     @Single
     fun setInsightFavorite(get: GetSelectedProjectId, repository: InsightRepository) =
         SetInsightFavorite(get, repository)
+
+    @Single
+    fun findInsightIdByShortId(get: GetSelectedProjectId, repository: InsightRepository) =
+        FindInsightIdByShortId(get, repository)
 }

@@ -40,6 +40,9 @@ class AppStateUsecaseModule {
         GetPostHogUrl(authRepository, appStateRepository)
 
     @Single
+    fun parsePostHogLink() = ParsePostHogLink()
+
+    @Single
     fun observeNavigationPreferences(repository: AppStateRepository) = ObserveNavigationPreferences(repository)
 
     @Single

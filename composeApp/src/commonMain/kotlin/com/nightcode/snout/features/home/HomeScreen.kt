@@ -23,6 +23,7 @@ import com.nightcode.snout.features.more.MoreScreen
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
+import com.nightcode.snout.shared.domain.model.appstate.resource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res

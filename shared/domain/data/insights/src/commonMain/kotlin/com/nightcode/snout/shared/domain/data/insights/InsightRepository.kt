@@ -11,5 +11,8 @@ interface InsightRepository {
     suspend fun refreshInsights(projectId: Long): Either<DataError, Unit>
     suspend fun searchInsights(projectId: Long, query: String): Either<DataError, List<InsightSummary>>
     suspend fun getInsight(projectId: Long, insightId: Long): Either<DataError, InsightDetail>
+
+    /** The id of the insight with [shortId], or null when the project has none. */
+    suspend fun findInsightId(projectId: Long, shortId: String): Either<DataError, Long?>
     suspend fun setFavorite(projectId: Long, insightId: Long, favorited: Boolean): Either<DataError, InsightSummary>
 }

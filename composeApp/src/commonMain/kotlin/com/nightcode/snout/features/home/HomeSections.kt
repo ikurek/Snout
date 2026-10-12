@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.home
 
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import snout.composeapp.generated.resources.Res
@@ -72,18 +71,4 @@ internal val HomeSection.icon: DrawableResource
         HomeSection.Experiments -> Res.drawable.ic_science_24dp
         HomeSection.Annotations -> Res.drawable.ic_sticky_note_24dp
         HomeSection.ActivityLog -> Res.drawable.ic_history_24dp
-    }
-
-/** Page opened by the "Open in PostHog" action while the section is on screen. */
-internal val HomeSection.resource: PostHogResource
-    get() = when (this) {
-        HomeSection.Analytics -> PostHogResource.WebAnalytics
-        HomeSection.Dashboards -> PostHogResource.Dashboards
-        HomeSection.Insights -> PostHogResource.Insights
-        HomeSection.FeatureFlags -> PostHogResource.FeatureFlags
-        HomeSection.ErrorTracking -> PostHogResource.ErrorTracking
-        HomeSection.Logs -> PostHogResource.Logs
-        HomeSection.Experiments -> PostHogResource.Experiments
-        HomeSection.Annotations -> PostHogResource.Annotations
-        HomeSection.ActivityLog -> PostHogResource.ActivityLog
     }

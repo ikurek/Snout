@@ -30,6 +30,11 @@ internal class InsightRepositoryImpl(private val api: InsightsApi, private val c
     override suspend fun getInsight(projectId: Long, insightId: Long): Either<DataError, InsightDetail> =
         api.getInsight(projectId, insightId).mapLeft { it.toDataError() }.map { it.toDetail() }
 
+    override suspend fun findInsightId(projectId: Long, shortId: String): Either<DataError, Long?> =
+        api.findInsightsByShortId(projectId, shortId)
+            .mapLeft { it.toDataError() }
+            .map { response -> response.results.firstOrNull { it.shortId == shortId }?.id }
+
     override suspend fun setFavorite(
         projectId: Long,
         insightId: Long,
