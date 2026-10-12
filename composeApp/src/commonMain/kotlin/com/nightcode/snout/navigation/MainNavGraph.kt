@@ -17,35 +17,20 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
-import com.nightcode.snout.features.dashboards.detail.DashboardDetailNavKey
 import com.nightcode.snout.features.dashboards.detail.DashboardDetailRoute
-import com.nightcode.snout.features.errortracking.detail.ErrorTrackingIssueNavKey
 import com.nightcode.snout.features.errortracking.detail.ErrorTrackingIssueRoute
-import com.nightcode.snout.features.experiments.detail.ExperimentDetailNavKey
 import com.nightcode.snout.features.experiments.detail.ExperimentDetailRoute
-import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailNavKey
 import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailRoute
-import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.HomeRoute
-import com.nightcode.snout.features.home.SectionNavKey
+import com.nightcode.snout.features.home.HomeSectionRoute
 import com.nightcode.snout.features.home.SectionNavigation
-import com.nightcode.snout.features.home.SectionRoute
-import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailRoute
-import com.nightcode.snout.features.links.toNavKey
-import com.nightcode.snout.features.logs.entry.LogEntryNavKey
 import com.nightcode.snout.features.logs.entry.LogEntryRoute
-import com.nightcode.snout.features.logs.service.LogServiceNavKey
 import com.nightcode.snout.features.logs.service.LogServiceRoute
-import com.nightcode.snout.features.onboarding.OnboardingNavKey
 import com.nightcode.snout.features.onboarding.OnboardingRoute
-import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.SettingsRoute
-import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
-import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
-import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
@@ -66,7 +51,7 @@ private val PopTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> C
 }
 
 @Composable
-internal fun MainNavGraph(initial: NavKey, initialNavigationPreferences: NavigationPreferences? = null) {
+internal fun MainNavGraph(initial: SnoutNavKey) {
     val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
     ReturnToLoginOnSessionExpiry(backStack)
     HandleIncomingLinks(backStack)
@@ -81,7 +66,7 @@ internal fun MainNavGraph(initial: NavKey, initialNavigationPreferences: Navigat
         transitionSpec = PushTransition,
         popTransitionSpec = PopTransition,
         predictivePopTransitionSpec = { PopTransition() },
-        entryProvider = mainEntryProvider(backStack, initialNavigationPreferences),
+        entryProvider = mainEntryProvider(backStack),
     )
 }
 
@@ -125,8 +110,7 @@ private fun HandleIncomingLinks(backStack: NavBackStack<NavKey>) {
             clearPendingLink()
             when (val resolution = resolvePostHogLink(url)) {
                 is LinkResolution.InApp -> {
-                    val home = backStack.indexOf(HomeNavKey)
-                    repeat(backStack.lastIndex - home) { backStack.removeAt(backStack.lastIndex) }
+                    backStack.popUpTo(HomeNavKey)
                     resolution.destination.toNavKey()?.let(backStack::add)
                 }
 
@@ -136,11 +120,40 @@ private fun HandleIncomingLinks(backStack: NavBackStack<NavKey>) {
     }
 }
 
-private fun mainEntryProvider(
-    backStack: NavBackStack<NavKey>,
-    initialNavigationPreferences: NavigationPreferences?,
-): (NavKey) -> NavEntry<NavKey> {
+/** Removes every entry above the last [key], which stays on top; nothing when [key] isn't in the stack. */
+private fun NavBackStack<NavKey>.popUpTo(key: SnoutNavKey) {
+    val index = lastIndexOf(key)
+    if (index < 0) return
+    while (lastIndex > index) removeAt(lastIndex)
+}
+
+/* One group of entries per area of the app, each with the navigation its screens need. */
+
+private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> {
     val back: () -> Unit = { backStack.removeLastOrNull() }
+    return entryProvider {
+        onboardingEntries(backStack)
+        homeEntries(backStack, back)
+        settingsEntries(backStack, back)
+        detailEntries(backStack, back)
+        logsEntries(backStack, back)
+    }
+}
+
+private fun EntryProviderScope<NavKey>.onboardingEntries(backStack: NavBackStack<NavKey>) {
+    entry<OnboardingNavKey> { key ->
+        OnboardingRoute(
+            navKey = key,
+            onFinished = {
+                backStack.clear()
+                backStack.add(HomeNavKey)
+            },
+        )
+    }
+}
+
+/** Home with its tabs, and a section opened from More; both open the same detail screens. */
+private fun EntryProviderScope<NavKey>.homeEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
     val sectionNavigation = SectionNavigation(
         onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
         onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
@@ -149,54 +162,48 @@ private fun mainEntryProvider(
         onOpenLogService = { service, range -> backStack.add(LogServiceNavKey(service, range)) },
         onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
     )
-    return entryProvider {
-        entry<OnboardingNavKey> { key ->
-            OnboardingRoute(
-                navKey = key,
-                onFinished = {
-                    backStack.clear()
-                    backStack.add(HomeNavKey)
-                },
-            )
-        }
-        entry<HomeNavKey> {
-            HomeRoute(
-                initialPreferences = initialNavigationPreferences,
-                onNavigateToSettings = { backStack.add(SettingsNavKey) },
-                onOpenSection = { backStack.add(SectionNavKey(it)) },
-                navigation = sectionNavigation,
-            )
-        }
-        entry<SectionNavKey> { key ->
-            SectionRoute(section = key.section, onNavigateBack = back, navigation = sectionNavigation)
-        }
-        entry<SettingsNavKey> {
-            SettingsRoute(
-                onNavigateBack = back,
-                onOpenNavigationSettings = { backStack.add(NavigationSettingsNavKey) },
-                onOpenAnalyticsSettings = { backStack.add(AnalyticsSettingsNavKey) },
-            )
-        }
-        entry<NavigationSettingsNavKey> { NavigationSettingsRoute(onNavigateBack = back) }
-        entry<AnalyticsSettingsNavKey> { AnalyticsSettingsRoute(onNavigateBack = back) }
-        entry<DashboardDetailNavKey> { key ->
-            DashboardDetailRoute(
-                navKey = key,
-                onNavigateBack = back,
-                onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
-            )
-        }
-        entry<InsightDetailNavKey> { key -> InsightDetailRoute(navKey = key, onNavigateBack = back) }
-        entry<FeatureFlagDetailNavKey> { key -> FeatureFlagDetailRoute(navKey = key, onNavigateBack = back) }
-        entry<ErrorTrackingIssueNavKey> { key -> ErrorTrackingIssueRoute(navKey = key, onNavigateBack = back) }
-        logsEntries(backStack, back)
-        entry<ExperimentDetailNavKey> { key ->
-            ExperimentDetailRoute(
-                navKey = key,
-                onNavigateBack = back,
-                onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
-            )
-        }
+    entry<HomeNavKey> {
+        HomeRoute(
+            onNavigateToSettings = { backStack.add(SettingsNavKey) },
+            onOpenSection = { backStack.add(HomeSectionNavKey(it)) },
+            navigation = sectionNavigation,
+        )
+    }
+    entry<HomeSectionNavKey> { key ->
+        HomeSectionRoute(section = key.section, onNavigateBack = back, navigation = sectionNavigation)
+    }
+}
+
+private fun EntryProviderScope<NavKey>.settingsEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
+    entry<SettingsNavKey> {
+        SettingsRoute(
+            onNavigateBack = back,
+            onOpenNavigationSettings = { backStack.add(NavigationSettingsNavKey) },
+            onOpenAnalyticsSettings = { backStack.add(AnalyticsSettingsNavKey) },
+        )
+    }
+    entry<NavigationSettingsNavKey> { NavigationSettingsRoute(onNavigateBack = back) }
+    entry<AnalyticsSettingsNavKey> { AnalyticsSettingsRoute(onNavigateBack = back) }
+}
+
+/** A single dashboard, insight, flag, issue or experiment, opened from a list or a link. */
+private fun EntryProviderScope<NavKey>.detailEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
+    entry<DashboardDetailNavKey> { key ->
+        DashboardDetailRoute(
+            navKey = key,
+            onNavigateBack = back,
+            onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
+        )
+    }
+    entry<InsightDetailNavKey> { key -> InsightDetailRoute(navKey = key, onNavigateBack = back) }
+    entry<FeatureFlagDetailNavKey> { key -> FeatureFlagDetailRoute(navKey = key, onNavigateBack = back) }
+    entry<ErrorTrackingIssueNavKey> { key -> ErrorTrackingIssueRoute(navKey = key, onNavigateBack = back) }
+    entry<ExperimentDetailNavKey> { key ->
+        ExperimentDetailRoute(
+            navKey = key,
+            onNavigateBack = back,
+            onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
+        )
     }
 }
 

@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
+import com.nightcode.snout.common.sections.description
+import com.nightcode.snout.common.sections.icon
+import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -33,9 +36,6 @@ import com.nightcode.snout.designsystem.organisms.OptionPickerSheet
 import com.nightcode.snout.designsystem.organisms.PickerOption
 import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import com.nightcode.snout.features.home.description
-import com.nightcode.snout.features.home.icon
-import com.nightcode.snout.features.home.label
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import org.jetbrains.compose.resources.painterResource

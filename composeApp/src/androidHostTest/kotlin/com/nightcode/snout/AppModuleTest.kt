@@ -15,7 +15,7 @@ import org.koin.test.verify.verify
 class AppModuleTest :
     ShouldSpec({
         should("provide every constructor dependency of the app graph") {
-            AppModule().module().verify(
+            snoutModule().verify(
                 // Constructors of the library types built by provider functions, which never come from Koin.
                 extraTypes = listOf(
                     HttpClientEngine::class,

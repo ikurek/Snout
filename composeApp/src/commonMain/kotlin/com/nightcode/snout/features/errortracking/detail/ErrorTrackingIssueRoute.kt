@@ -7,12 +7,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
+import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.designsystem.actionFailedMessage
+import com.nightcode.snout.navigation.ErrorTrackingIssueNavKey
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -28,6 +27,7 @@ import snout.composeapp.generated.resources.error_tracking_undo
 internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<ErrorTrackingIssueViewModel> { parametersOf(navKey.issueId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val openInPostHog = rememberPostHogOpener()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel.sideEffects) {
@@ -59,12 +59,9 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
         onNavigateBack = onNavigateBack,
         onRefresh = viewModel::refresh,
         onChangeStatus = viewModel::changeStatus,
-        onOpenInPostHog = rememberOpenInPostHog(PostHogResource.ErrorTrackingIssue(navKey.issueId)),
+        onOpenInPostHog = { openInPostHog(PostHogResource.ErrorTrackingIssue(navKey.issueId)) },
     )
 }
-
-@Serializable
-internal data class ErrorTrackingIssueNavKey(val issueId: String) : NavKey
 
 private fun IssueStatusFilter.changedMessage() = when (this) {
     IssueStatusFilter.Active -> Res.string.error_tracking_status_changed_active

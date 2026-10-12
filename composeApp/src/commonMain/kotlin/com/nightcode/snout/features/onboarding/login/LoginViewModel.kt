@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateAndSaveUserAuth
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidatePersonalApiKey
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ internal class LoginViewModel(
     private val validateInstanceUrl: ValidateInstanceUrl,
     private val validatePersonalApiKey: ValidatePersonalApiKey,
     private val validateAndSaveUserAuth: ValidateAndSaveUserAuth,
+    private val openInBrowser: OpenInBrowser,
     getInstanceUrl: GetInstanceUrl,
 ) : ViewModel() {
 
@@ -58,9 +60,10 @@ internal class LoginViewModel(
         )
     }
 
-    fun openApiKeySettings(instanceUrl: String) = viewModelScope.launch {
+    /** Opens the page where the user creates a key, on the instance typed so far or else the US cloud. */
+    fun openApiKeySettings(instanceUrl: String) {
         val baseUrl = validateInstanceUrl(instanceUrl).getOrNull() ?: PostHogCloudUsUrl
-        _sideEffects.send(LoginSideEffect.OpenUrl(baseUrl + ApiKeysSettingsPath))
+        openInBrowser(baseUrl + ApiKeysSettingsPath)
     }
 
     fun connect(instanceUrl: String, personalApiKey: String) = viewModelScope.launch {

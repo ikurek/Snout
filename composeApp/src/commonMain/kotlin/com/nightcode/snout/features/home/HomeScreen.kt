@@ -14,6 +14,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nightcode.snout.common.sections.icon
+import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.organisms.BottomNavigation

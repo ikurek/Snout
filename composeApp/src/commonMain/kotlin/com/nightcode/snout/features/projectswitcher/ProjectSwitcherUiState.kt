@@ -1,4 +1,4 @@
-package com.nightcode.snout.features.home
+package com.nightcode.snout.features.projectswitcher
 
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
@@ -18,7 +18,7 @@ internal sealed interface ProjectSwitcherUiState {
     data class Loaded(
         override val currentProjectName: String,
         val organizations: List<Organization>,
-        val selectedProject: SelectedProject?,
+        val selectedProject: SelectedProject,
     ) : ProjectSwitcherUiState
 }
 

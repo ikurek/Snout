@@ -3,6 +3,7 @@ package com.nightcode.snout.features.onboarding.login
 import arrow.core.Either
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
+import com.nightcode.snout.shared.domain.data.links.ExternalAppLauncher
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -10,10 +11,13 @@ import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateAndSaveUserAuth
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidatePersonalApiKey
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +30,7 @@ class LoginViewModelTest :
 
         val authRepository = mock<AuthRepository>(autoUnit)
         val userRepository = mock<UserRepository>()
+        val launcher = mock<ExternalAppLauncher>(autoUnit)
 
         fun subject(savedInstanceUrl: String? = null): LoginViewModel {
             everySuspend { authRepository.getInstanceUrl() } returns savedInstanceUrl
@@ -33,6 +38,7 @@ class LoginViewModelTest :
                 validateInstanceUrl = ValidateInstanceUrl(),
                 validatePersonalApiKey = ValidatePersonalApiKey(),
                 validateAndSaveUserAuth = ValidateAndSaveUserAuth(authRepository, userRepository),
+                openInBrowser = OpenInBrowser(launcher),
                 getInstanceUrl = GetInstanceUrl(authRepository),
             )
         }
@@ -72,5 +78,17 @@ class LoginViewModelTest :
             viewModel.connect(PostHogCloudEuUrl, "phx_valid")
             effect.await() shouldBe LoginSideEffect.ConnectFailed(DataError.RateLimited)
             viewModel.uiState.value.personalApiKeyValidationError shouldBe null
+        }
+
+        should("open the key settings of the typed instance, or of the US cloud before one is typed") {
+            val viewModel = subject()
+
+            viewModel.openApiKeySettings(PostHogCloudEuUrl)
+            viewModel.openApiKeySettings("")
+
+            verify(VerifyMode.order) {
+                launcher.openInBrowser("$PostHogCloudEuUrl/settings/user-api-keys")
+                launcher.openInBrowser("$PostHogCloudUsUrl/settings/user-api-keys")
+            }
         }
     })

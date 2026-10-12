@@ -3,10 +3,9 @@ package com.nightcode.snout.features.experiments.detail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
+import com.nightcode.snout.common.compose.rememberPostHogOpener
+import com.nightcode.snout.navigation.ExperimentDetailNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
-import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -18,15 +17,13 @@ internal fun ExperimentDetailRoute(
 ) {
     val viewModel = koinViewModel<ExperimentDetailViewModel> { parametersOf(navKey.experimentId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val openInPostHog = rememberPostHogOpener()
 
     ExperimentDetailScreen(
         state = state,
         onNavigateBack = onNavigateBack,
         onRefresh = viewModel::refresh,
         onOpenFeatureFlag = onOpenFeatureFlag,
-        onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Experiment(navKey.experimentId)),
+        onOpenInPostHog = { openInPostHog(PostHogResource.Experiment(navKey.experimentId)) },
     )
 }
-
-@Serializable
-internal data class ExperimentDetailNavKey(val experimentId: Long) : NavKey

@@ -1,4 +1,4 @@
-package com.nightcode.snout.features.home
+package com.nightcode.snout.features.projectswitcher
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,13 +19,14 @@ import kotlin.uuid.Uuid
 @KoinViewModel
 internal class ProjectSwitcherViewModel(
     private val observeOrganizations: ObserveOrganizations,
-    private val refreshOrganizations: RefreshOrganizations,
+    refreshOrganizations: RefreshOrganizations,
     private val observeSelectedProject: ObserveSelectedProject,
     private val saveSelectedProject: SaveSelectedProject,
 ) : ViewModel() {
 
     val uiState: StateFlow<ProjectSwitcherUiState> = combine(
         observeOrganizations(),
+        // Home and Settings, the only places with a switcher, are reached only once a project is selected.
         observeSelectedProject().filterNotNull(),
     ) { organizations, selected ->
         val currentProject = organizations.findProject(
@@ -49,10 +50,7 @@ internal class ProjectSwitcherViewModel(
     )
 
     init {
-        refresh()
-    }
-
-    private fun refresh() {
+        // The cached list shows meanwhile; a failed refresh just leaves it.
         viewModelScope.launch { refreshOrganizations() }
     }
 

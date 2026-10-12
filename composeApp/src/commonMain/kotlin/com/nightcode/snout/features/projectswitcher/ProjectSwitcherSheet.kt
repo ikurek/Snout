@@ -1,4 +1,4 @@
-package com.nightcode.snout.features.home
+package com.nightcode.snout.features.projectswitcher
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +30,7 @@ private const val LoadingRowCount = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ProjectSwitcherBottomSheet(
+internal fun ProjectSwitcherSheet(
     isVisible: Boolean,
     state: ProjectSwitcherUiState,
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
@@ -87,7 +87,7 @@ private fun NotFoundContent() {
 @Composable
 private fun LoadedContent(
     organizations: List<Organization>,
-    selectedProject: SelectedProject?,
+    selectedProject: SelectedProject,
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
 ) {
     LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {

@@ -78,6 +78,11 @@
 			path = ShareExtension;
 			sourceTree = "<group>";
 		};
+		A1B2C3D4E5F6071829304A10 /* SnoutLink */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SnoutLink;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +109,7 @@
 				891FC652B5AFE9494B36EE8F /* Configuration */,
 				C8242837FA762241B5DD7E8E /* iosApp */,
 				A1B2C3D4E5F6071829304A04 /* ShareExtension */,
+				A1B2C3D4E5F6071829304A10 /* SnoutLink */,
 				0C4F66FDD3FEF25A1720E3D4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +143,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				C8242837FA762241B5DD7E8E /* iosApp */,
+				A1B2C3D4E5F6071829304A10 /* SnoutLink */,
 			);
 			name = iosApp;
 			packageProductDependencies = (
@@ -159,6 +166,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A1B2C3D4E5F6071829304A04 /* ShareExtension */,
+				A1B2C3D4E5F6071829304A10 /* SnoutLink */,
 			);
 			name = ShareExtension;
 			packageProductDependencies = (

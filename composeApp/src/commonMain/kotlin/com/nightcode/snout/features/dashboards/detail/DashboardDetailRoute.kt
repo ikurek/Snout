@@ -3,10 +3,9 @@ package com.nightcode.snout.features.dashboards.detail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
+import com.nightcode.snout.common.compose.rememberPostHogOpener
+import com.nightcode.snout.navigation.DashboardDetailNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
-import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -18,7 +17,7 @@ internal fun DashboardDetailRoute(
 ) {
     val viewModel = koinViewModel<DashboardDetailViewModel> { parametersOf(navKey.dashboardId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val openInPostHog = rememberOpenInPostHog(PostHogResource.Dashboard(navKey.dashboardId))
+    val openInPostHog = rememberPostHogOpener()
 
     DashboardDetailScreen(
         state = state,
@@ -26,9 +25,6 @@ internal fun DashboardDetailRoute(
         onRefresh = viewModel::refresh,
         onRetryTile = viewModel::retryTile,
         onOpenInsight = onOpenInsight,
-        onOpenInPostHog = openInPostHog,
+        onOpenInPostHog = { openInPostHog(PostHogResource.Dashboard(navKey.dashboardId)) },
     )
 }
-
-@Serializable
-internal data class DashboardDetailNavKey(val dashboardId: Long) : NavKey

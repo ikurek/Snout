@@ -3,11 +3,9 @@ package com.nightcode.snout.features.logs.service
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.common.compose.rememberOpenInPostHog
+import com.nightcode.snout.common.compose.rememberPostHogOpener
+import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
-import com.nightcode.snout.shared.domain.model.logs.LogsRange
-import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Instant
@@ -20,6 +18,7 @@ internal fun LogServiceRoute(
 ) {
     val viewModel = koinViewModel<LogServiceViewModel> { parametersOf(navKey) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val openInPostHog = rememberPostHogOpener()
 
     LogServiceScreen(
         service = navKey.service,
@@ -31,10 +30,6 @@ internal fun LogServiceRoute(
         onRefresh = viewModel::refresh,
         onLoadMore = viewModel::loadMore,
         onOpenEntry = { onOpenEntry(it.id, it.timestamp) },
-        onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Logs),
+        onOpenInPostHog = { openInPostHog(PostHogResource.Logs) },
     )
 }
-
-/** A service's log lines over the [range] picked on the Logs screen. */
-@Serializable
-internal data class LogServiceNavKey(val service: String, val range: LogsRange) : NavKey

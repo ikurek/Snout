@@ -3,8 +3,6 @@ package com.nightcode.snout.features.settings.analytics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -22,6 +20,3 @@ internal fun AnalyticsSettingsRoute(onNavigateBack: () -> Unit) {
         onReset = viewModel::reset,
     )
 }
-
-@Serializable
-internal data object AnalyticsSettingsNavKey : NavKey

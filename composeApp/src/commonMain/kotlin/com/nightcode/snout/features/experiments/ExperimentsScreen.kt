@@ -27,7 +27,7 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.experiment_not_started
 import snout.composeapp.generated.resources.experiment_started
 
-/** Section body only; the home shell or [com.nightcode.snout.features.home.SectionRoute] supplies the chrome. */
+/** Section body only; the home shell or [com.nightcode.snout.features.home.HomeSectionRoute] supplies the chrome. */
 @Composable
 internal fun ExperimentsScreen(
     state: CachedUiState<List<Experiment>>,

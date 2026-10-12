@@ -22,6 +22,4 @@ internal sealed interface LoginSideEffect {
 
     /** Connecting failed for a reason other than a rejected key, which shows on the key field instead. */
     data class ConnectFailed(val error: DataError) : LoginSideEffect
-
-    data class OpenUrl(val url: String) : LoginSideEffect
 }

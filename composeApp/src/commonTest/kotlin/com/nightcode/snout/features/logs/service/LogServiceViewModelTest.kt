@@ -2,6 +2,7 @@ package com.nightcode.snout.features.logs.service
 
 import arrow.core.Either
 import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository

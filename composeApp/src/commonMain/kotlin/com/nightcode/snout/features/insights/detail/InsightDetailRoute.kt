@@ -6,11 +6,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.common.state.dataOrNull
+import com.nightcode.snout.navigation.InsightDetailNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -43,6 +42,3 @@ internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () 
         onOpenInPostHog = { shortId?.let { openInPostHog(PostHogResource.Insight(it)) } },
     )
 }
-
-@Serializable
-internal data class InsightDetailNavKey(val insightId: Long) : NavKey

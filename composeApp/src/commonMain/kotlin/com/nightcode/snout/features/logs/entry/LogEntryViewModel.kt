@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.common.state.toLoadState
+import com.nightcode.snout.navigation.LogEntryNavKey
 import com.nightcode.snout.shared.domain.model.logs.LogEntry
 import com.nightcode.snout.shared.domain.usecase.logs.GetLogEntry
 import kotlinx.coroutines.flow.MutableStateFlow

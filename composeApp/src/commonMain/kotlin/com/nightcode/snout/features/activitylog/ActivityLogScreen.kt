@@ -47,7 +47,7 @@ import snout.composeapp.generated.resources.activity_system_actor
 private const val CollapsedChanges = 2
 private const val Arrow = "→"
 
-/** Section body only; the home shell or [com.nightcode.snout.features.home.SectionRoute] supplies the chrome. */
+/** Section body only; the home shell or [com.nightcode.snout.features.home.HomeSectionRoute] supplies the chrome. */
 @Composable
 internal fun ActivityLogScreen(
     state: CachedUiState<List<ActivityEntry>>,

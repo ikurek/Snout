@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
@@ -22,11 +21,9 @@ import com.nightcode.snout.features.onboarding.login.LoginViewModel
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionPage
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionSideEffect
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionViewModel
-import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
+import com.nightcode.snout.navigation.OnboardingNavKey
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.snackbar_generic_error_message
@@ -45,7 +42,6 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     val instanceUrlTextFieldState = rememberTextFieldState()
     val personalApiKeyTextFieldState = rememberTextFieldState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val openInBrowser = koinInject<OpenInBrowser>()
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
 
@@ -90,8 +86,6 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
                         ),
                     ),
                 )
-
-                is LoginSideEffect.OpenUrl -> openInBrowser(sideEffect.url)
             }
         }
     }
@@ -143,7 +137,3 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
         }
     }
 }
-
-/** [startStep] is where the pager opens: the intro after a logout, login after a 401, a project after a restart. */
-@Serializable
-internal data class OnboardingNavKey(val startStep: OnboardingStep) : NavKey

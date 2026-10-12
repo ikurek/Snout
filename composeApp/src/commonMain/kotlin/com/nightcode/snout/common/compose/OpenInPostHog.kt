@@ -9,7 +9,10 @@ import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-/** Returns a function that opens any [PostHogResource] in the web app of the signed-in instance. */
+/**
+ * Returns a function that opens any [PostHogResource] in the web app of the signed-in instance: the one way every
+ * screen's "Open in PostHog" action gets there.
+ */
 @Composable
 internal fun rememberPostHogOpener(): (PostHogResource) -> Unit {
     val getPostHogUrl = koinInject<GetPostHogUrl>()
@@ -18,11 +21,4 @@ internal fun rememberPostHogOpener(): (PostHogResource) -> Unit {
     return remember(getPostHogUrl, openInBrowser, scope) {
         { resource -> scope.launch { getPostHogUrl(resource)?.let(openInBrowser::invoke) } }
     }
-}
-
-/** Returns a click handler that opens [resource] in the PostHog web app of the signed-in instance. */
-@Composable
-internal fun rememberOpenInPostHog(resource: PostHogResource): () -> Unit {
-    val open = rememberPostHogOpener()
-    return remember(open, resource) { { open(resource) } }
 }

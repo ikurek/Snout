@@ -62,7 +62,6 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
 import com.nightcode.snout.shared.domain.model.common.DataError
-import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -124,10 +123,6 @@ internal fun OnboardingScreen(
         }
     }
 }
-
-/** The three steps between a fresh install (or a logout) and Home, in pager order. */
-@Serializable
-internal enum class OnboardingStep { Intro, Login, ProjectSelection }
 
 /** Back arrow (fading in after the intro) on the left, the progress centred between it and a matching gap. */
 @Composable

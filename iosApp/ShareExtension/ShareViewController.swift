@@ -2,7 +2,7 @@ import UIKit
 import UniformTypeIdentifiers
 
 /// Share › Snout: iOS won't let Snout claim posthog.com links, so the share sheet is how a link gets in.
-/// Hands the shared link (or text containing one) to the app as snout://open?url=… and closes, with no UI.
+/// Hands the shared link (or text containing one) to the app through a SnoutLink URL and closes, with no UI.
 final class ShareViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -10,7 +10,7 @@ final class ShareViewController: UIViewController {
     }
 
     private func openInSnout() async {
-        if let shared = await sharedLink(), let url = snoutURL(for: shared) {
+        if let shared = await sharedLink(), let url = SnoutLink.url(carrying: shared) {
             open(url)
         }
         extensionContext?.completeRequest(returningItems: nil)
@@ -31,14 +31,6 @@ final class ShareViewController: UIViewController {
             }
         }
         return nil
-    }
-
-    private func snoutURL(for shared: String) -> URL? {
-        var components = URLComponents()
-        components.scheme = "snout"
-        components.host = "open"
-        components.queryItems = [URLQueryItem(name: "url", value: shared)]
-        return components.url
     }
 
     /// Extensions can't reach UIApplication.shared; the app object is still at the end of the responder chain.

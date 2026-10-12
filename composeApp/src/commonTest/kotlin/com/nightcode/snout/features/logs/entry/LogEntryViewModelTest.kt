@@ -2,6 +2,7 @@ package com.nightcode.snout.features.logs.entry
 
 import arrow.core.Either
 import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.navigation.LogEntryNavKey
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository

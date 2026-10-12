@@ -6,10 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import com.nightcode.snout.features.home.ProjectSwitcherBottomSheet
-import com.nightcode.snout.features.home.ProjectSwitcherViewModel
-import kotlinx.serialization.Serializable
+import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
+import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -37,13 +35,10 @@ internal fun SettingsRoute(
         onLogoutConfirmed = viewModel::onLogoutConfirmed,
     )
 
-    ProjectSwitcherBottomSheet(
+    ProjectSwitcherSheet(
         isVisible = showProjectSwitcher,
         state = switcherState,
         onProjectSelected = switcherViewModel::onProjectSelected,
         onDismiss = { showProjectSwitcher = false },
     )
 }
-
-@Serializable
-internal data object SettingsNavKey : NavKey

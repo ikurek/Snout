@@ -8,10 +8,8 @@ import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.nightcode.snout.features.links.IncomingLinks
 
 class MainActivity : ComponentActivity() {
-    private val incomingLinks = IncomingLinks()
     private var ready = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +21,7 @@ class MainActivity : ComponentActivity() {
         // A recreated activity already handled its link; one reopened from Recents would replay it.
         val fromHistory = intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0
         if (savedInstanceState == null && !fromHistory) handleLink(intent)
-        setContent { MainView(onReady = { ready = true }, incomingLinks = incomingLinks) }
+        setContent { App(onReady = { ready = true }) }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -38,10 +36,10 @@ class MainActivity : ComponentActivity() {
             Intent.ACTION_SEND -> intent.getStringExtra(Intent.EXTRA_TEXT)
             else -> null
         }
-        text?.let(incomingLinks::open)
+        text?.let(::submitIncomingLink)
     }
 
-    /** Holds the first draw, and with it the system splash, until the app knows which screen to open. */
+    /** Holds the first draw, and with it the system splash, until the first screen can draw its content. */
     private fun keepSplashUntilReady() {
         val content = findViewById<View>(android.R.id.content)
         content.viewTreeObserver.addOnPreDrawListener(

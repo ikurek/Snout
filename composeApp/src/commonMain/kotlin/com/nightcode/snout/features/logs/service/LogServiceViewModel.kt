@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.common.state.RefreshStatus
 import com.nightcode.snout.common.state.listUiState
+import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.usecase.logs.GetServiceLogVolume
 import com.nightcode.snout.shared.domain.usecase.logs.GetServiceLogs
