@@ -22,6 +22,7 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
@@ -66,6 +67,9 @@ fun MockRequestHandleScope.respondError(status: HttpStatusCode): HttpResponseDat
 /** The JSON object a request sent as its body. */
 suspend fun HttpRequestData.jsonBody(): JsonObject =
     TestJson.parseToJsonElement(body.toByteArray().decodeToString()).jsonObject
+
+/** Parses a JSON literal, so expected request bodies compare structurally with [jsonBody] (key order aside). */
+fun parseJson(literal: String): JsonElement = TestJson.parseToJsonElement(literal)
 
 private class InMemoryDataStore(initial: Preferences) : DataStore<Preferences> {
     private val state = MutableStateFlow(initial)
