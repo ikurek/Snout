@@ -40,8 +40,8 @@ PostHog rate-limits personal keys (240 requests/min); the app surfaces this inst
 ## Project layout
 
 ```
-androidApp/   Android entry point (Activity, launcher icons)
-iosApp/       iOS entry point (SwiftUI host, assets)
+androidApp/   Android entry point (SnoutApplication, MainActivity, launcher icons) and screenshot tests
+iosApp/       iOS entry point (SwiftUI host), ShareExtension, SnoutLink (URL contract shared by both)
 composeApp/   Shared Compose UI: design system, features (route / screen / view model), navigation
 shared/       Kotlin business logic, one module per layer and feature:
   api/<feature>            Ktor API + DTOs
@@ -50,11 +50,63 @@ shared/       Kotlin business logic, one module per layer and feature:
   data/<feature>           repository implementations, mappers, cache
   domain/usecase/<feature> use cases exposed to the UI
   storage/                 DataStore preferences and SQLDelight (organizations, JSON payload cache)
+  common/                  coroutine dispatchers, `@TestData` opt-in, test utilities
 buildLogic/   Gradle convention plugins
+scripts/      generate_screenshot_tests.py
 ```
 
-Conventions: Koin annotations for DI, Arrow `Either` for errors, SQLDelight cache-first lists
-(`CachedUiState` + `RefreshController`), Kotest + Mokkery unit tests, detekt with ktlint rules.
+## Architecture
+
+Layers, with dependencies pointing inwards:
+
+- `api` talks to PostHog and returns DTOs. `data` implements the `domain/data` repository interfaces: it calls
+  `api`, maps DTOs to `domain/model` types and caches them (`JsonCacheStore` over SQLDelight).
+- `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
+  `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
+  project-scoped wrappers (`observeSelectedProjectId.flatMapProject { repository.observeX(it) }`); that is
+  intentional, so the UI never handles project ids.
+- Repositories and use cases return Arrow `Either<DataError, T>`. Network failures become `DataError` via
+  `NetworkError.toDataError()` (`data/common`). The UI words them with `designsystem/DataErrorMessages.kt` and
+  shows full-screen failures with the placeholders in `designsystem/organisms/StatePlaceholders.kt`.
+
+DI (Koin annotations with the Koin compiler plugin):
+
+- Definitions are annotated on the classes themselves (`@Single`, `@Single(binds = [...])` for repository
+  implementations, `@KoinViewModel`). Each module is a `@Module @ComponentScan` class, e.g.
+  `FeatureFlagsDataModule`.
+- `shared/src/commonMain/.../di/SharedModule.kt` is the shared composition root: it includes every data and use
+  case module. `composeApp`'s `AppModule` includes it and scans the view models.
+- `composeApp/.../Snout.kt` starts Koin once, before any UI: `SnoutApplication` on Android, `startSnout()` from
+  `iOSApp.init` on iOS.
+- Missing definitions fail the build through the compiler plugin's check of `SharedGraph`, and fail
+  `AppModuleTest` for the app graph (view models included), which the plugin can't see.
+
+Screens (`composeApp/.../features/<feature>/`, nested packages such as `detail/` for pushed screens):
+
+- `XRoute.kt` wires the view model to the screen; `XScreen.kt` is stateless UI plus its previews;
+  `XViewModel.kt`; `XUiState.kt` holds the state, the `XSideEffect` type if any, and `TestX…` fixtures for
+  previews. `components/` holds the pieces, with labels in `XLabels.kt`
+  (`val X.label: StringResource` and similar).
+- One `uiState: StateFlow` per view model. Cache-observing lists use `CachedUiState` (with `RefreshController`);
+  one-shot fetches such as detail screens use `LoadState`.
+- Transient results (a failed favorite, navigation after an action) go through a `Channel` exposed as
+  `sideEffects`. A failure is kept in the state only when it renders inline next to what failed (in a sheet or
+  under a control).
+- Handlers are named `on<Noun><PastParticiple>` (`onQueryChanged`, `onToggleConfirmed`); reloading is
+  `refresh()`.
+- Every destination is a `@Serializable` key in `navigation/NavKeys.kt` under `sealed interface SnoutNavKey`,
+  which registers it for state saving automatically. Routes pass ids up through callbacks and
+  `MainNavGraph` builds the keys.
+
+Incoming links: Android `ACTION_VIEW`/`ACTION_SEND` intents (`MainActivity`) and iOS `onOpenURL` plus the share
+extension (which reopens the app through a `snout://` URL defined in `iosApp/SnoutLink/SnoutLink.swift`) call
+`submitIncomingLink`. The link stays pending until Home is in the back stack, then is resolved to a screen or
+opened in the browser.
+
+Tests are Kotest `ShouldSpec` with Mokkery mocks: mappers in `shared/data/*`, use cases in
+`shared/domain/usecase/*`, view models in `composeApp/src/commonTest` (real use cases over mocked repositories),
+the Koin graph in `AppModuleTest`, and previews as screenshot tests (see Build). Shared fixtures sit next to the
+models behind the `@TestData` opt-in.
 
 ## Design system
 
@@ -91,7 +143,15 @@ property names.
 ## Build
 
 Android: `./gradlew :androidApp:assembleDebug`. iOS: open `iosApp` in Xcode (the framework is built by Gradle).
-Checks: `./gradlew testAndroidHostTest detekt`.
+Checks before a pull request:
+
+```
+./gradlew testAndroidHostTest detekt :composeApp:compileKotlinIosSimulatorArm64
+./gradlew :androidApp:validateDebugScreenshotTest
+```
+
+The Android tasks never compile Kotlin/Native, so the iOS compile is needed to catch iOS-only breakage. detekt
+(with ktlint rules) runs with `autoCorrect` on and rewrites files, so review the diff after it.
 
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
 generated wrappers in `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Wrappers are
