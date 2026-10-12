@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
@@ -21,9 +20,10 @@ import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
@@ -55,7 +55,7 @@ internal fun ExperimentDetailScreen(
     onOpenInPostHog: () -> Unit,
 ) {
     val experiment = state.dataOrNull
-    ListScreenScaffold(
+    PushedScreenScaffold(
         title = experiment?.name ?: stringResource(Res.string.experiment_title_placeholder),
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
@@ -77,13 +77,18 @@ private fun ExperimentContent(
     modifier: Modifier,
     contentPadding: PaddingValues,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(bottom = Spacing.xxLarge),
+    ) {
         experiment.description?.let {
             Text(
                 text = it,
                 style = SnoutTheme.typography.bodyMedium,
                 color = SnoutTheme.colors.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
         }
         OverviewSection(experiment, onOpenFeatureFlag)
@@ -100,7 +105,7 @@ private fun ExperimentContent(
         }
         InfoBanner(
             text = stringResource(Res.string.experiment_results_note),
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp),
+            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.xLarge),
         )
     }
 }
@@ -157,7 +162,7 @@ private fun MetricsSection(experiment: Experiment) {
             text = stringResource(Res.string.experiment_no_metrics),
             style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
     }
     experiment.metricNames.forEach { MetricRow(it) }
@@ -171,7 +176,7 @@ private fun MetricsSection(experiment: Experiment) {
 private fun MetricRow(name: String) = Text(
     text = name,
     style = SnoutTheme.typography.bodyLarge,
-    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
 )
 
 @OptIn(TestData::class)

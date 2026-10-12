@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.designsystem.atoms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
+import com.nightcode.snout.designsystem.organisms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.open_link_button
@@ -58,15 +58,15 @@ private fun OpenLinkSheetContent(
     onOpen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.padding(horizontal = 16.dp).imePadding()) {
+    Column(modifier = modifier.padding(horizontal = Spacing.large).imePadding()) {
         Text(text = stringResource(Res.string.open_link_title), style = SnoutTheme.typography.titleLarge)
-        VerticalSpacer(4.dp)
+        VerticalSpacer(Spacing.xxSmall)
         Text(
             text = stringResource(Res.string.open_link_description),
             style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
         )
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
         PrimaryTextField(
             state = linkState,
             label = stringResource(Res.string.open_link_label),
@@ -76,14 +76,14 @@ private fun OpenLinkSheetContent(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = Modifier.fillMaxWidth(),
         )
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
         PrimaryButton(
             text = stringResource(Res.string.open_link_button),
             onClick = onOpen,
             enabled = linkState.text.isNotBlank(),
             modifier = Modifier.fillMaxWidth(),
         )
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
     }
 }
 

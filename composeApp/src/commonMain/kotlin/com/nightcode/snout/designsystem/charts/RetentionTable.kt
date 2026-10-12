@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -24,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDecimals
+import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private val LabelWidth = 52.dp
 private val SizeWidth = 44.dp
@@ -92,7 +93,7 @@ internal fun RetentionTable(
 /** Sized explicitly: inside the sideways scroll there is no width for the divider to fill. */
 @Composable
 private fun Divider(width: Dp) {
-    HorizontalDivider(modifier = Modifier.width(width), color = SnoutTheme.colors.outlineVariant)
+    Hairline(modifier = Modifier.width(width))
 }
 
 /** At most four characters so cells stay narrow: "100%", "48%", "8.9%". */
@@ -106,7 +107,7 @@ private fun HeaderCell(text: String, width: Dp) {
         color = SnoutTheme.colors.onSurfaceVariant,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.width(width).padding(vertical = 6.dp, horizontal = 2.dp),
+        modifier = Modifier.width(width).padding(vertical = Spacing.xSmall, horizontal = Spacing.xxxSmall),
     )
 }
 
@@ -117,7 +118,7 @@ private fun BodyCell(text: String, width: Dp) {
         style = SnoutTheme.code.small,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.width(width).padding(horizontal = 2.dp),
+        modifier = Modifier.width(width).padding(horizontal = Spacing.xxxSmall),
     )
 }
 

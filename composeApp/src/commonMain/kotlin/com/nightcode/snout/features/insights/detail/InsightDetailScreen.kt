@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,14 +22,13 @@ import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
-import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.organisms.LoadStateContainer
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.FavoriteIconButton
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
@@ -68,20 +65,17 @@ internal fun InsightDetailScreen(
     onOpenInPostHog: () -> Unit,
 ) {
     val detail = state.dataOrNull
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = {
-            SnoutTopAppBar(
-                title = detail?.summary?.name ?: stringResource(Res.string.insight_title_placeholder),
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-                actions = {
-                    if (detail != null) {
-                        FavoriteIconButton(favorited = detail.summary.favorited, onClick = onToggleFavorite)
-                        OpenInPostHogIconButton(onClick = onOpenInPostHog)
-                    }
-                },
-            )
+    PushedScreenScaffold(
+        title = detail?.summary?.name ?: stringResource(Res.string.insight_title_placeholder),
+        onNavigateBack = onNavigateBack,
+        // Both actions need the loaded insight.
+        onOpenInPostHog = onOpenInPostHog.takeIf { detail != null },
+        actions = {
+            if (detail != null) {
+                FavoriteIconButton(favorited = detail.summary.favorited, onClick = onToggleFavorite)
+            }
         },
+        snackbarHostState = snackbarHostState,
     ) { innerPadding ->
         LoadStateContainer(
             state = state,
@@ -100,12 +94,12 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(top = 8.dp, bottom = 24.dp),
+            .padding(top = Spacing.small, bottom = Spacing.xxLarge),
     ) {
         SectionCard(
             title = detail.summary.name,
             subtitle = detail.summary.description,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large),
         ) {
             detail.summary.period?.let {
                 Text(

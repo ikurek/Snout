@@ -44,6 +44,7 @@ import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.molecules.StatCard
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
@@ -83,7 +84,7 @@ internal fun AnalyticsScreen(
             selected = state.range,
             onSelect = onRangeSelected,
             label = { rangeLabels.getValue(it) },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
         CachedStateContainer(
             state = state.snapshot,
@@ -102,14 +103,14 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot, contentPadding: Padding
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(horizontal = Spacing.large),
+        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         OverviewGrid(snapshot.overview)
         if (snapshot.trends.isNotEmpty()) TrendCard(snapshot.trends)
         // Web projects have no screens and mobile projects have no pages; only show what has data.
         snapshot.breakdowns.filter { it.rows.isNotEmpty() }.forEach { BreakdownCard(it) }
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.small)
     }
 }
 
@@ -120,9 +121,12 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot, contentPadding: Padding
 @Composable
 private fun OverviewGrid(metrics: List<OverviewMetric>) {
     val previousLabel = stringResource(Res.string.analytics_metric_previous)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
         metrics.chunked(2).forEach { pair ->
-            Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+            ) {
                 pair.forEach { metric ->
                     StatCard(
                         label = metric.label(),
@@ -142,16 +146,22 @@ private fun OverviewGrid(metrics: List<OverviewMetric>) {
 /** Skeleton shaped like the stat grid and the chart card so the layout does not jump when data arrives. */
 @Composable
 private fun SnapshotSkeleton() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = Spacing.large),
+        verticalArrangement = Arrangement.spacedBy(Spacing.small),
+    ) {
         repeat(SkeletonStatRows) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 SkeletonStatCard(modifier = Modifier.weight(1f))
                 SkeletonStatCard(modifier = Modifier.weight(1f))
             }
         }
-        VerticalSpacer(4.dp)
+        VerticalSpacer(Spacing.xxSmall)
         Surface(shape = SnoutTheme.shapes.large, color = SnoutTheme.colors.surfaceContainerLow) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                modifier = Modifier.padding(Spacing.large),
+                verticalArrangement = Arrangement.spacedBy(Spacing.large),
+            ) {
                 SkeletonBlock(Modifier.fillMaxWidth(SkeletonLabelWidth).height(16.dp))
                 SkeletonLines()
             }
@@ -162,7 +172,7 @@ private fun SnapshotSkeleton() {
 @Composable
 private fun SkeletonStatCard(modifier: Modifier = Modifier) {
     Surface(modifier = modifier, shape = SnoutTheme.shapes.medium, color = SnoutTheme.colors.surfaceContainerLow) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SkeletonBlock(Modifier.fillMaxWidth(SkeletonLabelWidth).height(12.dp))
             SkeletonBlock(Modifier.fillMaxWidth(SkeletonValueWidth).height(28.dp))
             SkeletonBlock(Modifier.fillMaxWidth(SkeletonChipWidth).height(16.dp))
@@ -177,7 +187,7 @@ private fun TrendCard(trends: List<MetricTrend>) {
     val trend = trends.firstOrNull { it.metric == selected } ?: trends.first()
     SectionCard(title = stringResource(Res.string.analytics_trend_title, trend.metric.label())) {
         if (trends.size > 1) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 trends.forEach { option ->
                     ChoiceChip(
                         text = option.metric.label(),

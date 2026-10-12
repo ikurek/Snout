@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatDecimals
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import kotlin.math.abs
 
 private const val FlatThresholdPercent = 0.05
@@ -43,7 +43,7 @@ internal fun TrendChip(changePercent: Double, modifier: Modifier = Modifier, low
             style = SnoutTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            modifier = Modifier.padding(horizontal = Spacing.xSmall, vertical = Spacing.xxxSmall),
         )
     }
 }

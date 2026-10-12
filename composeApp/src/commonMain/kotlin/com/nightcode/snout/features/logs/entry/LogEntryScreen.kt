@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
@@ -23,8 +22,9 @@ import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.molecules.CodeBlock
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogSeverityTag
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -52,7 +52,7 @@ internal fun LogEntryScreen(
     onRefresh: () -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    ListScreenScaffold(
+    PushedScreenScaffold(
         title = service,
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
@@ -69,18 +69,23 @@ internal fun LogEntryScreen(
 
 @Composable
 private fun LogEntryContent(entry: LogEntry, modifier: Modifier, contentPadding: PaddingValues) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(bottom = Spacing.xxLarge),
+    ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         ) {
             LogSeverityTag(entry.severity)
             MetaText(entry.timestamp.formatLogTime())
         }
         SectionLabel(stringResource(Res.string.logs_entry_message))
-        CodeBlock(text = entry.body, wrap = true, modifier = Modifier.padding(horizontal = 16.dp))
-        SourceRows(entry, modifier = Modifier.padding(top = 12.dp))
+        CodeBlock(text = entry.body, wrap = true, modifier = Modifier.padding(horizontal = Spacing.large))
+        SourceRows(entry, modifier = Modifier.padding(top = Spacing.medium))
         AttributeSection(stringResource(Res.string.logs_entry_attributes), entry.attributes)
         AttributeSection(stringResource(Res.string.logs_entry_resource), entry.resourceAttributes)
     }

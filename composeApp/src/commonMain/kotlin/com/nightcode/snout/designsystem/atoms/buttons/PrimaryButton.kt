@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.atoms.HorizontalSpacer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.painterResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_arrow_right_alt_24dp
@@ -56,7 +57,7 @@ internal fun PrimaryButton(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text)
                     icon?.let {
-                        HorizontalSpacer(8.dp)
+                        HorizontalSpacer(Spacing.small)
                         Icon(painter = it, contentDescription = null, modifier = Modifier.size(ButtonIconSize))
                     }
                 }

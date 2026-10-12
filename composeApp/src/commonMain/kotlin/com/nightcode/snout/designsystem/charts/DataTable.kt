@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +15,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private val CellWidth = 132.dp
 
@@ -32,11 +33,13 @@ internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier
                     color = SnoutTheme.colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.width(CellWidth).padding(vertical = 6.dp, horizontal = 4.dp),
+                    modifier = Modifier
+                        .width(CellWidth)
+                        .padding(vertical = Spacing.xSmall, horizontal = Spacing.xxSmall),
                 )
             }
         }
-        HorizontalDivider(color = SnoutTheme.colors.outlineVariant)
+        Hairline()
         rows.forEach { row ->
             Row {
                 columns.indices.forEach { index ->
@@ -45,7 +48,9 @@ internal fun DataTable(columns: List<String>, rows: List<List<String>>, modifier
                         style = SnoutTheme.code.small,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.width(CellWidth).padding(vertical = 6.dp, horizontal = 4.dp),
+                        modifier = Modifier
+                            .width(CellWidth)
+                            .padding(vertical = Spacing.xSmall, horizontal = Spacing.xxSmall),
                     )
                 }
             }

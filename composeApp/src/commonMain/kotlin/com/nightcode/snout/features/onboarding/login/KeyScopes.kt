@@ -6,13 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,9 +29,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.molecules.CodeChip
+import com.nightcode.snout.designsystem.molecules.TonalCard
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -118,9 +120,9 @@ internal fun KeyScopes(modifier: Modifier = Modifier, initiallyExpanded: Boolean
                 .fillMaxWidth()
                 .clickable(role = Role.Button) { expanded = expanded.not() }
                 .semantics { stateDescription = stateText }
-                .padding(vertical = 8.dp),
+                .padding(vertical = Spacing.small),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         ) {
             Text(
                 text = stringResource(Res.string.login_screen_scopes_toggle),
@@ -136,7 +138,7 @@ internal fun KeyScopes(modifier: Modifier = Modifier, initiallyExpanded: Boolean
             )
         }
         AnimatedVisibility(visible = expanded) {
-            ScopesCard(modifier = Modifier.padding(top = 4.dp))
+            ScopesCard(modifier = Modifier.padding(top = Spacing.xxSmall))
         }
     }
 }
@@ -144,31 +146,26 @@ internal fun KeyScopes(modifier: Modifier = Modifier, initiallyExpanded: Boolean
 /** Tonal card of grouped feature rows, with a closing note that missing scopes only lock their own section. */
 @Composable
 private fun ScopesCard(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = SnoutTheme.shapes.medium,
-        color = SnoutTheme.colors.surfaceContainerLow,
+    TonalCard(
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = Spacing.large),
+        verticalArrangement = Arrangement.Top,
     ) {
-        Column(modifier = Modifier.padding(bottom = 16.dp)) {
-            ScopeGroups.forEach { group ->
-                SectionLabel(text = stringResource(group.title))
-                group.features.forEachIndexed { index, feature ->
-                    FeatureScopesRow(feature = feature)
-                    if (index < group.features.lastIndex) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = SnoutTheme.colors.outlineVariant,
-                        )
-                    }
+        ScopeGroups.forEach { group ->
+            SectionLabel(text = stringResource(group.title))
+            group.features.forEachIndexed { index, feature ->
+                FeatureScopesRow(feature = feature)
+                if (index < group.features.lastIndex) {
+                    Hairline(inset = true)
                 }
             }
-            Text(
-                text = stringResource(Res.string.login_scopes_footnote),
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                style = SnoutTheme.typography.bodySmall,
-                color = SnoutTheme.colors.onSurfaceVariant,
-            )
         }
+        Text(
+            text = stringResource(Res.string.login_scopes_footnote),
+            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.large),
+            style = SnoutTheme.typography.bodySmall,
+            color = SnoutTheme.colors.onSurfaceVariant,
+        )
     }
 }
 
@@ -180,14 +177,14 @@ private fun FeatureScopesRow(feature: ScopedFeature) {
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) { contentDescription = "$name: ${feature.scopes.joinToString()}" }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(horizontal = Spacing.large, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         Text(text = name, modifier = Modifier.weight(1f), style = SnoutTheme.typography.bodyMedium)
         FlowRow(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.xxSmall, Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         ) {
             feature.scopes.forEach { CodeChip(text = it) }
         }
@@ -197,4 +194,4 @@ private fun FeatureScopesRow(feature: ScopedFeature) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun KeyScopesPreview() = KeyScopes(modifier = Modifier.padding(16.dp), initiallyExpanded = true)
+fun KeyScopesPreview() = KeyScopes(modifier = Modifier.padding(Spacing.large), initiallyExpanded = true)

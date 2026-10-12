@@ -7,26 +7,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.Tag
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
-import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -50,14 +47,10 @@ internal fun DashboardDetailScreen(
 ) {
     val title = (state.dashboard as? CachedUiState.Content)?.data?.name
         ?: stringResource(Res.string.dashboard_title_placeholder)
-    Scaffold(
-        topBar = {
-            SnoutTopAppBar(
-                title = title,
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-                actions = { OpenInPostHogIconButton(onClick = onOpenInPostHog) },
-            )
-        },
+    PushedScreenScaffold(
+        title = title,
+        onNavigateBack = onNavigateBack,
+        onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
         CachedStateContainer(
             state = state.dashboard,
@@ -88,8 +81,8 @@ private fun TileList(
     contentPadding: PaddingValues,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp) + contentPadding,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = Spacing.large, vertical = Spacing.small) + contentPadding,
+        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
         items(tiles, key = { it.id }) { tile ->
             when (tile) {
@@ -129,7 +122,7 @@ private fun InsightTileCard(
                 onAction = onRetry,
             )
 
-            else -> SkeletonLines(modifier = Modifier.padding(vertical = 16.dp))
+            else -> SkeletonLines(modifier = Modifier.padding(vertical = Spacing.large))
         }
     }
 }

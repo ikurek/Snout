@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.common.state.CachedUiState
@@ -17,6 +16,7 @@ import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
@@ -36,7 +36,7 @@ internal fun ExperimentsScreen(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { experiments ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+        LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
             itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
                 ExperimentRow(
                     experiment = experiment,

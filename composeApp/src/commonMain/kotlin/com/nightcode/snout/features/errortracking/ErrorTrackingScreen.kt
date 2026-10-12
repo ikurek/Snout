@@ -19,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatRelative
@@ -33,7 +32,8 @@ import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
-import com.nightcode.snout.features.errortracking.components.ErrorTrackingUnavailablePlaceholder
+import com.nightcode.snout.designsystem.organisms.UnavailablePlaceholder
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -51,6 +51,8 @@ import snout.composeapp.generated.resources.error_tracking_empty_title
 import snout.composeapp.generated.resources.error_tracking_occurrences_count
 import snout.composeapp.generated.resources.error_tracking_search_empty_title
 import snout.composeapp.generated.resources.error_tracking_search_placeholder
+import snout.composeapp.generated.resources.error_tracking_unavailable_subtitle
+import snout.composeapp.generated.resources.error_tracking_unavailable_title
 import snout.composeapp.generated.resources.error_tracking_users_count
 import snout.composeapp.generated.resources.error_tracking_version_all
 import snout.composeapp.generated.resources.error_tracking_version_empty_subtitle
@@ -78,7 +80,10 @@ internal fun ErrorTrackingScreen(
         SearchField(
             state = searchState,
             placeholder = stringResource(Res.string.error_tracking_search_placeholder),
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.large)
+                .padding(top = Spacing.small, bottom = Spacing.xxSmall),
         )
         IssueFilters(
             status = state.status,
@@ -87,14 +92,17 @@ internal fun ErrorTrackingScreen(
             appVersions = state.appVersions,
             onAppVersionChanged = onAppVersionChanged,
         )
-        val issues = state.issues
-        if (issues is CachedUiState.Error && issues.error == DataError.NotFound) {
-            ErrorTrackingUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-            return@Column
-        }
         CachedStateContainer(
-            state = issues,
+            state = state.issues,
             onRefresh = onRefresh,
+            notFoundContent = {
+                UnavailablePlaceholder(
+                    title = stringResource(Res.string.error_tracking_unavailable_title),
+                    message = stringResource(Res.string.error_tracking_unavailable_subtitle),
+                    onRetry = onRefresh,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            },
             emptyContent = {
                 IssuesEmptyContent(
                     query = state.query,
@@ -105,7 +113,7 @@ internal fun ErrorTrackingScreen(
                 )
             },
         ) { list ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
                 itemsIndexed(list, key = { _, issue -> issue.id }) { index, issue ->
                     IssueRow(issue = issue, divider = index < list.lastIndex, onClick = { onOpenIssue(issue.id) })
                 }
@@ -164,11 +172,11 @@ private fun IssueFilters(
     onAppVersionChanged: (String?) -> Unit,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
     ) {
         FilterMenuChip(
             label = stringResource(status.label),

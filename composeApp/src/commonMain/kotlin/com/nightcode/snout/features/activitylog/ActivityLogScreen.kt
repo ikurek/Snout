@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.state.CachedUiState
@@ -33,6 +32,7 @@ import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityChange
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityEntry
@@ -55,7 +55,7 @@ internal fun ActivityLogScreen(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { entries ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+        LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
             itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
                 ActivityRow(entry = entry, divider = index < entries.lastIndex)
             }
@@ -70,22 +70,21 @@ private fun ActivityRow(entry: ActivityEntry, divider: Boolean) {
     val actor = entry.actor ?: stringResource(Res.string.activity_system_actor)
     val expandable = entry.changes.size > CollapsedChanges
     EntityRow(
-        title = actor,
+        headline = { ActivitySentence(actor = actor, entry = entry) },
         alignment = Alignment.Top,
         divider = divider,
         onClick = if (expandable) ({ expanded = expanded.not() }) else null,
         leading = { AvatarBox(name = actor) },
-        headline = { ActivitySentence(actor = actor, entry = entry) },
         meta = { MetaText(entry.createdAt.formatRelative()) },
         supporting = {
             val visible = if (expanded) entry.changes else entry.changes.take(CollapsedChanges)
-            visible.forEach { ChangeLine(it, modifier = Modifier.padding(top = 6.dp)) }
+            visible.forEach { ChangeLine(it, modifier = Modifier.padding(top = Spacing.xSmall)) }
             AnimatedVisibility(visible = expanded.not() && expandable) {
                 Text(
                     text = stringResource(Res.string.activity_more_changes, entry.changes.size - CollapsedChanges),
                     style = SnoutTheme.typography.bodySmall,
                     color = SnoutTheme.colors.primary,
-                    modifier = Modifier.padding(top = 6.dp),
+                    modifier = Modifier.padding(top = Spacing.xSmall),
                 )
             }
         },
@@ -95,8 +94,8 @@ private fun ActivityRow(entry: ActivityEntry, divider: Boolean) {
 @Composable
 private fun ActivitySentence(actor: String, entry: ActivityEntry) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -118,8 +117,8 @@ private fun ChangeLine(change: ActivityChange, modifier: Modifier = Modifier) {
     val empty = stringResource(Res.string.activity_change_empty_value)
     FlowRow(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         CodeChip(text = change.field.replace('_', ' '))

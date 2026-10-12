@@ -32,6 +32,12 @@ fun BrandMarkPreviewShot() = ScreenshotEnvironment { BrandMarkPreview() }
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun HairlinePreviewShot() = ScreenshotEnvironment { HairlinePreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun SectionLabelPreviewShot() = ScreenshotEnvironment { SectionLabelPreview() }
 
 @PreviewTest

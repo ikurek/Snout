@@ -53,6 +53,7 @@ import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.onboarding.intro.IntroPage
 import com.nightcode.snout.features.onboarding.login.LoginPage
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionPage
@@ -132,7 +133,7 @@ private fun TopBar(pagerState: PagerState, showBack: Boolean, onNavigateBack: ()
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
             .height(TopBarHeight)
-            .padding(horizontal = 4.dp),
+            .padding(horizontal = Spacing.xxSmall),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val backAlpha by animateFloatAsState(if (showBack) 1f else 0f)
@@ -144,7 +145,7 @@ private fun TopBar(pagerState: PagerState, showBack: Boolean, onNavigateBack: ()
                 )
             }
         }
-        StepProgress(pagerState = pagerState, modifier = Modifier.weight(1f).padding(horizontal = 24.dp))
+        StepProgress(pagerState = pagerState, modifier = Modifier.weight(1f).padding(horizontal = Spacing.xxLarge))
         Spacer(modifier = Modifier.size(IconButtonSize))
     }
 }
@@ -163,7 +164,7 @@ private fun StepProgress(pagerState: PagerState, modifier: Modifier = Modifier) 
     val fillColor = SnoutTheme.colors.primary
     Row(
         modifier = modifier.clearAndSetSemantics { contentDescription = description },
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
     ) {
         OnboardingStep.entries.forEach { segment ->
             Box(
@@ -212,7 +213,7 @@ private fun BottomBar(
                 .windowInsetsPadding(
                     WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
                 )
-                .padding(16.dp),
+                .padding(Spacing.large),
         ) {
             // One button for both steps, so its surface stays put and only the label changes.
             val isIntro = step == OnboardingStep.Intro

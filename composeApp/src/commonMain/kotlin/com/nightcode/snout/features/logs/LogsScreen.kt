@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatPercent
@@ -28,6 +27,7 @@ import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogsUnavailablePlaceholder
 import com.nightcode.snout.features.logs.components.label
 import com.nightcode.snout.features.logs.components.volumeColor
@@ -65,16 +65,12 @@ internal fun LogsScreen(
             options = LogsRange.entries.map { MenuOption(it, stringResource(it.label)) },
             selected = state.range,
             onSelect = onRangeSelected,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        val services = state.services
-        if (services is CachedUiState.Error && services.error == DataError.NotFound) {
-            LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-            return@Column
-        }
         CachedStateContainer(
-            state = services,
+            state = state.services,
             onRefresh = onRefresh,
+            notFoundContent = { LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize()) },
             emptyContent = {
                 Placeholder(
                     icon = painterResource(Res.drawable.ic_subject_24dp),
@@ -86,7 +82,7 @@ internal fun LogsScreen(
                 )
             },
         ) { list ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
                 itemsIndexed(list, key = { _, service -> service.name }) { index, service ->
                     ServiceRow(
                         service = service,
@@ -131,7 +127,7 @@ private fun ServiceRow(service: LogService, divider: Boolean, onClick: () -> Uni
         },
         trailing = { Sparkline(values = service.volume.map { it.toDouble() }) },
         supporting = service.levels?.takeIf { it.total > 0 }?.let { levels ->
-            { LevelBar(levels, modifier = Modifier.padding(top = 8.dp)) }
+            { LevelBar(levels, modifier = Modifier.padding(top = Spacing.small)) }
         },
     )
 }

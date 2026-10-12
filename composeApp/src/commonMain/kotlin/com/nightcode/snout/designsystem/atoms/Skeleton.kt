@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private const val ShimmerMinAlpha = 0.55f
 private const val ShimmerDurationMillis = 1200
@@ -62,15 +62,15 @@ internal fun SkeletonBlock(modifier: Modifier = Modifier) {
 internal fun SkeletonRow(modifier: Modifier = Modifier, divider: Boolean = true) {
     Column(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.small),
         ) {
             SkeletonBlock(Modifier.fillMaxWidth(TitleWidth).height(14.dp))
             SkeletonBlock(Modifier.fillMaxWidth(LineWidth).height(12.dp))
             SkeletonBlock(Modifier.fillMaxWidth(MetaWidth).height(10.dp))
         }
         if (divider) {
-            HorizontalDivider(color = SnoutTheme.colors.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+            Hairline(inset = true)
         }
     }
 }
@@ -86,7 +86,7 @@ internal fun SkeletonRows(modifier: Modifier = Modifier, count: Int = DefaultRow
 /** Three text-like lines, used inside cards whose content is still computing. */
 @Composable
 internal fun SkeletonLines(modifier: Modifier = Modifier, lineHeight: Dp = 12.dp) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
         SkeletonBlock(Modifier.fillMaxWidth(LineWidth).height(lineHeight))
         SkeletonBlock(Modifier.fillMaxWidth(TitleWidth).height(lineHeight))
         SkeletonBlock(Modifier.fillMaxWidth(ThirdLineWidth).height(lineHeight))

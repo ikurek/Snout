@@ -63,22 +63,30 @@ The UI follows the "Ember" design: warm paper neutrals, a burnt-orange `primary`
 (bottom nav, segmented control), and surface tiers instead of borders or shadows. Everything lives under
 `composeApp/.../designsystem`:
 
-- `tokens/` is the single source of colour, type and shape values (`SnoutTheme.colors`, `.extendedColors`
-  for success and chart colours, `.typography`, `.code` for the monospace styles, `.shapes`). Screens never
-  hardcode a colour, `sp` or font family.
+- `tokens/` is the single source of colour, type, shape and spacing values (`SnoutTheme.colors`,
+  `.extendedColors` for success and chart colours, `.typography`, `.code` for the monospace styles, `.shapes`,
+  and the `Spacing` scale from `xxxSmall` 2dp to `huge` 48dp, with `large` 16dp for screen edges). Screens never
+  hardcode a colour, `sp` or font family, and padding, gaps and spacers use `Spacing`; plain `dp` is left for
+  component sizes (icons, heights, widths, radii, strokes) and a few component insets off the scale.
 - `atoms/` are the smallest pieces: `StatusPill` and `Tag`, `TrendChip`, `SectionLabel`, `AvatarBox`,
-  `BrandMark`, skeleton blocks, buttons, chips and text fields.
-- `molecules/` compose them: `EntityRow` (the only list row), `KeyValueRow`, `StatCard`, `SectionCard` and
-  `TonalCard`, `CodeBlock` and `CodeChip`, `InfoBanner`, `InlineErrorBanner`, `SegmentedControl`,
-  `Placeholder`.
-- `organisms/` are screen-level: `CachedStateContainer` (skeleton loading, placeholders, refresh banner),
-  `SnoutTopAppBar`, `BottomNavigation`, `ConfirmationDialog`, the error placeholders.
+  `BrandMark`, `Hairline` (the `outlineVariant` rule, optionally inset to the 16dp edges), skeleton blocks,
+  buttons, chips and text fields.
+- `molecules/` compose them: `EntityRow` (the only list row, with a `headline` slot overload for rich titles),
+  `KeyValueRow`, `StatCard`, `SectionCard` and `TonalCard`, `CodeBlock` and `CodeChip`, `InfoBanner`,
+  `InlineErrorBanner`, `SegmentedControl`, `Placeholder`.
+- `organisms/` are screen-level: `PushedScreenScaffold` (back arrow, title, actions and open in PostHog for every
+  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, `CachedStateContainer` and
+  `LoadStateContainer` (skeleton loading, placeholders, refresh banner), `AnimatedBottomSheet` and
+  `OptionPickerSheet`, `ConfirmationDialog`, and the state placeholders: `ErrorPlaceholder` (worded per
+  `DataError`), `NothingFoundPlaceholder`, `NoSearchResultsPlaceholder` and `UnavailablePlaceholder` (a section
+  the instance answers 404 for, via `CachedStateContainer`'s `notFoundContent`).
 - `charts/` draw insight results with the `extendedColors.chart` palette.
 
-Rules of thumb: lists are `EntityRow`s separated by `outlineVariant` hairlines with no card per row; detail
-screens use uppercase `SectionLabel`s over `KeyValueRow`s; status is always a word in a `StatusPill`, never a
-bare colour; loading is skeleton rows, never a centred spinner; monospace is only for keys, values and
-event or property names.
+Rules of thumb: lists are `EntityRow`s separated by `Hairline`s with no card per row; detail screens use
+uppercase `SectionLabel`s over `KeyValueRow`s; status is always a word in a `StatusPill`, never a bare colour;
+loading is skeleton rows, never a centred spinner (a small progress indicator inside a control that is
+working, such as a button or the flag toggle, is fine); monospace is only for keys, values and event or
+property names.
 
 ## Build
 

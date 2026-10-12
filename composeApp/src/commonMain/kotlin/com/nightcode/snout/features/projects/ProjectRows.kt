@@ -12,6 +12,7 @@ import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.OrganizationLogo
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.model.organization.Project
@@ -83,7 +84,7 @@ internal fun ProjectRow(project: Project, onClick: () -> Unit, isSelected: Boole
         title = project.name,
         onClick = onClick,
         divider = divider,
-        modifier = Modifier.padding(start = 12.dp),
+        modifier = Modifier.padding(start = Spacing.medium),
         leading = { AvatarBox(name = project.name) },
         trailing = if (isSelected) {
             {

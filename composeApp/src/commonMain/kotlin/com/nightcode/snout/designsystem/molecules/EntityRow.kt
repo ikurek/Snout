@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,13 +16,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.atoms.AvatarBox
+import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.atoms.StatusPill
 import com.nightcode.snout.designsystem.atoms.StatusTone
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /**
  * The one list row used by every list in the app: optional leading visual, title, optional description,
@@ -31,7 +31,6 @@ import com.nightcode.snout.designsystem.tokens.SnoutTheme
  *
  * Rows sit directly on the background with 16dp sides and 12dp vertical padding, separated by an
  * `outlineVariant` hairline. No card per row. Only the trailing control may carry accent or status colour.
- * [headline] replaces the plain title text when a row needs rich content there (activity log sentences).
  */
 @Composable
 internal fun EntityRow(
@@ -48,24 +47,51 @@ internal fun EntityRow(
     trailing: (@Composable () -> Unit)? = null,
     meta: (@Composable RowScope.() -> Unit)? = null,
     supporting: (@Composable ColumnScope.() -> Unit)? = null,
-    headline: (@Composable () -> Unit)? = null,
+) {
+    EntityRow(
+        headline = {
+            Text(text = title, style = titleStyle, maxLines = titleMaxLines, overflow = TextOverflow.Ellipsis)
+        },
+        modifier = modifier,
+        subtitle = subtitle,
+        subtitleStyle = subtitleStyle,
+        alignment = alignment,
+        divider = divider,
+        onClick = onClick,
+        leading = leading,
+        trailing = trailing,
+        meta = meta,
+        supporting = supporting,
+    )
+}
+
+/** [EntityRow] whose title line is rich content rather than plain text, such as an activity log sentence. */
+@Composable
+internal fun EntityRow(
+    headline: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    subtitleStyle: TextStyle = SnoutTheme.typography.bodyMedium,
+    alignment: Alignment.Vertical = Alignment.CenterVertically,
+    divider: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    leading: (@Composable () -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
+    meta: (@Composable RowScope.() -> Unit)? = null,
+    supporting: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = Spacing.large, vertical = Spacing.medium),
             verticalAlignment = alignment,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
             leading?.invoke()
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (headline != null) {
-                    headline()
-                } else {
-                    Text(text = title, style = titleStyle, maxLines = titleMaxLines, overflow = TextOverflow.Ellipsis)
-                }
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xxxSmall)) {
+                headline()
                 subtitle?.let {
                     Text(
                         text = it,
@@ -78,8 +104,8 @@ internal fun EntityRow(
                 meta?.let {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.padding(top = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
+                        modifier = Modifier.padding(top = Spacing.xxSmall),
                         content = it,
                     )
                 }
@@ -88,7 +114,7 @@ internal fun EntityRow(
             trailing?.invoke()
         }
         if (divider) {
-            HorizontalDivider(color = SnoutTheme.colors.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+            Hairline(inset = true)
         }
     }
 }

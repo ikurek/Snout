@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /** Lifecycle state of a flag, experiment or insight: a fully rounded pill, 22dp tall. */
 @Composable
@@ -53,7 +54,7 @@ internal fun Tag(text: String, modifier: Modifier = Modifier, tone: StatusTone =
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp),
+            modifier = Modifier.padding(horizontal = Spacing.xSmall, vertical = 1.dp),
         )
     }
 }

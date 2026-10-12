@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,8 +33,6 @@ import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
-import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.CodeBlock
 import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.InfoBanner
@@ -45,8 +42,9 @@ import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.molecules.TonalCard
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
 import com.nightcode.snout.designsystem.organisms.LoadStateContainer
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.components.FeatureFlagStatusPill
 import com.nightcode.snout.features.featureflags.components.rolloutSummary
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -97,15 +95,11 @@ internal fun FeatureFlagDetailScreen(
     var pendingToggle by rememberSaveable { mutableStateOf<Boolean?>(null) }
     val flag = state.flag.dataOrNull
 
-    Scaffold(
-        topBar = {
-            SnoutTopAppBar(
-                title = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
-                titleStyle = SnoutTheme.code.large,
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-                actions = { OpenInPostHogIconButton(onClick = onOpenInPostHog) },
-            )
-        },
+    PushedScreenScaffold(
+        title = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
+        onNavigateBack = onNavigateBack,
+        titleStyle = SnoutTheme.code.large,
+        onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
         LoadStateContainer(
             state = state.flag,
@@ -168,13 +162,13 @@ private fun FlagContent(
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(top = 8.dp, bottom = 24.dp),
+            .padding(top = Spacing.small, bottom = Spacing.xxLarge),
     ) {
         ToggleCard(
             flag = flag,
             toggle = toggle,
             onToggleRequest = onToggleRequest,
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large),
         )
         if (toggle is ToggleStatus.Failed) {
             InlineErrorBanner(
@@ -186,7 +180,7 @@ private fun FlagContent(
                     ),
                 ),
                 onAction = onToggleErrorDismissed,
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.medium),
             )
         }
         flag.description?.let {
@@ -194,7 +188,7 @@ private fun FlagContent(
                 text = it,
                 style = SnoutTheme.typography.bodyMedium,
                 color = SnoutTheme.colors.onSurfaceVariant,
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.medium),
             )
         }
 
@@ -203,8 +197,8 @@ private fun FlagContent(
         if (flag.isRemoteConfiguration.not()) {
             SectionLabel(stringResource(Res.string.feature_flag_conditions_section))
             Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(horizontal = Spacing.large),
+                verticalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
                 flag.conditions.forEachIndexed { index, condition ->
                     ConditionCard(
@@ -231,14 +225,14 @@ private fun PayloadSection(flag: FeatureFlag) {
         Res.string.feature_flag_payload_section
     }
     SectionLabel(stringResource(title))
-    CodeBlock(text = payload, modifier = Modifier.padding(horizontal = 16.dp))
-    VerticalSpacer(12.dp)
+    CodeBlock(text = payload, modifier = Modifier.padding(horizontal = Spacing.large))
+    VerticalSpacer(Spacing.medium)
     val note = if (flag.hasEncryptedPayloads) {
         Res.string.feature_flag_value_encrypted_note
     } else {
         Res.string.feature_flag_value_read_only_note
     }
-    InfoBanner(text = stringResource(note), modifier = Modifier.padding(horizontal = 16.dp))
+    InfoBanner(text = stringResource(note), modifier = Modifier.padding(horizontal = Spacing.large))
 }
 
 @Composable
@@ -252,20 +246,23 @@ private fun VariantsSection(flag: FeatureFlag) {
             trailing = { RolloutPercent(variant.rolloutPercentage) },
         )
         flag.variantPayload(variant.key)?.let { payload ->
-            VariantPayload(payload = payload, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+            VariantPayload(
+                payload = payload,
+                modifier = Modifier.padding(horizontal = Spacing.large).padding(bottom = Spacing.small),
+            )
         }
     }
     if (flag.payloads.isNotEmpty()) {
         InfoBanner(
             text = stringResource(Res.string.feature_flag_value_read_only_note),
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp),
+            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.xxSmall),
         )
     }
 }
 
 @Composable
 private fun VariantPayload(payload: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.xSmall)) {
         Text(
             text = stringResource(Res.string.feature_flag_variant_payload),
             style = SnoutTheme.typography.bodySmall,
@@ -296,7 +293,10 @@ private fun ToggleCard(
     modifier: Modifier = Modifier,
 ) {
     TonalCard(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+        ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(Res.string.feature_flag_enabled_label),
@@ -318,7 +318,7 @@ private fun ToggleCard(
         if (flag.canEdit.not()) {
             InfoBanner(
                 text = stringResource(Res.string.feature_flag_read_only_note),
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = Spacing.small),
             )
         }
     }
@@ -345,8 +345,8 @@ private fun ConditionCard(index: Int, condition: ReleaseCondition, modifier: Mod
             condition.properties.forEach { property ->
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
                 ) {
                     CodeChip(text = property.key)
                     property.operator?.let {

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,14 +27,14 @@ import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.organisms.OptionPickerSheet
 import com.nightcode.snout.designsystem.organisms.PickerOption
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import org.jetbrains.compose.resources.painterResource
@@ -64,13 +63,9 @@ internal fun NavigationSettingsScreen(
 ) {
     var openPicker by rememberSaveable { mutableStateOf<Int?>(null) }
 
-    Scaffold(
-        topBar = {
-            SnoutTopAppBar(
-                title = stringResource(Res.string.settings_navigation_title),
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-            )
-        },
+    PushedScreenScaffold(
+        title = stringResource(Res.string.settings_navigation_title),
+        onNavigateBack = onNavigateBack,
     ) { innerPadding ->
         val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         if (preferences == null) {
@@ -130,7 +125,12 @@ private fun NavigationContent(
     onOpenLandingPicker: () -> Unit,
     onReset: () -> Unit,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(bottom = Spacing.xxLarge),
+    ) {
         SectionLabel(stringResource(Res.string.settings_navigation_tabs_section))
         preferences.tabs.forEachIndexed { index, section ->
             KeyValueRow(
@@ -140,10 +140,10 @@ private fun NavigationContent(
                 onClick = { onOpenSlotPicker(index) },
             )
         }
-        VerticalSpacer(12.dp)
+        VerticalSpacer(Spacing.medium)
         InfoBanner(
             text = stringResource(Res.string.settings_navigation_more_note),
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large),
         )
 
         SectionLabel(stringResource(Res.string.settings_navigation_landing_section))
@@ -154,12 +154,12 @@ private fun NavigationContent(
             onClick = onOpenLandingPicker,
         )
 
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
         SecondaryButton(
             text = stringResource(Res.string.settings_navigation_reset),
             onClick = onReset,
             enabled = preferences != NavigationPreferences.Default,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large),
         )
     }
 }

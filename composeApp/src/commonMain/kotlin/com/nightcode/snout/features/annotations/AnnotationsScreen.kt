@@ -34,6 +34,7 @@ import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.annotations.AnnotationScope
@@ -133,7 +134,7 @@ private fun AnnotationRow(annotation: Annotation, divider: Boolean) {
                 annotation.createdBy?.let { stringResource(Res.string.annotation_by, it) },
                 annotation.createdAt?.formatRelative(),
             ).joinToString(" · ")
-            if (meta.isNotEmpty()) MetaText(meta, modifier = Modifier.padding(top = 4.dp))
+            if (meta.isNotEmpty()) MetaText(meta, modifier = Modifier.padding(top = Spacing.xxSmall))
         },
     )
 }

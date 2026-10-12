@@ -20,6 +20,7 @@ import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
@@ -41,7 +42,7 @@ internal fun DashboardsScreen(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { dashboards ->
-        LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+        LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
             itemsIndexed(dashboards, key = { _, dashboard -> dashboard.id }) { index, dashboard ->
                 DashboardRow(
                     dashboard = dashboard,

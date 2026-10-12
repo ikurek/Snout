@@ -6,16 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /** Uppercase `labelSmall` heading that introduces a group of rows on detail and settings screens. */
 @Composable
 internal fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text.uppercase(),
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp),
+        modifier = modifier.padding(horizontal = Spacing.large).padding(top = Spacing.xLarge, bottom = Spacing.small),
         style = SnoutTheme.typography.labelSmall,
         color = SnoutTheme.colors.onSurfaceVariant,
     )

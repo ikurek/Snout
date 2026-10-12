@@ -11,9 +11,10 @@ import platform.UIKit.UIWindowScene
 /**
  * Overrides the interface style of the app's windows, so the status bar, keyboard and system alerts follow the
  * user's choice instead of the system's. The launch screen is drawn before any app code runs and can't follow it.
+ * [darkTheme] needs no handling: Compose on iOS already derives the status bar style from the content under it.
  */
 @Composable
-internal actual fun SystemNightMode(themeMode: ThemeMode?) {
+internal actual fun PlatformThemeEffects(themeMode: ThemeMode?, darkTheme: Boolean) {
     LaunchedEffect(themeMode) {
         val style = when (themeMode) {
             null -> return@LaunchedEffect

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import kotlin.math.roundToInt
 
 private val AxisLabelClearance = 40.dp
@@ -104,10 +105,10 @@ internal fun BoxScope.PeriodReadout(
             s.values.getOrNull(index)?.let { ReadoutEntry(s.name, s.color, valueFormatter(it), s.dashed) }
         },
         modifier = if (index < count / 2.0) {
-            Modifier.align(Alignment.TopEnd).padding(4.dp)
+            Modifier.align(Alignment.TopEnd).padding(Spacing.xxSmall)
         } else {
             // Clear the y-axis labels on the left.
-            Modifier.align(Alignment.TopStart).padding(start = AxisLabelClearance, top = 4.dp)
+            Modifier.align(Alignment.TopStart).padding(start = AxisLabelClearance, top = Spacing.xxSmall)
         },
     )
 }
@@ -121,12 +122,15 @@ internal fun ChartReadout(title: String, entries: List<ReadoutEntry>, modifier: 
         color = SnoutTheme.colors.surfaceContainerHighest,
         shadowElevation = 2.dp,
     ) {
-        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(
+            modifier = Modifier.padding(Spacing.small),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xxxSmall),
+        ) {
             Text(text = title, style = SnoutTheme.typography.labelMedium, color = SnoutTheme.colors.onSurfaceVariant)
             entries.forEach { entry ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
                 ) {
                     val swatch = Modifier.size(8.dp).clip(SnoutTheme.shapes.extraSmall)
                     Box(

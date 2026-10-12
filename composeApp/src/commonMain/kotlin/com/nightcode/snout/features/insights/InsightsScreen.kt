@@ -35,6 +35,7 @@ import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
@@ -66,7 +67,7 @@ internal fun InsightsScreen(
             SearchField(
                 state = searchState,
                 placeholder = stringResource(Res.string.insights_search_placeholder),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
             CachedStateContainer(
                 state = state.insights,
@@ -83,7 +84,7 @@ internal fun InsightsScreen(
                     }
                 },
             ) { insights ->
-                LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
                     itemsIndexed(insights, key = { _, insight -> insight.id }) { index, insight ->
                         InsightRow(
                             insight = insight,

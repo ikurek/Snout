@@ -5,16 +5,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.nightcode.snout.designsystem.atoms.StatusTone
 import com.nightcode.snout.designsystem.atoms.Tag
-import com.nightcode.snout.designsystem.molecules.Placeholder
+import com.nightcode.snout.designsystem.organisms.UnavailablePlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.domain.model.logs.LogSeverity
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.ic_info_outlined_24dp
 import snout.composeapp.generated.resources.logs_level_debug
 import snout.composeapp.generated.resources.logs_level_errors
 import snout.composeapp.generated.resources.logs_level_info
@@ -27,7 +25,6 @@ import snout.composeapp.generated.resources.logs_severity_errors
 import snout.composeapp.generated.resources.logs_severity_warnings
 import snout.composeapp.generated.resources.logs_unavailable_subtitle
 import snout.composeapp.generated.resources.logs_unavailable_title
-import snout.composeapp.generated.resources.placeholder_generic_error_retry
 
 internal val LogsRange.label: StringResource
     get() = when (this) {
@@ -79,12 +76,10 @@ internal fun LogSeverityTag(severity: LogSeverity, modifier: Modifier = Modifier
 /** PostHog answers 404 for the Logs API on instances that predate it. */
 @Composable
 internal fun LogsUnavailablePlaceholder(onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Placeholder(
-        icon = painterResource(Res.drawable.ic_info_outlined_24dp),
+    UnavailablePlaceholder(
         title = stringResource(Res.string.logs_unavailable_title),
         message = stringResource(Res.string.logs_unavailable_subtitle),
-        actionLabel = stringResource(Res.string.placeholder_generic_error_retry),
-        onAction = onRetry,
+        onRetry = onRetry,
         modifier = modifier,
     )
 }

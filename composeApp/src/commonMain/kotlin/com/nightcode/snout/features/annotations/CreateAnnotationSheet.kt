@@ -19,16 +19,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.designsystem.actionFailedMessage
-import com.nightcode.snout.designsystem.atoms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
+import com.nightcode.snout.designsystem.organisms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.domain.model.common.DataError
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -72,9 +72,9 @@ internal fun CreateAnnotationSheet(
     val dateMarker = LocalDate.parse(selectedDate).atTime(MarkerTime).toInstant(timeZone)
 
     AnimatedBottomSheet(isVisible = isVisible, onDismissRequest = onDismiss) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp).imePadding()) {
+        Column(modifier = Modifier.padding(horizontal = Spacing.large).imePadding()) {
             Text(text = stringResource(Res.string.annotation_create_title), style = SnoutTheme.typography.titleLarge)
-            VerticalSpacer(16.dp)
+            VerticalSpacer(Spacing.large)
             PrimaryTextField(
                 state = contentState,
                 label = stringResource(Res.string.annotation_create_content_label),
@@ -83,20 +83,20 @@ internal fun CreateAnnotationSheet(
                 lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3, maxHeightInLines = 6),
                 modifier = Modifier.fillMaxWidth(),
             )
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.small)
             KeyValueRow(
                 label = stringResource(Res.string.annotation_create_date_label),
                 value = dateMarker.formatShortDate(),
                 leadingIcon = painterResource(Res.drawable.ic_schedule_24dp),
                 onClick = { showDatePicker = true },
                 showChevron = false,
-                contentPadding = PaddingValues(vertical = 8.dp),
+                contentPadding = PaddingValues(vertical = Spacing.small),
             )
             if (status is CreateStatus.Failed) {
                 InlineErrorBanner(text = stringResource(status.error.createFailedMessage()))
-                VerticalSpacer(8.dp)
+                VerticalSpacer(Spacing.small)
             }
-            VerticalSpacer(16.dp)
+            VerticalSpacer(Spacing.large)
             PrimaryButton(
                 text = stringResource(Res.string.annotation_create_save),
                 onClick = { onCreate(contentState.text.toString(), dateMarker) },
@@ -104,7 +104,7 @@ internal fun CreateAnnotationSheet(
                 loading = status is CreateStatus.Saving,
                 modifier = Modifier.fillMaxWidth(),
             )
-            VerticalSpacer(24.dp)
+            VerticalSpacer(Spacing.xxLarge)
         }
     }
 

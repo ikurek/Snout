@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.atoms.BrandMark
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
@@ -105,13 +106,13 @@ private fun Content(contentPadding: PaddingValues, entrance: Animatable<Float, A
             .padding(contentPadding)
             .consumeWindowInsets(contentPadding)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = Spacing.large),
     ) {
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
         Row(
             modifier = Modifier.entrance(entrance, index = 0),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
             BrandMark(size = BrandMarkSize)
             Column {
@@ -123,33 +124,33 @@ private fun Content(contentPadding: PaddingValues, entrance: Animatable<Float, A
                 )
             }
         }
-        VerticalSpacer(32.dp)
+        VerticalSpacer(Spacing.xxxLarge)
         Text(
             text = stringResource(Res.string.intro_screen_header),
             style = SnoutTheme.typography.headlineSmall,
             modifier = Modifier.entrance(entrance, index = 1).semantics { heading() },
         )
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.small)
         Text(
             text = stringResource(Res.string.intro_screen_description),
             style = SnoutTheme.typography.bodyLarge,
             color = SnoutTheme.colors.onSurfaceVariant,
             modifier = Modifier.entrance(entrance, index = 2),
         )
-        VerticalSpacer(32.dp)
-        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        VerticalSpacer(Spacing.xxxLarge)
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xLarge)) {
             Features.forEachIndexed { index, feature ->
                 FeatureRow(feature = feature, modifier = Modifier.entrance(entrance, index = 3 + index))
             }
         }
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
     }
 }
 
 /** Tonal icon tile beside a bold one-line title and a short description. */
 @Composable
 private fun FeatureRow(feature: Feature, modifier: Modifier = Modifier) {
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(Spacing.large)) {
         Surface(
             shape = SnoutTheme.shapes.medium,
             color = SnoutTheme.colors.secondaryContainer,

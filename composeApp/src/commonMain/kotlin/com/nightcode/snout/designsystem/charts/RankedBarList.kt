@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private const val BarAlpha = 0.14f
 
@@ -39,7 +40,7 @@ internal fun RankedBarList(
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
     val max = rows.maxOfOrNull { it.value }?.takeIf { it > 0 } ?: 1.0
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall)) {
         rows.forEach { row ->
             Box(modifier = Modifier.fillMaxWidth().height(36.dp).clip(SnoutTheme.shapes.extraSmall)) {
                 Box(
@@ -49,9 +50,9 @@ internal fun RankedBarList(
                         .background(color.copy(alpha = BarAlpha)),
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 8.dp),
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = Spacing.small),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
                 ) {
                     Text(
                         text = row.label,

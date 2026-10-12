@@ -36,16 +36,16 @@ import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogSeverityTag
 import com.nightcode.snout.features.logs.components.LogsUnavailablePlaceholder
 import com.nightcode.snout.features.logs.components.label
 import com.nightcode.snout.features.logs.components.volumeColor
 import com.nightcode.snout.features.logs.components.volumeLabel
 import com.nightcode.snout.shared.common.testdata.TestData
-import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.logs.LogEntry
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.model.logs.LogVolume
@@ -84,21 +84,19 @@ internal fun LogServiceScreen(
     val searchState = rememberTextFieldState(state.query)
     LaunchedEffect(searchState.text) { onQueryChanged(searchState.text.toString()) }
 
-    ListScreenScaffold(
+    PushedScreenScaffold(
         title = service,
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())) {
             LogFilters(searchState = searchState, severity = state.severity, onSeverityChanged = onSeverityChanged)
-            val logs = state.logs
-            if (logs is CachedUiState.Error && logs.error == DataError.NotFound) {
-                LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-                return@Column
-            }
             CachedStateContainer(
-                state = logs,
+                state = state.logs,
                 onRefresh = onRefresh,
+                notFoundContent = {
+                    LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
+                },
                 emptyContent = {
                     if (state.query.isBlank()) {
                         Placeholder(
@@ -118,7 +116,7 @@ internal fun LogServiceScreen(
                     }
                 },
             ) { entries ->
-                LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + innerPadding.bottomOnly()) {
+                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
                     state.volume?.let { volume ->
                         item(key = "volume") { VolumeChart(volume, includeDate = range != LogsRange.LastHour) }
                     }
@@ -142,7 +140,10 @@ private fun LogFilters(
     SearchField(
         state = searchState,
         placeholder = stringResource(Res.string.logs_search_placeholder),
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.large)
+            .padding(top = Spacing.small, bottom = Spacing.xxSmall),
     )
     FilterMenuChip(
         label = stringResource(severity.label),
@@ -150,7 +151,7 @@ private fun LogFilters(
         selected = severity,
         onSelect = onSeverityChanged,
         active = severity != LogSeverityFilter.All,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
     )
 }
 
@@ -171,7 +172,7 @@ private fun VolumeChart(volume: LogVolume, includeDate: Boolean) {
         stacked = true,
         showLegend = true,
         height = 140.dp,
-        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp),
+        modifier = Modifier.padding(horizontal = Spacing.large).padding(bottom = Spacing.small),
     )
 }
 
@@ -204,7 +205,7 @@ private fun LoadMoreFooter(status: LoadMoreStatus, onLoadMore: () -> Unit) {
             text = stringResource(Res.string.logs_load_more_failed),
             actionLabel = stringResource(Res.string.logs_load_more_retry),
             onAction = onLoadMore,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.large),
         )
 
         LoadMoreStatus.Done -> Unit

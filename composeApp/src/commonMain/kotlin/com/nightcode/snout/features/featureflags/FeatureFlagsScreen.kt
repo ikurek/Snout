@@ -15,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
@@ -26,6 +25,7 @@ import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.components.FeatureFlagStatusPill
 import com.nightcode.snout.features.featureflags.components.rolloutSummary
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -51,7 +51,7 @@ internal fun FeatureFlagsScreen(
         SearchField(
             state = searchState,
             placeholder = stringResource(Res.string.feature_flags_search_placeholder),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
         CachedStateContainer(
             state = state.flags,
@@ -68,7 +68,7 @@ internal fun FeatureFlagsScreen(
                 }
             },
         ) { flags ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp) + contentPadding) {
+            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
                 itemsIndexed(flags, key = { _, flag -> flag.id }) { index, flag ->
                     FeatureFlagRow(flag = flag, divider = index < flags.lastIndex, onClick = { onOpenFlag(flag.id) })
                 }

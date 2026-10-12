@@ -37,6 +37,7 @@ import com.nightcode.snout.designsystem.charts.RetentionTable
 import com.nightcode.snout.designsystem.charts.RetentionTableRow
 import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.domain.model.insights.FunnelBreakdown
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
@@ -115,7 +116,7 @@ private fun SeriesView(
     val formatter: (Double) -> String = { it.formatValue(format) }
     val charted = all.take(MaxChartSeries)
     val ranked = all.sortedByDescending { it.total }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
         SeriesChart(charted, ranked, formatter, display, chartHeight, detailed)
         val chart = display == InsightDisplay.Line || display == InsightDisplay.Bar || display == InsightDisplay.Pie
         // The legend names each line but not its total; the detail screen lists every series with it.
@@ -139,7 +140,7 @@ private fun SeriesChart(
     detailed: Boolean,
 ) {
     val xLabels = charted.maxBy { it.periods.size }.periods.map { it.formatChartLabel() }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
         when (display) {
             InsightDisplay.Line -> {
                 LineChart(
@@ -229,7 +230,7 @@ private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String,
             single.previous?.let { previous ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
                 ) {
                     single.changePercent?.let { TrendChip(changePercent = it) }
                     Text(
@@ -243,12 +244,12 @@ private fun NumberView(series: List<TrendSeries>, formatter: (Double) -> String,
         return
     }
     ExpandableRows(items = series, expandable = expandable) { rows ->
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             rows.forEach { s ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
                 ) {
                     Text(
                         text = s.label,
@@ -278,7 +279,7 @@ private fun <T> ExpandableRows(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val shown = if (expandable && expanded) items else items.take(MaxListRows)
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall)) {
         content(shown)
         if (expandable && items.size > MaxListRows) {
             TextButton(onClick = { expanded = !expanded }) {
@@ -305,7 +306,7 @@ private fun RetentionView(result: InsightResult.Retention, chartHeight: Dp, deta
     // Intervals no cohort has reached yet would only add empty columns.
     val intervals = result.intervals.take(curve.size)
     val percent: (Double) -> String = { it.formatPercent(isFraction = true) }
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.large)) {
         LineChart(
             series = listOf(
                 ChartSeries(stringResource(Res.string.insight_result_retention_curve), curve, chartColor(0)),
@@ -348,7 +349,7 @@ private fun FunnelView(result: InsightResult.Funnel, detailed: Boolean) {
         return
     }
     val medianLabel = stringResource(Res.string.insight_result_median)
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.large)) {
         FunnelBars(
             steps = result.steps.map { step ->
                 FunnelBarStep(
@@ -367,7 +368,7 @@ private fun FunnelView(result: InsightResult.Funnel, detailed: Boolean) {
 @Composable
 private fun FunnelBreakdowns(breakdowns: List<FunnelBreakdown>) {
     val none = stringResource(Res.string.insight_result_breakdown_none)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
         Text(
             text = stringResource(Res.string.insight_result_funnel_breakdowns),
             style = SnoutTheme.typography.titleSmall,

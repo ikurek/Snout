@@ -10,6 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewWrapper
+import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
+import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
 /** Top app bar on `surface` that does not tint on scroll, with the screen title in `headlineSmall`. */
@@ -39,4 +44,22 @@ internal fun snoutTopAppBarColors(): TopAppBarColors = TopAppBarDefaults.topAppB
     titleContentColor = SnoutTheme.colors.onSurface,
     navigationIconContentColor = SnoutTheme.colors.onSurfaceVariant,
     actionIconContentColor = SnoutTheme.colors.onSurfaceVariant,
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun SnoutTopAppBarPreview() = SnoutTopAppBar(
+    title = "Product overview",
+    navigationIcon = { NavigationBackIconButton(onClick = {}) },
+    actions = { OpenInPostHogIconButton(onClick = {}) },
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun SnoutTopAppBarCodeTitlePreview() = SnoutTopAppBar(
+    title = "new-checkout-flow",
+    titleStyle = SnoutTheme.code.large,
+    navigationIcon = { NavigationBackIconButton(onClick = {}) },
 )

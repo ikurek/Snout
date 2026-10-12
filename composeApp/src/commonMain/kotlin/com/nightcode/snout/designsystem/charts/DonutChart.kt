@@ -26,6 +26,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private const val FullCircle = 360f
 private const val StartAngle = -90f
@@ -66,13 +67,13 @@ internal fun DonutChart(
             Text(text = valueFormatter(total), style = SnoutTheme.typography.headlineMedium)
         }
         Column(
-            modifier = Modifier.weight(1f).padding(start = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.weight(1f).padding(start = Spacing.large),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xSmall),
         ) {
             slices.take(MaxLegendRows).forEach { slice ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.small),
                 ) {
                     Box(modifier = Modifier.size(8.dp).background(slice.color, SnoutTheme.shapes.extraSmall))
                     Text(

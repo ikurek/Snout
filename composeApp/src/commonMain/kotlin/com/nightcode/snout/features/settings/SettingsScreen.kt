@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
@@ -28,10 +25,10 @@ import com.nightcode.snout.common.platform.appVersionName
 import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.AvatarBox
+import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRow
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
@@ -39,8 +36,9 @@ import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -95,13 +93,9 @@ internal fun SettingsScreen(
 ) {
     var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            SnoutTopAppBar(
-                title = stringResource(Res.string.settings_screen_title),
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-            )
-        },
+    PushedScreenScaffold(
+        title = stringResource(Res.string.settings_screen_title),
+        onNavigateBack = onNavigateBack,
     ) { innerPadding ->
         SettingsContent(
             state = state,
@@ -169,24 +163,24 @@ private fun SettingsContent(
             selected = state.themeMode,
             onSelect = onThemeModeSelected,
             label = { themeLabels.getValue(it) },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
         )
 
         SectionLabel(stringResource(Res.string.settings_about_section))
         KeyValueRow(label = stringResource(Res.string.settings_version_label), value = appVersionName())
 
-        VerticalSpacer(24.dp)
-        HorizontalDivider(color = SnoutTheme.colors.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
+        Hairline(inset = true)
+        VerticalSpacer(Spacing.xxLarge)
         SecondaryButton(
             text = stringResource(Res.string.settings_logout_button),
             onClick = onLogoutClicked,
             loading = state.isLoggingOut,
             destructive = true,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large),
             icon = painterResource(Res.drawable.ic_logout_24dp),
         )
-        VerticalSpacer(32.dp)
+        VerticalSpacer(Spacing.xxxLarge)
     }
 }
 
@@ -204,7 +198,7 @@ private fun AccountSection(account: LoadState<User>, onRetry: () -> Unit) {
                 ),
             ),
             onAction = onRetry,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
         )
 
         is LoadState.Loaded -> AccountRow(account.data)

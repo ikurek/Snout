@@ -14,6 +14,12 @@ import com.nightcode.snout.common.compose.ScreenshotEnvironment
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun BottomNavigationPreviewShot() = ScreenshotEnvironment { BottomNavigationPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun ConfirmationDialogPreviewShot() = ScreenshotEnvironment { ConfirmationDialogPreview() }
 
 @PreviewTest
@@ -38,6 +44,12 @@ fun NothingFoundPlaceholderPreviewShot() = ScreenshotEnvironment { NothingFoundP
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun OptionPickerSheetPreviewShot() = ScreenshotEnvironment { OptionPickerSheetPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun PaymentRequiredPlaceholderPreviewShot() = ScreenshotEnvironment { PaymentRequiredPlaceholderPreview() }
 
 @PreviewTest
@@ -51,3 +63,21 @@ fun PermissionDeniedPlaceholderPreviewShot() = ScreenshotEnvironment { Permissio
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun RateLimitedPlaceholderPreviewShot() = ScreenshotEnvironment { RateLimitedPlaceholderPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SnoutTopAppBarCodeTitlePreviewShot() = ScreenshotEnvironment { SnoutTopAppBarCodeTitlePreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SnoutTopAppBarPreviewShot() = ScreenshotEnvironment { SnoutTopAppBarPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun UnavailablePlaceholderPreviewShot() = ScreenshotEnvironment { UnavailablePlaceholderPreview() }

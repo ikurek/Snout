@@ -11,13 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.projects.projectEntries
 import com.nightcode.snout.features.projects.toProjectListEntries
 import com.nightcode.snout.shared.domain.model.organization.Organization
@@ -76,13 +76,15 @@ private fun Content(
 /** Headline and its intro under the onboarding progress, lined up with the login step's. */
 @Composable
 private fun Header() {
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = Spacing.large).padding(top = Spacing.large, bottom = Spacing.medium),
+    ) {
         Text(
             text = stringResource(Res.string.project_selection_screen_title),
             style = SnoutTheme.typography.headlineSmall,
             modifier = Modifier.semantics { heading() },
         )
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.small)
         Text(
             text = stringResource(Res.string.project_selection_screen_subtitle),
             style = SnoutTheme.typography.bodyMedium,

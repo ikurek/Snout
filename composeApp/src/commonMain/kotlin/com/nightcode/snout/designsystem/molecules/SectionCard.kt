@@ -3,6 +3,7 @@ package com.nightcode.snout.designsystem.molecules
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,8 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewWrapper
+import com.nightcode.snout.common.compose.ThemePreviewWrapper
+import com.nightcode.snout.designsystem.atoms.TrendChip
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /**
  * Chart card and dashboard tile: `surfaceContainerLow` on 16dp radius with a title row and 16dp padding.
@@ -48,8 +53,8 @@ private fun SectionCardContent(
     trailing: (@Composable () -> Unit)?,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = Modifier.padding(Spacing.large), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
@@ -73,14 +78,50 @@ private fun SectionCardContent(
     }
 }
 
-/** Smaller tonal card (12dp radius, 12dp padding) for the flag Enabled row and release conditions. */
+/**
+ * Smaller tonal card: `surfaceContainerLow` on 12dp radius, without a title row. Groups a few related rows or
+ * controls inside a screen; [contentPadding] and [verticalArrangement] default to 12dp padding and 4dp gaps.
+ */
 @Composable
-internal fun TonalCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun TonalCard(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(Spacing.medium),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(Spacing.xxSmall),
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = SnoutTheme.shapes.medium,
         color = SnoutTheme.colors.surfaceContainerLow,
     ) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp), content = content)
+        Column(
+            modifier = Modifier.padding(contentPadding),
+            verticalArrangement = verticalArrangement,
+            content = content,
+        )
     }
+}
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun SectionCardPreview() = SectionCard(
+    title = "Weekly active users",
+    subtitle = "Last 8 weeks",
+    trailing = { TrendChip(changePercent = 12.8) },
+    modifier = Modifier.padding(Spacing.large),
+) {
+    Text(text = "4,812", style = SnoutTheme.typography.headlineMedium)
+}
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun TonalCardPreview() = TonalCard(modifier = Modifier.padding(Spacing.large)) {
+    Text(text = "Release condition 1", style = SnoutTheme.typography.titleSmall)
+    Text(
+        text = "50% of users where country is Poland",
+        style = SnoutTheme.typography.bodyMedium,
+        color = SnoutTheme.colors.onSurfaceVariant,
+    )
 }

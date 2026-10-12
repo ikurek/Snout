@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
@@ -35,9 +34,10 @@ import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.StatCard
-import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.IssueStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -86,7 +86,7 @@ internal fun ErrorTrackingIssueScreen(
     onOpenInPostHog: () -> Unit,
 ) {
     val issue = state.issue.dataOrNull
-    ListScreenScaffold(
+    PushedScreenScaffold(
         title = issue?.name ?: stringResource(Res.string.error_tracking_issue_title_placeholder),
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
@@ -116,20 +116,25 @@ private fun IssueContent(
     modifier: Modifier,
     contentPadding: PaddingValues,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(bottom = Spacing.xxLarge),
+    ) {
         issue.description?.let {
             Text(
                 text = it,
                 style = SnoutTheme.code.medium,
                 color = SnoutTheme.colors.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
         }
         TriageActions(
             status = issue.status,
             updatingTo = updatingTo,
             onChangeStatus = onChangeStatus,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
         ImpactSection(issue)
         OverviewSection(issue)
@@ -137,7 +142,7 @@ private fun IssueContent(
         issue.latestRelease?.let { ReleaseSection(it) }
         InfoBanner(
             text = stringResource(Res.string.error_tracking_stack_trace_note),
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp),
+            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.xLarge),
         )
     }
 }
@@ -154,7 +159,7 @@ private fun TriageActions(
     modifier: Modifier = Modifier,
 ) {
     val idle = updatingTo == null
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small), modifier = modifier.fillMaxWidth()) {
         if (status == IssueStatus.Active) {
             PrimaryButton(
                 text = stringResource(Res.string.error_tracking_action_resolve),
@@ -187,8 +192,8 @@ private fun TriageActions(
 private fun ImpactSection(issue: ErrorTrackingIssue) {
     SectionLabel(stringResource(Res.string.error_tracking_impact_section))
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large),
     ) {
         val cardModifier = Modifier.weight(1f)
         StatCard(stringResource(Res.string.error_tracking_occurrences), issue.occurrences.compact(), cardModifier)
@@ -205,7 +210,7 @@ private fun ImpactSection(issue: ErrorTrackingIssue) {
                 ),
             ),
             xLabels = lastDaysLabels(issue.volume.size),
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.large),
         )
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /**
  * Verbatim JSON or text the user may copy. One colour, no highlighting. Scrolls sideways so indentation survives;
@@ -34,7 +35,7 @@ internal fun CodeBlock(text: String, modifier: Modifier = Modifier, wrap: Boolea
                 softWrap = wrap,
                 modifier = Modifier
                     .then(if (wrap) Modifier else Modifier.horizontalScroll(rememberScrollState()))
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .padding(horizontal = Spacing.medium, vertical = 10.dp),
             )
         }
     }
@@ -49,7 +50,7 @@ internal fun CodeChip(text: String, modifier: Modifier = Modifier) {
             style = SnoutTheme.code.small,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.dp),
+            modifier = Modifier.padding(horizontal = Spacing.xSmall, vertical = 1.dp),
         )
     }
 }

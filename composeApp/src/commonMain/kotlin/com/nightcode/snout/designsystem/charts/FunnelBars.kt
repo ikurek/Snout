@@ -23,6 +23,7 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 /** Series indices used for the first three steps: orange, blue, violet; later steps continue down the palette. */
 private val StepColorIndices = listOf(0, 1, 3)
@@ -42,11 +43,11 @@ internal fun FunnelBars(
     modifier: Modifier = Modifier,
     valueFormatter: (Double) -> String = { it.formatCompact() },
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
         steps.forEachIndexed { index, step ->
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.xSmall)) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xSmall),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(

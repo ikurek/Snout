@@ -27,12 +27,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.chips.ChoiceChip
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
 import org.jetbrains.compose.resources.stringResource
@@ -110,22 +110,22 @@ private fun Content(
             .padding(contentPadding)
             .consumeWindowInsets(contentPadding)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = Spacing.large),
     ) {
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
         Text(
             text = stringResource(Res.string.login_screen_header),
             style = SnoutTheme.typography.headlineSmall,
             modifier = Modifier.semantics { heading() },
         )
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.small)
         Text(
             stringResource(Res.string.login_screen_description),
             style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
         )
 
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
         PrimaryTextField(
             state = instanceUrlTextFieldState,
             label = stringResource(Res.string.login_screen_instance_url_input_label),
@@ -141,8 +141,8 @@ private fun Content(
                 imeAction = ImeAction.Done,
             ),
         )
-        VerticalSpacer(8.dp)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        VerticalSpacer(Spacing.small)
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
             // Selected whenever the field holds that cloud's URL, however it got there (chip, typing, a saved session).
             val instanceUrl = instanceUrlTextFieldState.text.toString()
             ChoiceChip(
@@ -158,7 +158,7 @@ private fun Content(
                 onClick = { instanceUrlTextFieldState.setTextAndPlaceCursorAtEnd(PostHogCloudEuUrl) },
             )
         }
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
 
         PrimaryTextField(
             state = personalApiKeyTextFieldState,
@@ -176,7 +176,7 @@ private fun Content(
             ),
         )
 
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.small)
 
         Text(
             text = stringResource(Res.string.login_screen_personal_api_key_create_in_web_button),
@@ -187,9 +187,9 @@ private fun Content(
             color = SnoutTheme.colors.primary,
         )
 
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.large)
         KeyScopes()
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
     }
 }
 

@@ -7,25 +7,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.SegmentedControl
-import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
+import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.analytics.label
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
@@ -53,13 +51,9 @@ internal fun AnalyticsSettingsScreen(
     onBreakdownToggled: (WebBreakdown, Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            SnoutTopAppBar(
-                title = stringResource(Res.string.settings_analytics_title),
-                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
-            )
-        },
+    PushedScreenScaffold(
+        title = stringResource(Res.string.settings_analytics_title),
+        onNavigateBack = onNavigateBack,
     ) { innerPadding ->
         val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
         if (preferences == null) {
@@ -91,14 +85,19 @@ private fun AnalyticsSettingsContent(
     onReset: () -> Unit,
 ) {
     val rangeLabels = AnalyticsRange.entries.associateWith { it.label() }
-    Column(modifier = modifier.verticalScroll(rememberScrollState()).padding(contentPadding).padding(bottom = 24.dp)) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(bottom = Spacing.xxLarge),
+    ) {
         SectionLabel(stringResource(Res.string.settings_analytics_range_section))
         SegmentedControl(
             options = AnalyticsRange.entries,
             selected = preferences.defaultRange,
             onSelect = onDefaultRangeSelected,
             label = { rangeLabels.getValue(it) },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
         )
 
         SectionLabel(stringResource(Res.string.settings_analytics_metrics_section))
@@ -134,12 +133,12 @@ private fun AnalyticsSettingsContent(
             )
         }
 
-        VerticalSpacer(24.dp)
+        VerticalSpacer(Spacing.xxLarge)
         SecondaryButton(
             text = stringResource(Res.string.settings_analytics_reset),
             onClick = onReset,
             enabled = preferences != AnalyticsPreferences.Default,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large),
         )
     }
 }

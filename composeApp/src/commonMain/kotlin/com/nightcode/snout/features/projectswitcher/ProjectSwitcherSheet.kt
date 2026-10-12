@@ -12,10 +12,10 @@ import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.nightcode.snout.designsystem.atoms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
+import com.nightcode.snout.designsystem.organisms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.projects.projectEntries
 import com.nightcode.snout.features.projects.toProjectListEntries
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
@@ -49,7 +49,9 @@ internal fun ProjectSwitcherSheet(
         Text(
             text = stringResource(Res.string.switch_project_bottom_sheet_title),
             style = SnoutTheme.typography.titleLarge,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
+            modifier = Modifier
+                .padding(horizontal = Spacing.large)
+                .padding(top = Spacing.small, bottom = Spacing.medium),
         )
         when (state) {
             ProjectSwitcherUiState.Loading -> SkeletonRows(count = LoadingRowCount)
@@ -73,7 +75,7 @@ private fun NotFoundContent() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 48.dp),
+            .padding(vertical = Spacing.huge),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -90,7 +92,7 @@ private fun LoadedContent(
     selectedProject: SelectedProject,
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
 ) {
-    LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+    LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large)) {
         projectEntries(
             entries = organizations.toProjectListEntries(),
             selectedProject = selectedProject,

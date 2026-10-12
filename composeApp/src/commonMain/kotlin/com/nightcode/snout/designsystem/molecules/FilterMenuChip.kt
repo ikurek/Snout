@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
-import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.atoms.chips.ChoiceChip
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.painterResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_arrow_drop_down_24dp
@@ -115,7 +115,7 @@ private fun <T> FilterMenuOptions(options: List<MenuOption<T>>, selected: T, onS
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun FilterMenuChipPreview() = Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+fun FilterMenuChipPreview() = Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
     FilterMenuChip(
         label = "Active",
         options = listOf(MenuOption("active", "Active"), MenuOption("resolved", "Resolved")),

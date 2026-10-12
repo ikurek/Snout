@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.painterResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_info_outlined_24dp
@@ -31,7 +32,7 @@ internal fun InfoBanner(text: String, modifier: Modifier = Modifier, showIcon: B
         contentColor = SnoutTheme.colors.onSecondaryContainer,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = Spacing.medium, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (showIcon) {
@@ -57,7 +58,7 @@ internal fun BannerAction(label: String, onClick: () -> Unit, modifier: Modifier
         fontWeight = FontWeight.SemiBold,
         modifier = modifier
             .clickable(onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 2.dp),
+            .padding(horizontal = Spacing.xxSmall, vertical = Spacing.xxxSmall),
     )
 }
 

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 import org.jetbrains.compose.resources.painterResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_chevron_right_24dp
@@ -36,7 +37,7 @@ internal fun KeyValueRow(
     valueIsCode: Boolean = false,
     leadingIcon: Painter? = null,
     valueMaxLines: Int = 2,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = Spacing.large, vertical = Spacing.small),
     onClick: (() -> Unit)? = null,
     showChevron: Boolean = true,
     trailing: (@Composable () -> Unit)? = null,
@@ -47,7 +48,7 @@ internal fun KeyValueRow(
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.large),
     ) {
         leadingIcon?.let {
             Icon(

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.designsystem.tokens.Spacing
 
 private const val TintAlpha = 0.16f
 private const val HashMultiplier = 31
@@ -52,7 +53,7 @@ private fun String.stableHash(): Int = fold(0) { hash, char -> hash * HashMultip
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun AvatarBoxPreview() = Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+fun AvatarBoxPreview() = Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
     listOf("Production", "Scandroid", "Leki w Ciąży", "Farmapedia", "Aware Beauty App").forEach {
         AvatarBox(name = it)
     }

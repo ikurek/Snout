@@ -68,6 +68,18 @@ fun KeyValueRowPreviewShot() = ScreenshotEnvironment { KeyValueRowPreview() }
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun PlaceholderPreviewShot() = ScreenshotEnvironment { PlaceholderPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun SectionCardPreviewShot() = ScreenshotEnvironment { SectionCardPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun SegmentedControlPreviewShot() = ScreenshotEnvironment { SegmentedControlPreview() }
 
 @PreviewTest
@@ -87,3 +99,9 @@ fun StatCardPreviewShot() = ScreenshotEnvironment { StatCardPreview() }
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun TagListPreviewShot() = ScreenshotEnvironment { TagListPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun TonalCardPreviewShot() = ScreenshotEnvironment { TonalCardPreview() }
