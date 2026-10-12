@@ -116,6 +116,8 @@
     <string name="settings_instance_label">Instance</string>
     <string name="settings_project_label">Project</string>
     <string name="settings_project_not_selected">No project selected</string>
+    <string name="settings_open_links_title">Open PostHog links in Snout</string>
+    <string name="settings_open_links_description">Under "Open by default", add the PostHog links</string>
     <string name="settings_customise_section">Customise</string>
     <string name="settings_navigation_title">Bottom navigation</string>
     <string name="settings_navigation_description">Choose the four tabs and which one opens first</string>
@@ -367,6 +369,13 @@
     <string name="annotation_scope_organization">Organization</string>
     <string name="annotation_scope_dashboard">Dashboard</string>
     <string name="annotation_scope_insight">Insight</string>
+    <string name="open_link_icon_content_description">Open a PostHog link</string>
+    <string name="open_link_title">Open a PostHog link</string>
+    <string name="open_link_description">Paste a link to a dashboard, insight, feature flag, error or experiment.</string>
+    <string name="open_link_label">Link</string>
+    <string name="open_link_placeholder">https://eu.posthog.com/project/…</string>
+    <string name="open_link_error">Not a PostHog page Snout can open</string>
+    <string name="open_link_button">Open</string>
     <string name="annotation_create_title">New annotation</string>
     <string name="annotation_create_content_label">What happened?</string>
     <string name="annotation_create_content_placeholder">e.g. Released v2.3.0 to production</string>

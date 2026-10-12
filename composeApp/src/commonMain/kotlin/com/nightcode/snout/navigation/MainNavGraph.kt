@@ -32,6 +32,7 @@ import com.nightcode.snout.features.home.SectionNavigation
 import com.nightcode.snout.features.home.SectionRoute
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailRoute
+import com.nightcode.snout.features.links.toNavKey
 import com.nightcode.snout.features.logs.entry.LogEntryNavKey
 import com.nightcode.snout.features.logs.entry.LogEntryRoute
 import com.nightcode.snout.features.logs.service.LogServiceNavKey
@@ -45,9 +46,15 @@ import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
+import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
+import com.nightcode.snout.shared.domain.usecase.links.ClearPendingLink
+import com.nightcode.snout.shared.domain.usecase.links.ObservePendingLink
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
+import com.nightcode.snout.shared.domain.usecase.links.ResolvePostHogLink
+import kotlinx.coroutines.flow.filterNotNull
 import org.koin.compose.koinInject
 
 private val PushTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
@@ -62,6 +69,7 @@ private val PopTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> C
 internal fun MainNavGraph(initial: NavKey, initialNavigationPreferences: NavigationPreferences? = null) {
     val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
     ReturnToLoginOnSessionExpiry(backStack)
+    HandleIncomingLinks(backStack)
 
     NavDisplay(
         backStack = backStack,
@@ -94,6 +102,35 @@ private fun ReturnToLoginOnSessionExpiry(backStack: NavBackStack<NavKey>) {
                 val onboarding = determineInitialLocation().toNavKey()
                 backStack.clear()
                 backStack.add(onboarding)
+            }
+        }
+    }
+}
+
+/**
+ * Opens the pending link once Home is in the back stack; until then (cold start, login, project selection) it
+ * stays pending. The stack is cut back to Home first, so Back from the linked screen lands there.
+ */
+@Composable
+private fun HandleIncomingLinks(backStack: NavBackStack<NavKey>) {
+    val observePendingLink = koinInject<ObservePendingLink>()
+    val clearPendingLink = koinInject<ClearPendingLink>()
+    val resolvePostHogLink = koinInject<ResolvePostHogLink>()
+    val openInBrowser = koinInject<OpenInBrowser>()
+    val hasHome = backStack.contains(HomeNavKey)
+
+    LaunchedEffect(hasHome) {
+        if (!hasHome) return@LaunchedEffect
+        observePendingLink().filterNotNull().collect { url ->
+            clearPendingLink()
+            when (val resolution = resolvePostHogLink(url)) {
+                is LinkResolution.InApp -> {
+                    val home = backStack.indexOf(HomeNavKey)
+                    repeat(backStack.lastIndex - home) { backStack.removeAt(backStack.lastIndex) }
+                    resolution.destination.toNavKey()?.let(backStack::add)
+                }
+
+                is LinkResolution.Browser -> openInBrowser(resolution.url)
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -13,6 +14,7 @@ import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.platform.SystemBarsAppearance
 import com.nightcode.snout.common.platform.SystemNightMode
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.features.links.IncomingLinks
 import com.nightcode.snout.navigation.MainNavGraph
 import com.nightcode.snout.navigation.toNavKey
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
@@ -20,6 +22,7 @@ import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
+import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
 import kotlinx.coroutines.flow.first
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
@@ -31,14 +34,17 @@ private class Startup(val initial: NavKey, val navigationPreferences: Navigation
 
 /**
  * [onReady] fires once the startup reads and the theme are in and the first screen is composed; Android keeps
- * its system splash up until then, so the app never shows an empty frame of its own.
+ * its system splash up until then, so the app never shows an empty frame of its own. [incomingLinks] brings in
+ * links the platform was asked to open.
  */
 @Composable
-fun App(onReady: () -> Unit = {}) = KoinApplication(
+fun App(onReady: () -> Unit = {}, incomingLinks: IncomingLinks? = null) = KoinApplication(
     configuration = koinConfiguration {
         module<AppModule>()
     },
 ) {
+    ReceiveIncomingLinks(incomingLinks)
+
     val determineInitialLocation = koinInject<DetermineInitialLocation>()
     val observeNavigationPreferences = koinInject<ObserveNavigationPreferences>()
     val startup by produceState<Startup?>(initialValue = null) {
@@ -71,5 +77,14 @@ fun App(onReady: () -> Unit = {}) = KoinApplication(
                 SideEffect(onReady)
             }
         }
+    }
+}
+
+/** Queues each link the platform hands over; the navigation graph opens it once it can. */
+@Composable
+private fun ReceiveIncomingLinks(incomingLinks: IncomingLinks?) {
+    val submitIncomingLink = koinInject<SubmitIncomingLink>()
+    LaunchedEffect(incomingLinks) {
+        incomingLinks?.receive()?.collect { submitIncomingLink(it) }
     }
 }

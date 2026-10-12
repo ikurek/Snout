@@ -28,8 +28,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.bottom_nav_more
+import snout.composeapp.generated.resources.ic_link_24dp
 import snout.composeapp.generated.resources.ic_more_horiz_24dp
 import snout.composeapp.generated.resources.ic_settings_24dp
+import snout.composeapp.generated.resources.open_link_icon_content_description
 import snout.composeapp.generated.resources.settings_icon_content_description
 
 /** The home shell: four preference-driven tabs plus More. `null` as the current section means More. */
@@ -39,6 +41,7 @@ internal fun HomeScreen(
     currentProjectName: String,
     onOpenProjectSwitcher: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onOpenLink: () -> Unit,
     onOpenSection: (HomeSection) -> Unit,
     onOpenInPostHog: (PostHogResource) -> Unit,
     navigation: SectionNavigation,
@@ -61,6 +64,12 @@ internal fun HomeScreen(
                     OpenInPostHogIconButton(
                         onClick = { onOpenInPostHog(current?.resource ?: PostHogResource.Project) },
                     )
+                    IconButton(onClick = onOpenLink) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_link_24dp),
+                            contentDescription = stringResource(Res.string.open_link_icon_content_description),
+                        )
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_settings_24dp),

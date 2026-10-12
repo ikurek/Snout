@@ -8,6 +8,9 @@ import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveThemeMode
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
+import com.nightcode.snout.shared.domain.usecase.links.CanOpenLinkSettings
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
+import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.user.GetCurrentUser
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +27,9 @@ internal class SettingsViewModel(
     private val getInstanceUrl: GetInstanceUrl,
     private val saveThemeMode: SaveThemeMode,
     private val logout: Logout,
+    private val openInBrowser: OpenInBrowser,
+    private val openLinkSettings: OpenLinkSettings,
+    canOpenLinkSettings: CanOpenLinkSettings,
     observeOrganizations: ObserveOrganizations,
     observeSelectedProject: ObserveSelectedProject,
     observeThemeMode: ObserveThemeMode,
@@ -32,6 +38,7 @@ internal class SettingsViewModel(
     private val account = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
     private val instanceUrl = MutableStateFlow<String?>(null)
     private val isLoggingOut = MutableStateFlow(false)
+    private val showLinkSettings = canOpenLinkSettings()
 
     private val selectedProjectNames = combine(
         observeOrganizations(),
@@ -56,8 +63,13 @@ internal class SettingsViewModel(
             projectName = projectName,
             themeMode = themeMode,
             isLoggingOut = isLoggingOut,
+            canOpenLinkSettings = showLinkSettings,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        SettingsUiState(canOpenLinkSettings = showLinkSettings),
+    )
 
     init {
         loadAccount()
@@ -71,6 +83,10 @@ internal class SettingsViewModel(
             ifRight = { AccountUiState.Loaded(it) },
         )
     }
+
+    fun onOpenInstance(url: String) = openInBrowser(url)
+
+    fun onOpenLinkSettings() = openLinkSettings()
 
     fun onThemeModeSelected(themeMode: ThemeMode) = viewModelScope.launch { saveThemeMode(themeMode) }
 

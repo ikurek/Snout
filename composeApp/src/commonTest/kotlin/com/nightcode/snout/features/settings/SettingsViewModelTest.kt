@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
+import com.nightcode.snout.shared.domain.data.links.ExternalAppLauncher
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
@@ -19,6 +20,9 @@ import com.nightcode.snout.shared.domain.usecase.appstate.SaveThemeMode
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
+import com.nightcode.snout.shared.domain.usecase.links.CanOpenLinkSettings
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
+import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.user.GetCurrentUser
 import dev.mokkery.MockMode.autoUnit
@@ -26,6 +30,7 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -43,6 +48,9 @@ class SettingsViewModelTest :
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
         val cacheRepository = mock<CacheRepository>(autoUnit)
+        val externalAppLauncher = mock<ExternalAppLauncher>(autoUnit) {
+            every { canOpenLinkSettings } returns true
+        }
 
         fun subject(): SettingsViewModel {
             everySuspend { authRepository.getInstanceUrl() } returns "https://eu.posthog.com"
@@ -60,6 +68,9 @@ class SettingsViewModelTest :
                 observeOrganizations = ObserveOrganizations(organizationRepository),
                 observeSelectedProject = ObserveSelectedProject(appStateRepository),
                 observeThemeMode = ObserveThemeMode(appStateRepository),
+                openInBrowser = OpenInBrowser(externalAppLauncher),
+                openLinkSettings = OpenLinkSettings(externalAppLauncher),
+                canOpenLinkSettings = CanOpenLinkSettings(externalAppLauncher),
             )
         }
 
@@ -74,8 +85,17 @@ class SettingsViewModelTest :
                 organizationName = TestOrganization.name,
                 projectName = TestOrganization.projects.first().name,
                 themeMode = ThemeMode.Dark,
+                canOpenLinkSettings = true,
             )
             collector.cancel()
+        }
+
+        should("hand the instance to the browser and open the link settings") {
+            val viewModel = subject()
+            viewModel.onOpenInstance("https://eu.posthog.com")
+            viewModel.onOpenLinkSettings()
+            verify { externalAppLauncher.openInBrowser("https://eu.posthog.com") }
+            verify { externalAppLauncher.openLinkSettings() }
         }
 
         should("expose account error and allow retry") {

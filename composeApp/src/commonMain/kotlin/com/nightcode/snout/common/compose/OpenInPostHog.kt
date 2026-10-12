@@ -2,9 +2,9 @@ package com.nightcode.snout.common.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalUriHandler
 import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import com.nightcode.snout.shared.domain.usecase.appstate.GetPostHogUrl
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -12,9 +12,9 @@ import org.koin.compose.koinInject
 @Composable
 internal fun rememberPostHogOpener(): (PostHogResource) -> Unit {
     val getPostHogUrl = koinInject<GetPostHogUrl>()
-    val uriHandler = LocalUriHandler.current
+    val openInBrowser = koinInject<OpenInBrowser>()
     val scope = rememberCoroutineScope()
-    return { resource -> scope.launch { getPostHogUrl(resource)?.let(uriHandler::openUri) } }
+    return { resource -> scope.launch { getPostHogUrl(resource)?.let(openInBrowser::invoke) } }
 }
 
 /** Returns a click handler that opens [resource] in the PostHog web app of the signed-in instance. */

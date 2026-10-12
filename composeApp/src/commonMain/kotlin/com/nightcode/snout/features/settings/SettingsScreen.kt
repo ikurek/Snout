@@ -68,6 +68,8 @@ import snout.composeapp.generated.resources.settings_logout_dialog_text
 import snout.composeapp.generated.resources.settings_logout_dialog_title
 import snout.composeapp.generated.resources.settings_navigation_description
 import snout.composeapp.generated.resources.settings_navigation_title
+import snout.composeapp.generated.resources.settings_open_links_description
+import snout.composeapp.generated.resources.settings_open_links_title
 import snout.composeapp.generated.resources.settings_project_label
 import snout.composeapp.generated.resources.settings_project_not_selected
 import snout.composeapp.generated.resources.settings_screen_title
@@ -83,6 +85,7 @@ internal fun SettingsScreen(
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
     onSwitchProject: () -> Unit,
+    onOpenLinkSettings: () -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
@@ -105,6 +108,7 @@ internal fun SettingsScreen(
             onRetryAccount = onRetryAccount,
             onOpenInstance = onOpenInstance,
             onSwitchProject = onSwitchProject,
+            onOpenLinkSettings = onOpenLinkSettings,
             onThemeModeSelected = onThemeModeSelected,
             onOpenNavigationSettings = onOpenNavigationSettings,
             onOpenAnalyticsSettings = onOpenAnalyticsSettings,
@@ -135,6 +139,7 @@ private fun SettingsContent(
     onRetryAccount: () -> Unit,
     onOpenInstance: (url: String) -> Unit,
     onSwitchProject: () -> Unit,
+    onOpenLinkSettings: () -> Unit,
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
@@ -151,7 +156,7 @@ private fun SettingsContent(
         AccountSection(state.account, onRetry = onRetryAccount)
 
         SectionLabel(stringResource(Res.string.settings_connection_section))
-        ConnectionSection(state, onOpenInstance, onSwitchProject)
+        ConnectionSection(state, onOpenInstance, onSwitchProject, onOpenLinkSettings)
 
         SectionLabel(stringResource(Res.string.settings_customise_section))
         CustomiseSection(onOpenNavigationSettings, onOpenAnalyticsSettings)
@@ -218,6 +223,7 @@ private fun ConnectionSection(
     state: SettingsUiState,
     onOpenInstance: (url: String) -> Unit,
     onSwitchProject: () -> Unit,
+    onOpenLinkSettings: () -> Unit,
 ) {
     val projectValue = when {
         state.projectName == null -> stringResource(Res.string.settings_project_not_selected)
@@ -245,6 +251,16 @@ private fun ConnectionSection(
         value = projectValue,
         onClick = onSwitchProject,
     )
+    if (state.canOpenLinkSettings) {
+        EntityRow(
+            title = stringResource(Res.string.settings_open_links_title),
+            subtitle = stringResource(Res.string.settings_open_links_description),
+            subtitleStyle = SnoutTheme.typography.bodySmall,
+            divider = false,
+            onClick = onOpenLinkSettings,
+            trailing = { Chevron() },
+        )
+    }
 }
 
 /** Entry points to the sub-screens that shape the bottom bar and the Analytics tab. */
@@ -301,6 +317,7 @@ fun SettingsScreenPreview() = SettingsScreen(
     onRetryAccount = {},
     onOpenInstance = {},
     onSwitchProject = {},
+    onOpenLinkSettings = {},
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
@@ -317,6 +334,7 @@ fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     onRetryAccount = {},
     onOpenInstance = {},
     onSwitchProject = {},
+    onOpenLinkSettings = {},
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},

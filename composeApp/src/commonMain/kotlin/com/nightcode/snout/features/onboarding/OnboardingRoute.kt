@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigationevent.NavigationEventInfo
@@ -22,9 +21,11 @@ import com.nightcode.snout.features.onboarding.login.LoginViewModel
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionPage
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionSideEffect
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionViewModel
+import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /** [startStep] is where the pager opens: the intro after a logout, login after a 401, a project after a restart. */
@@ -48,7 +49,7 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     val instanceUrlTextFieldState = rememberTextFieldState()
     val personalApiKeyTextFieldState = rememberTextFieldState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val uriHandler = LocalUriHandler.current
+    val openInBrowser = koinInject<OpenInBrowser>()
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
 
@@ -87,7 +88,7 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
 
                 is LoginSideEffect.ShowError -> snackbarHostState.showSnackbar(getString(sideEffect.message))
 
-                is LoginSideEffect.OpenUrl -> uriHandler.openUri(sideEffect.url)
+                is LoginSideEffect.OpenUrl -> openInBrowser(sideEffect.url)
             }
         }
     }

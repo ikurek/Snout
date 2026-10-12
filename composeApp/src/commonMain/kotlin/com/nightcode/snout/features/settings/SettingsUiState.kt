@@ -13,6 +13,7 @@ internal data class SettingsUiState(
     val projectName: String? = null,
     val themeMode: ThemeMode = ThemeMode.System,
     val isLoggingOut: Boolean = false,
+    val canOpenLinkSettings: Boolean = false,
 )
 
 internal sealed interface AccountUiState {
@@ -31,4 +32,5 @@ internal val TestSettingsUiState = SettingsUiState(
     organizationName = "Nightcode",
     projectName = "My Project",
     themeMode = ThemeMode.System,
+    canOpenLinkSettings = true,
 )

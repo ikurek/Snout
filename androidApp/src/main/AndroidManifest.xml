@@ -3,6 +3,17 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Lets "Open in PostHog" find a browser to hand links to, instead of Snout itself. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,11 +24,36 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!--
+                PostHog cloud links. posthog.com doesn't publish an assetlinks.json for Snout, so these can't be
+                verified: Android only sends them here once the user adds them under "Open by default".
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="us.posthog.com" />
+                <data android:host="eu.posthog.com" />
+                <data android:host="app.posthog.com" />
+                <data android:pathPrefix="/project/" />
+            </intent-filter>
+            <!-- Sharing a link to Snout, the way in for self-hosted instances. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
     </application>

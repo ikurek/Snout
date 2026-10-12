@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.features.home.ProjectSwitcherBottomSheet
@@ -24,7 +23,6 @@ internal fun SettingsRoute(
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val uriHandler = LocalUriHandler.current
     val switcherViewModel = koinViewModel<ProjectSwitcherViewModel>()
     val switcherState by switcherViewModel.uiState.collectAsStateWithLifecycle()
     var showProjectSwitcher by rememberSaveable { mutableStateOf(false) }
@@ -33,8 +31,9 @@ internal fun SettingsRoute(
         state = state,
         onNavigateBack = onNavigateBack,
         onRetryAccount = viewModel::loadAccount,
-        onOpenInstance = { url -> uriHandler.openUri(url) },
+        onOpenInstance = viewModel::onOpenInstance,
         onSwitchProject = { showProjectSwitcher = true },
+        onOpenLinkSettings = viewModel::onOpenLinkSettings,
         onThemeModeSelected = viewModel::onThemeModeSelected,
         onOpenNavigationSettings = onOpenNavigationSettings,
         onOpenAnalyticsSettings = onOpenAnalyticsSettings,
