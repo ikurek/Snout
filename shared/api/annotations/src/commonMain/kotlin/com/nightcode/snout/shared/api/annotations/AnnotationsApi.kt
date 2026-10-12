@@ -2,7 +2,7 @@ package com.nightcode.snout.shared.api.annotations
 
 import com.nightcode.snout.shared.api.PaginatedResponseDto
 import com.nightcode.snout.shared.api.annotations.model.AnnotationDto
-import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationDto
+import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationRequestDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
@@ -23,7 +23,7 @@ class AnnotationsApi(private val client: HttpClient, private val authDataStore: 
     }
 
     /** Requires the `annotation:write` scope. */
-    suspend fun createAnnotation(projectId: Long, body: CreateAnnotationDto) = networkCall<AnnotationDto> {
+    suspend fun createAnnotation(projectId: Long, body: CreateAnnotationRequestDto) = networkCall<AnnotationDto> {
         client.postJson(authDataStore.projectUrl(projectId, "annotations/"), body).body()
     }
 }

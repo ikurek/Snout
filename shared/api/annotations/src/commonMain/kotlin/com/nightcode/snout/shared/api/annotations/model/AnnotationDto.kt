@@ -17,10 +17,3 @@ data class AnnotationDto(
     @SerialName("insight_name") val insightName: String? = null,
     @SerialName("deleted") val deleted: Boolean = false,
 )
-
-@Serializable
-data class CreateAnnotationDto(
-    @SerialName("content") val content: String,
-    @SerialName("date_marker") val dateMarker: Instant,
-    @SerialName("scope") val scope: String = "project",
-)

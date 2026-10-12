@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.api.featureflags
 
 import com.nightcode.snout.shared.api.PaginatedResponseDto
 import com.nightcode.snout.shared.api.featureflags.model.FeatureFlagDto
+import com.nightcode.snout.shared.api.featureflags.model.UpdateFeatureFlagRequestDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.patchJson
 import com.nightcode.snout.shared.api.projectUrl
@@ -10,8 +11,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import org.koin.core.annotation.Single
 
 private const val PageSize = 100
@@ -36,7 +35,7 @@ class FeatureFlagsApi(private val client: HttpClient, private val authDataStore:
     suspend fun setActive(projectId: Long, flagId: Long, active: Boolean) = networkCall<FeatureFlagDto> {
         client.patchJson(
             authDataStore.projectUrl(projectId, "feature_flags/$flagId/"),
-            buildJsonObject { put("active", active) },
+            UpdateFeatureFlagRequestDto(active = active),
         ).body()
     }
 }

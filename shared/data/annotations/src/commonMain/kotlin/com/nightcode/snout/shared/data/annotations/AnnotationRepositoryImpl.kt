@@ -5,7 +5,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.api.annotations.AnnotationsApi
 import com.nightcode.snout.shared.api.annotations.model.AnnotationDto
-import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationDto
+import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationRequestDto
 import com.nightcode.snout.shared.data.annotations.mapper.toAnnotation
 import com.nightcode.snout.shared.data.common.JsonCacheStore
 import com.nightcode.snout.shared.data.common.toDataError
@@ -32,7 +32,10 @@ internal class AnnotationRepositoryImpl(private val api: AnnotationsApi, private
         content: String,
         dateMarker: Instant,
     ): Either<DataError, Annotation> = either {
-        val created = api.createAnnotation(projectId, CreateAnnotationDto(content = content, dateMarker = dateMarker))
+        val created = api.createAnnotation(
+            projectId,
+            CreateAnnotationRequestDto(content = content, dateMarker = dateMarker),
+        )
             .mapLeft { it.toDataError() }
             .bind()
         val annotation = ensureNotNull(created.toAnnotation()) { DataError.UnexpectedError }

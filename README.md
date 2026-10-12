@@ -61,6 +61,10 @@ Layers, with dependencies pointing inwards:
 
 - `api` talks to PostHog and returns DTOs. `data` implements the `domain/data` repository interfaces: it calls
   `api`, maps DTOs to `domain/model` types and caches them (`JsonCacheStore` over SQLDelight).
+- DTOs sit in each `api` module's `model/` package, every field with a same-line `@SerialName`: responses are
+  `XDto`, request bodies `XRequestDto` (`UpdateXRequestDto` for PATCHes), and what query endpoints take inside
+  `{"query": …}` (`QueryRequestDto`) is `XQueryDto`, with its constant `kind` as an `@EncodeDefault` property.
+  Optional request fields default to null and are left out, since `ApiJson` doesn't encode defaults.
 - `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
   `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
   project-scoped wrappers (`observeSelectedProjectId.flatMapProject { repository.observeX(it) }`); that is
@@ -105,8 +109,8 @@ opened in the browser.
 
 Tests are Kotest `ShouldSpec` with Mokkery mocks: mappers in `shared/data/*`, use cases in
 `shared/domain/usecase/*`, view models in `composeApp/src/commonTest` (real use cases over mocked repositories),
-the Koin graph in `AppModuleTest`, and previews as screenshot tests (see Build). Shared fixtures sit next to the
-models behind the `@TestData` opt-in.
+request bodies in `shared/api/*` (pinned JSON against `FakePostHog`), the Koin graph in `AppModuleTest`, and
+previews as screenshot tests (see Build). Shared fixtures sit next to the models behind the `@TestData` opt-in.
 
 ## Design system
 

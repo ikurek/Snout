@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.api.analytics
 
-import arrow.core.Either
-import com.nightcode.snout.shared.api.NetworkError
+import com.nightcode.snout.shared.api.QueryRequestDto
 import com.nightcode.snout.shared.api.analytics.model.QueryResponseDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.postJson
@@ -9,8 +8,6 @@ import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
 import org.koin.core.annotation.Single
 
 /** Series names used in trends requests and matched again in results. */
@@ -63,11 +60,8 @@ class AnalyticsApi(private val client: HttpClient, private val authDataStore: Au
         ),
     )
 
-    private suspend fun runQuery(projectId: Long, query: JsonObject): Either<NetworkError, QueryResponseDto> =
-        networkCall {
-            client.postJson(
-                authDataStore.projectUrl(projectId, "query/"),
-                buildJsonObject { put("query", query) },
-            ).body()
-        }
+    /** Reified so the query serializes as its own DTO, with its `kind`. */
+    private suspend inline fun <reified Q> runQuery(projectId: Long, query: Q) = networkCall<QueryResponseDto> {
+        client.postJson(authDataStore.projectUrl(projectId, "query/"), QueryRequestDto(query)).body()
+    }
 }

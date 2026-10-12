@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.api.insights
 
 import com.nightcode.snout.shared.api.PaginatedResponseDto
 import com.nightcode.snout.shared.api.insights.model.InsightDto
+import com.nightcode.snout.shared.api.insights.model.UpdateInsightRequestDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.patchJson
 import com.nightcode.snout.shared.api.projectUrl
@@ -11,8 +12,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import org.koin.core.annotation.Single
 
 private const val PageSize = 100
@@ -57,7 +56,7 @@ class InsightsApi(private val client: HttpClient, private val authDataStore: Aut
     suspend fun setFavorite(projectId: Long, insightId: Long, favorited: Boolean) = networkCall<InsightDto> {
         client.patchJson(
             authDataStore.projectUrl(projectId, "insights/$insightId/"),
-            buildJsonObject { put("favorited", favorited) },
+            UpdateInsightRequestDto(favorited = favorited),
         ).body()
     }
 }

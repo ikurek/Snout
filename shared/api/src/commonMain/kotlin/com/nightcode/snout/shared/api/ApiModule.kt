@@ -16,15 +16,22 @@ import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
+/**
+ * The app's single [Json], for PostHog and the JSON cache; tests use it too. Request DTOs rely on `encodeDefaults`
+ * being off: their optional fields default to null and are then left out, as PostHog expects.
+ */
+val ApiJson = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = false
+}
+
 @Module(
     includes = [DataStoreModule::class],
 )
 class ApiModule {
 
     @Single
-    fun provideJson() = Json {
-        ignoreUnknownKeys = true
-    }
+    fun provideJson(): Json = ApiJson
 
     @Single
     fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore) = HttpClient {

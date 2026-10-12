@@ -1,21 +1,22 @@
 package com.nightcode.snout.shared.api.errortracking
 
+import com.nightcode.snout.shared.api.DateRangeDto
+import com.nightcode.snout.shared.api.PropertyFilterDto
+import com.nightcode.snout.shared.api.QueryRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
+import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueRequestDto
+import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesResponseDto
+import com.nightcode.snout.shared.api.errortracking.model.HogQLQueryDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
+import com.nightcode.snout.shared.api.errortracking.model.UpdateErrorTrackingIssueRequestDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.patchJson
 import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
-import com.nightcode.snout.shared.api.putDateRange
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
 import org.koin.core.annotation.Single
 
 /** PostHog caps a page of issues at 100. */
@@ -52,38 +53,36 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
         networkCall<ErrorTrackingIssuesResponseDto> {
             client.postJson(
                 authDataStore.projectUrl(projectId, "error_tracking/query/issues/"),
-                buildJsonObject {
-                    put("status", status)
-                    put("orderBy", "occurrences")
-                    put("limit", PageSize)
-                    put("volumeResolution", VolumeBuckets)
-                    putDateRange(DateFrom)
-                    search?.takeIf { it.isNotBlank() }?.let { put("searchQuery", it) }
-                    appVersion?.let { version ->
-                        putJsonArray("filterGroup") {
-                            add(
-                                buildJsonObject {
-                                    put("type", "event")
-                                    put("key", "${'$'}app_version")
-                                    put("operator", "exact")
-                                    putJsonArray("value") { add(version) }
-                                },
-                            )
-                        }
-                    }
-                },
+                ErrorTrackingIssuesRequestDto(
+                    status = status,
+                    orderBy = "occurrences",
+                    limit = PageSize,
+                    volumeResolution = VolumeBuckets,
+                    dateRange = DateRangeDto(DateFrom),
+                    searchQuery = search?.takeIf { it.isNotBlank() },
+                    filterGroup = appVersion?.let { version ->
+                        listOf(
+                            PropertyFilterDto(
+                                type = "event",
+                                key = "${'$'}app_version",
+                                operator = "exact",
+                                value = listOf(version),
+                            ),
+                        )
+                    },
+                ),
             ).body()
         }
 
     suspend fun getIssue(projectId: Long, issueId: String) = networkCall<ErrorTrackingIssueDto> {
         client.postJson(
             authDataStore.projectUrl(projectId, "error_tracking/query/issue/"),
-            buildJsonObject {
-                put("issueId", issueId)
-                put("includeSparkline", true)
-                put("volumeResolution", VolumeBuckets)
-                putDateRange(DateFrom)
-            },
+            ErrorTrackingIssueRequestDto(
+                issueId = issueId,
+                includeSparkline = true,
+                volumeResolution = VolumeBuckets,
+                dateRange = DateRangeDto(DateFrom),
+            ),
         ).body()
     }
 
@@ -94,7 +93,7 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
     suspend fun setStatus(projectId: Long, issueId: String, status: String) = networkCall<ErrorTrackingIssueDto> {
         client.patchJson(
             authDataStore.projectUrl(projectId, "error_tracking/issues/$issueId/"),
-            buildJsonObject { put("status", status) },
+            UpdateErrorTrackingIssueRequestDto(status = status),
         ).body()
     }
 
@@ -105,12 +104,7 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
     suspend fun getAppVersions(projectId: Long) = networkCall<HogQLResultsDto> {
         client.postJson(
             authDataStore.projectUrl(projectId, "query/"),
-            buildJsonObject {
-                putJsonObject("query") {
-                    put("kind", "HogQLQuery")
-                    put("query", AppVersionsQuery.trimIndent())
-                }
-            },
+            QueryRequestDto(HogQLQueryDto(query = AppVersionsQuery.trimIndent())),
         ).body()
     }
 }
