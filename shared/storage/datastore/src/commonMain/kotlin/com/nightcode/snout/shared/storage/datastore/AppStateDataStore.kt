@@ -17,6 +17,8 @@ private val NavigationTabsKey = stringPreferencesKey("navigation_tabs")
 private val NavigationLandingKey = stringPreferencesKey("navigation_landing")
 private val AnalyticsDefaultRangeKey = stringPreferencesKey("analytics_default_range")
 private val AnalyticsHiddenMetricsKey = stringPreferencesKey("analytics_hidden_metrics")
+
+// Backs showTrendChart; the old name stays so preferences saved by earlier versions still load.
 private val AnalyticsShowVisitorsTrendKey = booleanPreferencesKey("analytics_show_visitors_trend")
 private val AnalyticsHiddenBreakdownsKey = stringPreferencesKey("analytics_hidden_breakdowns")
 

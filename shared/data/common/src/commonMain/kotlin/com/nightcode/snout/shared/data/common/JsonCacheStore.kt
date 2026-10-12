@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
-/** Typed facade over [JsonCache]: repositories store DTOs and map them to domain on read. */
+/** Typed facade over [JsonCache]: repositories map API responses to domain models and store those as JSON. */
 class JsonCacheStore(val json: Json, private val cache: JsonCache) : CacheRepository {
 
     inline fun <reified T> observe(key: String): Flow<T?> = observeRaw(key).map { raw ->

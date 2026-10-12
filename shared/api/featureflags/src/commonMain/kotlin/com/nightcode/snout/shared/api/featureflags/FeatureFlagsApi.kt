@@ -20,7 +20,7 @@ private const val PageSize = 100
 
 class FeatureFlagsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
-    // ponytail: first 100 flags only; add offset paging when a project outgrows that.
+    // Limitation: first 100 flags only; add offset paging when a project outgrows that.
     suspend fun getFeatureFlags(projectId: Long, search: String? = null) =
         networkCall<PaginatedResponseDto<FeatureFlagDto>> {
             client.get(authDataStore.projectUrl(projectId, "feature_flags/")) {

@@ -1,6 +1,7 @@
 package com.nightcode.snout.convention
 
 import com.nightcode.snout.id
+import com.nightcode.snout.library
 import com.nightcode.snout.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,8 +15,8 @@ class MultiplatformKoinPlugin : Plugin<Project> {
 
             configure<KotlinMultiplatformExtension> {
                 sourceSets.commonMain.dependencies {
-                    implementation(libs.findLibrary("koin-core").get())
-                    implementation(libs.findLibrary("koin-annotations").get())
+                    implementation(libs.library("koin.core"))
+                    implementation(libs.library("koin.annotations"))
                 }
             }
         }

@@ -2,12 +2,11 @@ plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.koin)
     alias(libs.plugins.snout.multiplatform.unittest)
-    alias(libs.plugins.mokkery)
 }
 
 kotlin {
     android {
-        namespace = "com.nightcode.snout.shared.usecase.user"
+        namespace = "com.nightcode.snout.shared.domain.usecase.user"
     }
 
     sourceSets.commonMain.dependencies {

@@ -13,11 +13,9 @@ kotlin {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(libs.kotest.framework.engine)
-            implementation(libs.coroutines.core)
-            implementation(libs.coroutines.test)
-        }
+    sourceSets.commonMain.dependencies {
+        implementation(libs.kotest.framework.engine)
+        implementation(libs.coroutines.core)
+        implementation(libs.coroutines.test)
     }
 }

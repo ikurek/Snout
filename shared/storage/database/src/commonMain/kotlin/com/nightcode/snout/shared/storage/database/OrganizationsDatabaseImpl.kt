@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.storage.database.entity.ProjectEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 
 @Single(binds = [OrganizationsDatabase::class])
@@ -48,22 +49,24 @@ internal class OrganizationsDatabaseImpl(
     }
 
     override suspend fun replaceAll(organizations: List<OrganizationEntity>) {
-        database.transaction {
-            database.organizationQueries.deleteAll()
-            database.projectQueries.deleteAll()
-            organizations.forEach { org ->
-                database.organizationQueries.upsert(
-                    id = org.id,
-                    name = org.name,
-                    slug = org.slug,
-                    logo_url = org.logoUrl,
-                )
-                org.projects.forEach { project ->
-                    database.projectQueries.upsert(
-                        id = project.id,
-                        organization_id = org.id,
-                        name = project.name,
+        withContext(ioDispatcher) {
+            database.transaction {
+                database.organizationQueries.deleteAll()
+                database.projectQueries.deleteAll()
+                organizations.forEach { org ->
+                    database.organizationQueries.upsert(
+                        id = org.id,
+                        name = org.name,
+                        slug = org.slug,
+                        logo_url = org.logoUrl,
                     )
+                    org.projects.forEach { project ->
+                        database.projectQueries.upsert(
+                            id = project.id,
+                            organization_id = org.id,
+                            name = project.name,
+                        )
+                    }
                 }
             }
         }

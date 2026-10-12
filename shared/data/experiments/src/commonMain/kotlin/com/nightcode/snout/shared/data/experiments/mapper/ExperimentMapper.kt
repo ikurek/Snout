@@ -53,8 +53,5 @@ private fun JsonElement.metricName(): String {
         ?: "Metric"
 }
 
-private fun JsonObject.string(key: String): String? = (
-    get(
-        key,
-    ) as? JsonPrimitive
-    )?.contentOrNull?.takeIf { it.isNotBlank() }
+private fun JsonObject.string(key: String): String? =
+    (get(key) as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotBlank() }

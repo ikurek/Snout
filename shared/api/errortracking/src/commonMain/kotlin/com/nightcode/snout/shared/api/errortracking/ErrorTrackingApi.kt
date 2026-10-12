@@ -44,10 +44,11 @@ LIMIT 20
  */
 class ErrorTrackingApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
-    // ponytail: first 100 issues only; add offset paging when a project outgrows that.
     /**
      * [status] is one of active, resolved, suppressed, archived, pending_release or all. [appVersion] keeps only
      * exceptions whose `${'$'}app_version` matches, so counts cover that version alone.
+     *
+     * Limitation: first 100 issues only; add offset paging when a project outgrows that.
      */
     suspend fun getIssues(projectId: Long, status: String, search: String? = null, appVersion: String? = null) =
         networkCall<ErrorTrackingIssuesResponseDto> {

@@ -12,6 +12,7 @@ import com.nightcode.snout.features.links.IncomingLinks
 
 class MainActivity : ComponentActivity() {
     private val incomingLinks = IncomingLinks()
+    private var ready = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -39,8 +40,6 @@ class MainActivity : ComponentActivity() {
         }
         text?.let(incomingLinks::open)
     }
-
-    private var ready = false
 
     /** Holds the first draw, and with it the system splash, until the app knows which screen to open. */
     private fun keepSplashUntilReady() {

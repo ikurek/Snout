@@ -5,4 +5,4 @@ import platform.Foundation.NSBundle
 
 @Composable
 internal actual fun appVersionName(): String =
-    NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""
+    NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: "1.0"

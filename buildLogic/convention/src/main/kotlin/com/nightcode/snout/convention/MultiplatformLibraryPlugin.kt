@@ -2,6 +2,7 @@ package com.nightcode.snout.convention
 
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.nightcode.snout.id
+import com.nightcode.snout.library
 import com.nightcode.snout.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -38,14 +39,14 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
 
                 sourceSets {
                     androidMain.dependencies {
-                        implementation(libs.findLibrary("coroutines-android").get())
+                        implementation(libs.library("coroutines.android"))
                     }
                     commonMain.dependencies {
                         implementation(project(":shared:common:testdata"))
-                        implementation(libs.findLibrary("arrow-core").get())
-                        implementation(libs.findLibrary("coroutines-core").get())
-                        implementation(libs.findLibrary("kotlin-datetime").get())
-                        implementation(libs.findLibrary("kotlin-serialization-json").get())
+                        implementation(libs.library("arrow.core"))
+                        implementation(libs.library("coroutines.core"))
+                        implementation(libs.library("kotlin.datetime"))
+                        implementation(libs.library("kotlin.serialization.json"))
                     }
                 }
             }

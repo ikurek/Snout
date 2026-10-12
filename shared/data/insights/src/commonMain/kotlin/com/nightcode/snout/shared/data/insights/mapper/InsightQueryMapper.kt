@@ -125,11 +125,8 @@ private fun JsonObject?.displayOrDefault(default: InsightDisplay): InsightDispla
 internal fun JsonElement?.seriesTitle(): String? {
     val series = sourceNode()?.get("series") as? JsonArray ?: return null
     return series.mapNotNull { node ->
-        (node as? JsonObject)?.let {
-            it.stringValue(
-                "custom_name",
-            ) ?: it.stringValue("name") ?: it.stringValue("event")
-        }
+        val step = node as? JsonObject ?: return@mapNotNull null
+        step.stringValue("custom_name") ?: step.stringValue("name") ?: step.stringValue("event")
     }.distinct().joinToString(" · ").ifBlank { null }
 }
 

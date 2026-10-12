@@ -8,9 +8,7 @@ kotlin {
         namespace = "com.nightcode.snout.shared.data.links"
     }
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(projects.shared.domain.data.links)
-        }
+    sourceSets.commonMain.dependencies {
+        implementation(projects.shared.domain.data.links)
     }
 }

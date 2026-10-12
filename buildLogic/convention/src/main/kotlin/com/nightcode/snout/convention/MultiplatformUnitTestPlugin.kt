@@ -1,5 +1,6 @@
 package com.nightcode.snout.convention
 
+import com.nightcode.snout.id
 import com.nightcode.snout.library
 import com.nightcode.snout.libs
 import org.gradle.api.Plugin
@@ -12,6 +13,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class MultiplatformUnitTestPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
+            pluginManager.apply(libs.findPlugin("mokkery").id)
+
             tasks.withType<Test>().configureEach {
                 if (name == "testAndroidHostTest") useJUnitPlatform()
             }

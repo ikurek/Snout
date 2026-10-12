@@ -30,9 +30,6 @@ class AuthUsecaseModule {
     fun validatePersonalApiKey() = ValidatePersonalApiKey()
 
     @Single
-    fun isPersonalApiKeySaved(repository: AuthRepository) = IsPersonalApiKeySaved(repository)
-
-    @Single
     fun validateUserAuth(authRepository: AuthRepository, userRepository: UserRepository) =
         ValidateAndSaveUserAuth(authRepository, userRepository)
 

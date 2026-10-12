@@ -14,7 +14,7 @@ private val InstanceUrlPreferenceKey = stringPreferencesKey("instance_url")
 class AuthDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
     suspend fun getPersonalApiKey(): String? = dataStore.data.map { it[PersonalApiKeyPreferenceKey] }
         .firstOrNull()
-        ?.takeIf { it.isBlank().not() }
+        ?.takeIf { it.isNotBlank() }
 
     suspend fun savePersonalApiKey(key: String) {
         dataStore.edit { it[PersonalApiKeyPreferenceKey] = key }
@@ -22,10 +22,10 @@ class AuthDataStore internal constructor(private val dataStore: DataStore<Prefer
 
     suspend fun getInstanceUrl(): String? = dataStore.data.map { it[InstanceUrlPreferenceKey] }
         .firstOrNull()
-        ?.takeIf { it.isBlank().not() }
+        ?.takeIf { it.isNotBlank() }
 
-    suspend fun saveInstanceUrl(key: String) {
-        dataStore.edit { it[InstanceUrlPreferenceKey] = key }
+    suspend fun saveInstanceUrl(url: String) {
+        dataStore.edit { it[InstanceUrlPreferenceKey] = url }
     }
 
     suspend fun clear() {

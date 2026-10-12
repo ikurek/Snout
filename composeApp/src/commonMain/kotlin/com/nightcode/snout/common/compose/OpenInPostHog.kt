@@ -1,6 +1,7 @@
 package com.nightcode.snout.common.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import com.nightcode.snout.shared.domain.usecase.appstate.GetPostHogUrl
@@ -14,12 +15,14 @@ internal fun rememberPostHogOpener(): (PostHogResource) -> Unit {
     val getPostHogUrl = koinInject<GetPostHogUrl>()
     val openInBrowser = koinInject<OpenInBrowser>()
     val scope = rememberCoroutineScope()
-    return { resource -> scope.launch { getPostHogUrl(resource)?.let(openInBrowser::invoke) } }
+    return remember(getPostHogUrl, openInBrowser, scope) {
+        { resource -> scope.launch { getPostHogUrl(resource)?.let(openInBrowser::invoke) } }
+    }
 }
 
 /** Returns a click handler that opens [resource] in the PostHog web app of the signed-in instance. */
 @Composable
 internal fun rememberOpenInPostHog(resource: PostHogResource): () -> Unit {
     val open = rememberPostHogOpener()
-    return { open(resource) }
+    return remember(open, resource) { { open(resource) } }
 }

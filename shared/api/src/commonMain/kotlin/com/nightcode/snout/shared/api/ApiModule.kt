@@ -23,7 +23,6 @@ class ApiModule {
 
     @Single
     fun json() = Json {
-        prettyPrint = true
         ignoreUnknownKeys = true
     }
 

@@ -8,10 +8,8 @@ kotlin {
         namespace = "com.nightcode.snout.shared.api.organizations"
     }
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(projects.shared.api)
-            implementation(projects.shared.storage.datastore)
-        }
+    sourceSets.commonMain.dependencies {
+        implementation(projects.shared.api)
+        implementation(projects.shared.storage.datastore)
     }
 }

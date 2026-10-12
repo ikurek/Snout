@@ -18,7 +18,5 @@ internal class AuthRepositoryImpl(private val dataStore: AuthDataStore) : AuthRe
 
     override suspend fun clear() = dataStore.clear()
 
-    override suspend fun clearPersonalApiKey() = dataStore.clearPersonalApiKey()
-
     override fun observePersonalApiKey(): Flow<String?> = dataStore.observePersonalApiKey()
 }

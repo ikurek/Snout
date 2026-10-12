@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.api.annotations.AnnotationsApi
+import com.nightcode.snout.shared.api.annotations.model.AnnotationDto
 import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationDto
 import com.nightcode.snout.shared.data.annotations.mapper.toAnnotation
 import com.nightcode.snout.shared.data.common.JsonCacheStore
@@ -38,7 +39,7 @@ internal class AnnotationRepositoryImpl(private val api: AnnotationsApi, private
         annotation
     }
 
-    private fun List<com.nightcode.snout.shared.api.annotations.model.AnnotationDto>.toSortedAnnotations() =
+    private fun List<AnnotationDto>.toSortedAnnotations() =
         filterNot { it.deleted }.mapNotNull { it.toAnnotation() }.sortedByDescending { it.dateMarker }
 
     private fun key(projectId: Long) = "annotations:$projectId"

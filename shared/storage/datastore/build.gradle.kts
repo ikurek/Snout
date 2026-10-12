@@ -8,10 +8,8 @@ kotlin {
         namespace = "com.nightcode.snout.shared.storage.datastore"
     }
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(libs.datastore)
-            implementation(libs.datastore.preferences)
-        }
+    sourceSets.commonMain.dependencies {
+        implementation(libs.datastore)
+        implementation(libs.datastore.preferences)
     }
 }

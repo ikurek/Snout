@@ -8,10 +8,8 @@ kotlin {
         namespace = "com.nightcode.snout.shared.data.auth"
     }
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(projects.shared.domain.data.auth)
-            implementation(projects.shared.storage.datastore)
-        }
+    sourceSets.commonMain.dependencies {
+        implementation(projects.shared.domain.data.auth)
+        implementation(projects.shared.storage.datastore)
     }
 }

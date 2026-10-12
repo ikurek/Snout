@@ -11,6 +11,5 @@ kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.shared.api)
         implementation(projects.shared.storage.datastore)
-        implementation(libs.kotlin.serialization.json)
     }
 }

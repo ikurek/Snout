@@ -14,7 +14,7 @@ private const val PageSize = 50
 
 class ActivityLogApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
-    // ponytail: newest 50 entries only; cursor paging can follow `next` later.
+    // Limitation: newest 50 entries only; cursor paging would follow the response's `next` link.
     suspend fun getActivityLog(projectId: Long) = networkCall<PaginatedResponseDto<ActivityLogDto>> {
         client.get(authDataStore.projectUrl(projectId, "activity_log/")) { parameter("limit", PageSize) }.body()
     }

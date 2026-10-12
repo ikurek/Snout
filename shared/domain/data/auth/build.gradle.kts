@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "com.nightcode.snout.shared.domain.auth"
+        namespace = "com.nightcode.snout.shared.domain.data.auth"
     }
 
     sourceSets.commonMain.dependencies {

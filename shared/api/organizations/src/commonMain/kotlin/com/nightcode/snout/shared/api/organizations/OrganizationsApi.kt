@@ -1,6 +1,7 @@
 package com.nightcode.snout.shared.api.organizations
 
 import com.nightcode.snout.shared.api.PaginatedResponseDto
+import com.nightcode.snout.shared.api.instanceUrl
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.organizations.model.OrganizationDto
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
@@ -11,6 +12,6 @@ import io.ktor.client.request.get
 class OrganizationsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getOrganizations() = networkCall<PaginatedResponseDto<OrganizationDto>> {
-        client.get("${authDataStore.getInstanceUrl()}/api/organizations/").body()
+        client.get(authDataStore.instanceUrl("organizations/")).body()
     }
 }

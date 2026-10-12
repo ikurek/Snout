@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.snout.multiplatform.compose)
     alias(libs.plugins.snout.multiplatform.koin)
     alias(libs.plugins.snout.multiplatform.unittest)
-    alias(libs.plugins.mokkery)
 }
 
 kotlin {
@@ -24,9 +23,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-        }
         commonMain.dependencies {
             implementation(projects.shared)
             // Compose
@@ -48,8 +44,6 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
-            // Kotlin
-            implementation(libs.kotlin.serialization.json)
         }
         commonTest.dependencies {
             implementation(projects.shared.domain.data.activitylog)
@@ -76,5 +70,6 @@ composeCompiler {
 }
 
 dependencies {
+    // Runtime-only tooling so Android Studio can render @Preview composables from this module.
     androidRuntimeClasspath(libs.compose.uiTooling)
 }

@@ -1,6 +1,8 @@
 package com.nightcode.snout.shared.data.organization
 
 import arrow.core.Either
+import arrow.core.raise.either
+import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.api.organizations.OrganizationsApi
 import com.nightcode.snout.shared.data.organization.mapper.toEntity
 import com.nightcode.snout.shared.data.organization.mapper.toGetOrganizationsError
@@ -19,11 +21,15 @@ internal class OrganizationRepositoryImpl(
     private val database: OrganizationsDatabase,
 ) : OrganizationRepository {
 
-    override suspend fun refreshOrganizations(): Either<GetOrganizationsError, Unit> = api.getOrganizations()
-        .mapLeft { it.toGetOrganizationsError() }
-        .map { response -> response.results.map { it.toOrganization(authDataStore.getInstanceUrl()!!) } }
-        .onRight { organizations -> database.replaceAll(organizations.map { it.toEntity() }) }
-        .map { }
+    override suspend fun refreshOrganizations(): Either<GetOrganizationsError, Unit> = either {
+        val instanceUrl = ensureNotNull(authDataStore.getInstanceUrl()) { GetOrganizationsError.UnexpectedError }
+        val organizations = api.getOrganizations()
+            .mapLeft { it.toGetOrganizationsError() }
+            .bind()
+            .results
+            .map { it.toOrganization(instanceUrl) }
+        database.replaceAll(organizations.map { it.toEntity() })
+    }
 
     override fun observeOrganizations(): Flow<List<Organization>> =
         database.observe().map { entities -> entities.map { it.toOrganization() } }
