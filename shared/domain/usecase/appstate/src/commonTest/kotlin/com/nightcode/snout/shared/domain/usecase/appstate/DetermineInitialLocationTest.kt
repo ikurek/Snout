@@ -19,8 +19,15 @@ class DetermineInitialLocationTest :
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val subject = DetermineInitialLocation(authRepository, appStateRepository)
 
-        should("return Login when no api key is saved") {
+        should("return Intro when nothing is saved") {
             everySuspend { authRepository.getPersonalApiKey() } returns null
+            everySuspend { authRepository.getInstanceUrl() } returns null
+            subject() shouldBe InitialLocation.Intro
+        }
+
+        should("return Login when only the instance url survived") {
+            everySuspend { authRepository.getPersonalApiKey() } returns null
+            everySuspend { authRepository.getInstanceUrl() } returns "https://eu.posthog.com"
             subject() shouldBe InitialLocation.Login
         }
 

@@ -20,6 +20,7 @@ internal fun ChoiceChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     FilterChip(
@@ -27,6 +28,7 @@ internal fun ChoiceChip(
         onClick = onClick,
         label = { Text(text, style = SnoutTheme.typography.labelMedium) },
         modifier = modifier,
+        enabled = enabled,
         trailingIcon = trailingIcon,
         shape = SnoutTheme.shapes.extraSmall,
         colors = FilterChipDefaults.filterChipColors(
@@ -37,7 +39,7 @@ internal fun ChoiceChip(
             selectedTrailingIconColor = SnoutTheme.colors.onSecondaryContainer,
         ),
         border = FilterChipDefaults.filterChipBorder(
-            enabled = true,
+            enabled = enabled,
             selected = selected,
             borderColor = SnoutTheme.colors.outline,
             selectedBorderColor = SnoutTheme.colors.secondaryContainer,

@@ -7,6 +7,7 @@ compose-multiplatform = "1.12.1"
 compose-multiplatform-lifecycle = "2.11.0"
 compose-multiplatform-material3 = "1.12.0-alpha03"
 compose-multiplatform-navigation3 = "1.1.2"
+compose-multiplatform-navigationevent = "1.1.0"
 arrow = "2.2.3"
 coil = "3.6.3"
 coroutines = "1.11.0"
@@ -59,6 +60,7 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-mu
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-multiplatform" }
 compose-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "compose-multiplatform-navigation3" }
+compose-navigationevent = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version.ref = "compose-multiplatform-navigationevent" }
 
 # Lifecycle
 compose-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-multiplatform-lifecycle" }

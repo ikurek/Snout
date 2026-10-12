@@ -32,14 +32,12 @@ import com.nightcode.snout.features.home.SectionNavigation
 import com.nightcode.snout.features.home.SectionRoute
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailRoute
-import com.nightcode.snout.features.intialproject.InitialProjectNavKey
-import com.nightcode.snout.features.intialproject.InitialProjectRoute
-import com.nightcode.snout.features.login.LoginNavKey
-import com.nightcode.snout.features.login.LoginRoute
 import com.nightcode.snout.features.logs.entry.LogEntryNavKey
 import com.nightcode.snout.features.logs.entry.LogEntryRoute
 import com.nightcode.snout.features.logs.service.LogServiceNavKey
 import com.nightcode.snout.features.logs.service.LogServiceRoute
+import com.nightcode.snout.features.onboarding.OnboardingNavKey
+import com.nightcode.snout.features.onboarding.OnboardingRoute
 import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
@@ -47,6 +45,7 @@ import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
+import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
 import com.nightcode.snout.shared.domain.usecase.auth.ShouldReturnToLogin
 import org.koin.compose.koinInject
@@ -78,18 +77,23 @@ internal fun MainNavGraph(initial: NavKey, initialNavigationPreferences: Navigat
     )
 }
 
-/** Wipes local data and restarts at login once the API key disappears (logout or 401). */
+/**
+ * Wipes local data and restarts onboarding once the API key disappears: at the intro after a logout, which also
+ * forgets the instance, or at the login step after a 401, which keeps it.
+ */
 @Composable
 private fun ReturnToLoginOnSessionExpiry(backStack: NavBackStack<NavKey>) {
     val shouldReturnToLogin = koinInject<ShouldReturnToLogin>()
     val clearLocalData = koinInject<ClearLocalData>()
+    val determineInitialLocation = koinInject<DetermineInitialLocation>()
 
     LaunchedEffect(Unit) {
         shouldReturnToLogin().collect {
-            if (backStack.contains(LoginNavKey).not()) {
+            if (backStack.none { it is OnboardingNavKey }) {
                 clearLocalData()
+                val onboarding = determineInitialLocation().toNavKey()
                 backStack.clear()
-                backStack.add(LoginNavKey)
+                backStack.add(onboarding)
             }
         }
     }
@@ -109,10 +113,10 @@ private fun mainEntryProvider(
         onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
     )
     return entryProvider {
-        entry<LoginNavKey> { LoginRoute(onUserAuthorized = { backStack.add(InitialProjectNavKey) }) }
-        entry<InitialProjectNavKey> {
-            InitialProjectRoute(
-                onProjectSelected = {
+        entry<OnboardingNavKey> { key ->
+            OnboardingRoute(
+                navKey = key,
+                onFinished = {
                     backStack.clear()
                     backStack.add(HomeNavKey)
                 },

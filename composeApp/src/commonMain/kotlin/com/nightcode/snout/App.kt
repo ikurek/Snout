@@ -13,14 +13,11 @@ import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.platform.SystemBarsAppearance
 import com.nightcode.snout.common.platform.SystemNightMode
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import com.nightcode.snout.features.home.HomeNavKey
-import com.nightcode.snout.features.intialproject.InitialProjectNavKey
-import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.navigation.MainNavGraph
+import com.nightcode.snout.navigation.toNavKey
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
-import com.nightcode.snout.shared.domain.usecase.appstate.InitialLocation
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
 import kotlinx.coroutines.flow.first
@@ -46,11 +43,7 @@ fun App(onReady: () -> Unit = {}) = KoinApplication(
     val observeNavigationPreferences = koinInject<ObserveNavigationPreferences>()
     val startup by produceState<Startup?>(initialValue = null) {
         value = Startup(
-            initial = when (determineInitialLocation()) {
-                InitialLocation.Login -> LoginNavKey
-                InitialLocation.ProjectSelection -> InitialProjectNavKey
-                InitialLocation.Home -> HomeNavKey
-            },
+            initial = determineInitialLocation().toNavKey(),
             // Home's tabs come from preferences; reading them here lets it draw on its first frame.
             navigationPreferences = observeNavigationPreferences().first(),
         )

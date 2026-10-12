@@ -9,10 +9,9 @@ import com.nightcode.snout.features.featureflags.detail.FeatureFlagDetailNavKey
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.home.SectionNavKey
 import com.nightcode.snout.features.insights.detail.InsightDetailNavKey
-import com.nightcode.snout.features.intialproject.InitialProjectNavKey
-import com.nightcode.snout.features.login.LoginNavKey
 import com.nightcode.snout.features.logs.entry.LogEntryNavKey
 import com.nightcode.snout.features.logs.service.LogServiceNavKey
+import com.nightcode.snout.features.onboarding.OnboardingNavKey
 import com.nightcode.snout.features.settings.SettingsNavKey
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsNavKey
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsNavKey
@@ -23,8 +22,7 @@ internal val DefaultSavedStateConfiguration = SavedStateConfiguration {
     serializersModule = SerializersModule {
         polymorphic(NavKey::class) {
             subclass(HomeNavKey::class, HomeNavKey.serializer())
-            subclass(LoginNavKey::class, LoginNavKey.serializer())
-            subclass(InitialProjectNavKey::class, InitialProjectNavKey.serializer())
+            subclass(OnboardingNavKey::class, OnboardingNavKey.serializer())
             subclass(SettingsNavKey::class, SettingsNavKey.serializer())
             subclass(NavigationSettingsNavKey::class, NavigationSettingsNavKey.serializer())
             subclass(AnalyticsSettingsNavKey::class, AnalyticsSettingsNavKey.serializer())

@@ -39,6 +39,7 @@ kotlin {
             implementation(libs.compose.lifecycle.viewmodel)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.compose.navigation3.ui)
+            implementation(libs.compose.navigationevent)
             implementation(libs.compose.lifecycle.viewmodel.navigation3)
             // Coil
             implementation(libs.coil.compose)

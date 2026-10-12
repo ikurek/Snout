@@ -33,7 +33,8 @@ except calls to the instance you configure.
 
 Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `feature_flag`, `experiment`,
 `annotation`, `activity_log`. Add `error_tracking:read` for Errors and `logs:read` for Logs. Add `feature_flag:write` to toggle flags,
-`annotation:write` to add annotations and `error_tracking:write` to resolve or suppress errors.
+`annotation:write` to add annotations, `error_tracking:write` to resolve or suppress errors and `insight:write`
+to favorite insights. The login screen lists which scope each feature needs.
 PostHog rate-limits personal keys (240 requests/min); the app surfaces this instead of failing silently.
 
 ## Project layout
