@@ -6,12 +6,17 @@ import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.annotations.TestAnnotation
 import com.nightcode.snout.shared.domain.model.common.DataError
 
+/** Saving from the create sheet; a failure stays in the sheet until it is dismissed. */
 internal sealed interface CreateStatus {
     data object Idle : CreateStatus
 
     data object Saving : CreateStatus
 
     data class Failed(val error: DataError) : CreateStatus
+}
+
+internal sealed interface AnnotationsSideEffect {
+    data object Created : AnnotationsSideEffect
 }
 
 internal data class AnnotationsUiState(

@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.errortracking.detail
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -45,8 +45,7 @@ class ErrorTrackingIssueViewModelTest :
         should("load the issue on start") {
             everySuspend { repository.getIssue(any(), TestErrorTrackingIssue.id) } returns
                 Either.Right(TestErrorTrackingIssue)
-            subject().uiState.value.issue shouldBe
-                CachedUiState.Content(TestErrorTrackingIssue, isRefreshing = false)
+            subject().uiState.value.issue shouldBe LoadState.Loaded(TestErrorTrackingIssue)
         }
 
         should("show the error and recover on retry") {
@@ -55,10 +54,9 @@ class ErrorTrackingIssueViewModelTest :
                 returns(Either.Right(TestErrorTrackingIssue))
             }
             val viewModel = subject()
-            viewModel.uiState.value.issue shouldBe CachedUiState.Error(DataError.ConnectionError)
-            viewModel.load()
-            viewModel.uiState.value.issue shouldBe
-                CachedUiState.Content(TestErrorTrackingIssue, isRefreshing = false)
+            viewModel.uiState.value.issue shouldBe LoadState.Error(DataError.ConnectionError)
+            viewModel.refresh()
+            viewModel.uiState.value.issue shouldBe LoadState.Loaded(TestErrorTrackingIssue)
         }
 
         should("resolve the issue and offer to reopen it") {
@@ -69,12 +67,12 @@ class ErrorTrackingIssueViewModelTest :
             } returns Either.Right(IssueStatus.Resolved)
             val viewModel = subject()
 
-            viewModel.onStatusChange(IssueStatusFilter.Resolved)
+            viewModel.changeStatus(IssueStatusFilter.Resolved)
 
             viewModel.sideEffects.first() shouldBe
                 ErrorTrackingIssueSideEffect.StatusChanged(IssueStatusFilter.Resolved, undo = IssueStatusFilter.Active)
             viewModel.uiState.value shouldBe ErrorTrackingIssueUiState(
-                issue = CachedUiState.Content(TestErrorTrackingIssue.copy(status = IssueStatus.Resolved), false),
+                issue = LoadState.Loaded(TestErrorTrackingIssue.copy(status = IssueStatus.Resolved)),
             )
         }
 
@@ -84,11 +82,11 @@ class ErrorTrackingIssueViewModelTest :
             everySuspend { repository.setStatus(any(), any(), any()) } returns Either.Left(DataError.Forbidden)
             val viewModel = subject()
 
-            viewModel.onStatusChange(IssueStatusFilter.Suppressed)
+            viewModel.changeStatus(IssueStatusFilter.Suppressed)
 
             viewModel.sideEffects.first() shouldBe ErrorTrackingIssueSideEffect.StatusChangeFailed(DataError.Forbidden)
             viewModel.uiState.value shouldBe ErrorTrackingIssueUiState(
-                issue = CachedUiState.Content(TestErrorTrackingIssue, isRefreshing = false),
+                issue = LoadState.Loaded(TestErrorTrackingIssue),
             )
         }
     })

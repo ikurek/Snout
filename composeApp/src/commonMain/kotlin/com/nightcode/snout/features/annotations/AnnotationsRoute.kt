@@ -38,12 +38,12 @@ internal fun AnnotationsRoute(contentPadding: PaddingValues = PaddingValues()) {
         snackbarHostState = snackbarHostState,
         showCreateSheet = showCreateSheet,
         onRefresh = viewModel::refresh,
-        onAddClick = { showCreateSheet = true },
-        onCreateDismiss = {
+        onAddClicked = { showCreateSheet = true },
+        onCreateDismissed = {
             showCreateSheet = false
-            viewModel.dismissCreateError()
+            viewModel.onCreateErrorDismissed()
         },
-        onCreate = viewModel::onCreate,
+        onCreate = viewModel::create,
         contentPadding = contentPadding,
     )
 }

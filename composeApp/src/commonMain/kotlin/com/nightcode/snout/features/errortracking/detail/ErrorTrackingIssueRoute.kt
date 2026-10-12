@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberOpenInPostHog
-import com.nightcode.snout.shared.domain.model.common.DataError
+import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import kotlinx.serialization.Serializable
@@ -38,16 +38,15 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
                         message = getString(effect.status.changedMessage()),
                         actionLabel = effect.undo?.let { getString(Res.string.error_tracking_undo) },
                     )
-                    if (result == SnackbarResult.ActionPerformed) effect.undo?.let(viewModel::onStatusChange)
+                    if (result == SnackbarResult.ActionPerformed) effect.undo?.let(viewModel::changeStatus)
                 }
 
                 is ErrorTrackingIssueSideEffect.StatusChangeFailed -> snackbarHostState.showSnackbar(
                     getString(
-                        if (effect.error == DataError.Forbidden || effect.error == DataError.Unauthorized) {
-                            Res.string.error_tracking_status_error_forbidden
-                        } else {
-                            Res.string.error_tracking_status_error_generic
-                        },
+                        effect.error.actionFailedMessage(
+                            generic = Res.string.error_tracking_status_error_generic,
+                            forbidden = Res.string.error_tracking_status_error_forbidden,
+                        ),
                     ),
                 )
             }
@@ -58,8 +57,8 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
         state = state,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
-        onRetry = viewModel::load,
-        onStatusChange = viewModel::onStatusChange,
+        onRefresh = viewModel::refresh,
+        onChangeStatus = viewModel::changeStatus,
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.ErrorTrackingIssue(navKey.issueId)),
     )
 }

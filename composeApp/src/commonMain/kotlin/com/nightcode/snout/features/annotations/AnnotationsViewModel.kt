@@ -21,10 +21,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import kotlin.time.Instant
 
-internal sealed interface AnnotationsSideEffect {
-    data object Created : AnnotationsSideEffect
-}
-
 @KoinViewModel
 internal class AnnotationsViewModel(
     private val refreshAnnotations: RefreshAnnotations,
@@ -54,7 +50,7 @@ internal class AnnotationsViewModel(
 
     fun refresh() = viewModelScope.launch { refresh.run { refreshAnnotations() } }
 
-    fun onCreate(content: String, dateMarker: Instant) = viewModelScope.launch {
+    fun create(content: String, dateMarker: Instant) = viewModelScope.launch {
         if (content.isBlank()) return@launch
         create.value = CreateStatus.Saving
         createAnnotation(content, dateMarker).fold(
@@ -66,7 +62,7 @@ internal class AnnotationsViewModel(
         )
     }
 
-    fun dismissCreateError() {
+    fun onCreateErrorDismissed() {
         create.value = CreateStatus.Idle
     }
 }

@@ -17,14 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
-import com.nightcode.snout.shared.domain.model.common.DataError
+import com.nightcode.snout.designsystem.refreshFailedMessage
 import org.jetbrains.compose.resources.stringResource
-import snout.composeapp.generated.resources.Res
-import snout.composeapp.generated.resources.refresh_failed_forbidden
-import snout.composeapp.generated.resources.refresh_failed_generic
-import snout.composeapp.generated.resources.refresh_failed_offline
-import snout.composeapp.generated.resources.refresh_failed_payment_required
-import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
 /**
  * Renders loading, error, empty and content states of cache-first data with pull to refresh.
@@ -70,7 +64,7 @@ internal fun <T> CachedStateContainer(
             Column(modifier = Modifier.fillMaxSize()) {
                 state.refreshError?.let { error ->
                     InlineErrorBanner(
-                        text = stringResource(error.refreshMessage()),
+                        text = stringResource(error.refreshFailedMessage()),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }
@@ -78,12 +72,4 @@ internal fun <T> CachedStateContainer(
             }
         }
     }
-}
-
-private fun DataError.refreshMessage() = when (this) {
-    DataError.Unauthorized, DataError.Forbidden -> Res.string.refresh_failed_forbidden
-    DataError.PaymentRequired -> Res.string.refresh_failed_payment_required
-    DataError.RateLimited -> Res.string.refresh_failed_rate_limited
-    DataError.ConnectionError -> Res.string.refresh_failed_offline
-    DataError.NotFound, DataError.UnexpectedError -> Res.string.refresh_failed_generic
 }

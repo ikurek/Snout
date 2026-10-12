@@ -13,7 +13,7 @@ internal fun FeatureFlagsRoute(onOpenFlag: (flagId: Long) -> Unit, contentPaddin
 
     FeatureFlagsScreen(
         state = state,
-        onQueryChange = viewModel::onQueryChange,
+        onQueryChanged = viewModel::onQueryChanged,
         onRefresh = viewModel::refresh,
         onOpenFlag = onOpenFlag,
         contentPadding = contentPadding,

@@ -34,7 +34,7 @@ internal class AnalyticsSettingsViewModel(
 
     fun onBreakdownToggled(breakdown: WebBreakdown, enabled: Boolean) = update { it.withBreakdown(breakdown, enabled) }
 
-    fun onReset() = viewModelScope.launch { saveAnalyticsPreferences(AnalyticsPreferences.Default) }
+    fun reset() = viewModelScope.launch { saveAnalyticsPreferences(AnalyticsPreferences.Default) }
 
     private fun update(transform: (AnalyticsPreferences) -> AnalyticsPreferences) {
         val current = uiState.value ?: return

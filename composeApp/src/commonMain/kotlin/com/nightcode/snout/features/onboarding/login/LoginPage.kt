@@ -64,9 +64,9 @@ internal fun LoginPage(
     personalApiKeyValidationError: PersonalApiKeyValidationError?,
     isConnecting: Boolean,
     bottomPadding: PaddingValues,
-    onInstanceUrlChange: (instanceUrl: String) -> Unit,
-    onPersonalApiKeyChange: (personalApiKey: String) -> Unit,
-    onApiKeysLinkClick: (instanceUrl: String) -> Unit,
+    onInstanceUrlChanged: (instanceUrl: String) -> Unit,
+    onPersonalApiKeyChanged: (personalApiKey: String) -> Unit,
+    onApiKeysLinkClicked: (instanceUrl: String) -> Unit,
 ) {
     // After a 401 the instance is still known, so only the key needs typing again.
     LaunchedEffect(savedInstanceUrl) {
@@ -76,11 +76,11 @@ internal fun LoginPage(
     }
 
     LaunchedEffect(instanceUrlTextFieldState.text) {
-        onInstanceUrlChange(instanceUrlTextFieldState.text.toString())
+        onInstanceUrlChanged(instanceUrlTextFieldState.text.toString())
     }
 
     LaunchedEffect(personalApiKeyTextFieldState.text) {
-        onPersonalApiKeyChange(personalApiKeyTextFieldState.text.toString())
+        onPersonalApiKeyChanged(personalApiKeyTextFieldState.text.toString())
     }
 
     Content(
@@ -90,7 +90,7 @@ internal fun LoginPage(
         personalApiKeyTextFieldState = personalApiKeyTextFieldState,
         personalApiKeyTextFieldError = personalApiKeyValidationError?.textFieldError,
         isConnecting = isConnecting,
-        onApiKeysLinkClick = { onApiKeysLinkClick(instanceUrlTextFieldState.text.toString()) },
+        onApiKeysLinkClicked = { onApiKeysLinkClicked(instanceUrlTextFieldState.text.toString()) },
     )
 }
 
@@ -103,7 +103,7 @@ private fun Content(
     personalApiKeyTextFieldState: TextFieldState,
     personalApiKeyTextFieldError: TextFieldError?,
     isConnecting: Boolean,
-    onApiKeysLinkClick: () -> Unit,
+    onApiKeysLinkClicked: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -180,7 +180,7 @@ private fun Content(
 
         Text(
             text = stringResource(Res.string.login_screen_personal_api_key_create_in_web_button),
-            modifier = Modifier.align(Alignment.End).clickable(onClick = onApiKeysLinkClick),
+            modifier = Modifier.align(Alignment.End).clickable(onClick = onApiKeysLinkClicked),
             textAlign = TextAlign.End,
             style = SnoutTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,

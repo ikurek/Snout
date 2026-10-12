@@ -17,7 +17,7 @@ internal fun LogsRoute(
 
     LogsScreen(
         state = state,
-        onRangeChange = viewModel::onRangeChange,
+        onRangeSelected = viewModel::onRangeSelected,
         onRefresh = viewModel::refresh,
         onOpenService = { onOpenService(it, state.range) },
         contentPadding = contentPadding,

@@ -5,6 +5,10 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
 import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 
+internal sealed interface InsightsSideEffect {
+    data object FavoriteUpdateFailed : InsightsSideEffect
+}
+
 internal data class InsightsUiState(
     val query: String = "",
     val insights: CachedUiState<List<InsightSummary>> = CachedUiState.Loading,

@@ -58,8 +58,8 @@ internal fun AnnotationsScreen(
     snackbarHostState: SnackbarHostState,
     showCreateSheet: Boolean,
     onRefresh: () -> Unit,
-    onAddClick: () -> Unit,
-    onCreateDismiss: () -> Unit,
+    onAddClicked: () -> Unit,
+    onCreateDismissed: () -> Unit,
     onCreate: (content: String, dateMarker: Instant) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -69,7 +69,7 @@ internal fun AnnotationsScreen(
         // Only the bottom it hands over is left, so the FAB and snackbar clear the navigation bar.
         contentWindowInsets = WindowInsets(bottom = contentPadding.calculateBottomPadding()),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = { AddAnnotationButton(onClick = onAddClick) },
+        floatingActionButton = { AddAnnotationButton(onClick = onAddClicked) },
     ) { innerPadding ->
         CachedStateContainer(
             state = state.annotations,
@@ -87,7 +87,7 @@ internal fun AnnotationsScreen(
     CreateAnnotationSheet(
         isVisible = showCreateSheet,
         status = state.create,
-        onDismiss = onCreateDismiss,
+        onDismiss = onCreateDismissed,
         onCreate = onCreate,
     )
 }
@@ -156,8 +156,8 @@ fun AnnotationsScreenPreview() = AnnotationsScreen(
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
     onRefresh = {},
-    onAddClick = {},
-    onCreateDismiss = {},
+    onAddClicked = {},
+    onCreateDismissed = {},
     onCreate = { _, _ -> },
 )
 
@@ -169,7 +169,7 @@ fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
     onRefresh = {},
-    onAddClick = {},
-    onCreateDismiss = {},
+    onAddClicked = {},
+    onCreateDismissed = {},
     onCreate = { _, _ -> },
 )

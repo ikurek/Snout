@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.featureflags.detail
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -39,7 +39,7 @@ class FeatureFlagDetailViewModelTest :
         }
 
         should("load the flag on start") {
-            subject().uiState.value.flag shouldBe CachedUiState.Content(TestFeatureFlag, isRefreshing = false)
+            subject().uiState.value.flag shouldBe LoadState.Loaded(TestFeatureFlag)
         }
 
         should("replace the flag after a successful toggle") {
@@ -47,7 +47,7 @@ class FeatureFlagDetailViewModelTest :
             everySuspend { repository.setActive(any(), TestFeatureFlag.id, false) } returns Either.Right(disabled)
             val viewModel = subject()
             viewModel.onToggleConfirmed(false)
-            viewModel.uiState.value.flag shouldBe CachedUiState.Content(disabled, isRefreshing = false)
+            viewModel.uiState.value.flag shouldBe LoadState.Loaded(disabled)
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Idle
         }
 
@@ -61,9 +61,9 @@ class FeatureFlagDetailViewModelTest :
             } returns Either.Left(DataError.Forbidden)
             val viewModel = subject()
             viewModel.onToggleConfirmed(false)
-            viewModel.uiState.value.flag shouldBe CachedUiState.Content(TestFeatureFlag, isRefreshing = false)
+            viewModel.uiState.value.flag shouldBe LoadState.Loaded(TestFeatureFlag)
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Failed(DataError.Forbidden)
-            viewModel.dismissToggleError()
+            viewModel.onToggleErrorDismissed()
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Idle
         }
     })

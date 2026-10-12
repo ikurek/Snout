@@ -13,6 +13,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.logs.ObserveLogServices
 import com.nightcode.snout.shared.domain.usecase.logs.RefreshLogServices
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -21,9 +22,7 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
 class LogsViewModelTest :
@@ -48,16 +47,15 @@ class LogsViewModelTest :
 
         should("show the last day's services and switch ranges") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.uiState.value.services shouldBe CachedUiState.Content(TestLogServices, isRefreshing = false)
-            viewModel.onRangeChange(LogsRange.LastHour)
-            viewModel.uiState.value.range shouldBe LogsRange.LastHour
-            viewModel.uiState.value.services shouldBe CachedUiState.Content(
-                TestLogServices.take(1),
-                isRefreshing = false,
-            )
-            verifySuspend { repository.refreshServices(TestSelectedProject.projectId, LogsRange.LastHour) }
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.services shouldBe CachedUiState.Content(TestLogServices, isRefreshing = false)
+                viewModel.onRangeSelected(LogsRange.LastHour)
+                viewModel.uiState.value.range shouldBe LogsRange.LastHour
+                viewModel.uiState.value.services shouldBe CachedUiState.Content(
+                    TestLogServices.take(1),
+                    isRefreshing = false,
+                )
+                verifySuspend { repository.refreshServices(TestSelectedProject.projectId, LogsRange.LastHour) }
+            }
         }
     })

@@ -22,7 +22,7 @@ internal fun ExperimentDetailRoute(
     ExperimentDetailScreen(
         state = state,
         onNavigateBack = onNavigateBack,
-        onRetry = viewModel::load,
+        onRefresh = viewModel::refresh,
         onOpenFeatureFlag = onOpenFeatureFlag,
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Experiment(navKey.experimentId)),
     )

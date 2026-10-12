@@ -24,9 +24,9 @@ import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.lastDaysLabels
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
-import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
 import com.nightcode.snout.designsystem.charts.BarChart
@@ -35,8 +35,8 @@ import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.StatCard
-import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
+import com.nightcode.snout.designsystem.organisms.LoadStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.IssueStatusPill
@@ -76,36 +76,32 @@ import snout.composeapp.generated.resources.error_tracking_status_label
 import snout.composeapp.generated.resources.error_tracking_users
 import snout.composeapp.generated.resources.ic_check_24dp
 
-private const val LoadingRowCount = 4
-
 @Composable
 internal fun ErrorTrackingIssueScreen(
     state: ErrorTrackingIssueUiState,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: () -> Unit,
-    onRetry: () -> Unit,
-    onStatusChange: (IssueStatusFilter) -> Unit,
+    onRefresh: () -> Unit,
+    onChangeStatus: (IssueStatusFilter) -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    val issueState = state.issue
-    val issue = (issueState as? CachedUiState.Content)?.data
+    val issue = state.issue.dataOrNull
     ListScreenScaffold(
         title = issue?.name ?: stringResource(Res.string.error_tracking_issue_title_placeholder),
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
         snackbarHostState = snackbarHostState,
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
-        when (issueState) {
-            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
-
-            is CachedUiState.Error -> ErrorPlaceholder(error = issueState.error, onRetry = onRetry, modifier = modifier)
-
-            is CachedUiState.Content -> IssueContent(
-                issue = issueState.data,
+        LoadStateContainer(
+            state = state.issue,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+        ) { issue ->
+            IssueContent(
+                issue = issue,
                 updatingTo = state.updatingTo,
-                onStatusChange = onStatusChange,
-                modifier = modifier,
+                onChangeStatus = onChangeStatus,
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = innerPadding.bottomOnly(),
             )
         }
@@ -116,7 +112,7 @@ internal fun ErrorTrackingIssueScreen(
 private fun IssueContent(
     issue: ErrorTrackingIssue,
     updatingTo: IssueStatusFilter?,
-    onStatusChange: (IssueStatusFilter) -> Unit,
+    onChangeStatus: (IssueStatusFilter) -> Unit,
     modifier: Modifier,
     contentPadding: PaddingValues,
 ) {
@@ -132,7 +128,7 @@ private fun IssueContent(
         TriageActions(
             status = issue.status,
             updatingTo = updatingTo,
-            onStatusChange = onStatusChange,
+            onChangeStatus = onChangeStatus,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
         ImpactSection(issue)
@@ -154,7 +150,7 @@ private fun IssueContent(
 private fun TriageActions(
     status: IssueStatus,
     updatingTo: IssueStatusFilter?,
-    onStatusChange: (IssueStatusFilter) -> Unit,
+    onChangeStatus: (IssueStatusFilter) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val idle = updatingTo == null
@@ -162,7 +158,7 @@ private fun TriageActions(
         if (status == IssueStatus.Active) {
             PrimaryButton(
                 text = stringResource(Res.string.error_tracking_action_resolve),
-                onClick = { onStatusChange(IssueStatusFilter.Resolved) },
+                onClick = { onChangeStatus(IssueStatusFilter.Resolved) },
                 icon = painterResource(Res.drawable.ic_check_24dp),
                 enabled = idle,
                 loading = updatingTo == IssueStatusFilter.Resolved,
@@ -170,7 +166,7 @@ private fun TriageActions(
             )
             SecondaryButton(
                 text = stringResource(Res.string.error_tracking_action_suppress),
-                onClick = { onStatusChange(IssueStatusFilter.Suppressed) },
+                onClick = { onChangeStatus(IssueStatusFilter.Suppressed) },
                 enabled = idle,
                 loading = updatingTo == IssueStatusFilter.Suppressed,
                 modifier = Modifier.weight(1f),
@@ -178,7 +174,7 @@ private fun TriageActions(
         } else {
             SecondaryButton(
                 text = stringResource(Res.string.error_tracking_action_reopen),
-                onClick = { onStatusChange(IssueStatusFilter.Active) },
+                onClick = { onChangeStatus(IssueStatusFilter.Active) },
                 enabled = idle,
                 loading = updatingTo == IssueStatusFilter.Active,
                 modifier = Modifier.fillMaxWidth(),
@@ -277,11 +273,11 @@ private fun Long.compact(): String = toDouble().formatCompact()
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingIssueScreenPreview() = ErrorTrackingIssueScreen(
-    state = ErrorTrackingIssueUiState(CachedUiState.Content(TestErrorTrackingIssue, isRefreshing = false)),
+    state = ErrorTrackingIssueUiState(LoadState.Loaded(TestErrorTrackingIssue)),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onStatusChange = {},
+    onRefresh = {},
+    onChangeStatus = {},
     onOpenInPostHog = {},
 )
 
@@ -290,11 +286,11 @@ fun ErrorTrackingIssueScreenPreview() = ErrorTrackingIssueScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingIssueScreenResolvedPreview() = ErrorTrackingIssueScreen(
-    state = ErrorTrackingIssueUiState(CachedUiState.Content(TestResolvedErrorTrackingIssue, isRefreshing = false)),
+    state = ErrorTrackingIssueUiState(LoadState.Loaded(TestResolvedErrorTrackingIssue)),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onStatusChange = {},
+    onRefresh = {},
+    onChangeStatus = {},
     onOpenInPostHog = {},
 )
 
@@ -302,11 +298,11 @@ fun ErrorTrackingIssueScreenResolvedPreview() = ErrorTrackingIssueScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingIssueScreenForbiddenPreview() = ErrorTrackingIssueScreen(
-    state = ErrorTrackingIssueUiState(CachedUiState.Error(DataError.Forbidden)),
+    state = ErrorTrackingIssueUiState(LoadState.Error(DataError.Forbidden)),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onStatusChange = {},
+    onRefresh = {},
+    onChangeStatus = {},
     onOpenInPostHog = {},
 )
 
@@ -316,12 +312,12 @@ fun ErrorTrackingIssueScreenForbiddenPreview() = ErrorTrackingIssueScreen(
 @Composable
 fun ErrorTrackingIssueScreenResolvingPreview() = ErrorTrackingIssueScreen(
     state = ErrorTrackingIssueUiState(
-        issue = CachedUiState.Content(TestErrorTrackingIssue, isRefreshing = false),
+        issue = LoadState.Loaded(TestErrorTrackingIssue),
         updatingTo = IssueStatusFilter.Resolved,
     ),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onStatusChange = {},
+    onRefresh = {},
+    onChangeStatus = {},
     onOpenInPostHog = {},
 )

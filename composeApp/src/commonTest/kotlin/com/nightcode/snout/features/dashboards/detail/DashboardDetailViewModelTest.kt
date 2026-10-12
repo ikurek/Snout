@@ -16,6 +16,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.insights.ObserveDashboard
 import com.nightcode.snout.shared.domain.usecase.insights.RefreshDashboard
 import com.nightcode.snout.shared.domain.usecase.insights.RefreshDashboardTile
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -25,9 +26,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
 class DashboardDetailViewModelTest :
@@ -56,20 +55,18 @@ class DashboardDetailViewModelTest :
         should("compute tiles that arrive without a result") {
             everySuspend { repository.refreshTile(any(), any(), any()) } returns Either.Right(Unit)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.uiState.value.dashboard.shouldBeInstanceOf<CachedUiState.Content<*>>()
-            verifySuspend { repository.refreshTile(TestSelectedProject.projectId, dashboard.id, 99) }
-            viewModel.uiState.value.tiles shouldBe emptyMap()
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.dashboard.shouldBeInstanceOf<CachedUiState.Content<*>>()
+                verifySuspend { repository.refreshTile(TestSelectedProject.projectId, dashboard.id, 99) }
+                viewModel.uiState.value.tiles shouldBe emptyMap()
+            }
         }
 
         should("keep a failed status for tiles that could not be computed") {
             everySuspend { repository.refreshTile(any(), any(), any()) } returns Either.Left(DataError.RateLimited)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.RateLimited))
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.RateLimited))
+            }
         }
     })

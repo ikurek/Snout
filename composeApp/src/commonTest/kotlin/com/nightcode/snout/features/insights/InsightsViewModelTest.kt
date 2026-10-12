@@ -15,6 +15,7 @@ import com.nightcode.snout.shared.domain.usecase.insights.ObserveInsights
 import com.nightcode.snout.shared.domain.usecase.insights.RefreshInsights
 import com.nightcode.snout.shared.domain.usecase.insights.SearchInsights
 import com.nightcode.snout.shared.domain.usecase.insights.SetInsightFavorite
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -56,25 +57,24 @@ class InsightsViewModelTest :
 
         should("show cached insights when query is blank") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value.insights shouldBe CachedUiState.Content(
-                listOf(TestInsightSummary),
-                isRefreshing = false,
-            )
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.insights shouldBe CachedUiState.Content(
+                    listOf(TestInsightSummary),
+                    isRefreshing = false,
+                )
+            }
         }
 
         should("search the server when a query is typed") {
             everySuspend { repository.searchInsights(any(), "sign") } returns Either.Right(listOf(searched))
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.onQueryChange("sign")
-            viewModel.uiState.value.query shouldBe "sign"
-            viewModel.uiState.value.insights.shouldBeInstanceOf<CachedUiState.Content<*>>().data shouldBe listOf(
-                searched,
-            )
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.onQueryChanged("sign")
+                viewModel.uiState.value.query shouldBe "sign"
+                viewModel.uiState.value.insights.shouldBeInstanceOf<CachedUiState.Content<*>>().data shouldBe listOf(
+                    searched,
+                )
+            }
         }
 
         should("emit side effect when favoriting fails") {
@@ -83,7 +83,7 @@ class InsightsViewModelTest :
             val effects = launch(Dispatchers.Main) {
                 viewModel.sideEffects.first() shouldBe InsightsSideEffect.FavoriteUpdateFailed
             }
-            viewModel.onFavoriteToggle(TestInsightSummary)
+            viewModel.toggleFavorite(TestInsightSummary)
             effects.join()
         }
     })

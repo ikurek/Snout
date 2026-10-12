@@ -32,5 +32,5 @@ internal class NavigationSettingsViewModel(
         viewModelScope.launch { saveNavigationPreferences(current.withLanding(section)) }
     }
 
-    fun onReset() = viewModelScope.launch { saveNavigationPreferences(NavigationPreferences.Default) }
+    fun reset() = viewModelScope.launch { saveNavigationPreferences(NavigationPreferences.Default) }
 }

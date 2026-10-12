@@ -64,15 +64,15 @@ import snout.composeapp.generated.resources.placeholder_nothing_found_retry
 @Composable
 internal fun ErrorTrackingScreen(
     state: ErrorTrackingUiState,
-    onQueryChange: (String) -> Unit,
-    onStatusChange: (IssueStatusFilter) -> Unit,
-    onAppVersionChange: (String?) -> Unit,
+    onQueryChanged: (String) -> Unit,
+    onStatusChanged: (IssueStatusFilter) -> Unit,
+    onAppVersionChanged: (String?) -> Unit,
     onRefresh: () -> Unit,
     onOpenIssue: (issueId: String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val searchState = rememberTextFieldState(state.query)
-    LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
+    LaunchedEffect(searchState.text) { onQueryChanged(searchState.text.toString()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         SearchField(
@@ -82,10 +82,10 @@ internal fun ErrorTrackingScreen(
         )
         IssueFilters(
             status = state.status,
-            onStatusChange = onStatusChange,
+            onStatusChanged = onStatusChanged,
             appVersion = state.appVersion,
             appVersions = state.appVersions,
-            onAppVersionChange = onAppVersionChange,
+            onAppVersionChanged = onAppVersionChanged,
         )
         val issues = state.issues
         if (issues is CachedUiState.Error && issues.error == DataError.NotFound) {
@@ -100,7 +100,7 @@ internal fun ErrorTrackingScreen(
                     query = state.query,
                     appVersion = state.appVersion,
                     onClearSearch = { searchState.clearText() },
-                    onClearAppVersion = { onAppVersionChange(null) },
+                    onClearAppVersion = { onAppVersionChanged(null) },
                     onRefresh = onRefresh,
                 )
             },
@@ -158,10 +158,10 @@ private fun IssuesEmptyContent(
 @Composable
 private fun IssueFilters(
     status: IssueStatusFilter,
-    onStatusChange: (IssueStatusFilter) -> Unit,
+    onStatusChanged: (IssueStatusFilter) -> Unit,
     appVersion: String?,
     appVersions: List<AppVersion>,
-    onAppVersionChange: (String?) -> Unit,
+    onAppVersionChanged: (String?) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -174,7 +174,7 @@ private fun IssueFilters(
             label = stringResource(status.label),
             options = IssueStatusFilter.entries.map { MenuOption(it, stringResource(it.label)) },
             selected = status,
-            onSelect = onStatusChange,
+            onSelect = onStatusChanged,
         )
         if (appVersions.isNotEmpty() || appVersion != null) {
             val allVersions = stringResource(Res.string.error_tracking_version_all)
@@ -193,7 +193,7 @@ private fun IssueFilters(
                     )
                 },
                 selected = appVersion,
-                onSelect = onAppVersionChange,
+                onSelect = onAppVersionChanged,
                 active = appVersion != null,
             )
         }
@@ -242,9 +242,9 @@ private fun Long.toPluralQuantity(): Int = coerceAtMost(Int.MAX_VALUE.toLong()).
 @Composable
 fun ErrorTrackingScreenPreview() = ErrorTrackingScreen(
     state = TestErrorTrackingUiState,
-    onQueryChange = {},
-    onStatusChange = {},
-    onAppVersionChange = {},
+    onQueryChanged = {},
+    onStatusChanged = {},
+    onAppVersionChanged = {},
     onRefresh = {},
     onOpenIssue = {},
 )
@@ -254,9 +254,9 @@ fun ErrorTrackingScreenPreview() = ErrorTrackingScreen(
 @Composable
 fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
     state = ErrorTrackingUiState(issues = CachedUiState.Empty(isRefreshing = false)),
-    onQueryChange = {},
-    onStatusChange = {},
-    onAppVersionChange = {},
+    onQueryChanged = {},
+    onStatusChanged = {},
+    onAppVersionChanged = {},
     onRefresh = {},
     onOpenIssue = {},
 )
@@ -266,9 +266,9 @@ fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
 @Composable
 fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
     state = ErrorTrackingUiState(issues = CachedUiState.Error(DataError.NotFound)),
-    onQueryChange = {},
-    onStatusChange = {},
-    onAppVersionChange = {},
+    onQueryChanged = {},
+    onStatusChanged = {},
+    onAppVersionChanged = {},
     onRefresh = {},
     onOpenIssue = {},
 )
@@ -278,9 +278,9 @@ fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
 @Composable
 fun ErrorTrackingScreenForbiddenPreview() = ErrorTrackingScreen(
     state = ErrorTrackingUiState(issues = CachedUiState.Error(DataError.Forbidden)),
-    onQueryChange = {},
-    onStatusChange = {},
-    onAppVersionChange = {},
+    onQueryChanged = {},
+    onStatusChanged = {},
+    onAppVersionChanged = {},
     onRefresh = {},
     onOpenIssue = {},
 )
@@ -295,9 +295,9 @@ fun ErrorTrackingScreenVersionEmptyPreview() = ErrorTrackingScreen(
         appVersions = TestAppVersions,
         issues = CachedUiState.Empty(isRefreshing = false),
     ),
-    onQueryChange = {},
-    onStatusChange = {},
-    onAppVersionChange = {},
+    onQueryChanged = {},
+    onStatusChanged = {},
+    onAppVersionChanged = {},
     onRefresh = {},
     onOpenIssue = {},
 )

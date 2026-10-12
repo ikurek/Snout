@@ -5,20 +5,20 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberOpenInPostHog
-import com.nightcode.snout.features.logs.entry.LogEntryNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.time.Instant
 
 @Composable
 internal fun LogServiceRoute(
     navKey: LogServiceNavKey,
     onNavigateBack: () -> Unit,
-    onOpenEntry: (LogEntryNavKey) -> Unit,
+    onOpenEntry: (entryId: String, timestamp: Instant) -> Unit,
 ) {
-    val viewModel = koinViewModel<LogServiceViewModel> { parametersOf(navKey.service, navKey.range) }
+    val viewModel = koinViewModel<LogServiceViewModel> { parametersOf(navKey) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LogServiceScreen(
@@ -26,11 +26,11 @@ internal fun LogServiceRoute(
         range = navKey.range,
         state = state,
         onNavigateBack = onNavigateBack,
-        onQueryChange = viewModel::onQueryChange,
-        onSeverityChange = viewModel::onSeverityChange,
+        onQueryChanged = viewModel::onQueryChanged,
+        onSeverityChanged = viewModel::onSeverityChanged,
         onRefresh = viewModel::refresh,
         onLoadMore = viewModel::loadMore,
-        onOpenEntry = { onOpenEntry(LogEntryNavKey(navKey.service, it.id, it.timestamp)) },
+        onOpenEntry = { onOpenEntry(it.id, it.timestamp) },
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Logs),
     )
 }

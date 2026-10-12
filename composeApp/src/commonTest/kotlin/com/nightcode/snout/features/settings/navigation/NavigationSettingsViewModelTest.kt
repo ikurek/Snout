@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveNavigationPreferences
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -13,9 +14,7 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 class NavigationSettingsViewModelTest :
     ShouldSpec({
@@ -33,38 +32,40 @@ class NavigationSettingsViewModelTest :
 
         should("expose stored preferences") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value shouldBe NavigationPreferences.Default
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value shouldBe NavigationPreferences.Default
+            }
         }
 
         should("save a swapped slot") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.onSlotSelected(0, HomeSection.Dashboards)
-            verifySuspend {
-                repository.saveNavigationPreferences(
-                    NavigationPreferences(
-                        tabs = listOf(
-                            HomeSection.Dashboards,
-                            HomeSection.Analytics,
-                            HomeSection.Insights,
-                            HomeSection.FeatureFlags,
+            viewModel.uiState.subscribed {
+                viewModel.onSlotSelected(0, HomeSection.Dashboards)
+                verifySuspend {
+                    repository.saveNavigationPreferences(
+                        NavigationPreferences(
+                            tabs = listOf(
+                                HomeSection.Dashboards,
+                                HomeSection.Analytics,
+                                HomeSection.Insights,
+                                HomeSection.FeatureFlags,
+                            ),
+                            landing = HomeSection.Analytics,
                         ),
-                        landing = HomeSection.Analytics,
-                    ),
-                )
+                    )
+                }
             }
-            collector.cancel()
         }
 
         should("save a new landing tab") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.onLandingSelected(HomeSection.Insights)
-            verifySuspend {
-                repository.saveNavigationPreferences(NavigationPreferences.Default.copy(landing = HomeSection.Insights))
+            viewModel.uiState.subscribed {
+                viewModel.onLandingSelected(HomeSection.Insights)
+                verifySuspend {
+                    repository.saveNavigationPreferences(
+                        NavigationPreferences.Default.copy(landing = HomeSection.Insights),
+                    )
+                }
             }
-            collector.cancel()
         }
     })

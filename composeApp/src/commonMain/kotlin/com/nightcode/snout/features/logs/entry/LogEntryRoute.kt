@@ -20,7 +20,7 @@ internal fun LogEntryRoute(navKey: LogEntryNavKey, onNavigateBack: () -> Unit) {
         service = navKey.service,
         state = state,
         onNavigateBack = onNavigateBack,
-        onRetry = viewModel::load,
+        onRefresh = viewModel::refresh,
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Logs),
     )
 }

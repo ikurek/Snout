@@ -13,6 +13,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.featureflags.ObserveFeatureFlags
 import com.nightcode.snout.shared.domain.usecase.featureflags.RefreshFeatureFlags
 import com.nightcode.snout.shared.domain.usecase.featureflags.SearchFeatureFlags
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -21,9 +22,7 @@ import dev.mokkery.mock
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 @OptIn(TestData::class)
@@ -53,11 +52,13 @@ class FeatureFlagsViewModelTest :
             val found = TestFeatureFlag.copy(id = 2, key = "dark-mode")
             everySuspend { repository.searchFeatureFlags(any(), "dark") } returns Either.Right(listOf(found))
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.uiState.value.flags shouldBe CachedUiState.Content(listOf(TestFeatureFlag), isRefreshing = false)
-            viewModel.onQueryChange("dark")
-            viewModel.uiState.value.flags.shouldBeInstanceOf<CachedUiState.Content<*>>().data shouldBe listOf(found)
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.flags shouldBe CachedUiState.Content(
+                    listOf(TestFeatureFlag),
+                    isRefreshing = false,
+                )
+                viewModel.onQueryChanged("dark")
+                viewModel.uiState.value.flags.shouldBeInstanceOf<CachedUiState.Content<*>>().data shouldBe listOf(found)
+            }
         }
     })

@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -86,8 +87,8 @@ internal fun OnboardingScreen(
     isConnectEnabled: Boolean,
     isConnecting: Boolean,
     onNavigateBack: () -> Unit,
-    onGetStartedClick: () -> Unit,
-    onConnectClick: () -> Unit,
+    onGetStartedClicked: () -> Unit,
+    onConnectClicked: () -> Unit,
     page: @Composable (step: OnboardingStep, bottomPadding: PaddingValues) -> Unit,
 ) {
     // The step the pager is heading to, so the arrow and button change as soon as a move starts.
@@ -103,8 +104,8 @@ internal fun OnboardingScreen(
                 step = step,
                 isConnectEnabled = isConnectEnabled,
                 isConnecting = isConnecting,
-                onGetStartedClick = onGetStartedClick,
-                onConnectClick = onConnectClick,
+                onGetStartedClicked = onGetStartedClicked,
+                onConnectClicked = onConnectClicked,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -202,8 +203,8 @@ private fun BottomBar(
     step: OnboardingStep,
     isConnectEnabled: Boolean,
     isConnecting: Boolean,
-    onGetStartedClick: () -> Unit,
-    onConnectClick: () -> Unit,
+    onGetStartedClicked: () -> Unit,
+    onConnectClicked: () -> Unit,
 ) {
     AnimatedVisibility(
         visible = step != OnboardingStep.ProjectSelection,
@@ -226,7 +227,7 @@ private fun BottomBar(
             }
             PrimaryButton(
                 text = stringResource(label),
-                onClick = if (isIntro) onGetStartedClick else onConnectClick,
+                onClick = if (isIntro) onGetStartedClicked else onConnectClicked,
                 modifier = Modifier.fillMaxWidth(),
                 icon = painterResource(Res.drawable.ic_arrow_right_alt_24dp),
                 enabled = isIntro || isConnectEnabled,
@@ -253,8 +254,8 @@ private fun OnboardingPreview(
         isConnectEnabled = isConnecting.not(),
         isConnecting = isConnecting,
         onNavigateBack = {},
-        onGetStartedClick = {},
-        onConnectClick = {},
+        onGetStartedClicked = {},
+        onConnectClicked = {},
     ) { page, bottomPadding ->
         when (page) {
             OnboardingStep.Intro -> IntroPage(bottomPadding = bottomPadding)
@@ -267,9 +268,9 @@ private fun OnboardingPreview(
                 personalApiKeyValidationError = personalApiKeyValidationError,
                 isConnecting = isConnecting,
                 bottomPadding = bottomPadding,
-                onInstanceUrlChange = {},
-                onPersonalApiKeyChange = {},
-                onApiKeysLinkClick = {},
+                onInstanceUrlChanged = {},
+                onPersonalApiKeyChanged = {},
+                onApiKeysLinkClicked = {},
             )
 
             OnboardingStep.ProjectSelection -> ProjectSelectionPage(
@@ -316,7 +317,7 @@ fun OnboardingProjectSelectionPreview() = OnboardingPreview(step = OnboardingSte
 @Composable
 fun OnboardingProjectSelectionLoadingPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
-    projectSelectionState = ProjectSelectionUiState.Loading,
+    projectSelectionState = LoadState.Loading,
 )
 
 @PreviewLightDark
@@ -324,5 +325,5 @@ fun OnboardingProjectSelectionLoadingPreview() = OnboardingPreview(
 @Composable
 fun OnboardingProjectSelectionErrorPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
-    projectSelectionState = ProjectSelectionUiState.Error(DataError.UnexpectedError),
+    projectSelectionState = LoadState.Error(DataError.UnexpectedError),
 )

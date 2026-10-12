@@ -45,7 +45,7 @@ internal class LogsViewModel(
         }
     }
 
-    fun onRangeChange(value: LogsRange) {
+    fun onRangeSelected(value: LogsRange) {
         range.value = value
     }
 

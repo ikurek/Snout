@@ -27,10 +27,10 @@ internal fun SettingsRoute(
     SettingsScreen(
         state = state,
         onNavigateBack = onNavigateBack,
-        onRetryAccount = viewModel::loadAccount,
-        onOpenInstance = viewModel::onOpenInstance,
+        onRetryAccount = viewModel::refresh,
+        onOpenInstance = viewModel::openInstance,
         onSwitchProject = { showProjectSwitcher = true },
-        onOpenLinkSettings = viewModel::onOpenLinkSettings,
+        onOpenLinkSettings = viewModel::openLinkSettings,
         onThemeModeSelected = viewModel::onThemeModeSelected,
         onOpenNavigationSettings = onOpenNavigationSettings,
         onOpenAnalyticsSettings = onOpenAnalyticsSettings,

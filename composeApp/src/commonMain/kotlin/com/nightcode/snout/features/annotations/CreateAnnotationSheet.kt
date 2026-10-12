@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.format.formatShortDate
+import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
@@ -92,7 +93,7 @@ internal fun CreateAnnotationSheet(
                 contentPadding = PaddingValues(vertical = 8.dp),
             )
             if (status is CreateStatus.Failed) {
-                InlineErrorBanner(text = stringResource(status.error.createMessage()))
+                InlineErrorBanner(text = stringResource(status.error.createFailedMessage()))
                 VerticalSpacer(8.dp)
             }
             VerticalSpacer(16.dp)
@@ -145,14 +146,7 @@ private fun AnnotationDatePickerDialog(initialDate: LocalDate, onConfirm: (Local
     }
 }
 
-private fun DataError.createMessage() = when (this) {
-    DataError.Unauthorized, DataError.Forbidden -> Res.string.annotation_create_error_forbidden
-
-    DataError.NotFound,
-    DataError.PaymentRequired,
-    DataError.RateLimited,
-    DataError.ConnectionError,
-    DataError.UnexpectedError,
-    ->
-        Res.string.annotation_create_error_generic
-}
+private fun DataError.createFailedMessage() = actionFailedMessage(
+    generic = Res.string.annotation_create_error_generic,
+    forbidden = Res.string.annotation_create_error_forbidden,
+)

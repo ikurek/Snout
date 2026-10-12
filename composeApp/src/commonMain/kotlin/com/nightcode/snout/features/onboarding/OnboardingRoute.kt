@@ -14,6 +14,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.features.onboarding.intro.IntroPage
 import com.nightcode.snout.features.onboarding.login.LoginPage
 import com.nightcode.snout.features.onboarding.login.LoginSideEffect
@@ -27,18 +28,17 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.snackbar_generic_error_message
+import snout.composeapp.generated.resources.snackbar_rate_limited_message
 
 @Suppress("LongMethod")
 @Composable
 internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     val loginViewModel = koinViewModel<LoginViewModel>()
     val projectSelectionViewModel = koinViewModel<ProjectSelectionViewModel>()
-    val savedInstanceUrl by loginViewModel.savedInstanceUrl.collectAsStateWithLifecycle()
-    val instanceUrlValidationError by loginViewModel.instanceUrlValidationError.collectAsStateWithLifecycle()
-    val personalApiKeyValidationError by loginViewModel.personalApiKeyValidationError.collectAsStateWithLifecycle()
-    val isConnectEnabled by loginViewModel.isConnectEnabled.collectAsStateWithLifecycle()
-    val isConnecting by loginViewModel.isConnecting.collectAsStateWithLifecycle()
-    val projectSelectionState by projectSelectionViewModel.state.collectAsStateWithLifecycle()
+    val loginState by loginViewModel.uiState.collectAsStateWithLifecycle()
+    val projectSelectionState by projectSelectionViewModel.uiState.collectAsStateWithLifecycle()
 
     val pagerState = rememberPagerState(initialPage = navKey.startStep.ordinal) { OnboardingStep.entries.size }
     // Owned here rather than by the login page: the fixed Connect button reads them.
@@ -70,7 +70,7 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     // Every arrival loads afresh: the key may have changed since the last visit.
     LaunchedEffect(pagerState.targetPage) {
         if (pagerState.targetPage == OnboardingStep.ProjectSelection.ordinal) {
-            projectSelectionViewModel.load()
+            projectSelectionViewModel.refresh()
         }
     }
 
@@ -82,7 +82,14 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
                     goTo(OnboardingStep.ProjectSelection)
                 }
 
-                is LoginSideEffect.ShowError -> snackbarHostState.showSnackbar(getString(sideEffect.message))
+                is LoginSideEffect.ConnectFailed -> snackbarHostState.showSnackbar(
+                    getString(
+                        sideEffect.error.actionFailedMessage(
+                            generic = Res.string.snackbar_generic_error_message,
+                            rateLimited = Res.string.snackbar_rate_limited_message,
+                        ),
+                    ),
+                )
 
                 is LoginSideEffect.OpenUrl -> openInBrowser(sideEffect.url)
             }
@@ -100,12 +107,12 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     OnboardingScreen(
         pagerState = pagerState,
         snackbarHostState = snackbarHostState,
-        isConnectEnabled = isConnectEnabled,
-        isConnecting = isConnecting,
+        isConnectEnabled = loginState.isConnectEnabled,
+        isConnecting = loginState.isConnecting,
         onNavigateBack = navigateBack,
-        onGetStartedClick = { goTo(OnboardingStep.Login) },
-        onConnectClick = {
-            loginViewModel.onConnectClick(
+        onGetStartedClicked = { goTo(OnboardingStep.Login) },
+        onConnectClicked = {
+            loginViewModel.connect(
                 instanceUrlTextFieldState.text.toString(),
                 personalApiKeyTextFieldState.text.toString(),
             )
@@ -117,20 +124,20 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
             OnboardingStep.Login -> LoginPage(
                 instanceUrlTextFieldState = instanceUrlTextFieldState,
                 personalApiKeyTextFieldState = personalApiKeyTextFieldState,
-                savedInstanceUrl = savedInstanceUrl,
-                instanceUrlValidationError = instanceUrlValidationError,
-                personalApiKeyValidationError = personalApiKeyValidationError,
-                isConnecting = isConnecting,
+                savedInstanceUrl = loginState.savedInstanceUrl,
+                instanceUrlValidationError = loginState.instanceUrlValidationError,
+                personalApiKeyValidationError = loginState.personalApiKeyValidationError,
+                isConnecting = loginState.isConnecting,
                 bottomPadding = bottomPadding,
-                onInstanceUrlChange = loginViewModel::onInstanceUrlChange,
-                onPersonalApiKeyChange = loginViewModel::onPersonalApiKeyChanged,
-                onApiKeysLinkClick = loginViewModel::onCreateApiKeyClick,
+                onInstanceUrlChanged = loginViewModel::onInstanceUrlChanged,
+                onPersonalApiKeyChanged = loginViewModel::onPersonalApiKeyChanged,
+                onApiKeysLinkClicked = loginViewModel::openApiKeySettings,
             )
 
             OnboardingStep.ProjectSelection -> ProjectSelectionPage(
                 state = projectSelectionState,
                 bottomPadding = bottomPadding,
-                onRetry = projectSelectionViewModel::load,
+                onRetry = projectSelectionViewModel::refresh,
                 onProjectSelected = projectSelectionViewModel::onProjectSelected,
             )
         }

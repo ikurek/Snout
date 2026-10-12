@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.logs.entry
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -38,11 +38,11 @@ class LogEntryViewModelTest :
         should("show the line looked up by its service, id and time") {
             everySuspend { repository.getLog(any(), "checkout-api", entry.id, entry.timestamp) } returns
                 Either.Right(entry)
-            subject().uiState.value shouldBe CachedUiState.Content(entry, isRefreshing = false)
+            subject().uiState.value shouldBe LoadState.Loaded(entry)
         }
 
         should("report a line that can no longer be found") {
             everySuspend { repository.getLog(any(), any(), any(), any()) } returns Either.Left(DataError.NotFound)
-            subject().uiState.value shouldBe CachedUiState.Error(DataError.NotFound)
+            subject().uiState.value shouldBe LoadState.Error(DataError.NotFound)
         }
     })

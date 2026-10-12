@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.common.state.RefreshController
-import com.nightcode.snout.common.state.RefreshStatus
 import com.nightcode.snout.common.state.listUiState
+import com.nightcode.snout.common.state.liveResults
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
-import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorAppVersions
@@ -16,7 +15,6 @@ import com.nightcode.snout.shared.domain.usecase.errortracking.RefreshErrorTrack
 import com.nightcode.snout.shared.domain.usecase.errortracking.SearchErrorTrackingIssues
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,8 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -67,21 +63,22 @@ internal class ErrorTrackingViewModel(
         refresh.status,
     ) { issues, refreshStatus -> listUiState(issues, refreshStatus) }
 
-    private val liveResults: Flow<CachedUiState<List<ErrorTrackingIssue>>?> = combine(
+    private val liveResults = combine(
         query.debounce(searchDebounce).distinctUntilChanged(),
         status,
         appVersion,
         liveReload,
     ) { text, status, version, reload -> LiveFilter(status, text, version, reload) }
-        .flatMapLatest { filter -> if (filter.isLive) fetch(filter) else flowOf(null) }
+        .liveResults(isLive = { isLive(it.query, it.appVersion) }) { filter ->
+            searchIssues(filter.status, filter.query, filter.appVersion)
+        }
 
     private val filters = combine(query, status, appVersion, appVersions) { query, status, version, versions ->
         ErrorTrackingUiState(query = query, status = status, appVersion = version, appVersions = versions)
     }
 
     val uiState: StateFlow<ErrorTrackingUiState> = combine(filters, cachedList, liveResults) { state, cached, live ->
-        val isLive = state.query.isNotBlank() || state.appVersion != null
-        state.copy(issues = if (isLive) live ?: CachedUiState.Loading else cached)
+        state.copy(issues = if (isLive(state.query, state.appVersion)) live ?: CachedUiState.Loading else cached)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ErrorTrackingUiState())
 
     init {
@@ -99,21 +96,21 @@ internal class ErrorTrackingViewModel(
         }
     }
 
-    fun onQueryChange(text: String) {
+    fun onQueryChanged(text: String) {
         query.value = text
     }
 
-    fun onStatusChange(value: IssueStatusFilter) {
+    fun onStatusChanged(value: IssueStatusFilter) {
         status.value = value
     }
 
-    fun onAppVersionChange(value: String?) {
+    fun onAppVersionChanged(value: String?) {
         appVersion.value = value
     }
 
     fun refresh() = viewModelScope.launch {
         launch { loadAppVersions() }
-        if (query.value.isNotBlank() || appVersion.value != null) {
+        if (isLive(query.value, appVersion.value)) {
             liveReload.value++
         } else {
             refresh.run { refreshIssues(status.value) }
@@ -125,15 +122,6 @@ internal class ErrorTrackingViewModel(
         getAppVersions().onRight { appVersions.value = it }
     }
 
-    private val LiveFilter.isLive: Boolean get() = query.isNotBlank() || appVersion != null
-
-    private fun fetch(filter: LiveFilter): Flow<CachedUiState<List<ErrorTrackingIssue>>> = flow {
-        emit(CachedUiState.Loading)
-        emit(
-            searchIssues(filter.status, filter.query, filter.appVersion).fold(
-                ifLeft = { CachedUiState.Error(it) },
-                ifRight = { listUiState(it, RefreshStatus.Idle) },
-            ),
-        )
-    }
+    /** Whether the filters need a live request instead of the cached list. */
+    private fun isLive(query: String, appVersion: String?) = query.isNotBlank() || appVersion != null
 }

@@ -12,6 +12,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperiments
 import com.nightcode.snout.shared.domain.usecase.experiments.RefreshExperiments
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -19,9 +20,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
 class ExperimentsViewModelTest :
@@ -42,8 +41,8 @@ class ExperimentsViewModelTest :
                 observeExperiments = ObserveExperiments(ObserveSelectedProjectId(appStateRepository), repository),
                 observeSelectedProjectId = ObserveSelectedProjectId(appStateRepository),
             )
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value shouldBe CachedUiState.Content(listOf(TestExperiment), isRefreshing = false)
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value shouldBe CachedUiState.Content(listOf(TestExperiment), isRefreshing = false)
+            }
         }
     })

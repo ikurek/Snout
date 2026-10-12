@@ -39,13 +39,13 @@ import snout.composeapp.generated.resources.feature_flags_search_placeholder
 @Composable
 internal fun FeatureFlagsScreen(
     state: FeatureFlagsUiState,
-    onQueryChange: (String) -> Unit,
+    onQueryChanged: (String) -> Unit,
     onRefresh: () -> Unit,
     onOpenFlag: (flagId: Long) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val searchState = rememberTextFieldState(state.query)
-    LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
+    LaunchedEffect(searchState.text) { onQueryChanged(searchState.text.toString()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         SearchField(
@@ -108,7 +108,7 @@ private fun String.singleLine(): String = lineSequence().map { it.trim() }.filte
 @Composable
 fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
     state = TestFeatureFlagsUiState,
-    onQueryChange = {},
+    onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},
 )
@@ -118,7 +118,7 @@ fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
 @Composable
 fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
     state = FeatureFlagsUiState(flags = CachedUiState.Empty(isRefreshing = false)),
-    onQueryChange = {},
+    onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},
 )
@@ -128,7 +128,7 @@ fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
 @Composable
 fun FeatureFlagsScreenForbiddenPreview() = FeatureFlagsScreen(
     state = FeatureFlagsUiState(flags = CachedUiState.Error(DataError.Forbidden)),
-    onQueryChange = {},
+    onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},
 )

@@ -20,7 +20,8 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatDateTime
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
@@ -28,7 +29,7 @@ import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.TagList
-import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
+import com.nightcode.snout.designsystem.organisms.LoadStateContainer
 import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.insights.FavoriteIconButton
@@ -59,14 +60,14 @@ private const val LoadingRowCount = 3
 
 @Composable
 internal fun InsightDetailScreen(
-    state: CachedUiState<InsightDetail>,
+    state: InsightDetailUiState,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: () -> Unit,
-    onRetry: () -> Unit,
-    onFavoriteToggle: () -> Unit,
+    onRefresh: () -> Unit,
+    onToggleFavorite: () -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    val detail = (state as? CachedUiState.Content)?.data
+    val detail = state.dataOrNull
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -75,18 +76,20 @@ internal fun InsightDetailScreen(
                 navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
                 actions = {
                     if (detail != null) {
-                        FavoriteIconButton(favorited = detail.summary.favorited, onClick = onFavoriteToggle)
+                        FavoriteIconButton(favorited = detail.summary.favorited, onClick = onToggleFavorite)
                         OpenInPostHogIconButton(onClick = onOpenInPostHog)
                     }
                 },
             )
         },
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
-        when (state) {
-            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
-            is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
-            is CachedUiState.Content -> DetailContent(state.data, modifier, innerPadding.bottomOnly())
+        LoadStateContainer(
+            state = state,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+            loadingContent = { SkeletonRows(count = LoadingRowCount) },
+        ) { detail ->
+            DetailContent(detail, Modifier.fillMaxSize(), innerPadding.bottomOnly())
         }
     }
 }
@@ -143,11 +146,11 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenPreview() = InsightDetailScreen(
-    state = CachedUiState.Content(TestInsightDetail, isRefreshing = false),
+    state = LoadState.Loaded(TestInsightDetail),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onFavoriteToggle = {},
+    onRefresh = {},
+    onToggleFavorite = {},
     onOpenInPostHog = {},
 )
 
@@ -156,7 +159,7 @@ fun InsightDetailScreenPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
-    state = CachedUiState.Content(
+    state = LoadState.Loaded(
         TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Day 1 retention",
@@ -165,12 +168,11 @@ fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
             ),
             result = TestRetentionResult,
         ),
-        isRefreshing = false,
     ),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onFavoriteToggle = {},
+    onRefresh = {},
+    onToggleFavorite = {},
     onOpenInPostHog = {},
 )
 
@@ -179,7 +181,7 @@ fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
-    state = CachedUiState.Content(
+    state = LoadState.Loaded(
         TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Pageviews by browser",
@@ -188,12 +190,11 @@ fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
             ),
             result = TestComparisonResult,
         ),
-        isRefreshing = false,
     ),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onFavoriteToggle = {},
+    onRefresh = {},
+    onToggleFavorite = {},
     onOpenInPostHog = {},
 )
 
@@ -202,7 +203,7 @@ fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
-    state = CachedUiState.Content(
+    state = LoadState.Loaded(
         TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Checkout by browser",
@@ -213,12 +214,11 @@ fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
             ),
             result = TestFunnelResult,
         ),
-        isRefreshing = false,
     ),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onFavoriteToggle = {},
+    onRefresh = {},
+    onToggleFavorite = {},
     onOpenInPostHog = {},
 )
 
@@ -227,10 +227,10 @@ fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenPendingPreview() = InsightDetailScreen(
-    state = CachedUiState.Content(TestInsightDetail.copy(result = null), isRefreshing = true),
+    state = LoadState.Loaded(TestInsightDetail.copy(result = null)),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
-    onRetry = {},
-    onFavoriteToggle = {},
+    onRefresh = {},
+    onToggleFavorite = {},
     onOpenInPostHog = {},
 )

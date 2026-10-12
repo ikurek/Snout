@@ -25,6 +25,8 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatMonthYear
 import com.nightcode.snout.common.platform.appVersionName
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRow
@@ -112,7 +114,7 @@ internal fun SettingsScreen(
             onThemeModeSelected = onThemeModeSelected,
             onOpenNavigationSettings = onOpenNavigationSettings,
             onOpenAnalyticsSettings = onOpenAnalyticsSettings,
-            onLogoutClick = { showLogoutDialog = true },
+            onLogoutClicked = { showLogoutDialog = true },
         )
     }
 
@@ -143,7 +145,7 @@ private fun SettingsContent(
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
-    onLogoutClick: () -> Unit,
+    onLogoutClicked: () -> Unit,
 ) {
     val themeLabels = ThemeMode.entries.associateWith { it.label() }
     Column(
@@ -178,7 +180,7 @@ private fun SettingsContent(
         VerticalSpacer(24.dp)
         SecondaryButton(
             text = stringResource(Res.string.settings_logout_button),
-            onClick = onLogoutClick,
+            onClick = onLogoutClicked,
             loading = state.isLoggingOut,
             destructive = true,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -189,17 +191,23 @@ private fun SettingsContent(
 }
 
 @Composable
-private fun AccountSection(account: AccountUiState, onRetry: () -> Unit) {
+private fun AccountSection(account: LoadState<User>, onRetry: () -> Unit) {
     when (account) {
-        AccountUiState.Loading -> SkeletonRow(divider = false)
+        LoadState.Loading -> SkeletonRow(divider = false)
 
-        is AccountUiState.Error -> InlineErrorBanner(
-            text = stringResource(account.error.message()),
+        is LoadState.Error -> InlineErrorBanner(
+            text = stringResource(
+                account.error.actionFailedMessage(
+                    generic = Res.string.settings_account_error,
+                    forbidden = Res.string.settings_account_error_permission,
+                    rateLimited = Res.string.settings_account_error_rate_limited,
+                ),
+            ),
             onAction = onRetry,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
 
-        is AccountUiState.Loaded -> AccountRow(account.user)
+        is LoadState.Loaded -> AccountRow(account.data)
     }
 }
 
@@ -301,18 +309,6 @@ private fun ThemeMode.label(): String = stringResource(
     },
 )
 
-private fun DataError.message() = when (this) {
-    DataError.Unauthorized, DataError.Forbidden -> Res.string.settings_account_error_permission
-
-    DataError.RateLimited -> Res.string.settings_account_error_rate_limited
-
-    DataError.PaymentRequired,
-    DataError.NotFound,
-    DataError.ConnectionError,
-    DataError.UnexpectedError,
-    -> Res.string.settings_account_error
-}
-
 @OptIn(TestData::class)
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
@@ -335,7 +331,7 @@ fun SettingsScreenPreview() = SettingsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun SettingsScreenAccountErrorPreview() = SettingsScreen(
-    state = TestSettingsUiState.copy(account = AccountUiState.Error(DataError.ConnectionError)),
+    state = TestSettingsUiState.copy(account = LoadState.Error(DataError.ConnectionError)),
     onNavigateBack = {},
     onRetryAccount = {},
     onOpenInstance = {},

@@ -54,7 +54,7 @@ private const val NoisyErrorRate = 0.01
 @Composable
 internal fun LogsScreen(
     state: LogsUiState,
-    onRangeChange: (LogsRange) -> Unit,
+    onRangeSelected: (LogsRange) -> Unit,
     onRefresh: () -> Unit,
     onOpenService: (service: String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
@@ -64,7 +64,7 @@ internal fun LogsScreen(
             label = stringResource(state.range.label),
             options = LogsRange.entries.map { MenuOption(it, stringResource(it.label)) },
             selected = state.range,
-            onSelect = onRangeChange,
+            onSelect = onRangeSelected,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
         val services = state.services
@@ -154,14 +154,14 @@ private fun LevelBar(levels: LogLevelCounts, modifier: Modifier = Modifier) {
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun LogsScreenPreview() = LogsScreen(state = TestLogsUiState, onRangeChange = {}, onRefresh = {}, onOpenService = {})
+fun LogsScreenPreview() = LogsScreen(state = TestLogsUiState, onRangeSelected = {}, onRefresh = {}, onOpenService = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LogsScreenEmptyPreview() = LogsScreen(
     state = LogsUiState(services = CachedUiState.Empty(isRefreshing = false)),
-    onRangeChange = {},
+    onRangeSelected = {},
     onRefresh = {},
     onOpenService = {},
 )
@@ -171,7 +171,7 @@ fun LogsScreenEmptyPreview() = LogsScreen(
 @Composable
 fun LogsScreenUnavailablePreview() = LogsScreen(
     state = LogsUiState(services = CachedUiState.Error(DataError.NotFound)),
-    onRangeChange = {},
+    onRangeSelected = {},
     onRefresh = {},
     onOpenService = {},
 )

@@ -18,14 +18,13 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatLogTime
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
-import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.CodeBlock
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
+import com.nightcode.snout.designsystem.organisms.LoadStateContainer
 import com.nightcode.snout.features.logs.components.LogSeverityTag
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -41,8 +40,6 @@ import snout.composeapp.generated.resources.logs_entry_resource
 import snout.composeapp.generated.resources.logs_entry_span
 import snout.composeapp.generated.resources.logs_entry_trace
 
-private const val LoadingRowCount = 4
-
 /** Attribute values such as SQL or user agents run long; four lines keep the screen scannable. */
 private const val AttributeValueLines = 4
 
@@ -50,9 +47,9 @@ private const val AttributeValueLines = 4
 @Composable
 internal fun LogEntryScreen(
     service: String,
-    state: CachedUiState<LogEntry>,
+    state: LoadState<LogEntry>,
     onNavigateBack: () -> Unit,
-    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
     ListScreenScaffold(
@@ -60,11 +57,12 @@ internal fun LogEntryScreen(
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
-        when (state) {
-            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
-            is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
-            is CachedUiState.Content -> LogEntryContent(state.data, modifier, innerPadding.bottomOnly())
+        LoadStateContainer(
+            state = state,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+        ) { entry ->
+            LogEntryContent(entry, Modifier.fillMaxSize(), innerPadding.bottomOnly())
         }
     }
 }
@@ -118,9 +116,9 @@ private fun AttributeSection(title: String, attributes: Map<String, String>) {
 @Composable
 fun LogEntryScreenPreview() = LogEntryScreen(
     service = "checkout-api",
-    state = CachedUiState.Content(TestLogEntries.first(), isRefreshing = false),
+    state = LoadState.Loaded(TestLogEntries.first()),
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onOpenInPostHog = {},
 )
 
@@ -129,8 +127,8 @@ fun LogEntryScreenPreview() = LogEntryScreen(
 @Composable
 fun LogEntryScreenNotFoundPreview() = LogEntryScreen(
     service = "checkout-api",
-    state = CachedUiState.Error(DataError.NotFound),
+    state = LoadState.Error(DataError.NotFound),
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onOpenInPostHog = {},
 )

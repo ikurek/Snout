@@ -30,9 +30,9 @@ internal fun InsightsRoute(onOpenInsight: (insightId: Long) -> Unit, contentPadd
     InsightsScreen(
         state = state,
         snackbarHostState = snackbarHostState,
-        onQueryChange = viewModel::onQueryChange,
+        onQueryChanged = viewModel::onQueryChanged,
         onRefresh = viewModel::refresh,
-        onFavoriteToggle = viewModel::onFavoriteToggle,
+        onToggleFavorite = viewModel::toggleFavorite,
         onOpenInsight = onOpenInsight,
         contentPadding = contentPadding,
     )

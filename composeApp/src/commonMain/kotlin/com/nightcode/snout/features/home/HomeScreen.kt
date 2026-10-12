@@ -98,7 +98,7 @@ internal fun HomeScreen(
             modifier = Modifier.padding(innerPadding),
         ) { section ->
             if (section == null) {
-                MoreScreen(sections = preferences.hidden, onItemClick = onOpenSection)
+                MoreScreen(sections = preferences.hidden, onItemClicked = onOpenSection)
             } else {
                 HomeSectionContent(section = section, navigation = navigation)
             }

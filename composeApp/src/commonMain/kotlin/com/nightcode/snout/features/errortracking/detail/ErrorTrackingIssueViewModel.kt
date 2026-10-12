@@ -2,7 +2,9 @@ package com.nightcode.snout.features.errortracking.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.dataOrNull
+import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorTrackingIssue
@@ -32,22 +34,19 @@ internal class ErrorTrackingIssueViewModel(
     val sideEffects: Flow<ErrorTrackingIssueSideEffect> = _sideEffects.receiveAsFlow()
 
     init {
-        load()
+        refresh()
     }
 
-    fun load() = viewModelScope.launch {
-        _uiState.update { it.copy(issue = CachedUiState.Loading) }
-        val issue = getIssue(issueId).fold(
-            ifLeft = { CachedUiState.Error(it) },
-            ifRight = { CachedUiState.Content(it, isRefreshing = false) },
-        )
+    fun refresh() = viewModelScope.launch {
+        _uiState.update { it.copy(issue = LoadState.Loading) }
+        val issue = getIssue(issueId).toLoadState()
         _uiState.update { it.copy(issue = issue) }
     }
 
     /** Reversible, so no confirmation: the snackbar that follows offers to undo. */
-    fun onStatusChange(target: IssueStatusFilter) {
+    fun changeStatus(target: IssueStatusFilter) {
         val current = _uiState.value
-        val issue = (current.issue as? CachedUiState.Content)?.data ?: return
+        val issue = current.issue.dataOrNull ?: return
         if (current.updatingTo != null) return
         viewModelScope.launch {
             _uiState.update { it.copy(updatingTo = target) }
@@ -59,7 +58,7 @@ internal class ErrorTrackingIssueViewModel(
                 ifRight = { status ->
                     _uiState.update {
                         it.copy(
-                            issue = CachedUiState.Content(issue.copy(status = status), isRefreshing = false),
+                            issue = LoadState.Loaded(issue.copy(status = status)),
                             updatingTo = null,
                         )
                     }

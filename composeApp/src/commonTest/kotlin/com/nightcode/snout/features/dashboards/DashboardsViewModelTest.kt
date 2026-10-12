@@ -12,6 +12,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.insights.ObserveDashboards
 import com.nightcode.snout.shared.domain.usecase.insights.RefreshDashboards
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -21,9 +22,7 @@ import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
 class DashboardsViewModelTest :
@@ -48,11 +47,10 @@ class DashboardsViewModelTest :
 
         should("refresh on start and list pinned dashboards first") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            val content = viewModel.uiState.value.shouldBeInstanceOf<CachedUiState.Content<*>>()
-            content.data shouldBe listOf(TestDashboardSummary, unpinned)
-            verifySuspend { repository.refreshDashboards(TestSelectedProject.projectId) }
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                val content = viewModel.uiState.value.shouldBeInstanceOf<CachedUiState.Content<*>>()
+                content.data shouldBe listOf(TestDashboardSummary, unpinned)
+                verifySuspend { repository.refreshDashboards(TestSelectedProject.projectId) }
+            }
         }
     })

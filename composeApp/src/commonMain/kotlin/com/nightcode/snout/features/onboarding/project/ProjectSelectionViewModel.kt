@@ -2,6 +2,7 @@ package com.nightcode.snout.features.onboarding.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
@@ -11,6 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,23 +35,24 @@ internal class ProjectSelectionViewModel(
 
     private val error = MutableStateFlow<DataError?>(null)
 
-    val state = combine(
+    val uiState: StateFlow<ProjectSelectionUiState> = combine(
         observeOrganizations(),
         isLoading,
         error,
     ) { organizations, isLoading, error ->
         when {
-            isLoading -> ProjectSelectionUiState.Loading
-            error != null -> ProjectSelectionUiState.Error(error)
-            else -> ProjectSelectionUiState.Loaded(organizations)
+            isLoading -> LoadState.Loading
+            error != null -> LoadState.Error(error)
+            else -> LoadState.Loaded(organizations)
         }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ProjectSelectionUiState.Loading,
+        LoadState.Loading,
     )
 
-    fun load() = viewModelScope.launch {
+    /** Called on every arrival at this step: the key may have changed since the last visit. */
+    fun refresh() = viewModelScope.launch {
         isLoading.value = true
         refreshOrganizations()
             .onLeft { error.value = it }

@@ -52,14 +52,14 @@ import snout.composeapp.generated.resources.unfavorite_content_description
 internal fun InsightsScreen(
     state: InsightsUiState,
     snackbarHostState: SnackbarHostState,
-    onQueryChange: (String) -> Unit,
+    onQueryChanged: (String) -> Unit,
     onRefresh: () -> Unit,
-    onFavoriteToggle: (InsightSummary) -> Unit,
+    onToggleFavorite: (InsightSummary) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val searchState = rememberTextFieldState(state.query)
-    LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
+    LaunchedEffect(searchState.text) { onQueryChanged(searchState.text.toString()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -89,7 +89,7 @@ internal fun InsightsScreen(
                             insight = insight,
                             divider = index < insights.lastIndex,
                             onClick = { onOpenInsight(insight.id) },
-                            onFavoriteToggle = { onFavoriteToggle(insight) },
+                            onToggleFavorite = { onToggleFavorite(insight) },
                         )
                     }
                 }
@@ -103,7 +103,7 @@ internal fun InsightsScreen(
 }
 
 @Composable
-private fun InsightRow(insight: InsightSummary, divider: Boolean, onClick: () -> Unit, onFavoriteToggle: () -> Unit) {
+private fun InsightRow(insight: InsightSummary, divider: Boolean, onClick: () -> Unit, onToggleFavorite: () -> Unit) {
     EntityRow(
         title = insight.name,
         subtitle = insight.description,
@@ -117,7 +117,7 @@ private fun InsightRow(insight: InsightSummary, divider: Boolean, onClick: () ->
             // Pull the 48dp touch target outward so the icon itself sits on the 16dp edge like other trailing content.
             FavoriteIconButton(
                 favorited = insight.favorited,
-                onClick = onFavoriteToggle,
+                onClick = onToggleFavorite,
                 modifier = Modifier.offset(x = 12.dp),
             )
         },
@@ -145,9 +145,9 @@ internal fun FavoriteIconButton(favorited: Boolean, onClick: () -> Unit, modifie
 fun InsightsScreenPreview() = InsightsScreen(
     state = TestInsightsUiState,
     snackbarHostState = remember { SnackbarHostState() },
-    onQueryChange = {},
+    onQueryChanged = {},
     onRefresh = {},
-    onFavoriteToggle = {},
+    onToggleFavorite = {},
     onOpenInsight = {},
 )
 
@@ -157,8 +157,8 @@ fun InsightsScreenPreview() = InsightsScreen(
 fun InsightsScreenEmptyPreview() = InsightsScreen(
     state = InsightsUiState(query = "retention", insights = CachedUiState.Empty(isRefreshing = false)),
     snackbarHostState = remember { SnackbarHostState() },
-    onQueryChange = {},
+    onQueryChanged = {},
     onRefresh = {},
-    onFavoriteToggle = {},
+    onToggleFavorite = {},
     onOpenInsight = {},
 )

@@ -2,7 +2,10 @@ package com.nightcode.snout.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
+import com.nightcode.snout.shared.domain.model.user.User
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveThemeMode
@@ -35,7 +38,7 @@ internal class SettingsViewModel(
     observeThemeMode: ObserveThemeMode,
 ) : ViewModel() {
 
-    private val account = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
+    private val account = MutableStateFlow<LoadState<User>>(LoadState.Loading)
     private val instanceUrl = MutableStateFlow<String?>(null)
     private val isLoggingOut = MutableStateFlow(false)
     private val showLinkSettings = canOpenLinkSettings()
@@ -72,21 +75,19 @@ internal class SettingsViewModel(
     )
 
     init {
-        loadAccount()
+        refresh()
         viewModelScope.launch { instanceUrl.value = getInstanceUrl() }
     }
 
-    fun loadAccount() = viewModelScope.launch {
-        account.value = AccountUiState.Loading
-        account.value = getCurrentUser().fold(
-            ifLeft = { AccountUiState.Error(it) },
-            ifRight = { AccountUiState.Loaded(it) },
-        )
+    /** Reloads the account, the only part of the screen fetched from PostHog. */
+    fun refresh() = viewModelScope.launch {
+        account.value = LoadState.Loading
+        account.value = getCurrentUser().toLoadState()
     }
 
-    fun onOpenInstance(url: String) = openInBrowser(url)
+    fun openInstance(url: String) = openInBrowser(url)
 
-    fun onOpenLinkSettings() = openLinkSettings()
+    fun openLinkSettings() = openLinkSettings.invoke()
 
     fun onThemeModeSelected(themeMode: ThemeMode) = viewModelScope.launch { saveThemeMode(themeMode) }
 

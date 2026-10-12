@@ -45,8 +45,7 @@ class LogServiceViewModelTest :
                 Either.Right(TestLogVolume)
             val projectId = GetSelectedProjectId(appStateRepository)
             return LogServiceViewModel(
-                service = Service,
-                range = LogsRange.LastHour,
+                navKey = LogServiceNavKey(Service, LogsRange.LastHour),
                 getLogs = GetServiceLogs(projectId, repository),
                 getVolume = GetServiceLogVolume(projectId, repository),
                 searchDebounce = Duration.ZERO,
@@ -84,7 +83,7 @@ class LogServiceViewModelTest :
             } returns Either.Right(LogPage(TestLogEntries.take(1), nextCursor = null))
             val viewModel = subject()
 
-            viewModel.onSeverityChange(LogSeverityFilter.Errors)
+            viewModel.onSeverityChanged(LogSeverityFilter.Errors)
             viewModel.uiState.value.severity shouldBe LogSeverityFilter.Errors
             viewModel.uiState.value.logs shouldBe CachedUiState.Content(TestLogEntries.take(1), isRefreshing = false)
             viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Done

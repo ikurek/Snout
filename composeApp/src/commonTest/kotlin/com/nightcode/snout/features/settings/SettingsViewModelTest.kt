@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.settings
 
 import arrow.core.Either
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -25,6 +26,7 @@ import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.user.GetCurrentUser
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -34,9 +36,7 @@ import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 @OptIn(TestData::class)
 class SettingsViewModelTest :
@@ -77,23 +77,22 @@ class SettingsViewModelTest :
         should("expose account, connection and theme once loaded") {
             everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-
-            viewModel.uiState.value shouldBe SettingsUiState(
-                account = AccountUiState.Loaded(TestUser),
-                instanceUrl = "https://eu.posthog.com",
-                organizationName = TestOrganization.name,
-                projectName = TestOrganization.projects.first().name,
-                themeMode = ThemeMode.Dark,
-                canOpenLinkSettings = true,
-            )
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value shouldBe SettingsUiState(
+                    account = LoadState.Loaded(TestUser),
+                    instanceUrl = "https://eu.posthog.com",
+                    organizationName = TestOrganization.name,
+                    projectName = TestOrganization.projects.first().name,
+                    themeMode = ThemeMode.Dark,
+                    canOpenLinkSettings = true,
+                )
+            }
         }
 
         should("hand the instance to the browser and open the link settings") {
             val viewModel = subject()
-            viewModel.onOpenInstance("https://eu.posthog.com")
-            viewModel.onOpenLinkSettings()
+            viewModel.openInstance("https://eu.posthog.com")
+            viewModel.openLinkSettings()
             verify { externalAppLauncher.openInBrowser("https://eu.posthog.com") }
             verify { externalAppLauncher.openLinkSettings() }
         }
@@ -101,13 +100,13 @@ class SettingsViewModelTest :
         should("expose account error and allow retry") {
             everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.ConnectionError)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value.account shouldBe AccountUiState.Error(DataError.ConnectionError)
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.account shouldBe LoadState.Error(DataError.ConnectionError)
 
-            everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
-            viewModel.loadAccount()
-            viewModel.uiState.value.account shouldBe AccountUiState.Loaded(TestUser)
-            collector.cancel()
+                everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
+                viewModel.refresh()
+                viewModel.uiState.value.account shouldBe LoadState.Loaded(TestUser)
+            }
         }
 
         should("persist selected theme mode") {

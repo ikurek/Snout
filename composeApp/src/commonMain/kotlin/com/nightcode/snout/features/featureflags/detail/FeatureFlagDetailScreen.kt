@@ -29,9 +29,10 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatShortDate
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.dataOrNull
+import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.SectionLabel
-import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
@@ -43,7 +44,7 @@ import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.molecules.TonalCard
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
-import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
+import com.nightcode.snout.designsystem.organisms.LoadStateContainer
 import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.featureflags.components.FeatureFlagStatusPill
@@ -84,19 +85,17 @@ import snout.composeapp.generated.resources.feature_flag_value_section
 import snout.composeapp.generated.resources.feature_flag_variant_payload
 import snout.composeapp.generated.resources.feature_flag_variants_section
 
-private const val LoadingRowCount = 4
-
 @Composable
 internal fun FeatureFlagDetailScreen(
     state: FeatureFlagDetailUiState,
     onNavigateBack: () -> Unit,
-    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     onToggleConfirmed: (active: Boolean) -> Unit,
-    onDismissToggleError: () -> Unit,
+    onToggleErrorDismissed: () -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
     var pendingToggle by rememberSaveable { mutableStateOf<Boolean?>(null) }
-    val flag = (state.flag as? CachedUiState.Content)?.data
+    val flag = state.flag.dataOrNull
 
     Scaffold(
         topBar = {
@@ -108,18 +107,17 @@ internal fun FeatureFlagDetailScreen(
             )
         },
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
-        when (val flagState = state.flag) {
-            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
-
-            is CachedUiState.Error -> ErrorPlaceholder(error = flagState.error, onRetry = onRetry, modifier = modifier)
-
-            is CachedUiState.Content -> FlagContent(
-                flag = flagState.data,
+        LoadStateContainer(
+            state = state.flag,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+        ) { flag ->
+            FlagContent(
+                flag = flag,
                 toggle = state.toggle,
                 onToggleRequest = { pendingToggle = it },
-                onDismissToggleError = onDismissToggleError,
-                modifier = modifier,
+                onToggleErrorDismissed = onToggleErrorDismissed,
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = innerPadding.bottomOnly(),
             )
         }
@@ -162,7 +160,7 @@ private fun FlagContent(
     flag: FeatureFlag,
     toggle: ToggleStatus,
     onToggleRequest: (active: Boolean) -> Unit,
-    onDismissToggleError: () -> Unit,
+    onToggleErrorDismissed: () -> Unit,
     modifier: Modifier,
     contentPadding: PaddingValues,
 ) {
@@ -180,8 +178,14 @@ private fun FlagContent(
         )
         if (toggle is ToggleStatus.Failed) {
             InlineErrorBanner(
-                text = stringResource(toggle.error.toggleMessage()),
-                onAction = onDismissToggleError,
+                text = stringResource(
+                    toggle.error.actionFailedMessage(
+                        generic = Res.string.feature_flag_toggle_error_generic,
+                        forbidden = Res.string.feature_flag_toggle_error_forbidden,
+                        rateLimited = Res.string.feature_flag_toggle_error_rate_limited,
+                    ),
+                ),
+                onAction = onToggleErrorDismissed,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
             )
         }
@@ -374,15 +378,6 @@ private fun RolloutPercent(percent: Int) {
     )
 }
 
-private fun DataError.toggleMessage() = when (this) {
-    DataError.Unauthorized, DataError.Forbidden -> Res.string.feature_flag_toggle_error_forbidden
-
-    DataError.RateLimited -> Res.string.feature_flag_toggle_error_rate_limited
-
-    DataError.NotFound, DataError.PaymentRequired, DataError.ConnectionError, DataError.UnexpectedError ->
-        Res.string.feature_flag_toggle_error_generic
-}
-
 @OptIn(TestData::class)
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
@@ -390,9 +385,9 @@ private fun DataError.toggleMessage() = when (this) {
 fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
     state = TestFeatureFlagDetailUiState,
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onToggleConfirmed = {},
-    onDismissToggleError = {},
+    onToggleErrorDismissed = {},
     onOpenInPostHog = {},
 )
 
@@ -403,9 +398,9 @@ fun FeatureFlagDetailScreenPreview() = FeatureFlagDetailScreen(
 fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
     state = TestFeatureFlagDetailUiState.copy(toggle = ToggleStatus.Failed(DataError.Forbidden)),
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onToggleConfirmed = {},
-    onDismissToggleError = {},
+    onToggleErrorDismissed = {},
     onOpenInPostHog = {},
 )
 
@@ -414,10 +409,10 @@ fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagDetailScreenRemoteConfigPreview() = FeatureFlagDetailScreen(
-    state = FeatureFlagDetailUiState(flag = CachedUiState.Content(TestRemoteConfigFeatureFlag, isRefreshing = false)),
+    state = FeatureFlagDetailUiState(flag = LoadState.Loaded(TestRemoteConfigFeatureFlag)),
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onToggleConfirmed = {},
-    onDismissToggleError = {},
+    onToggleErrorDismissed = {},
     onOpenInPostHog = {},
 )

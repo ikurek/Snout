@@ -16,13 +16,13 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatShortDate
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
-import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
-import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
+import com.nightcode.snout.designsystem.organisms.LoadStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -46,30 +46,26 @@ import snout.composeapp.generated.resources.experiment_title_placeholder
 import snout.composeapp.generated.resources.experiment_variants_section
 import snout.composeapp.generated.resources.feature_flag_rollout_percent
 
-private const val LoadingRowCount = 4
-
 @Composable
 internal fun ExperimentDetailScreen(
-    state: CachedUiState<Experiment>,
+    state: LoadState<Experiment>,
     onNavigateBack: () -> Unit,
-    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     onOpenFeatureFlag: (flagId: Long) -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    val experiment = (state as? CachedUiState.Content)?.data
+    val experiment = state.dataOrNull
     ListScreenScaffold(
         title = experiment?.name ?: stringResource(Res.string.experiment_title_placeholder),
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
-        when (state) {
-            CachedUiState.Loading, is CachedUiState.Empty -> SkeletonRows(modifier = modifier, count = LoadingRowCount)
-
-            is CachedUiState.Error -> ErrorPlaceholder(error = state.error, onRetry = onRetry, modifier = modifier)
-
-            is CachedUiState.Content ->
-                ExperimentContent(state.data, onOpenFeatureFlag, modifier, innerPadding.bottomOnly())
+        LoadStateContainer(
+            state = state,
+            onRefresh = onRefresh,
+            modifier = Modifier.padding(innerPadding.withoutBottom()),
+        ) { experiment ->
+            ExperimentContent(experiment, onOpenFeatureFlag, Modifier.fillMaxSize(), innerPadding.bottomOnly())
         }
     }
 }
@@ -183,9 +179,9 @@ private fun MetricRow(name: String) = Text(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ExperimentDetailScreenPreview() = ExperimentDetailScreen(
-    state = CachedUiState.Content(TestExperiment, isRefreshing = false),
+    state = LoadState.Loaded(TestExperiment),
     onNavigateBack = {},
-    onRetry = {},
+    onRefresh = {},
     onOpenFeatureFlag = {},
     onOpenInPostHog = {},
 )

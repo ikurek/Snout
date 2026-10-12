@@ -74,15 +74,15 @@ internal fun LogServiceScreen(
     range: LogsRange,
     state: LogServiceUiState,
     onNavigateBack: () -> Unit,
-    onQueryChange: (String) -> Unit,
-    onSeverityChange: (LogSeverityFilter) -> Unit,
+    onQueryChanged: (String) -> Unit,
+    onSeverityChanged: (LogSeverityFilter) -> Unit,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
     onOpenEntry: (LogEntry) -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
     val searchState = rememberTextFieldState(state.query)
-    LaunchedEffect(searchState.text) { onQueryChange(searchState.text.toString()) }
+    LaunchedEffect(searchState.text) { onQueryChanged(searchState.text.toString()) }
 
     ListScreenScaffold(
         title = service,
@@ -90,7 +90,7 @@ internal fun LogServiceScreen(
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())) {
-            LogFilters(searchState = searchState, severity = state.severity, onSeverityChange = onSeverityChange)
+            LogFilters(searchState = searchState, severity = state.severity, onSeverityChanged = onSeverityChanged)
             val logs = state.logs
             if (logs is CachedUiState.Error && logs.error == DataError.NotFound) {
                 LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
@@ -137,7 +137,7 @@ internal fun LogServiceScreen(
 private fun LogFilters(
     searchState: TextFieldState,
     severity: LogSeverityFilter,
-    onSeverityChange: (LogSeverityFilter) -> Unit,
+    onSeverityChanged: (LogSeverityFilter) -> Unit,
 ) {
     SearchField(
         state = searchState,
@@ -148,7 +148,7 @@ private fun LogFilters(
         label = stringResource(severity.label),
         options = LogSeverityFilter.entries.map { MenuOption(it, stringResource(it.label)) },
         selected = severity,
-        onSelect = onSeverityChange,
+        onSelect = onSeverityChanged,
         active = severity != LogSeverityFilter.All,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
     )
@@ -220,8 +220,8 @@ fun LogServiceScreenPreview() = LogServiceScreen(
     range = LogsRange.Last24Hours,
     state = TestLogServiceUiState,
     onNavigateBack = {},
-    onQueryChange = {},
-    onSeverityChange = {},
+    onQueryChanged = {},
+    onSeverityChanged = {},
     onRefresh = {},
     onLoadMore = {},
     onOpenEntry = {},
@@ -239,8 +239,8 @@ fun LogServiceScreenEmptyPreview() = LogServiceScreen(
         logs = CachedUiState.Empty(isRefreshing = false),
     ),
     onNavigateBack = {},
-    onQueryChange = {},
-    onSeverityChange = {},
+    onQueryChanged = {},
+    onSeverityChanged = {},
     onRefresh = {},
     onLoadMore = {},
     onOpenEntry = {},

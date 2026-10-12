@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
@@ -55,16 +56,16 @@ private fun Content(
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
 ) {
     when (state) {
-        ProjectSelectionUiState.Loading -> SkeletonRows()
+        LoadState.Loading -> SkeletonRows()
 
-        is ProjectSelectionUiState.Error -> ErrorPlaceholder(
+        is LoadState.Error -> ErrorPlaceholder(
             error = state.error,
             onRetry = onRetry,
             modifier = Modifier.fillMaxSize(),
         )
 
-        is ProjectSelectionUiState.Loaded -> LoadedContent(
-            organizations = state.organizations,
+        is LoadState.Loaded -> LoadedContent(
+            organizations = state.data,
             contentPadding = contentPadding,
             onRetry = onRetry,
             onProjectSelected = onProjectSelected,

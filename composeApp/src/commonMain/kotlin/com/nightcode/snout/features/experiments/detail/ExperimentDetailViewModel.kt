@@ -2,7 +2,8 @@ package com.nightcode.snout.features.experiments.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
 import com.nightcode.snout.shared.domain.usecase.experiments.GetExperiment
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,18 +19,15 @@ internal class ExperimentDetailViewModel(
     private val getExperiment: GetExperiment,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<CachedUiState<Experiment>>(CachedUiState.Loading)
-    val uiState: StateFlow<CachedUiState<Experiment>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<LoadState<Experiment>>(LoadState.Loading)
+    val uiState: StateFlow<LoadState<Experiment>> = _uiState.asStateFlow()
 
     init {
-        load()
+        refresh()
     }
 
-    fun load() = viewModelScope.launch {
-        _uiState.value = CachedUiState.Loading
-        _uiState.value = getExperiment(experimentId).fold(
-            ifLeft = { CachedUiState.Error(it) },
-            ifRight = { CachedUiState.Content(it, isRefreshing = false) },
-        )
+    fun refresh() = viewModelScope.launch {
+        _uiState.value = LoadState.Loading
+        _uiState.value = getExperiment(experimentId).toLoadState()
     }
 }

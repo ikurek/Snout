@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberPostHogOpener
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
@@ -33,13 +33,13 @@ internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () 
         }
     }
 
-    val shortId = (state as? CachedUiState.Content)?.data?.summary?.shortId
+    val shortId = state.dataOrNull?.summary?.shortId
     InsightDetailScreen(
         state = state,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
-        onRetry = viewModel::load,
-        onFavoriteToggle = viewModel::onFavoriteToggle,
+        onRefresh = viewModel::refresh,
+        onToggleFavorite = viewModel::toggleFavorite,
         onOpenInPostHog = { shortId?.let { openInPostHog(PostHogResource.Insight(it)) } },
     )
 }

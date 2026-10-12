@@ -2,7 +2,8 @@ package com.nightcode.snout.features.featureflags.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlag
 import com.nightcode.snout.shared.domain.usecase.featureflags.SetFeatureFlagActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,15 +25,12 @@ internal class FeatureFlagDetailViewModel(
     val uiState: StateFlow<FeatureFlagDetailUiState> = _uiState.asStateFlow()
 
     init {
-        load()
+        refresh()
     }
 
-    fun load() = viewModelScope.launch {
-        _uiState.update { it.copy(flag = CachedUiState.Loading) }
-        val flag = getFeatureFlag(flagId).fold(
-            ifLeft = { CachedUiState.Error(it) },
-            ifRight = { CachedUiState.Content(it, isRefreshing = false) },
-        )
+    fun refresh() = viewModelScope.launch {
+        _uiState.update { it.copy(flag = LoadState.Loading) }
+        val flag = getFeatureFlag(flagId).toLoadState()
         _uiState.update { it.copy(flag = flag) }
     }
 
@@ -42,11 +40,11 @@ internal class FeatureFlagDetailViewModel(
             ifLeft = { error -> _uiState.update { it.copy(toggle = ToggleStatus.Failed(error)) } },
             ifRight = { updated ->
                 _uiState.update {
-                    it.copy(flag = CachedUiState.Content(updated, isRefreshing = false), toggle = ToggleStatus.Idle)
+                    it.copy(flag = LoadState.Loaded(updated), toggle = ToggleStatus.Idle)
                 }
             },
         )
     }
 
-    fun dismissToggleError() = _uiState.update { it.copy(toggle = ToggleStatus.Idle) }
+    fun onToggleErrorDismissed() = _uiState.update { it.copy(toggle = ToggleStatus.Idle) }
 }

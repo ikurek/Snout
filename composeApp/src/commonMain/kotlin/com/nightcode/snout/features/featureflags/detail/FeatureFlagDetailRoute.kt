@@ -18,9 +18,9 @@ internal fun FeatureFlagDetailRoute(navKey: FeatureFlagDetailNavKey, onNavigateB
     FeatureFlagDetailScreen(
         state = state,
         onNavigateBack = onNavigateBack,
-        onRetry = viewModel::load,
+        onRefresh = viewModel::refresh,
         onToggleConfirmed = viewModel::onToggleConfirmed,
-        onDismissToggleError = viewModel::dismissToggleError,
+        onToggleErrorDismissed = viewModel::onToggleErrorDismissed,
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.FeatureFlag(navKey.flagId)),
     )
 }

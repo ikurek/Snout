@@ -203,7 +203,11 @@ private fun mainEntryProvider(
 /** A service's log lines and a single line, both pushed from the Logs section. */
 private fun EntryProviderScope<NavKey>.logsEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
     entry<LogServiceNavKey> { key ->
-        LogServiceRoute(navKey = key, onNavigateBack = back, onOpenEntry = { backStack.add(it) })
+        LogServiceRoute(
+            navKey = key,
+            onNavigateBack = back,
+            onOpenEntry = { entryId, timestamp -> backStack.add(LogEntryNavKey(key.service, entryId, timestamp)) },
+        )
     }
     entry<LogEntryNavKey> { key -> LogEntryRoute(navKey = key, onNavigateBack = back) }
 }

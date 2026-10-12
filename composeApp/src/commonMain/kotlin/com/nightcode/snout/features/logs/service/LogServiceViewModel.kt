@@ -6,7 +6,6 @@ import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.common.state.RefreshStatus
 import com.nightcode.snout.common.state.listUiState
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
-import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import com.nightcode.snout.shared.domain.usecase.logs.GetServiceLogVolume
 import com.nightcode.snout.shared.domain.usecase.logs.GetServiceLogs
 import kotlinx.coroutines.FlowPreview
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -32,15 +32,12 @@ private data class LogFilter(val query: String, val severity: LogSeverityFilter,
 @OptIn(FlowPreview::class)
 @KoinViewModel
 internal class LogServiceViewModel(
-    @InjectedParam private val service: String,
-    @InjectedParam private val range: LogsRange,
+    @InjectedParam private val navKey: LogServiceNavKey,
     private val getLogs: GetServiceLogs,
     private val getVolume: GetServiceLogVolume,
     searchDebounce: Duration = 300.milliseconds,
 ) : ViewModel() {
 
-    private val query = MutableStateFlow("")
-    private val severity = MutableStateFlow(LogSeverityFilter.All)
     private val reload = MutableStateFlow(0)
     private var cursor: String? = null
     private var loadMoreJob: Job? = null
@@ -51,18 +48,22 @@ internal class LogServiceViewModel(
 
     init {
         viewModelScope.launch {
-            combine(query.debounce(searchDebounce).distinctUntilChanged(), severity, reload, ::LogFilter)
+            // The screen state is the only copy of the filters; the first page follows it.
+            val query = _uiState.map { it.query }
+                .distinctUntilChanged()
+                .debounce(searchDebounce)
+                .distinctUntilChanged()
+            val severity = _uiState.map { it.severity }.distinctUntilChanged()
+            combine(query, severity, reload, ::LogFilter)
                 .collectLatest { loadFirstPage(it) }
         }
     }
 
-    fun onQueryChange(text: String) {
-        query.value = text
+    fun onQueryChanged(text: String) {
         _uiState.update { it.copy(query = text) }
     }
 
-    fun onSeverityChange(value: LogSeverityFilter) {
-        severity.value = value
+    fun onSeverityChanged(value: LogSeverityFilter) {
         _uiState.update { it.copy(severity = value) }
     }
 
@@ -74,11 +75,14 @@ internal class LogServiceViewModel(
     fun loadMore() {
         val state = _uiState.value
         val after = cursor
+        val filter = lastFilter
         val loaded = (state.logs as? CachedUiState.Content)?.data ?: return
-        if (after == null || state.loadMore == LoadMoreStatus.Loading || loadMoreJob?.isActive == true) return
+        val isLoading = state.loadMore == LoadMoreStatus.Loading || loadMoreJob?.isActive == true
+        if (after == null || filter == null || isLoading) return
         loadMoreJob = viewModelScope.launch {
             _uiState.update { it.copy(loadMore = LoadMoreStatus.Loading) }
-            getLogs(service, range, state.severity, query.value, after).fold(
+            // The filter the loaded pages were fetched with, which a query still being typed hasn't replaced yet.
+            getLogs(navKey.service, navKey.range, filter.severity, filter.query, after).fold(
                 ifLeft = { error -> _uiState.update { it.copy(loadMore = LoadMoreStatus.Failed(error)) } },
                 ifRight = { page ->
                     cursor = page.nextCursor
@@ -110,10 +114,10 @@ internal class LogServiceViewModel(
         }
         launch {
             // The chart is a bonus: when it fails the list still stands on its own.
-            val volume = getVolume(service, range, filter.severity, filter.query).getOrNull()
+            val volume = getVolume(navKey.service, navKey.range, filter.severity, filter.query).getOrNull()
             _uiState.update { it.copy(volume = volume?.takeUnless { v -> v.isEmpty }) }
         }
-        getLogs(service, range, filter.severity, filter.query).fold(
+        getLogs(navKey.service, navKey.range, filter.severity, filter.query).fold(
             ifLeft = { error -> _uiState.update { it.copy(logs = CachedUiState.Error(error)) } },
             ifRight = { page ->
                 cursor = page.nextCursor

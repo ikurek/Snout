@@ -16,9 +16,9 @@ internal fun ErrorTrackingRoute(
 
     ErrorTrackingScreen(
         state = state,
-        onQueryChange = viewModel::onQueryChange,
-        onStatusChange = viewModel::onStatusChange,
-        onAppVersionChange = viewModel::onAppVersionChange,
+        onQueryChanged = viewModel::onQueryChanged,
+        onStatusChanged = viewModel::onStatusChanged,
+        onAppVersionChanged = viewModel::onAppVersionChanged,
         onRefresh = viewModel::refresh,
         onOpenIssue = onOpenIssue,
         contentPadding = contentPadding,

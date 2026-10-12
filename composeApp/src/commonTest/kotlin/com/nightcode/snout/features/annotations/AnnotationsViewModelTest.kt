@@ -14,6 +14,7 @@ import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.RefreshAnnotations
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -50,33 +51,33 @@ class AnnotationsViewModelTest :
 
         should("list cached annotations") {
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value.annotations shouldBe CachedUiState.Content(
-                listOf(TestAnnotation),
-                isRefreshing = false,
-            )
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.annotations shouldBe CachedUiState.Content(
+                    listOf(TestAnnotation),
+                    isRefreshing = false,
+                )
+            }
         }
 
         should("emit Created and reset status after a successful create") {
             everySuspend { repository.createAnnotation(any(), "Release", any()) } returns Either.Right(TestAnnotation)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            val effects = launch(
-                Dispatchers.Main,
-            ) { viewModel.sideEffects.first() shouldBe AnnotationsSideEffect.Created }
-            viewModel.onCreate("Release", TestAnnotation.dateMarker)
-            effects.join()
-            viewModel.uiState.value.create shouldBe CreateStatus.Idle
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                val effects = launch(
+                    Dispatchers.Main,
+                ) { viewModel.sideEffects.first() shouldBe AnnotationsSideEffect.Created }
+                viewModel.create("Release", TestAnnotation.dateMarker)
+                effects.join()
+                viewModel.uiState.value.create shouldBe CreateStatus.Idle
+            }
         }
 
         should("expose failure when creation is forbidden") {
             everySuspend { repository.createAnnotation(any(), any(), any()) } returns Either.Left(DataError.Forbidden)
             val viewModel = subject()
-            val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.onCreate("Release", TestAnnotation.dateMarker)
-            viewModel.uiState.value.create shouldBe CreateStatus.Failed(DataError.Forbidden)
-            collector.cancel()
+            viewModel.uiState.subscribed {
+                viewModel.create("Release", TestAnnotation.dateMarker)
+                viewModel.uiState.value.create shouldBe CreateStatus.Failed(DataError.Forbidden)
+            }
         }
     })

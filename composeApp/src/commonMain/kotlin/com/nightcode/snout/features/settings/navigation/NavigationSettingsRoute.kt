@@ -17,7 +17,7 @@ internal fun NavigationSettingsRoute(onNavigateBack: () -> Unit) {
         onNavigateBack = onNavigateBack,
         onSlotSelected = viewModel::onSlotSelected,
         onLandingSelected = viewModel::onLandingSelected,
-        onReset = viewModel::onReset,
+        onReset = viewModel::reset,
     )
 }
 
