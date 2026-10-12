@@ -22,12 +22,12 @@ import org.koin.core.annotation.Single
 class ApiModule {
 
     @Single
-    fun json() = Json {
+    fun provideJson() = Json {
         ignoreUnknownKeys = true
     }
 
     @Single
-    fun postHogHttpClient(json: Json, dataStore: AuthDataStore) = HttpClient {
+    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore) = HttpClient {
         expectSuccess = true
         install(ContentNegotiation) {
             json(json)

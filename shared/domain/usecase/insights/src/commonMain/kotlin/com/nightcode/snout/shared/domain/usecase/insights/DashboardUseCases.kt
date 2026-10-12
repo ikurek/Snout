@@ -7,17 +7,13 @@ import com.nightcode.snout.shared.domain.model.insights.Dashboard
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveDashboards(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: DashboardRepository,
 ) {
     operator fun invoke(): Flow<List<DashboardSummary>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeDashboards(it) }
+        observeSelectedProjectId.flatMapProject { repository.observeDashboards(it) }
 }
 
 class RefreshDashboards(
@@ -26,14 +22,12 @@ class RefreshDashboards(
 ) {
     suspend operator fun invoke(): Either<DataError, Unit> = repository.refreshDashboards(getSelectedProjectId())
 }
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveDashboard(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: DashboardRepository,
 ) {
     operator fun invoke(dashboardId: Long): Flow<Dashboard?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeDashboard(it, dashboardId) }
+        observeSelectedProjectId.flatMapProject { repository.observeDashboard(it, dashboardId) }
 }
 
 class RefreshDashboard(

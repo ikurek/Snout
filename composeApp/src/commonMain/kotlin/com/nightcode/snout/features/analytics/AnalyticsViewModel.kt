@@ -7,8 +7,8 @@ import com.nightcode.snout.common.state.cachedUiState
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.applying
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.analytics.RefreshAnalytics
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

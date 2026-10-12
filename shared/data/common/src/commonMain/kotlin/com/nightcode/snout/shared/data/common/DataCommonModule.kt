@@ -11,5 +11,5 @@ import org.koin.core.annotation.Single
 @Module(includes = [ApiModule::class, DatabaseModule::class])
 class DataCommonModule {
     @Single(binds = [JsonCacheStore::class, CacheRepository::class])
-    fun jsonCacheStore(json: Json, cache: JsonCache) = JsonCacheStore(json, cache)
+    fun provideJsonCacheStore(json: Json, cache: JsonCache) = JsonCacheStore(json, cache)
 }

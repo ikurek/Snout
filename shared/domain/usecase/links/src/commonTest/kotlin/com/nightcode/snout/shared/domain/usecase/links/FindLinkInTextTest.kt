@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.usecase.links
 
 import com.nightcode.snout.shared.domain.model.links.NoLinkInText
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec

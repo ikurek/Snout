@@ -375,7 +375,7 @@ private fun RolloutPercent(percent: Int) {
 }
 
 private fun DataError.toggleMessage() = when (this) {
-    DataError.Forbidden -> Res.string.feature_flag_toggle_error_forbidden
+    DataError.Unauthorized, DataError.Forbidden -> Res.string.feature_flag_toggle_error_forbidden
 
     DataError.RateLimited -> Res.string.feature_flag_toggle_error_rate_limited
 

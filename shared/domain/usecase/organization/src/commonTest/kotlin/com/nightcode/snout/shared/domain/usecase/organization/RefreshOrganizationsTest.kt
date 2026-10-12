@@ -2,7 +2,7 @@ package com.nightcode.snout.shared.domain.usecase.organization
 
 import arrow.core.Either
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
@@ -22,8 +22,8 @@ class RefreshOrganizationsTest :
 
         should("return left on failure") {
             everySuspend { repository.refreshOrganizations() } returns Either.Left(
-                GetOrganizationsError.ConnectionError,
+                DataError.ConnectionError,
             )
-            subject().shouldBeLeft(GetOrganizationsError.ConnectionError)
+            subject().shouldBeLeft(DataError.ConnectionError)
         }
     })

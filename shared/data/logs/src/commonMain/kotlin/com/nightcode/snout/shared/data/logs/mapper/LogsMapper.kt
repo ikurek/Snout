@@ -4,6 +4,7 @@ import com.nightcode.snout.shared.api.logs.model.LogEntryDto
 import com.nightcode.snout.shared.api.logs.model.LogServicesResponseDto
 import com.nightcode.snout.shared.api.logs.model.LogVolumeBucketDto
 import com.nightcode.snout.shared.api.logs.model.LogsQueryResponseDto
+import com.nightcode.snout.shared.data.common.nullIfBlank
 import com.nightcode.snout.shared.domain.model.logs.LogEntry
 import com.nightcode.snout.shared.domain.model.logs.LogLevelCounts
 import com.nightcode.snout.shared.domain.model.logs.LogPage
@@ -60,8 +61,8 @@ private fun LogEntryDto.toEntry(): LogEntry? {
         severity = severityText.toSeverity(),
         traceId = traceId?.takeUnless { EmptyId.matches(it) },
         spanId = spanId?.takeUnless { EmptyId.matches(it) },
-        logger = instrumentationScope?.takeIf { it.isNotBlank() },
-        eventName = eventName?.takeIf { it.isNotBlank() },
+        logger = instrumentationScope.nullIfBlank(),
+        eventName = eventName.nullIfBlank(),
         attributes = attributes,
         resourceAttributes = resourceAttributes,
     )

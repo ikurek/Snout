@@ -11,10 +11,10 @@ internal const val PreferencesFileName = "snout.preferences_pb"
 class DataStoreModule {
 
     @Single
-    fun authDataStore(dataStore: DataStore<Preferences>) = AuthDataStore(dataStore)
+    fun provideAuthDataStore(dataStore: DataStore<Preferences>) = AuthDataStore(dataStore)
 
     @Single
-    fun appStateDataStore(dataStore: DataStore<Preferences>) = AppStateDataStore(dataStore)
+    fun provideAppStateDataStore(dataStore: DataStore<Preferences>) = AppStateDataStore(dataStore)
 }
 
 @Module

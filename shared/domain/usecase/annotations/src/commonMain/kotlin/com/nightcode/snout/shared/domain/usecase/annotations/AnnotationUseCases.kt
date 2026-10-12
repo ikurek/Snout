@@ -6,18 +6,14 @@ import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlin.time.Instant
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveAnnotations(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: AnnotationRepository,
 ) {
     operator fun invoke(): Flow<List<Annotation>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeAnnotations(it) }
+        observeSelectedProjectId.flatMapProject { repository.observeAnnotations(it) }
 }
 
 class RefreshAnnotations(

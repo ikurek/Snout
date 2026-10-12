@@ -1,6 +1,6 @@
-package com.nightcode.snout.shared.domain.usecase.appstate
+package com.nightcode.snout.shared.domain.usecase.links
 
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import kotlin.uuid.Uuid
 
 /*

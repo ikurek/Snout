@@ -9,9 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberOpenInPostHog
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
@@ -46,7 +46,7 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
 
                 is ErrorTrackingIssueSideEffect.StatusChangeFailed -> snackbarHostState.showSnackbar(
                     getString(
-                        if (effect.error == DataError.Forbidden) {
+                        if (effect.error == DataError.Forbidden || effect.error == DataError.Unauthorized) {
                             Res.string.error_tracking_status_error_forbidden
                         } else {
                             Res.string.error_tracking_status_error_generic

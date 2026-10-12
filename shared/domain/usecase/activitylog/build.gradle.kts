@@ -10,7 +10,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.activitylog)
-        implementation(projects.shared.data.activitylog)
         implementation(projects.shared.domain.data.activitylog)
         implementation(projects.shared.domain.data.appstate)
         implementation(projects.shared.domain.usecase.appstate)

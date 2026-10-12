@@ -1,5 +1,8 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
+import com.nightcode.snout.shared.data.common.number
+import com.nightcode.snout.shared.data.common.string
+import com.nightcode.snout.shared.data.common.stringValue
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
@@ -15,7 +18,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.doubleOrNull
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -176,17 +178,14 @@ private fun JsonElement?.cellText(): String = when (this) {
     else -> toString()
 }
 
-internal fun JsonElement?.number(): Double? = (this as? JsonPrimitive)?.doubleOrNull
-
 /** A breakdown value as text; multi-property breakdowns arrive as arrays and read "Chrome / Mac OS X". */
 internal fun JsonElement?.breakdownText(): String? = when (this) {
     null, JsonNull -> null
     is JsonPrimitive -> contentOrNull
-    is JsonArray -> joinToString(" / ") { (it as? JsonPrimitive)?.contentOrNull.orEmpty() }
+    is JsonArray -> joinToString(" / ") { it.string().orEmpty() }
     else -> null
 }
 
 private fun JsonElement?.numbers(): List<Double> = (this as? JsonArray)?.mapNotNull { it.number() }.orEmpty()
 
-private fun JsonElement?.strings(): List<String> =
-    (this as? JsonArray)?.mapNotNull { (it as? JsonPrimitive)?.contentOrNull }.orEmpty()
+private fun JsonElement?.strings(): List<String> = (this as? JsonArray)?.mapNotNull { it.string() }.orEmpty()

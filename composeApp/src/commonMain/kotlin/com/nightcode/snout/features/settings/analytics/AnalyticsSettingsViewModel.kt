@@ -6,8 +6,8 @@ import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveAnalyticsPreferences
-import com.nightcode.snout.shared.domain.usecase.appstate.SaveAnalyticsPreferences
+import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
+import com.nightcode.snout.shared.domain.usecase.analytics.SaveAnalyticsPreferences
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn

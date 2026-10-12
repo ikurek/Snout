@@ -2,19 +2,16 @@ package com.nightcode.snout.shared.storage.database
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.nightcode.snout.shared.common.coroutines.IoDispatcher
 import com.nightcode.snout.shared.storage.database.entity.OrganizationEntity
 import com.nightcode.snout.shared.storage.database.entity.ProjectEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
-import org.koin.core.annotation.Single
 
-@Single(binds = [OrganizationsDatabase::class])
 internal class OrganizationsDatabaseImpl(
     private val database: SnoutDatabase,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : OrganizationsDatabase {
 
     override fun observe(): Flow<List<OrganizationEntity>> {

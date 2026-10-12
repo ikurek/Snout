@@ -6,14 +6,9 @@ import kotlin.time.Instant
 
 @Serializable
 data class UserDto(
-    @SerialName("date_joined")
-    val dateJoined: Instant,
-    @SerialName("uuid")
-    val uuid: String,
-    @SerialName("first_name")
-    val firstName: String,
-    @SerialName("last_name")
-    val lastName: String,
-    @SerialName("email")
-    val email: String,
+    @SerialName("date_joined") val dateJoined: Instant,
+    @SerialName("uuid") val uuid: String,
+    @SerialName("first_name") val firstName: String,
+    @SerialName("last_name") val lastName: String,
+    @SerialName("email") val email: String,
 )

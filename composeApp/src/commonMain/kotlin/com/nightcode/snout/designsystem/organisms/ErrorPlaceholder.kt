@@ -7,7 +7,8 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 @Composable
 internal fun ErrorPlaceholder(error: DataError, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     when (error) {
-        DataError.Forbidden -> PermissionDeniedPlaceholder(onRetry = onRetry, modifier = modifier)
+        DataError.Unauthorized, DataError.Forbidden ->
+            PermissionDeniedPlaceholder(onRetry = onRetry, modifier = modifier)
 
         DataError.PaymentRequired -> PaymentRequiredPlaceholder(onRetry = onRetry, modifier = modifier)
 

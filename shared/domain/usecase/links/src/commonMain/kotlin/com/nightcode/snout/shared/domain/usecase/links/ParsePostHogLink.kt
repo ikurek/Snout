@@ -1,11 +1,11 @@
-package com.nightcode.snout.shared.domain.usecase.appstate
+package com.nightcode.snout.shared.domain.usecase.links
 
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
-import com.nightcode.snout.shared.domain.model.appstate.PostHogLink
-import com.nightcode.snout.shared.domain.model.appstate.PostHogLinkError
+import com.nightcode.snout.shared.domain.model.links.PostHogLink
+import com.nightcode.snout.shared.domain.model.links.PostHogLinkError
 
 private const val HttpsScheme = "https://"
 

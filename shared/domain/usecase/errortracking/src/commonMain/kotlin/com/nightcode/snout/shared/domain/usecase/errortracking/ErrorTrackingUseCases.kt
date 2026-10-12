@@ -9,17 +9,13 @@ import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveErrorTrackingIssues(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: ErrorTrackingRepository,
 ) {
     operator fun invoke(status: IssueStatusFilter): Flow<List<ErrorTrackingIssue>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeIssues(it, status) }
+        observeSelectedProjectId.flatMapProject { repository.observeIssues(it, status) }
 }
 
 class RefreshErrorTrackingIssues(

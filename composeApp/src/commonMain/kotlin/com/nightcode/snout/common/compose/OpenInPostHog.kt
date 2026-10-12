@@ -3,8 +3,8 @@ package com.nightcode.snout.common.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
-import com.nightcode.snout.shared.domain.usecase.appstate.GetPostHogUrl
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
+import com.nightcode.snout.shared.domain.usecase.links.GetPostHogUrl
 import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

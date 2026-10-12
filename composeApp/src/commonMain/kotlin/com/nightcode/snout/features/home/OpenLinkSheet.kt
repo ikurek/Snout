@@ -29,8 +29,8 @@ import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.atoms.textfields.TextFieldError
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 import com.nightcode.snout.shared.domain.usecase.links.FindLinkInText
+import com.nightcode.snout.shared.domain.usecase.links.ParsePostHogLink
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import snout.composeapp.generated.resources.Res

@@ -5,7 +5,7 @@ import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateAndSaveUserAuth
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateInstanceUrl
@@ -34,7 +34,7 @@ class LoginViewModelTest :
         )
 
         should("clear a rejected key and unlock Connect when the instance url changes") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(GetCurrentUserError.Unauthorized)
+            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.Unauthorized)
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.isConnectEnabled.collect {} }
 

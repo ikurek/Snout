@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateAndSaveUserAuth
 import com.nightcode.snout.shared.domain.usecase.auth.ValidateInstanceUrl
@@ -98,17 +98,19 @@ internal class LoginViewModel(
         validateAndSaveUserAuth(token = personalApiKey.trim(), instanceUrl = normalizedUrl)
             .onLeft { error ->
                 when (error) {
-                    GetCurrentUserError.Unauthorized,
-                    GetCurrentUserError.Forbidden,
+                    DataError.Unauthorized,
+                    DataError.Forbidden,
                     ->
                         _personalApiKeyValidationError.value =
                             PersonalApiKeyValidationError.ServerValidationFailed
 
-                    GetCurrentUserError.RateLimited ->
+                    DataError.RateLimited ->
                         _sideEffects.send(LoginSideEffect.ShowError(Res.string.snackbar_rate_limited_message))
 
-                    GetCurrentUserError.ConnectionError,
-                    GetCurrentUserError.UnexpectedError,
+                    DataError.PaymentRequired,
+                    DataError.NotFound,
+                    DataError.ConnectionError,
+                    DataError.UnexpectedError,
                     ->
                         _sideEffects.send(LoginSideEffect.ShowError(Res.string.snackbar_generic_error_message))
                 }

@@ -4,20 +4,17 @@ import com.nightcode.snout.shared.api.logs.model.LogServicesResponseDto
 import com.nightcode.snout.shared.api.logs.model.LogVolumeBucketDto
 import com.nightcode.snout.shared.api.logs.model.LogsQueryResponseDto
 import com.nightcode.snout.shared.api.networkCall
+import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
+import com.nightcode.snout.shared.api.putDateRange
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
 
 private const val PageSize = 100
 
@@ -29,7 +26,7 @@ class LogsApi internal constructor(private val client: HttpClient, private val a
 
     /** Per-service volume and error counts since [dateFrom], a relative date such as `-24h`. */
     suspend fun getServices(projectId: Long, dateFrom: String) = networkCall<LogServicesResponseDto> {
-        post(projectId, "logs/services/") { putDateRange(dateFrom) }.body()
+        postQuery(projectId, "logs/services/") { putDateRange(dateFrom) }.body()
     }
 
     /**
@@ -46,7 +43,7 @@ class LogsApi internal constructor(private val client: HttpClient, private val a
         after: String?,
         dateTo: String? = null,
     ) = networkCall<LogsQueryResponseDto> {
-        post(projectId, "logs/query/") {
+        postQuery(projectId, "logs/query/") {
             putDateRange(dateFrom, dateTo)
             putJsonArray("serviceNames") { add(serviceName) }
             putJsonArray("severityLevels") { severityLevels.forEach { add(it) } }
@@ -65,7 +62,7 @@ class LogsApi internal constructor(private val client: HttpClient, private val a
         severityLevels: List<String>,
         search: String?,
     ) = networkCall<List<LogVolumeBucketDto>> {
-        post(projectId, "logs/sparkline/") {
+        postQuery(projectId, "logs/sparkline/") {
             putDateRange(dateFrom)
             putJsonArray("serviceNames") { add(serviceName) }
             putJsonArray("severityLevels") { severityLevels.forEach { add(it) } }
@@ -75,14 +72,8 @@ class LogsApi internal constructor(private val client: HttpClient, private val a
     }
 
     /** The logs endpoints wrap their parameters in a `query` object. */
-    private suspend fun post(projectId: Long, path: String, query: JsonObjectBuilder.() -> Unit) =
-        client.post(authDataStore.projectUrl(projectId, path)) {
-            contentType(ContentType.Application.Json)
-            setBody(buildJsonObject { put("query", buildJsonObject(query)) })
-        }
-
-    private fun JsonObjectBuilder.putDateRange(dateFrom: String, dateTo: String? = null) = putJsonObject("dateRange") {
-        put("date_from", dateFrom)
-        dateTo?.let { put("date_to", it) }
-    }
+    private suspend fun postQuery(projectId: Long, path: String, query: JsonObjectBuilder.() -> Unit) = client.postJson(
+        authDataStore.projectUrl(projectId, path),
+        buildJsonObject { put("query", buildJsonObject(query)) },
+    )
 }

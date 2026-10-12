@@ -4,6 +4,7 @@ import com.nightcode.snout.shared.api.insights.model.DashboardDetailDto
 import com.nightcode.snout.shared.api.insights.model.DashboardDto
 import com.nightcode.snout.shared.api.insights.model.DashboardTileDto
 import com.nightcode.snout.shared.api.insights.model.InsightDto
+import com.nightcode.snout.shared.data.common.nullIfBlank
 import com.nightcode.snout.shared.domain.model.insights.Dashboard
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
 import com.nightcode.snout.shared.domain.model.insights.DashboardTile
@@ -18,11 +19,11 @@ internal fun InsightDto.toSummary(): InsightSummary {
     return InsightSummary(
         id = id,
         shortId = shortId,
-        name = name?.takeIf { it.isNotBlank() }
-            ?: derivedName?.takeIf { it.isNotBlank() }
+        name = name.nullIfBlank()
+            ?: derivedName.nullIfBlank()
             ?: query.seriesTitle()
             ?: "Untitled insight",
-        description = description?.takeIf { it.isNotBlank() },
+        description = description.nullIfBlank(),
         favorited = favorited,
         lastModifiedAt = lastModifiedAt,
         tags = tags,
@@ -45,7 +46,7 @@ internal fun InsightDto.toDetail(now: Instant = Clock.System.now()): InsightDeta
 internal fun DashboardDto.toSummary(): DashboardSummary = DashboardSummary(
     id = id,
     name = name,
-    description = description?.takeIf { it.isNotBlank() },
+    description = description.nullIfBlank(),
     pinned = pinned,
     lastAccessedAt = lastAccessedAt,
     tags = tags,
@@ -54,7 +55,7 @@ internal fun DashboardDto.toSummary(): DashboardSummary = DashboardSummary(
 internal fun DashboardDetailDto.toDashboard(): Dashboard = Dashboard(
     id = id,
     name = name,
-    description = description?.takeIf { it.isNotBlank() },
+    description = description.nullIfBlank(),
     tiles = tiles.mapNotNull { it.toTile() },
 )
 

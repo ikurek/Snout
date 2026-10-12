@@ -7,17 +7,13 @@ import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveInsights(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: InsightRepository,
 ) {
     operator fun invoke(): Flow<List<InsightSummary>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeInsights(it) }
+        observeSelectedProjectId.flatMapProject { repository.observeInsights(it) }
 }
 
 class RefreshInsights(

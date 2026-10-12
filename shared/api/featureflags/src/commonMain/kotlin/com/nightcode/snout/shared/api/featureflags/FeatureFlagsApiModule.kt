@@ -9,5 +9,6 @@ import org.koin.core.annotation.Single
 @Module(includes = [ApiModule::class])
 class FeatureFlagsApiModule {
     @Single
-    fun featureFlagsApi(client: HttpClient, authDataStore: AuthDataStore) = FeatureFlagsApi(client, authDataStore)
+    fun provideFeatureFlagsApi(client: HttpClient, authDataStore: AuthDataStore) =
+        FeatureFlagsApi(client, authDataStore)
 }

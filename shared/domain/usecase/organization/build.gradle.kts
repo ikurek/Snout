@@ -11,7 +11,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.organization)
-        implementation(projects.shared.data.organization)
         implementation(projects.shared.domain.data.organization)
     }
 }

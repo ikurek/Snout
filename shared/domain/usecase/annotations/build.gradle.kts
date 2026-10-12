@@ -10,7 +10,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.annotations)
-        implementation(projects.shared.data.annotations)
         implementation(projects.shared.domain.data.annotations)
         implementation(projects.shared.domain.data.appstate)
         implementation(projects.shared.domain.usecase.appstate)

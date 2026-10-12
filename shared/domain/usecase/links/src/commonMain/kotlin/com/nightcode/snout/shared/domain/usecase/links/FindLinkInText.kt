@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.nightcode.snout.shared.domain.model.links.NoLinkInText
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 
 private val UrlPattern = Regex("""https?://[^\s<>"']+""")
 

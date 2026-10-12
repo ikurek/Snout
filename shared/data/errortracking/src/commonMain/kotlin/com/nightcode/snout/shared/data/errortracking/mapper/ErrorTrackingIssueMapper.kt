@@ -4,6 +4,8 @@ import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingFrameDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingReleaseDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
+import com.nightcode.snout.shared.data.common.nullIfBlank
+import com.nightcode.snout.shared.data.common.string
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
 import com.nightcode.snout.shared.domain.model.errortracking.IssueRelease
@@ -12,7 +14,6 @@ import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.model.errortracking.StackFrame
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.longOrNull
 import kotlin.math.roundToLong
 
@@ -22,7 +23,7 @@ private const val UnnamedIssue = "Unknown error"
 internal fun ErrorTrackingIssueDto.toIssue(): ErrorTrackingIssue {
     // List rows carry `aggregations`, the detail response `impact` plus a `sparkline`.
     val counts = aggregations ?: impact
-    val title = name?.takeIf { it.isNotBlank() } ?: description?.takeIf { it.isNotBlank() } ?: UnnamedIssue
+    val title = name.nullIfBlank() ?: description.nullIfBlank() ?: UnnamedIssue
     return ErrorTrackingIssue(
         id = id,
         name = title,
@@ -31,8 +32,8 @@ internal fun ErrorTrackingIssueDto.toIssue(): ErrorTrackingIssue {
         severity = severity.toIssueSeverity(),
         firstSeen = firstSeen,
         lastSeen = lastSeen,
-        library = library?.takeIf { it.isNotBlank() },
-        source = source?.takeIf { it.isNotBlank() },
+        library = library.nullIfBlank(),
+        source = source.nullIfBlank(),
         occurrences = counts?.occurrences.toCount(),
         users = counts?.users.toCount(),
         sessions = counts?.sessions.toCount(),
@@ -44,7 +45,7 @@ internal fun ErrorTrackingIssueDto.toIssue(): ErrorTrackingIssue {
 
 /** Rows of `[version, exceptions]`; rows that don't have that shape are skipped. */
 internal fun HogQLResultsDto.toAppVersions(): List<AppVersion> = results.mapNotNull { row ->
-    val name = (row.getOrNull(0) as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotBlank() }
+    val name = row.getOrNull(0).string().nullIfBlank()
     val exceptions = (row.getOrNull(1) as? JsonPrimitive)?.longOrNull
     if (name != null && exceptions != null) AppVersion(name, exceptions) else null
 }

@@ -4,14 +4,11 @@ import arrow.core.Either
 import com.nightcode.snout.shared.api.NetworkError
 import com.nightcode.snout.shared.api.analytics.model.QueryResponseDto
 import com.nightcode.snout.shared.api.networkCall
+import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 
@@ -66,9 +63,9 @@ class AnalyticsApi internal constructor(private val client: HttpClient, private 
 
     private suspend fun runQuery(projectId: Long, query: JsonObject): Either<NetworkError, QueryResponseDto> =
         networkCall {
-            client.post(authDataStore.projectUrl(projectId, "query/")) {
-                contentType(ContentType.Application.Json)
-                setBody(buildJsonObject { put("query", query) })
-            }.body()
+            client.postJson(
+                authDataStore.projectUrl(projectId, "query/"),
+                buildJsonObject { put("query", query) },
+            ).body()
         }
 }

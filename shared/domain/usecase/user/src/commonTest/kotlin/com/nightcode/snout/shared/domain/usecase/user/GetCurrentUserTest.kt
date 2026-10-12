@@ -3,7 +3,7 @@ package com.nightcode.snout.shared.domain.usecase.user
 import arrow.core.Either
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.user.UserRepository
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.user.TestUser
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -25,7 +25,7 @@ class GetCurrentUserTest :
         }
 
         should("return error on failure") {
-            everySuspend { repository.getCurrentUser() } returns Either.Left(GetCurrentUserError.Unauthorized)
-            subject().shouldBeLeft() shouldBe GetCurrentUserError.Unauthorized
+            everySuspend { repository.getCurrentUser() } returns Either.Left(DataError.Unauthorized)
+            subject().shouldBeLeft() shouldBe DataError.Unauthorized
         }
     })

@@ -1,4 +1,4 @@
-package com.nightcode.snout.shared.domain.usecase.appstate
+package com.nightcode.snout.shared.domain.usecase.analytics
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences

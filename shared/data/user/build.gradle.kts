@@ -11,6 +11,7 @@ kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.shared.api)
         implementation(projects.shared.api.users)
+        implementation(projects.shared.data.common)
         implementation(projects.shared.domain.data.user)
     }
 }

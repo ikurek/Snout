@@ -1,5 +1,6 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
+import com.nightcode.snout.shared.data.common.stringValue
 import com.nightcode.snout.shared.domain.model.insights.InsightDateRange
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.InsightPeriod

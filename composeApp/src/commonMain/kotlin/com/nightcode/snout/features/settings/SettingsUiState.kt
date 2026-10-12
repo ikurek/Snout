@@ -2,7 +2,7 @@ package com.nightcode.snout.features.settings
 
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.user.TestUser
 import com.nightcode.snout.shared.domain.model.user.User
 
@@ -19,7 +19,7 @@ internal data class SettingsUiState(
 internal sealed interface AccountUiState {
     data object Loading : AccountUiState
 
-    data class Error(val error: GetCurrentUserError) : AccountUiState
+    data class Error(val error: DataError) : AccountUiState
 
     data class Loaded(val user: User) : AccountUiState
 }

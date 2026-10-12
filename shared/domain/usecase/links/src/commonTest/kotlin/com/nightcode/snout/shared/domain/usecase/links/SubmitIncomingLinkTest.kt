@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.usecase.links
 
 import com.nightcode.snout.shared.domain.data.links.IncomingLinkRepository
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.matcher.any
 import dev.mokkery.mock

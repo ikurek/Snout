@@ -4,16 +4,13 @@ import com.nightcode.snout.shared.api.PaginatedResponseDto
 import com.nightcode.snout.shared.api.annotations.model.AnnotationDto
 import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationDto
 import com.nightcode.snout.shared.api.networkCall
+import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 
 private const val PageSize = 100
 
@@ -25,9 +22,6 @@ class AnnotationsApi internal constructor(private val client: HttpClient, privat
 
     /** Requires the `annotation:write` scope. */
     suspend fun createAnnotation(projectId: Long, body: CreateAnnotationDto) = networkCall<AnnotationDto> {
-        client.post(authDataStore.projectUrl(projectId, "annotations/")) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }.body()
+        client.postJson(authDataStore.projectUrl(projectId, "annotations/"), body).body()
     }
 }

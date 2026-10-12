@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.onboarding.project
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
 
@@ -10,7 +10,7 @@ internal sealed interface ProjectSelectionUiState {
 
     data class Loaded(val organizations: List<Organization>) : ProjectSelectionUiState
 
-    data class Error(val error: GetOrganizationsError) : ProjectSelectionUiState
+    data class Error(val error: DataError) : ProjectSelectionUiState
 }
 
 @TestData

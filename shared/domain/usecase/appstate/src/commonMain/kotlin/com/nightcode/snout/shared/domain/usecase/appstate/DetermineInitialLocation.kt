@@ -2,9 +2,7 @@ package com.nightcode.snout.shared.domain.usecase.appstate
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
-
-/** [Login] skips the intro for someone who connected before and only lost the key (a 401 or a revoked key). */
-enum class InitialLocation { Intro, Login, ProjectSelection, Home }
+import com.nightcode.snout.shared.domain.model.appstate.InitialLocation
 
 class DetermineInitialLocation(
     private val authRepository: AuthRepository,

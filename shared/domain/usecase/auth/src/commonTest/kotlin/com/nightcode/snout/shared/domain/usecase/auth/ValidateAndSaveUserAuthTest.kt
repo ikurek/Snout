@@ -5,7 +5,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKey
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.user.TestUser
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
@@ -32,9 +32,9 @@ class ValidateAndSaveUserAuthTest :
         }
 
         should("clear api key on failure and return error") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(GetCurrentUserError.Unauthorized)
+            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.Unauthorized)
             val result = subject("phx_token", "https://app.posthog.com")
-            result.shouldBeLeft() shouldBe GetCurrentUserError.Unauthorized
+            result.shouldBeLeft() shouldBe DataError.Unauthorized
             verifySuspend { authRepository.clear() }
         }
     })

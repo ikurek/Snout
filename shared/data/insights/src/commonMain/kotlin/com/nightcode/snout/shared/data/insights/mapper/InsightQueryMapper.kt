@@ -1,5 +1,6 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
+import com.nightcode.snout.shared.data.common.stringValue
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.ValueFormat
@@ -9,7 +10,6 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
 
 /** The query node that actually describes the visualization (unwrapping InsightVizNode / DataTableNode). */
@@ -129,7 +129,5 @@ internal fun JsonElement?.seriesTitle(): String? {
         step.stringValue("custom_name") ?: step.stringValue("name") ?: step.stringValue("event")
     }.distinct().joinToString(" · ").ifBlank { null }
 }
-
-internal fun JsonObject.stringValue(key: String): String? = (get(key) as? JsonPrimitive)?.contentOrNull
 
 private fun JsonObject.intValue(key: String): Int? = (get(key) as? JsonPrimitive)?.intOrNull

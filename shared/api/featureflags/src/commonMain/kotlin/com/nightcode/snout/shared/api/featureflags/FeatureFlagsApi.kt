@@ -3,16 +3,13 @@ package com.nightcode.snout.shared.api.featureflags
 import com.nightcode.snout.shared.api.PaginatedResponseDto
 import com.nightcode.snout.shared.api.featureflags.model.FeatureFlagDto
 import com.nightcode.snout.shared.api.networkCall
+import com.nightcode.snout.shared.api.patchJson
 import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.request.patch
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -35,9 +32,9 @@ class FeatureFlagsApi internal constructor(private val client: HttpClient, priva
 
     /** Requires a key with the `feature_flag:write` scope; PostHog answers 403 otherwise. */
     suspend fun setActive(projectId: Long, flagId: Long, active: Boolean) = networkCall<FeatureFlagDto> {
-        client.patch(authDataStore.projectUrl(projectId, "feature_flags/$flagId/")) {
-            contentType(ContentType.Application.Json)
-            setBody(buildJsonObject { put("active", active) })
-        }.body()
+        client.patchJson(
+            authDataStore.projectUrl(projectId, "feature_flags/$flagId/"),
+            buildJsonObject { put("active", active) },
+        ).body()
     }
 }

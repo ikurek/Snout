@@ -3,6 +3,7 @@ package com.nightcode.snout.shared.data.featureflags.mapper
 import com.nightcode.snout.shared.api.featureflags.model.FeatureFlagDto
 import com.nightcode.snout.shared.api.featureflags.model.FlagGroupDto
 import com.nightcode.snout.shared.api.featureflags.model.FlagPropertyDto
+import com.nightcode.snout.shared.data.common.nullIfBlank
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import com.nightcode.snout.shared.domain.model.featureflags.FlagVariant
@@ -20,7 +21,7 @@ private const val FullRollout = 100
 internal fun FeatureFlagDto.toFeatureFlag(): FeatureFlag = FeatureFlag(
     id = id,
     key = key,
-    description = name?.takeIf { it.isNotBlank() },
+    description = name.nullIfBlank(),
     active = active,
     status = when (status) {
         "ACTIVE" -> FeatureFlagStatus.Active
@@ -33,7 +34,7 @@ internal fun FeatureFlagDto.toFeatureFlag(): FeatureFlag = FeatureFlag(
     variants = filters?.multivariate?.variants.orEmpty().map { FlagVariant(it.key, it.name, it.rolloutPercentage) },
     tags = tags,
     createdAt = createdAt,
-    createdBy = createdBy?.displayName?.takeIf { it.isNotBlank() },
+    createdBy = createdBy?.displayName.nullIfBlank(),
     canEdit = canEdit,
     isRemoteConfiguration = isRemoteConfiguration,
     payloads = filters?.payloads.orEmpty().mapValues { (_, value) -> value.toPayloadText() },
@@ -66,12 +67,12 @@ private fun FlagGroupDto.toCondition() = ReleaseCondition(
 private fun FlagPropertyDto.toPropertyFilter() = PropertyFilter(
     key = key,
     operator = operator,
-    value = value.readable(),
+    value = value.displayText(),
 )
 
-private fun JsonElement?.readable(): String = when (this) {
+private fun JsonElement?.displayText(): String = when (this) {
     null, JsonNull -> ""
     is JsonPrimitive -> contentOrNull ?: toString()
-    is JsonArray -> joinToString(", ") { it.readable() }
+    is JsonArray -> joinToString(", ") { it.displayText() }
     else -> toString()
 }

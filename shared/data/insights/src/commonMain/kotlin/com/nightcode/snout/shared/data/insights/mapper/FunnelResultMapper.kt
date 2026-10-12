@@ -1,5 +1,7 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
+import com.nightcode.snout.shared.data.common.number
+import com.nightcode.snout.shared.data.common.stringValue
 import com.nightcode.snout.shared.domain.model.insights.FunnelBreakdown
 import com.nightcode.snout.shared.domain.model.insights.FunnelStep
 import com.nightcode.snout.shared.domain.model.insights.InsightResult

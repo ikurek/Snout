@@ -4,6 +4,8 @@ import com.nightcode.snout.shared.api.analytics.TrendSeriesNames
 import com.nightcode.snout.shared.api.analytics.model.QueryResponseDto
 import com.nightcode.snout.shared.api.analytics.model.TrendResultDto
 import com.nightcode.snout.shared.api.analytics.model.WebOverviewItemDto
+import com.nightcode.snout.shared.data.common.number
+import com.nightcode.snout.shared.data.common.string
 import com.nightcode.snout.shared.domain.model.analytics.BreakdownRow
 import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
 import com.nightcode.snout.shared.domain.model.analytics.MetricTrend
@@ -22,7 +24,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.jsonArray
 
 private const val BreakdownColumn = "context.columns.breakdown_value"
 private const val VisitorsColumn = "context.columns.visitors"
@@ -144,13 +145,13 @@ internal fun QueryResponseDto.toPropertyBreakdownTable(json: Json, breakdown: We
 private fun JsonElement?.firstNumber(): Double? = when (this) {
     null, JsonNull -> null
     is JsonPrimitive -> doubleOrNull
-    is JsonArray -> firstOrNull()?.let { (it as? JsonPrimitive)?.doubleOrNull }
+    is JsonArray -> firstOrNull().number()
     else -> null
 }
 
 private fun JsonElement?.asLabel(): String? = when (this) {
     null, JsonNull -> null
     is JsonPrimitive -> contentOrNull
-    is JsonArray -> jsonArray.joinToString(" ") { (it as? JsonPrimitive)?.contentOrNull.orEmpty() }
+    is JsonArray -> joinToString(" ") { it.string().orEmpty() }
     else -> toString()
 }

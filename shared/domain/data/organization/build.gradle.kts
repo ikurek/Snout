@@ -8,6 +8,7 @@ kotlin {
     }
 
     sourceSets.commonMain.dependencies {
+        api(projects.shared.domain.model.common)
         api(projects.shared.domain.model.organization)
     }
 }

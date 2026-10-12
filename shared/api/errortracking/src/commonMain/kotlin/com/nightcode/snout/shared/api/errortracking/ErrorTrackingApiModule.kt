@@ -9,5 +9,6 @@ import org.koin.core.annotation.Single
 @Module(includes = [ApiModule::class])
 class ErrorTrackingApiModule {
     @Single
-    fun errorTrackingApi(client: HttpClient, authDataStore: AuthDataStore) = ErrorTrackingApi(client, authDataStore)
+    fun provideErrorTrackingApi(client: HttpClient, authDataStore: AuthDataStore) =
+        ErrorTrackingApi(client, authDataStore)
 }

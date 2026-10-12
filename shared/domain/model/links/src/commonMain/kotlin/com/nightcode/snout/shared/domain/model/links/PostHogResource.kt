@@ -1,4 +1,4 @@
-package com.nightcode.snout.shared.domain.model.appstate
+package com.nightcode.snout.shared.domain.model.links
 
 /** Something that has a page in the PostHog web app. */
 sealed interface PostHogResource {

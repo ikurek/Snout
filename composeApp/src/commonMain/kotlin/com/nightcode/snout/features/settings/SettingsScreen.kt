@@ -41,7 +41,7 @@ import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.user.User
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -301,10 +301,16 @@ private fun ThemeMode.label(): String = stringResource(
     },
 )
 
-private fun GetCurrentUserError.message() = when (this) {
-    GetCurrentUserError.Unauthorized, GetCurrentUserError.Forbidden -> Res.string.settings_account_error_permission
-    GetCurrentUserError.RateLimited -> Res.string.settings_account_error_rate_limited
-    GetCurrentUserError.ConnectionError, GetCurrentUserError.UnexpectedError -> Res.string.settings_account_error
+private fun DataError.message() = when (this) {
+    DataError.Unauthorized, DataError.Forbidden -> Res.string.settings_account_error_permission
+
+    DataError.RateLimited -> Res.string.settings_account_error_rate_limited
+
+    DataError.PaymentRequired,
+    DataError.NotFound,
+    DataError.ConnectionError,
+    DataError.UnexpectedError,
+    -> Res.string.settings_account_error
 }
 
 @OptIn(TestData::class)
@@ -329,7 +335,7 @@ fun SettingsScreenPreview() = SettingsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun SettingsScreenAccountErrorPreview() = SettingsScreen(
-    state = TestSettingsUiState.copy(account = AccountUiState.Error(GetCurrentUserError.ConnectionError)),
+    state = TestSettingsUiState.copy(account = AccountUiState.Error(DataError.ConnectionError)),
     onNavigateBack = {},
     onRetryAccount = {},
     onOpenInstance = {},

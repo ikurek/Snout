@@ -9,7 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel

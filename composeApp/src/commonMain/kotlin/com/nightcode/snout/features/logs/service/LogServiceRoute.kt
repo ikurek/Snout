@@ -6,7 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.common.compose.rememberOpenInPostHog
 import com.nightcode.snout.features.logs.entry.LogEntryNavKey
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel

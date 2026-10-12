@@ -1,14 +1,13 @@
 package com.nightcode.snout.shared.domain.usecase.links
 
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
-import com.nightcode.snout.shared.domain.model.appstate.PostHogLink
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
-import com.nightcode.snout.shared.domain.model.appstate.resource
 import com.nightcode.snout.shared.domain.model.links.DeepLinkDestination
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
+import com.nightcode.snout.shared.domain.model.links.PostHogLink
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
+import com.nightcode.snout.shared.domain.model.links.resource
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProject
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId

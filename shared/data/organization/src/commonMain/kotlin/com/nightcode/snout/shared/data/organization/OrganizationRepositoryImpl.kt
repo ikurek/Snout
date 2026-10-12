@@ -4,11 +4,11 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.api.organizations.OrganizationsApi
+import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.organization.mapper.toEntity
-import com.nightcode.snout.shared.data.organization.mapper.toGetOrganizationsError
 import com.nightcode.snout.shared.data.organization.mapper.toOrganization
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.storage.database.OrganizationsDatabase
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
@@ -21,10 +21,10 @@ internal class OrganizationRepositoryImpl(
     private val database: OrganizationsDatabase,
 ) : OrganizationRepository {
 
-    override suspend fun refreshOrganizations(): Either<GetOrganizationsError, Unit> = either {
-        val instanceUrl = ensureNotNull(authDataStore.getInstanceUrl()) { GetOrganizationsError.UnexpectedError }
+    override suspend fun refreshOrganizations(): Either<DataError, Unit> = either {
+        val instanceUrl = ensureNotNull(authDataStore.getInstanceUrl()) { DataError.UnexpectedError }
         val organizations = api.getOrganizations()
-            .mapLeft { it.toGetOrganizationsError() }
+            .mapLeft { it.toDataError() }
             .bind()
             .results
             .map { it.toOrganization(instanceUrl) }

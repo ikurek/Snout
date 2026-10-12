@@ -9,5 +9,5 @@ import org.koin.core.annotation.Single
 @Module(includes = [ApiModule::class])
 class LogsApiModule {
     @Single
-    fun logsApi(client: HttpClient, authDataStore: AuthDataStore) = LogsApi(client, authDataStore)
+    fun provideLogsApi(client: HttpClient, authDataStore: AuthDataStore) = LogsApi(client, authDataStore)
 }

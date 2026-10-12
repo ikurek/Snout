@@ -11,7 +11,7 @@ import com.nightcode.snout.common.compose.rememberOpenInPostHog
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.organisms.ListScreenScaffold
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
-import com.nightcode.snout.shared.domain.model.appstate.resource
+import com.nightcode.snout.shared.domain.model.links.resource
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 

@@ -4,7 +4,8 @@ import com.nightcode.snout.shared.api.NetworkError
 import com.nightcode.snout.shared.domain.model.common.DataError
 
 fun NetworkError.toDataError(): DataError = when (this) {
-    NetworkError.Api.Unauthorized, NetworkError.Api.Forbidden -> DataError.Forbidden
+    NetworkError.Api.Unauthorized -> DataError.Unauthorized
+    NetworkError.Api.Forbidden -> DataError.Forbidden
     NetworkError.Api.PaymentRequired -> DataError.PaymentRequired
     NetworkError.Api.NotFound -> DataError.NotFound
     NetworkError.Api.RateLimited -> DataError.RateLimited

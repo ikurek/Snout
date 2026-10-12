@@ -10,7 +10,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.errortracking)
-        implementation(projects.shared.data.errortracking)
         implementation(projects.shared.domain.data.errortracking)
         implementation(projects.shared.domain.data.appstate)
         implementation(projects.shared.domain.usecase.appstate)

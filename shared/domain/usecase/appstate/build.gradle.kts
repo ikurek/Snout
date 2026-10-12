@@ -11,10 +11,7 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.appstate)
-        api(projects.shared.domain.model.analytics)
-        implementation(projects.shared.data.appstate)
         implementation(projects.shared.domain.data.appstate)
         implementation(projects.shared.domain.data.auth)
-        implementation(projects.shared.data.auth)
     }
 }

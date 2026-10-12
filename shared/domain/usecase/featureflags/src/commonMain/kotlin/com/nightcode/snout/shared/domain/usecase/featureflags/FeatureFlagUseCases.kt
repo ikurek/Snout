@@ -6,17 +6,13 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveFeatureFlags(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: FeatureFlagRepository,
 ) {
     operator fun invoke(): Flow<List<FeatureFlag>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeFlags(it) }
+        observeSelectedProjectId.flatMapProject { repository.observeFlags(it) }
 }
 
 class RefreshFeatureFlags(

@@ -11,8 +11,8 @@ import com.nightcode.snout.shared.domain.data.organization.OrganizationRepositor
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
-import com.nightcode.snout.shared.domain.model.user.GetCurrentUserError
 import com.nightcode.snout.shared.domain.model.user.TestUser
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
@@ -99,10 +99,10 @@ class SettingsViewModelTest :
         }
 
         should("expose account error and allow retry") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(GetCurrentUserError.ConnectionError)
+            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.ConnectionError)
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
-            viewModel.uiState.value.account shouldBe AccountUiState.Error(GetCurrentUserError.ConnectionError)
+            viewModel.uiState.value.account shouldBe AccountUiState.Error(DataError.ConnectionError)
 
             everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
             viewModel.loadAccount()

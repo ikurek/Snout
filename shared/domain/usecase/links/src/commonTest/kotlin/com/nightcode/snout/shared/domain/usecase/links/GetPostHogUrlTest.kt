@@ -1,10 +1,10 @@
-package com.nightcode.snout.shared.domain.usecase.appstate
+package com.nightcode.snout.shared.domain.usecase.links
 
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock

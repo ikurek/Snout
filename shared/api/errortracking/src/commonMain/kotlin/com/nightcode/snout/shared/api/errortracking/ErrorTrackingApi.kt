@@ -4,17 +4,13 @@ import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesResponseDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
 import com.nightcode.snout.shared.api.networkCall
+import com.nightcode.snout.shared.api.patchJson
+import com.nightcode.snout.shared.api.postJson
 import com.nightcode.snout.shared.api.projectUrl
+import com.nightcode.snout.shared.api.putDateRange
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.patch
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -52,15 +48,14 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
      */
     suspend fun getIssues(projectId: Long, status: String, search: String? = null, appVersion: String? = null) =
         networkCall<ErrorTrackingIssuesResponseDto> {
-            post(
-                projectId,
-                "error_tracking/query/issues/",
+            client.postJson(
+                authDataStore.projectUrl(projectId, "error_tracking/query/issues/"),
                 buildJsonObject {
                     put("status", status)
                     put("orderBy", "occurrences")
                     put("limit", PageSize)
                     put("volumeResolution", VolumeBuckets)
-                    putDateRange()
+                    putDateRange(DateFrom)
                     search?.takeIf { it.isNotBlank() }?.let { put("searchQuery", it) }
                     appVersion?.let { version ->
                         putJsonArray("filterGroup") {
@@ -79,14 +74,13 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
         }
 
     suspend fun getIssue(projectId: Long, issueId: String) = networkCall<ErrorTrackingIssueDto> {
-        post(
-            projectId,
-            "error_tracking/query/issue/",
+        client.postJson(
+            authDataStore.projectUrl(projectId, "error_tracking/query/issue/"),
             buildJsonObject {
                 put("issueId", issueId)
                 put("includeSparkline", true)
                 put("volumeResolution", VolumeBuckets)
-                putDateRange()
+                putDateRange(DateFrom)
             },
         ).body()
     }
@@ -96,10 +90,10 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
      * answers 403 otherwise.
      */
     suspend fun setStatus(projectId: Long, issueId: String, status: String) = networkCall<ErrorTrackingIssueDto> {
-        client.patch(authDataStore.projectUrl(projectId, "error_tracking/issues/$issueId/")) {
-            contentType(ContentType.Application.Json)
-            setBody(buildJsonObject { put("status", status) })
-        }.body()
+        client.patchJson(
+            authDataStore.projectUrl(projectId, "error_tracking/issues/$issueId/"),
+            buildJsonObject { put("status", status) },
+        ).body()
     }
 
     /**
@@ -107,9 +101,8 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
      * query endpoint, so it needs `query:read` rather than an error tracking scope.
      */
     suspend fun getAppVersions(projectId: Long) = networkCall<HogQLResultsDto> {
-        post(
-            projectId,
-            "query/",
+        client.postJson(
+            authDataStore.projectUrl(projectId, "query/"),
             buildJsonObject {
                 putJsonObject("query") {
                     put("kind", "HogQLQuery")
@@ -118,12 +111,4 @@ class ErrorTrackingApi internal constructor(private val client: HttpClient, priv
             },
         ).body()
     }
-
-    private suspend fun post(projectId: Long, path: String, body: JsonObject) =
-        client.post(authDataStore.projectUrl(projectId, path)) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
-
-    private fun JsonObjectBuilder.putDateRange() = putJsonObject("dateRange") { put("date_from", DateFrom) }
 }

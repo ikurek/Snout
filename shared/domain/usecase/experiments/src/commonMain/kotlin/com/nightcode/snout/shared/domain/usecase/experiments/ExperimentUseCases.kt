@@ -6,17 +6,13 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveExperiments(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: ExperimentRepository,
 ) {
     operator fun invoke(): Flow<List<Experiment>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeExperiments(it) }
+        observeSelectedProjectId.flatMapProject { repository.observeExperiments(it) }
 }
 
 class RefreshExperiments(

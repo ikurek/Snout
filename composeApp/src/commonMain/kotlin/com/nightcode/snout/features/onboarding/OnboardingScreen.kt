@@ -60,7 +60,7 @@ import com.nightcode.snout.features.onboarding.project.TestProjectSelectionUiSta
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
 import com.nightcode.snout.shared.domain.model.auth.PersonalApiKeyValidationError
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -324,5 +324,5 @@ fun OnboardingProjectSelectionLoadingPreview() = OnboardingPreview(
 @Composable
 fun OnboardingProjectSelectionErrorPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
-    projectSelectionState = ProjectSelectionUiState.Error(GetOrganizationsError.UnexpectedError),
+    projectSelectionState = ProjectSelectionUiState.Error(DataError.UnexpectedError),
 )

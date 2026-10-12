@@ -2,7 +2,7 @@ package com.nightcode.snout.features.onboarding.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
+import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
@@ -31,7 +31,7 @@ internal class ProjectSelectionViewModel(
 
     private val isLoading = MutableStateFlow(true)
 
-    private val error = MutableStateFlow<GetOrganizationsError?>(null)
+    private val error = MutableStateFlow<DataError?>(null)
 
     val state = combine(
         observeOrganizations(),

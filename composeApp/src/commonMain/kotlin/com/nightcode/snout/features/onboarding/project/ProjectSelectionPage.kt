@@ -14,14 +14,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
-import com.nightcode.snout.designsystem.organisms.GenericErrorPlaceholder
+import com.nightcode.snout.designsystem.organisms.ErrorPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
-import com.nightcode.snout.designsystem.organisms.PermissionDeniedPlaceholder
-import com.nightcode.snout.designsystem.organisms.RateLimitedPlaceholder
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.features.projects.projectEntries
 import com.nightcode.snout.features.projects.toProjectListEntries
-import com.nightcode.snout.shared.domain.model.organization.GetOrganizationsError
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -60,7 +57,11 @@ private fun Content(
     when (state) {
         ProjectSelectionUiState.Loading -> SkeletonRows()
 
-        is ProjectSelectionUiState.Error -> ErrorContent(error = state.error, onRetry = onRetry)
+        is ProjectSelectionUiState.Error -> ErrorPlaceholder(
+            error = state.error,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxSize(),
+        )
 
         is ProjectSelectionUiState.Loaded -> LoadedContent(
             organizations = state.organizations,
@@ -86,22 +87,6 @@ private fun Header() {
             style = SnoutTheme.typography.bodyMedium,
             color = SnoutTheme.colors.onSurfaceVariant,
         )
-    }
-}
-
-@Composable
-private fun ErrorContent(error: GetOrganizationsError, onRetry: () -> Unit) {
-    when (error) {
-        GetOrganizationsError.Forbidden ->
-            PermissionDeniedPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
-
-        GetOrganizationsError.RateLimited ->
-            RateLimitedPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
-
-        GetOrganizationsError.ConnectionError,
-        GetOrganizationsError.UnexpectedError,
-        ->
-            GenericErrorPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
     }
 }
 

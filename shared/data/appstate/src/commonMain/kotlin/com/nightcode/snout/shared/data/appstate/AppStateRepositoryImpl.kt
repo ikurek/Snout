@@ -1,7 +1,5 @@
 package com.nightcode.snout.shared.data.appstate
 
-import arrow.core.raise.either
-import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
@@ -17,19 +15,12 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
     override suspend fun saveSelectedProject(organizationId: Uuid, projectId: Long) =
         dataStore.saveSelectedProject(organizationId.toString(), projectId)
 
-    override suspend fun getSelectedProject(): SelectedProject? = either {
-        val organizationId = ensureNotNull(dataStore.getSelectedOrganizationId()) {}
-        val projectId = ensureNotNull(dataStore.getSelectedProjectId()) {}
-        SelectedProject(organizationId = Uuid.parse(organizationId), projectId = projectId)
-    }.getOrNull()
+    override suspend fun getSelectedProject(): SelectedProject? =
+        selectedProject(dataStore.getSelectedOrganizationId(), dataStore.getSelectedProjectId())
 
     override fun observeSelectedProject(): Flow<SelectedProject?> =
-        dataStore.observeSelectedProject().map { (orgIdStr, projectId) ->
-            if (orgIdStr == null || projectId == null) {
-                null
-            } else {
-                SelectedProject(organizationId = Uuid.parse(orgIdStr), projectId = projectId)
-            }
+        dataStore.observeSelectedProject().map { (organizationId, projectId) ->
+            selectedProject(organizationId, projectId)
         }
 
     override suspend fun clearSelectedProject() = dataStore.clearSelectedProject()
@@ -59,4 +50,11 @@ internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) 
             showTrendChart = preferences.showTrendChart,
             hiddenBreakdowns = PreferencesCodec.encodeHiddenBreakdowns(preferences),
         )
+
+    private fun selectedProject(organizationId: String?, projectId: Long?): SelectedProject? =
+        if (organizationId == null || projectId == null) {
+            null
+        } else {
+            SelectedProject(organizationId = Uuid.parse(organizationId), projectId = projectId)
+        }
 }

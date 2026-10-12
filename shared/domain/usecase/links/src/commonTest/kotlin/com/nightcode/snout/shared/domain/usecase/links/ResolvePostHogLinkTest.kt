@@ -15,7 +15,6 @@ import com.nightcode.snout.shared.domain.model.organization.Project
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ParsePostHogLink
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId

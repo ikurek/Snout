@@ -1,8 +1,7 @@
 package com.nightcode.snout.shared.api.analytics
 
+import com.nightcode.snout.shared.api.putDateRange
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObjectBuilder
-import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -77,12 +76,5 @@ internal fun trendsQuery(
             put("breakdown_type", "event")
             breakdownLimit?.let { put("breakdown_limit", it) }
         }
-    }
-}
-
-private fun JsonObjectBuilder.putDateRange(dateFrom: String) {
-    putJsonObject("dateRange") {
-        put("date_from", dateFrom)
-        put("date_to", JsonPrimitive(null as String?))
     }
 }

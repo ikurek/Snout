@@ -11,18 +11,14 @@ import com.nightcode.snout.shared.domain.model.logs.LogVolume
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlin.time.Instant
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveLogServices(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: LogsRepository,
 ) {
     operator fun invoke(range: LogsRange): Flow<List<LogService>?> =
-        observeSelectedProjectId().flatMapLatest { repository.observeServices(it, range) }
+        observeSelectedProjectId.flatMapProject { repository.observeServices(it, range) }
 }
 
 class RefreshLogServices(

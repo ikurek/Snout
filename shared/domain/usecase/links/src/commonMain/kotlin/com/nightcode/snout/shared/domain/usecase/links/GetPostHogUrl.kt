@@ -1,8 +1,8 @@
-package com.nightcode.snout.shared.domain.usecase.appstate
+package com.nightcode.snout.shared.domain.usecase.links
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
-import com.nightcode.snout.shared.domain.model.appstate.PostHogResource
+import com.nightcode.snout.shared.domain.model.links.PostHogResource
 
 class GetPostHogUrl(private val authRepository: AuthRepository, private val appStateRepository: AppStateRepository) {
 

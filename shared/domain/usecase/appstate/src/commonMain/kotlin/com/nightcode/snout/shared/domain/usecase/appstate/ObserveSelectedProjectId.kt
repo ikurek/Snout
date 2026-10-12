@@ -1,9 +1,11 @@
 package com.nightcode.snout.shared.domain.usecase.appstate
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class ObserveSelectedProjectId(private val repository: AppStateRepository) {
@@ -11,4 +13,8 @@ class ObserveSelectedProjectId(private val repository: AppStateRepository) {
         .filterNotNull()
         .map { it.projectId }
         .distinctUntilChanged()
+
+    /** [observe]'s flow for the selected project, switched over whenever another project is selected. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun <T> flatMapProject(observe: (projectId: Long) -> Flow<T>): Flow<T> = invoke().flatMapLatest(observe)
 }

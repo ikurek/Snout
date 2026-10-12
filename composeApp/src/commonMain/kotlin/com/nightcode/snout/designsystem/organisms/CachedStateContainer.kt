@@ -81,7 +81,7 @@ internal fun <T> CachedStateContainer(
 }
 
 private fun DataError.refreshMessage() = when (this) {
-    DataError.Forbidden -> Res.string.refresh_failed_forbidden
+    DataError.Unauthorized, DataError.Forbidden -> Res.string.refresh_failed_forbidden
     DataError.PaymentRequired -> Res.string.refresh_failed_payment_required
     DataError.RateLimited -> Res.string.refresh_failed_rate_limited
     DataError.ConnectionError -> Res.string.refresh_failed_offline

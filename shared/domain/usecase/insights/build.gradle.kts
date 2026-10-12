@@ -11,7 +11,6 @@ kotlin {
 
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.insights)
-        implementation(projects.shared.data.insights)
         implementation(projects.shared.domain.data.insights)
         implementation(projects.shared.domain.data.appstate)
         implementation(projects.shared.domain.usecase.appstate)

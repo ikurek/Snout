@@ -14,9 +14,9 @@ import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.analytics.RefreshAnalytics
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import dev.mokkery.answering.returns
 import dev.mokkery.every

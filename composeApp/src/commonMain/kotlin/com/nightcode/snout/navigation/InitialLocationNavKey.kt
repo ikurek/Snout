@@ -4,7 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.nightcode.snout.features.home.HomeNavKey
 import com.nightcode.snout.features.onboarding.OnboardingNavKey
 import com.nightcode.snout.features.onboarding.OnboardingStep
-import com.nightcode.snout.shared.domain.usecase.appstate.InitialLocation
+import com.nightcode.snout.shared.domain.model.appstate.InitialLocation
 
 internal fun InitialLocation.toNavKey(): NavKey = when (this) {
     InitialLocation.Intro -> OnboardingNavKey(OnboardingStep.Intro)

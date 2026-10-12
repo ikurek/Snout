@@ -1,4 +1,4 @@
-package com.nightcode.snout.shared.domain.model.appstate
+package com.nightcode.snout.shared.domain.model.links
 
 /** Why a link couldn't be read as a PostHog page. */
 enum class PostHogLinkError {
