@@ -70,10 +70,6 @@ import snout.composeapp.generated.resources.intro_screen_get_started_button
 import snout.composeapp.generated.resources.login_screen_connect_button_text
 import snout.composeapp.generated.resources.onboarding_step_content_description
 
-/** The three steps between a fresh install (or a logout) and Home, in pager order. */
-@Serializable
-internal enum class OnboardingStep { Intro, Login, ProjectSelection }
-
 private val TopBarHeight = 56.dp
 private val IconButtonSize = 48.dp
 private val SegmentHeight = 4.dp
@@ -127,6 +123,10 @@ internal fun OnboardingScreen(
         }
     }
 }
+
+/** The three steps between a fresh install (or a logout) and Home, in pager order. */
+@Serializable
+internal enum class OnboardingStep { Intro, Login, ProjectSelection }
 
 /** Back arrow (fading in after the intro) on the left, the progress centred between it and a matching gap. */
 @Composable

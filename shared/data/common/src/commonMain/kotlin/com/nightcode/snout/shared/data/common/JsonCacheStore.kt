@@ -5,8 +5,10 @@ import com.nightcode.snout.shared.storage.database.JsonCache
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import org.koin.core.annotation.Single
 
 /** Typed facade over [JsonCache]: repositories map API responses to domain models and store those as JSON. */
+@Single(binds = [CacheRepository::class])
 class JsonCacheStore(val json: Json, private val cache: JsonCache) : CacheRepository {
 
     inline fun <reified T> observe(key: String): Flow<T?> = observeRaw(key).map { raw ->

@@ -28,10 +28,6 @@ import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-/** [startStep] is where the pager opens: the intro after a logout, login after a 401, a project after a restart. */
-@Serializable
-internal data class OnboardingNavKey(val startStep: OnboardingStep) : NavKey
-
 @Suppress("LongMethod")
 @Composable
 internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
@@ -140,3 +136,7 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
         }
     }
 }
+
+/** [startStep] is where the pager opens: the intro after a logout, login after a 401, a project after a restart. */
+@Serializable
+internal data class OnboardingNavKey(val startStep: OnboardingStep) : NavKey

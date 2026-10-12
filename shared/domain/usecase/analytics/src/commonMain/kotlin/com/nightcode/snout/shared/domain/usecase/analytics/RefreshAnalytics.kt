@@ -6,7 +6,9 @@ import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
+import org.koin.core.annotation.Single
 
+@Single
 class RefreshAnalytics(
     private val getSelectedProjectId: GetSelectedProjectId,
     private val repository: AnalyticsRepository,

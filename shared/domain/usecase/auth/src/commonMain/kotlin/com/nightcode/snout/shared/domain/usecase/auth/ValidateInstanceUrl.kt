@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import com.nightcode.snout.shared.domain.model.auth.InstanceUrlValidationError
+import org.koin.core.annotation.Single
 
 private const val HttpsScheme = "https://"
 
@@ -11,6 +12,7 @@ private const val HttpsScheme = "https://"
  * Validates a PostHog instance URL typed by the user and returns its normalized form:
  * trimmed, `https://` prepended when no scheme was given, trailing slashes removed.
  */
+@Single
 class ValidateInstanceUrl {
     operator fun invoke(instanceUrl: String): Either<InstanceUrlValidationError, String> = either {
         val trimmed = instanceUrl.trim()

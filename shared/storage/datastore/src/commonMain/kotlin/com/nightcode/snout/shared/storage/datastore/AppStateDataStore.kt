@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
 private val SelectedOrganizationIdKey = stringPreferencesKey("selected_organization_id")
 private val SelectedProjectIdKey = longPreferencesKey("selected_project_id")
@@ -36,6 +37,7 @@ data class StoredAnalyticsPreferences(
     val hiddenBreakdowns: String?,
 )
 
+@Single
 class AppStateDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
 
     suspend fun getSelectedOrganizationId(): String? = dataStore.data.map { it[SelectedOrganizationIdKey] }

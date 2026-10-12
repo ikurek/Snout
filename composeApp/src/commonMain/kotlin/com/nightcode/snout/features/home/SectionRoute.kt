@@ -15,10 +15,6 @@ import com.nightcode.snout.shared.domain.model.links.resource
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 
-/** A section opened from the More list: the same content as a tab, pushed with its own app bar. */
-@Serializable
-internal data class SectionNavKey(val section: HomeSection) : NavKey
-
 @Composable
 internal fun SectionRoute(section: HomeSection, onNavigateBack: () -> Unit, navigation: SectionNavigation) {
     ListScreenScaffold(
@@ -36,3 +32,7 @@ internal fun SectionRoute(section: HomeSection, onNavigateBack: () -> Unit, navi
         }
     }
 }
+
+/** A section opened from the More list: the same content as a tab, pushed with its own app bar. */
+@Serializable
+internal data class SectionNavKey(val section: HomeSection) : NavKey

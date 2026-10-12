@@ -6,9 +6,9 @@ import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import kotlinx.coroutines.flow.Flow
 
 interface FeatureFlagRepository {
-    fun observeFlags(projectId: Long): Flow<List<FeatureFlag>?>
-    suspend fun refreshFlags(projectId: Long): Either<DataError, Unit>
-    suspend fun searchFlags(projectId: Long, query: String): Either<DataError, List<FeatureFlag>>
-    suspend fun getFlag(projectId: Long, flagId: Long): Either<DataError, FeatureFlag>
+    fun observeFeatureFlags(projectId: Long): Flow<List<FeatureFlag>?>
+    suspend fun refreshFeatureFlags(projectId: Long): Either<DataError, Unit>
+    suspend fun searchFeatureFlags(projectId: Long, query: String): Either<DataError, List<FeatureFlag>>
+    suspend fun getFeatureFlag(projectId: Long, flagId: Long): Either<DataError, FeatureFlag>
     suspend fun setActive(projectId: Long, flagId: Long, active: Boolean): Either<DataError, FeatureFlag>
 }

@@ -7,9 +7,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
-@Serializable
-internal data object AnalyticsSettingsNavKey : NavKey
-
 @Composable
 internal fun AnalyticsSettingsRoute(onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<AnalyticsSettingsViewModel>()
@@ -25,3 +22,6 @@ internal fun AnalyticsSettingsRoute(onNavigateBack: () -> Unit) {
         onReset = viewModel::onReset,
     )
 }
+
+@Serializable
+internal data object AnalyticsSettingsNavKey : NavKey

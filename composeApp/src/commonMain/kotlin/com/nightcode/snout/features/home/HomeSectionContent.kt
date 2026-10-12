@@ -14,16 +14,6 @@ import com.nightcode.snout.features.logs.LogsRoute
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 
-/** Navigation callbacks a section may need; the shell and the standalone section screen both provide them. */
-internal data class SectionNavigation(
-    val onOpenDashboard: (dashboardId: Long) -> Unit,
-    val onOpenInsight: (insightId: Long) -> Unit,
-    val onOpenFeatureFlag: (flagId: Long) -> Unit,
-    val onOpenErrorTrackingIssue: (issueId: String) -> Unit,
-    val onOpenLogService: (service: String, range: LogsRange) -> Unit,
-    val onOpenExperiment: (experimentId: Long) -> Unit,
-)
-
 /**
  * Body of a section without any chrome, so it renders the same inside the home tabs and as a pushed screen.
  * [contentPadding] goes inside the scrolling content, letting it scroll behind the navigation bar.
@@ -58,3 +48,13 @@ internal fun HomeSectionContent(
         HomeSection.ActivityLog -> ActivityLogRoute(contentPadding = contentPadding)
     }
 }
+
+/** Navigation callbacks a section may need; the shell and the standalone section screen both provide them. */
+internal data class SectionNavigation(
+    val onOpenDashboard: (dashboardId: Long) -> Unit,
+    val onOpenInsight: (insightId: Long) -> Unit,
+    val onOpenFeatureFlag: (flagId: Long) -> Unit,
+    val onOpenErrorTrackingIssue: (issueId: String) -> Unit,
+    val onOpenLogService: (service: String, range: LogsRange) -> Unit,
+    val onOpenExperiment: (experimentId: Long) -> Unit,
+)

@@ -17,9 +17,6 @@ import org.koin.core.parameter.parametersOf
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.insights_favorite_failed
 
-@Serializable
-internal data class InsightDetailNavKey(val insightId: Long) : NavKey
-
 @Composable
 internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<InsightDetailViewModel> { parametersOf(navKey.insightId) }
@@ -46,3 +43,6 @@ internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () 
         onOpenInPostHog = { shortId?.let { openInPostHog(PostHogResource.Insight(it)) } },
     )
 }
+
+@Serializable
+internal data class InsightDetailNavKey(val insightId: Long) : NavKey

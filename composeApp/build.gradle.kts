@@ -60,6 +60,9 @@ kotlin {
             implementation(projects.shared.domain.data.organization)
             implementation(projects.shared.domain.data.user)
         }
+        named("androidHostTest").dependencies {
+            implementation(libs.koin.test)
+        }
     }
 }
 

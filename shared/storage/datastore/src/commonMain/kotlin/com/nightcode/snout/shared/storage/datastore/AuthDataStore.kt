@@ -7,10 +7,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
 private val PersonalApiKeyPreferenceKey = stringPreferencesKey("personal_api_key")
 private val InstanceUrlPreferenceKey = stringPreferencesKey("instance_url")
 
+@Single
 class AuthDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
     suspend fun getPersonalApiKey(): String? = dataStore.data.map { it[PersonalApiKeyPreferenceKey] }
         .firstOrNull()

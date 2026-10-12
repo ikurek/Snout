@@ -15,6 +15,7 @@ import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import org.koin.core.annotation.Single
 
 private const val PageSize = 100
 
@@ -22,6 +23,7 @@ private const val PageSize = 100
  * PostHog's Logs API (OpenTelemetry logs sent to PostHog). Requires the `logs:read` scope; instances without the
  * Logs product answer 404.
  */
+@Single
 class LogsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     /** Per-service volume and error counts since [dateFrom], a relative date such as `-24h`. */

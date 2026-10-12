@@ -10,9 +10,6 @@ import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@Serializable
-internal data class FeatureFlagDetailNavKey(val flagId: Long) : NavKey
-
 @Composable
 internal fun FeatureFlagDetailRoute(navKey: FeatureFlagDetailNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<FeatureFlagDetailViewModel> { parametersOf(navKey.flagId) }
@@ -27,3 +24,6 @@ internal fun FeatureFlagDetailRoute(navKey: FeatureFlagDetailNavKey, onNavigateB
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.FeatureFlag(navKey.flagId)),
     )
 }
+
+@Serializable
+internal data class FeatureFlagDetailNavKey(val flagId: Long) : NavKey

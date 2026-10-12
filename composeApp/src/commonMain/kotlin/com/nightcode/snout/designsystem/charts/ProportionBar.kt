@@ -15,9 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** One part of a [ProportionBar]: its share is [value] over the sum of all values. */
-internal data class BarSegment(val value: Double, val color: Color)
-
 /**
  * A thin full-width bar split into [segments] by share, in order from the start. Decorative: the row it sits in
  * states the numbers in text. Draws nothing when the values add up to zero.
@@ -35,6 +32,9 @@ internal fun ProportionBar(segments: List<BarSegment>, modifier: Modifier = Modi
         }
     }
 }
+
+/** One part of a [ProportionBar]: its share is [value] over the sum of all values. */
+internal data class BarSegment(val value: Double, val color: Color)
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)

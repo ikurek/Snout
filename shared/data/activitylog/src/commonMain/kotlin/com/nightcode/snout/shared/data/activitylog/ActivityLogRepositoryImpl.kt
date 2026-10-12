@@ -9,7 +9,9 @@ import com.nightcode.snout.shared.domain.data.activitylog.ActivityLogRepository
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityEntry
 import com.nightcode.snout.shared.domain.model.common.DataError
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Single
 
+@Single(binds = [ActivityLogRepository::class])
 internal class ActivityLogRepositoryImpl(private val api: ActivityLogApi, private val cache: JsonCacheStore) :
     ActivityLogRepository {
 

@@ -3,7 +3,9 @@ package com.nightcode.snout.shared.domain.usecase.links
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
+import org.koin.core.annotation.Single
 
+@Single
 class GetPostHogUrl(private val authRepository: AuthRepository, private val appStateRepository: AppStateRepository) {
 
     suspend operator fun invoke(resource: PostHogResource): String? {

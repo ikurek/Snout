@@ -18,9 +18,6 @@ import kotlinx.serialization.Serializable
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@Serializable
-internal data object HomeNavKey : NavKey
-
 @Composable
 internal fun HomeRoute(
     initialPreferences: NavigationPreferences?,
@@ -69,3 +66,6 @@ internal fun HomeRoute(
         },
     )
 }
+
+@Serializable
+internal data object HomeNavKey : NavKey

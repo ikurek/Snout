@@ -14,8 +14,10 @@ import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.common.DataError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 import kotlin.time.Instant
 
+@Single(binds = [AnnotationRepository::class])
 internal class AnnotationRepositoryImpl(private val api: AnnotationsApi, private val cache: JsonCacheStore) :
     AnnotationRepository {
 

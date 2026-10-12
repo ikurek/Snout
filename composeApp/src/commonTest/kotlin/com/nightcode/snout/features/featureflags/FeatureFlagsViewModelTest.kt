@@ -37,8 +37,8 @@ class FeatureFlagsViewModelTest :
         fun subject(): FeatureFlagsViewModel {
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
             every { appStateRepository.observeSelectedProject() } returns flowOf(TestSelectedProject)
-            every { repository.observeFlags(any()) } returns flowOf(listOf(TestFeatureFlag))
-            everySuspend { repository.refreshFlags(any()) } returns Either.Right(Unit)
+            every { repository.observeFeatureFlags(any()) } returns flowOf(listOf(TestFeatureFlag))
+            everySuspend { repository.refreshFeatureFlags(any()) } returns Either.Right(Unit)
             val projectId = GetSelectedProjectId(appStateRepository)
             return FeatureFlagsViewModel(
                 refreshFeatureFlags = RefreshFeatureFlags(projectId, repository),
@@ -51,7 +51,7 @@ class FeatureFlagsViewModelTest :
 
         should("list cached flags and search on query") {
             val found = TestFeatureFlag.copy(id = 2, key = "dark-mode")
-            everySuspend { repository.searchFlags(any(), "dark") } returns Either.Right(listOf(found))
+            everySuspend { repository.searchFeatureFlags(any(), "dark") } returns Either.Right(listOf(found))
             val viewModel = subject()
             val collector = launch(Dispatchers.Main) { viewModel.uiState.collect {} }
 

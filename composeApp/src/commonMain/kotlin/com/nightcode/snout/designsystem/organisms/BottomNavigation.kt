@@ -10,9 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/** One destination of the [BottomNavigation]. */
-internal data class BottomNavigationItem(val label: String, val icon: Painter)
-
 /**
  * Five destinations on `surfaceContainer` with a tonal `secondaryContainer` indicator pill. The active icon is
  * `onSecondaryContainer`, never `primary`; labels are always visible.
@@ -42,3 +39,6 @@ internal fun BottomNavigation(
         }
     }
 }
+
+/** One destination of the [BottomNavigation]. */
+internal data class BottomNavigationItem(val label: String, val icon: Painter)

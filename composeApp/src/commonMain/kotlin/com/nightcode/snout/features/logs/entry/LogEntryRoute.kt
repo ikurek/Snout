@@ -11,10 +11,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Instant
 
-/** A log line; [service] and [timestamp] let it be found again, since PostHog can't fetch one line by [id]. */
-@Serializable
-internal data class LogEntryNavKey(val service: String, val id: String, val timestamp: Instant) : NavKey
-
 @Composable
 internal fun LogEntryRoute(navKey: LogEntryNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<LogEntryViewModel> { parametersOf(navKey) }
@@ -28,3 +24,7 @@ internal fun LogEntryRoute(navKey: LogEntryNavKey, onNavigateBack: () -> Unit) {
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Logs),
     )
 }
+
+/** A log line; [service] and [timestamp] let it be found again, since PostHog can't fetch one line by [id]. */
+@Serializable
+internal data class LogEntryNavKey(val service: String, val id: String, val timestamp: Instant) : NavKey

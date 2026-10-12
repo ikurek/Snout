@@ -3,8 +3,10 @@ package com.nightcode.snout.shared.domain.usecase.auth
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
+import org.koin.core.annotation.Single
 
 /** Removes everything cached for the signed-in account except the credentials themselves. */
+@Single
 class ClearLocalData(
     private val appStateRepository: AppStateRepository,
     private val organizationRepository: OrganizationRepository,

@@ -16,7 +16,9 @@ import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
 import com.nightcode.snout.shared.domain.model.insights.DashboardTile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single(binds = [DashboardRepository::class])
 internal class DashboardRepositoryImpl(
     private val dashboardsApi: DashboardsApi,
     private val insightsApi: InsightsApi,

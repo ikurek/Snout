@@ -16,7 +16,9 @@ import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single(binds = [ErrorTrackingRepository::class])
 internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi, private val cache: JsonCacheStore) :
     ErrorTrackingRepository {
 

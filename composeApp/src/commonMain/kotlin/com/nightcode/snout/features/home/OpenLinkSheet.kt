@@ -61,7 +61,7 @@ internal fun OpenLinkSheet(isVisible: Boolean, onDismiss: () -> Unit, onOpen: (u
             onOpen = {
                 val text = linkState.text.toString()
                 // Only pages Snout can show: the sheet isn't a way to open the browser.
-                val url = findLinkInText(text).getOrNull()?.takeIf { parsePostHogLink(it).isRight() }
+                val url = findLinkInText(text)?.takeIf { parsePostHogLink(it).isRight() }
                 if (url == null) {
                     rejected = text
                 } else {

@@ -50,5 +50,18 @@ kotlin {
         implementation(projects.shared.data.logs)
         implementation(projects.shared.data.organization)
         implementation(projects.shared.data.user)
+        // Not used directly: their Koin definitions must be visible here for the compile-time graph check
+        // (SharedGraph), which only sees modules on this compilation's classpath.
+        implementation(projects.shared.api.activitylog)
+        implementation(projects.shared.api.analytics)
+        implementation(projects.shared.api.annotations)
+        implementation(projects.shared.api.errortracking)
+        implementation(projects.shared.api.experiments)
+        implementation(projects.shared.api.featureflags)
+        implementation(projects.shared.api.insights)
+        implementation(projects.shared.api.logs)
+        implementation(projects.shared.api.organizations)
+        implementation(projects.shared.api.users)
+        implementation(projects.shared.common.coroutines)
     }
 }

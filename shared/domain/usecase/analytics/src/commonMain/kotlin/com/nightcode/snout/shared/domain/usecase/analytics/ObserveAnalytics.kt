@@ -5,7 +5,9 @@ import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Single
 
+@Single
 class ObserveAnalytics(
     private val observeSelectedProjectId: ObserveSelectedProjectId,
     private val repository: AnalyticsRepository,

@@ -14,7 +14,9 @@ import com.nightcode.snout.shared.storage.database.OrganizationsDatabase
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single(binds = [OrganizationRepository::class])
 internal class OrganizationRepositoryImpl(
     private val api: OrganizationsApi,
     private val authDataStore: AuthDataStore,

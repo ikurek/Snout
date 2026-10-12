@@ -22,6 +22,7 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Single
 
 private const val BreakdownRowLimit = 8
 
@@ -30,6 +31,7 @@ private const val CacheVersion = "v2"
 
 private val ActiveUserKeys = setOf(OverviewMetricKey.WeeklyActiveUsers, OverviewMetricKey.MonthlyActiveUsers)
 
+@Single(binds = [AnalyticsRepository::class])
 internal class AnalyticsRepositoryImpl(private val api: AnalyticsApi, private val cache: JsonCacheStore) :
     AnalyticsRepository {
 

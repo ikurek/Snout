@@ -29,7 +29,7 @@ class FeatureFlagDetailViewModelTest :
 
         fun subject(): FeatureFlagDetailViewModel {
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
-            everySuspend { repository.getFlag(any(), TestFeatureFlag.id) } returns Either.Right(TestFeatureFlag)
+            everySuspend { repository.getFeatureFlag(any(), TestFeatureFlag.id) } returns Either.Right(TestFeatureFlag)
             val projectId = GetSelectedProjectId(appStateRepository)
             return FeatureFlagDetailViewModel(
                 flagId = TestFeatureFlag.id,

@@ -9,7 +9,9 @@ import com.nightcode.snout.shared.domain.data.experiments.ExperimentRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Single
 
+@Single(binds = [ExperimentRepository::class])
 internal class ExperimentRepositoryImpl(private val api: ExperimentsApi, private val cache: JsonCacheStore) :
     ExperimentRepository {
 

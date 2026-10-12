@@ -6,6 +6,7 @@ import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.domain.model.links.PostHogLink
 import com.nightcode.snout.shared.domain.model.links.PostHogLinkError
+import org.koin.core.annotation.Single
 
 private const val HttpsScheme = "https://"
 
@@ -13,6 +14,7 @@ private const val HttpsScheme = "https://"
  * Reads a PostHog web link (`https://{host}/project/{id}/{page}`) into a [PostHogLink]. Query, fragment and a
  * trailing slash are ignored.
  */
+@Single
 class ParsePostHogLink {
     operator fun invoke(url: String): Either<PostHogLinkError, PostHogLink> = either {
         val trimmed = url.trim()

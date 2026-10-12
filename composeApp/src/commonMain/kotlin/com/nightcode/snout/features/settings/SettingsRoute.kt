@@ -12,9 +12,6 @@ import com.nightcode.snout.features.home.ProjectSwitcherViewModel
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 
-@Serializable
-internal data object SettingsNavKey : NavKey
-
 @Composable
 internal fun SettingsRoute(
     onNavigateBack: () -> Unit,
@@ -47,3 +44,6 @@ internal fun SettingsRoute(
         onDismiss = { showProjectSwitcher = false },
     )
 }
+
+@Serializable
+internal data object SettingsNavKey : NavKey

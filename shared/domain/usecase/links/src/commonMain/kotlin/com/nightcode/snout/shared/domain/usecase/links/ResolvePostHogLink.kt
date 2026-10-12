@@ -14,11 +14,13 @@ import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
 /**
  * Turns a PostHog web link into the matching screen. A link to another project the user can access switches
  * the selected project first; anything the app can't show goes to the browser.
  */
+@Single
 @Suppress("LongParameterList") // every step of opening a link is its own use case
 class ResolvePostHogLink(
     private val parsePostHogLink: ParsePostHogLink,

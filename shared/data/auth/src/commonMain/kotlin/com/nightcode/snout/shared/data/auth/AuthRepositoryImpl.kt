@@ -5,7 +5,9 @@ import com.nightcode.snout.shared.domain.model.auth.PersonalApiKey
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single(binds = [AuthRepository::class])
 internal class AuthRepositoryImpl(private val dataStore: AuthDataStore) : AuthRepository {
 
     override suspend fun getPersonalApiKey(): PersonalApiKey? = dataStore.getPersonalApiKey()?.let(::PersonalApiKey)

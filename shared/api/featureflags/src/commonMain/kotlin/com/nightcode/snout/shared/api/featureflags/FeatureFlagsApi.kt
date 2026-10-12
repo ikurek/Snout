@@ -12,9 +12,11 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.koin.core.annotation.Single
 
 private const val PageSize = 100
 
+@Single
 class FeatureFlagsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     // Limitation: first 100 flags only; add offset paging when a project outgrows that.

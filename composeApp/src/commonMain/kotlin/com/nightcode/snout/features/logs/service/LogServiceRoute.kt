@@ -12,10 +12,6 @@ import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-/** A service's log lines over the [range] picked on the Logs screen. */
-@Serializable
-internal data class LogServiceNavKey(val service: String, val range: LogsRange) : NavKey
-
 @Composable
 internal fun LogServiceRoute(
     navKey: LogServiceNavKey,
@@ -38,3 +34,7 @@ internal fun LogServiceRoute(
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.Logs),
     )
 }
+
+/** A service's log lines over the [range] picked on the Logs screen. */
+@Serializable
+internal data class LogServiceNavKey(val service: String, val range: LogsRange) : NavKey

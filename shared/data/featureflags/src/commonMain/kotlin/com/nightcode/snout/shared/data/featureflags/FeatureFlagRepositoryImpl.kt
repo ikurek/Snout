@@ -10,13 +10,15 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single(binds = [FeatureFlagRepository::class])
 internal class FeatureFlagRepositoryImpl(private val api: FeatureFlagsApi, private val cache: JsonCacheStore) :
     FeatureFlagRepository {
 
-    override fun observeFlags(projectId: Long): Flow<List<FeatureFlag>?> = cache.observe(key(projectId))
+    override fun observeFeatureFlags(projectId: Long): Flow<List<FeatureFlag>?> = cache.observe(key(projectId))
 
-    override suspend fun refreshFlags(projectId: Long): Either<DataError, Unit> = api.getFeatureFlags(projectId)
+    override suspend fun refreshFeatureFlags(projectId: Long): Either<DataError, Unit> = api.getFeatureFlags(projectId)
         .mapLeft { it.toDataError() }
         .map { response ->
             cache.put(
@@ -25,12 +27,12 @@ internal class FeatureFlagRepositoryImpl(private val api: FeatureFlagsApi, priva
             )
         }
 
-    override suspend fun searchFlags(projectId: Long, query: String): Either<DataError, List<FeatureFlag>> =
+    override suspend fun searchFeatureFlags(projectId: Long, query: String): Either<DataError, List<FeatureFlag>> =
         api.getFeatureFlags(projectId, search = query)
             .mapLeft { it.toDataError() }
             .map { response -> response.results.filterNot { it.deleted }.map { it.toFeatureFlag() } }
 
-    override suspend fun getFlag(projectId: Long, flagId: Long): Either<DataError, FeatureFlag> =
+    override suspend fun getFeatureFlag(projectId: Long, flagId: Long): Either<DataError, FeatureFlag> =
         api.getFeatureFlag(projectId, flagId).mapLeft { it.toDataError() }.map { it.toFeatureFlag() }
 
     override suspend fun setActive(projectId: Long, flagId: Long, active: Boolean): Either<DataError, FeatureFlag> =

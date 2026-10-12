@@ -16,6 +16,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import org.koin.core.annotation.Single
 
 /** PostHog caps a page of issues at 100. */
 private const val PageSize = 100
@@ -38,6 +39,7 @@ LIMIT 20
  * The compact error tracking endpoints, available on PostHog since mid-2026; older self-hosted instances answer 404.
  * Requires the `error_tracking:read` scope.
  */
+@Single
 class ErrorTrackingApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     /**

@@ -24,9 +24,6 @@ import snout.composeapp.generated.resources.error_tracking_status_error_forbidde
 import snout.composeapp.generated.resources.error_tracking_status_error_generic
 import snout.composeapp.generated.resources.error_tracking_undo
 
-@Serializable
-internal data class ErrorTrackingIssueNavKey(val issueId: String) : NavKey
-
 @Composable
 internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<ErrorTrackingIssueViewModel> { parametersOf(navKey.issueId) }
@@ -66,6 +63,9 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
         onOpenInPostHog = rememberOpenInPostHog(PostHogResource.ErrorTrackingIssue(navKey.issueId)),
     )
 }
+
+@Serializable
+internal data class ErrorTrackingIssueNavKey(val issueId: String) : NavKey
 
 private fun IssueStatusFilter.changedMessage() = when (this) {
     IssueStatusFilter.Active -> Res.string.error_tracking_status_changed_active

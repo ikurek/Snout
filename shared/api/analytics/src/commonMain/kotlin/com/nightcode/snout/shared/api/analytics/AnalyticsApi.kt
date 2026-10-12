@@ -11,6 +11,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import org.koin.core.annotation.Single
 
 /** Series names used in trends requests and matched again in results. */
 object TrendSeriesNames {
@@ -34,6 +35,7 @@ private val ActiveUserSeries = listOf(
 
 private val BreakdownSeries = listOf(TrendSeriesSpec(TrendSeriesNames.Visitors, "dau"))
 
+@Single
 class AnalyticsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getWebOverview(projectId: Long, dateFrom: String) = runQuery(projectId, webOverviewQuery(dateFrom))

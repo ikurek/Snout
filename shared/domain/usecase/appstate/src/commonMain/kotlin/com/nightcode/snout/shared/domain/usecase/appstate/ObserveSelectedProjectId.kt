@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single
 class ObserveSelectedProjectId(private val repository: AppStateRepository) {
     operator fun invoke(): Flow<Long> = repository.observeSelectedProject()
         .filterNotNull()

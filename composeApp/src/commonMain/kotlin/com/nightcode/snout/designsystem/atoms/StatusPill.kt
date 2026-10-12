@@ -15,17 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 
-/**
- * Semantic tone shared by [StatusPill] and [Tag]. Status is never colour alone: the word always travels with it.
- * `primary` is deliberately absent; orange means actionable, not "on".
- */
-internal enum class StatusTone {
-    Neutral,
-    Active,
-    Attention,
-    Info,
-}
-
 /** Lifecycle state of a flag, experiment or insight: a fully rounded pill, 22dp tall. */
 @Composable
 internal fun StatusPill(text: String, modifier: Modifier = Modifier, tone: StatusTone = StatusTone.Neutral) {
@@ -40,6 +29,17 @@ internal fun StatusPill(text: String, modifier: Modifier = Modifier, tone: Statu
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
         )
     }
+}
+
+/**
+ * Semantic tone shared by [StatusPill] and [Tag]. Status is never colour alone: the word always travels with it.
+ * `primary` is deliberately absent; orange means actionable, not "on".
+ */
+internal enum class StatusTone {
+    Neutral,
+    Active,
+    Attention,
+    Info,
 }
 
 /** Type or category label ("Trends", "mobile"): a square-cornered tag, 18dp tall. */

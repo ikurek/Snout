@@ -17,9 +17,6 @@ import org.jetbrains.compose.resources.painterResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_check_24dp
 
-/** One option in an [OptionPickerSheet]. */
-internal data class PickerOption<T>(val value: T, val title: String, val subtitle: String? = null)
-
 /**
  * Single-choice bottom sheet: a title and one [EntityRow] per option, the current one marked with a
  * `primary` check. Picking an option reports it and closes the sheet.
@@ -71,3 +68,6 @@ internal fun <T> OptionPickerSheet(
         VerticalSpacer(16.dp)
     }
 }
+
+/** One option in an [OptionPickerSheet]. */
+internal data class PickerOption<T>(val value: T, val title: String, val subtitle: String? = null)

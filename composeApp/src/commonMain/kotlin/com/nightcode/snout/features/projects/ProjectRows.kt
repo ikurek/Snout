@@ -22,6 +22,11 @@ import snout.composeapp.generated.resources.ic_check_24dp
 import snout.composeapp.generated.resources.initial_project_screen_project_count
 import kotlin.uuid.Uuid
 
+internal fun List<Organization>.toProjectListEntries(): List<ProjectListEntry> = flatMap { organization ->
+    listOf(ProjectListEntry.OrganizationHeader(organization)) +
+        organization.projects.map { ProjectListEntry.ProjectItem(organization.id, it) }
+}
+
 /** Flattened organization → projects hierarchy so both the selection screen and the switcher render one list. */
 internal sealed interface ProjectListEntry {
     val key: String
@@ -33,11 +38,6 @@ internal sealed interface ProjectListEntry {
     data class ProjectItem(val organizationId: Uuid, val project: Project) : ProjectListEntry {
         override val key: String get() = "project_${project.id}"
     }
-}
-
-internal fun List<Organization>.toProjectListEntries(): List<ProjectListEntry> = flatMap { organization ->
-    listOf(ProjectListEntry.OrganizationHeader(organization)) +
-        organization.projects.map { ProjectListEntry.ProjectItem(organization.id, it) }
 }
 
 /** Organization headers with their projects indented beneath; the last row has no divider. */

@@ -12,7 +12,9 @@ import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import org.koin.core.annotation.Single
 
+@Single(binds = [InsightRepository::class])
 internal class InsightRepositoryImpl(private val api: InsightsApi, private val cache: JsonCacheStore) :
     InsightRepository {
 

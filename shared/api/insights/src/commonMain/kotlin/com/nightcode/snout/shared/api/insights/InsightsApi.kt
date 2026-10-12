@@ -13,12 +13,14 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.koin.core.annotation.Single
 
 private const val PageSize = 100
 
 /** PostHog answers `refresh=blocking` only once the query has run; breakdown funnels take well past 10 s. */
 private const val BlockingRefreshTimeoutMillis = 90_000L
 
+@Single
 class InsightsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     // Limitation: first 100 saved insights only; add offset paging when a project outgrows that.

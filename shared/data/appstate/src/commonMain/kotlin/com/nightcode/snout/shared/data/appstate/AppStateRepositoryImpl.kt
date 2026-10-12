@@ -8,8 +8,10 @@ import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.storage.datastore.AppStateDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 import kotlin.uuid.Uuid
 
+@Single(binds = [AppStateRepository::class])
 internal class AppStateRepositoryImpl(private val dataStore: AppStateDataStore) : AppStateRepository {
 
     override suspend fun saveSelectedProject(organizationId: Uuid, projectId: Long) =

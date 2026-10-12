@@ -5,7 +5,7 @@ import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import com.nightcode.snout.shared.domain.data.logs.LogsRepository
+import com.nightcode.snout.shared.domain.data.logs.LogRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import com.nightcode.snout.shared.domain.model.logs.TestLogServices
@@ -31,7 +31,7 @@ class LogsViewModelTest :
         extension(MainDispatcherExtension)
 
         val appStateRepository = mock<AppStateRepository>()
-        val repository = mock<LogsRepository>()
+        val repository = mock<LogRepository>()
 
         fun subject(): LogsViewModel {
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
