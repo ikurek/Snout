@@ -1,17 +1,15 @@
 package com.nightcode.snout.shared.data.featureflags.mapper
 
 import com.nightcode.snout.shared.api.featureflags.model.FeatureFlagDto
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlagStatus
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.Json
 
 class FeatureFlagMapperTest :
     ShouldSpec({
-        val json = Json { ignoreUnknownKeys = true }
-
         should("map filters, variants and status") {
-            val dto = json.decodeFromString<FeatureFlagDto>(
+            val dto = TestJson.decodeFromString<FeatureFlagDto>(
                 """{"id":7,"key":"new-checkout","name":"Redesign","active":true,"status":"STALE",
                 "filters":{"groups":[{"properties":[{"key":"email","value":["a@x.com","b@x.com"],"operator":"exact","type":"person"}],
                 "rollout_percentage":null,"variant":"test"}],
@@ -29,7 +27,7 @@ class FeatureFlagMapperTest :
         }
 
         should("derive status from active when missing and detect full rollout") {
-            val dto = json.decodeFromString<FeatureFlagDto>(
+            val dto = TestJson.decodeFromString<FeatureFlagDto>(
                 """{"id":1,"key":"k","active":false,
                 "filters":{"groups":[{"properties":[],"rollout_percentage":100}]}}""",
             )
@@ -40,7 +38,7 @@ class FeatureFlagMapperTest :
         }
 
         should("unwrap JSON-encoded payloads into readable text") {
-            val dto = json.decodeFromString<FeatureFlagDto>(
+            val dto = TestJson.decodeFromString<FeatureFlagDto>(
                 """{"id":2,"key":"paywall","active":true,"is_remote_configuration":true,"has_encrypted_payloads":false,
                 "filters":{"groups":[],"payloads":{"true":"{\"free_views\":3,\"offering\":\"lifetime\"}",
                 "control":"\"plain\"","test":"42","raw":{"a":1},"text":"not json"}}}""",

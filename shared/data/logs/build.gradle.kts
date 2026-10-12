@@ -14,4 +14,8 @@ kotlin {
         implementation(projects.shared.data.common)
         implementation(projects.shared.domain.data.logs)
     }
+
+    sourceSets.commonTest.dependencies {
+        implementation(projects.shared.data.testutils)
+    }
 }

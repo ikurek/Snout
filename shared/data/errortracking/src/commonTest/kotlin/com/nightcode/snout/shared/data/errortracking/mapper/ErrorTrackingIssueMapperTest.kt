@@ -3,6 +3,7 @@ package com.nightcode.snout.shared.data.errortracking.mapper
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesResponseDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.IssueRelease
 import com.nightcode.snout.shared.domain.model.errortracking.IssueSeverity
@@ -11,15 +12,12 @@ import com.nightcode.snout.shared.domain.model.errortracking.StackFrame
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class ErrorTrackingIssueMapperTest :
     ShouldSpec({
-        val json = Json { ignoreUnknownKeys = true }
-
         should("map a list row with aggregations and volume") {
-            val response = json.decodeFromString<ErrorTrackingIssuesResponseDto>(
+            val response = TestJson.decodeFromString<ErrorTrackingIssuesResponseDto>(
                 """{"results":[{"id":"0189-a","name":"TypeError","description":"Cannot read 'price'",
                 "status":"pending_release","severity":"critical","first_seen":"2026-09-28T08:12:00.123456Z",
                 "last_seen":"2026-10-09T07:41:00Z","library":"posthog-js","source":"cart.tsx",
@@ -41,7 +39,7 @@ class ErrorTrackingIssueMapperTest :
         }
 
         should("map the detail response's impact, sparkline, frame and release") {
-            val issue = json.decodeFromString<ErrorTrackingIssueDto>(
+            val issue = TestJson.decodeFromString<ErrorTrackingIssueDto>(
                 """{"id":"0189-b","name":"NetworkError","status":"active","severity":null,
                 "impact":{"occurrences":18.0,"users":9.0},"sparkline":[6.0,5.0],
                 "top_in_app_frame":{"function":"load","source":"api.kt","line":42,"in_app":true},
@@ -56,7 +54,7 @@ class ErrorTrackingIssueMapperTest :
         }
 
         should("drop empty frame and release objects and fall back for unnamed issues") {
-            val issue = json.decodeFromString<ErrorTrackingIssueDto>(
+            val issue = TestJson.decodeFromString<ErrorTrackingIssueDto>(
                 """{"id":"0189-c","name":"","description":"Script error.","status":"something_new",
                 "impact":{},"top_in_app_frame":{},"latest_release":{}}""",
             ).toIssue()
@@ -70,7 +68,7 @@ class ErrorTrackingIssueMapperTest :
         }
 
         should("read app versions from HogQL rows and skip malformed ones") {
-            val versions = json.decodeFromString<HogQLResultsDto>(
+            val versions = TestJson.decodeFromString<HogQLResultsDto>(
                 """{"results":[["2.14.0",1102],["2.13.2",186],[null,4],[""," 3"],["1.0"]],
                 "columns":["version","exceptions"]}""",
             ).toAppVersions()

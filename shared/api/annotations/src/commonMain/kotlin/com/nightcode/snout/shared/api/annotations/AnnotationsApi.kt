@@ -16,7 +16,7 @@ import org.koin.core.annotation.Single
 private const val PageSize = 100
 
 @Single
-class AnnotationsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class AnnotationsApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getAnnotations(projectId: Long) = networkCall<PaginatedResponseDto<AnnotationDto>> {
         client.get(authDataStore.projectUrl(projectId, "annotations/")) { parameter("limit", PageSize) }.body()

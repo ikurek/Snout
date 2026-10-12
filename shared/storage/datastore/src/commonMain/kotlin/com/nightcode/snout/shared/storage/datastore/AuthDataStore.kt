@@ -13,7 +13,7 @@ private val PersonalApiKeyPreferenceKey = stringPreferencesKey("personal_api_key
 private val InstanceUrlPreferenceKey = stringPreferencesKey("instance_url")
 
 @Single
-class AuthDataStore internal constructor(private val dataStore: DataStore<Preferences>) {
+class AuthDataStore(private val dataStore: DataStore<Preferences>) {
     suspend fun getPersonalApiKey(): String? = dataStore.data.map { it[PersonalApiKeyPreferenceKey] }
         .firstOrNull()
         ?.takeIf { it.isNotBlank() }

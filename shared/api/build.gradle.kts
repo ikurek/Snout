@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.koin)
+    alias(libs.plugins.snout.multiplatform.unittest)
 }
 
 kotlin {
@@ -18,6 +19,9 @@ kotlin {
             implementation(libs.ktor.client.contentNegotiation)
             implementation(libs.ktor.serialization.json)
             implementation(projects.shared.storage.datastore)
+        }
+        commonTest.dependencies {
+            implementation(libs.ktor.client.mock)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

@@ -15,7 +15,7 @@ import org.koin.core.annotation.Single
 private const val PageSize = 100
 
 @Single
-class DashboardsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class DashboardsApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getDashboards(projectId: Long) = networkCall<PaginatedResponseDto<DashboardDto>> {
         client.get(authDataStore.projectUrl(projectId, "dashboards/")) { parameter("limit", PageSize) }.body()

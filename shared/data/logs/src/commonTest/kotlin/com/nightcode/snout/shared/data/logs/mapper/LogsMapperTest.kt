@@ -3,21 +3,19 @@ package com.nightcode.snout.shared.data.logs.mapper
 import com.nightcode.snout.shared.api.logs.model.LogServicesResponseDto
 import com.nightcode.snout.shared.api.logs.model.LogVolumeBucketDto
 import com.nightcode.snout.shared.api.logs.model.LogsQueryResponseDto
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.domain.model.logs.LogLevelCounts
 import com.nightcode.snout.shared.domain.model.logs.LogSeverity
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class LogsMapperTest :
     ShouldSpec({
-        val json = Json { ignoreUnknownKeys = true }
-
         should("attach each service's volume buckets in time order") {
-            val services = json.decodeFromString<LogServicesResponseDto>(
+            val services = TestJson.decodeFromString<LogServicesResponseDto>(
                 """{"services":[
                 {"service_name":"api","log_count":300,"error_count":6,"error_rate":0.02,"volume_share_pct":90.0,
                 "severity_breakdown":{"debug":10,"info":250,"warn":34,"error":6}},
@@ -35,7 +33,7 @@ class LogsMapperTest :
         }
 
         should("map entries, blank padded trace IDs and keep the cursor only when there is more") {
-            val page = json.decodeFromString<LogsQueryResponseDto>(
+            val page = TestJson.decodeFromString<LogsQueryResponseDto>(
                 """{"results":[
                 {"uuid":"a","timestamp":"2026-10-06T11:58:42.120Z","body":"boom","severity_text":"ERROR",
                 "trace_id":"00000000000000000000000000000000","attributes":{"order":"1"},"resource_attributes":{}},

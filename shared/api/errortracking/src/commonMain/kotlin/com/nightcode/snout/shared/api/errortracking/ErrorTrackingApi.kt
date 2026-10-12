@@ -40,7 +40,7 @@ LIMIT 20
  * Requires the `error_tracking:read` scope.
  */
 @Single
-class ErrorTrackingApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class ErrorTrackingApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     /**
      * [status] is one of active, resolved, suppressed, archived, pending_release or all. [appVersion] keeps only

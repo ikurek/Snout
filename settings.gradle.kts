@@ -61,6 +61,7 @@ include(":shared:data:insights")
 include(":shared:data:links")
 include(":shared:data:logs")
 include(":shared:data:organization")
+include(":shared:data:testutils")
 include(":shared:data:user")
 
 // Domain models

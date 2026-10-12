@@ -24,7 +24,7 @@ private const val PageSize = 100
  * Logs product answer 404.
  */
 @Single
-class LogsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class LogsApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     /** Per-service volume and error counts since [dateFrom], a relative date such as `-24h`. */
     suspend fun getServices(projectId: Long, dateFrom: String) = networkCall<LogServicesResponseDto> {

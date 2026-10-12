@@ -36,7 +36,7 @@ private val ActiveUserSeries = listOf(
 private val BreakdownSeries = listOf(TrendSeriesSpec(TrendSeriesNames.Visitors, "dau"))
 
 @Single
-class AnalyticsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class AnalyticsApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getWebOverview(projectId: Long, dateFrom: String) = runQuery(projectId, webOverviewQuery(dateFrom))
 

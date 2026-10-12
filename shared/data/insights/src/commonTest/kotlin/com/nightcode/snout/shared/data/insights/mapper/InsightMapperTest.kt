@@ -1,6 +1,7 @@
 package com.nightcode.snout.shared.data.insights.mapper
 
 import com.nightcode.snout.shared.api.insights.model.InsightDto
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.domain.model.insights.InsightDateRange
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.InsightKind
@@ -12,15 +13,12 @@ import com.nightcode.snout.shared.domain.model.insights.ValueUnit
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.serialization.json.Json
 import kotlin.time.Instant
 
 class InsightMapperTest :
     ShouldSpec({
-        val json = Json { ignoreUnknownKeys = true }
-
         should("derive kind and display from an InsightVizNode trends query") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","name":"","derived_name":"Pageviews",
                 "query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery","trendsFilter":{"display":"BoldNumber"}}},
                 "result":[{"label":"${'$'}pageview","aggregated_value":4200,"data":[]}]}""",
@@ -33,7 +31,7 @@ class InsightMapperTest :
         }
 
         should("map trend series with breakdown labels and skip previous period") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},
                 "result":[
                  {"label":"${'$'}pageview","breakdown_value":"Chrome","data":[1,2],"days":["2026-10-01","2026-10-02"]},
@@ -48,7 +46,7 @@ class InsightMapperTest :
         }
 
         should("attach each previous period series to its current series") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},
                 "result":[
                  {"label":"${'$'}pageview","breakdown_value":"Chrome","compare_label":"current","data":[6,6]},
@@ -66,7 +64,7 @@ class InsightMapperTest :
         }
 
         should("average periods instead of summing them for non-additive math") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},
                 "result":[
                  {"label":"duration","action":{"math":"avg"},"data":[40,50,60]},
@@ -78,7 +76,7 @@ class InsightMapperTest :
         }
 
         should("use readable labels for stickiness periods") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"StickinessQuery"}},
                 "result":[{"label":"${'$'}screen","data":[12,1],"days":[1,2],"labels":["1 day","2 days"]}]}""",
             )
@@ -87,7 +85,7 @@ class InsightMapperTest :
         }
 
         should("map funnel steps with conversion relative to first step") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"FunnelsQuery"}},
                 "result":[
                   {"name":"visit","count":100,"order":0},
@@ -103,7 +101,7 @@ class InsightMapperTest :
         }
 
         should("map SQL rows into a table using top-level columns") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"DataTableNode","source":{"kind":"HogQLQuery","query":"select 1"}},
                 "columns":["event","count"],"result":[["${'$'}pageview",12],["click",null]]}""",
             )
@@ -113,7 +111,7 @@ class InsightMapperTest :
         }
 
         should("sum funnel step counts across breakdown values") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"FunnelsQuery"}},
                 "result":[
                   [{"name":"visit","count":60,"breakdown_value":["Chrome"]},
@@ -135,7 +133,7 @@ class InsightMapperTest :
         }
 
         should("describe the period an insight covers") {
-            fun period(kind: String, source: String) = json.decodeFromString<InsightDto>(
+            fun period(kind: String, source: String) = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"$kind"$source}}}""",
             ).toSummary().period
             period(
@@ -159,7 +157,7 @@ class InsightMapperTest :
         }
 
         should("map retention cohorts and weight the curve by cohort size") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"RetentionQuery"}},
                 "result":[
                   {"date":"2026-10-01T00:00:00Z","label":"Day 0",
@@ -180,7 +178,7 @@ class InsightMapperTest :
         }
 
         should("add retention breakdown values into one cohort per date") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"RetentionQuery"}},
                 "result":[
                   {"date":"2026-10-01T00:00:00Z","label":"Day 0","breakdown_value":"Chrome",
@@ -195,7 +193,7 @@ class InsightMapperTest :
         }
 
         should("drop the zero padding PostHog sends for retention intervals that haven't started") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"RetentionQuery",
                 "retentionFilter":{"period":"Week"}}},
                 "result":[
@@ -213,7 +211,7 @@ class InsightMapperTest :
         }
 
         should("carry the trends aggregation axis format") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery",
                 "trendsFilter":{"display":"BoldNumber","aggregationAxisFormat":"duration",
                 "aggregationAxisPrefix":"~","aggregationAxisPostfix":"","decimalPlaces":1}}},
@@ -224,7 +222,7 @@ class InsightMapperTest :
         }
 
         should("map percentage formats and default to numeric") {
-            fun format(filter: String) = json.decodeFromString<InsightDto>(
+            fun format(filter: String) = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery",
                 "trendsFilter":$filter}},"result":[]}""",
             ).toDetail().result.shouldBeInstanceOf<InsightResult.Series>().format.unit
@@ -234,7 +232,7 @@ class InsightMapperTest :
         }
 
         should("show a 1x1 SQL BoldNumber visualization as a number") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"DataVisualizationNode","display":"BoldNumber",
                 "source":{"kind":"HogQLQuery","query":"select count() from events"},
                 "chartSettings":{"yAxis":[{"column":"count()","settings":{"formatting":{"suffix":" events"}}}]}},
@@ -248,7 +246,7 @@ class InsightMapperTest :
         }
 
         should("chart a SQL line graph from its chart settings columns") {
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"DataVisualizationNode","display":"ActionsLineGraph",
                 "source":{"kind":"HogQLQuery","query":"select day, users, views from t"},
                 "chartSettings":{"xAxis":{"column":"day"},"yAxis":[{"column":"users"},{"column":"views"}]}},
@@ -265,13 +263,13 @@ class InsightMapperTest :
         }
 
         should("fall back to a table when a SQL visualization can't be drawn") {
-            val noSettings = json.decodeFromString<InsightDto>(
+            val noSettings = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"DataVisualizationNode","display":"ActionsLineGraph",
                 "source":{"kind":"HogQLQuery","query":"select day, users from t"}},
                 "columns":["day","users"],"result":[["2026-10-01",3]]}""",
             )
             noSettings.toDetail().result.shouldBeInstanceOf<InsightResult.Table>()
-            val wideNumber = json.decodeFromString<InsightDto>(
+            val wideNumber = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"DataVisualizationNode","display":"BoldNumber",
                 "source":{"kind":"HogQLQuery","query":"select a, b from t"}},
                 "columns":["a","b"],"result":[[1,2]]}""",
@@ -281,7 +279,7 @@ class InsightMapperTest :
 
         should("keep the SQL row count when trimming table rows") {
             val rows = (1..60).joinToString(",") { "[$it]" }
-            val dto = json.decodeFromString<InsightDto>(
+            val dto = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a","query":{"kind":"HogQLQuery","query":"select n"},
                 "columns":["n"],"result":[$rows]}""",
             )
@@ -291,12 +289,12 @@ class InsightMapperTest :
         }
 
         should("report unsupported kinds and null result when not computed") {
-            val paths = json.decodeFromString<InsightDto>(
+            val paths = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a",
                 "query":{"kind":"InsightVizNode","source":{"kind":"PathsQuery"}},"result":[]}""",
             )
             paths.toDetail().result shouldBe InsightResult.Unsupported
-            val pending = json.decodeFromString<InsightDto>(
+            val pending = TestJson.decodeFromString<InsightDto>(
                 """{"id":1,"short_id":"a",
                 "query":{"kind":"InsightVizNode","source":{"kind":"TrendsQuery"}},"result":null}""",
             )

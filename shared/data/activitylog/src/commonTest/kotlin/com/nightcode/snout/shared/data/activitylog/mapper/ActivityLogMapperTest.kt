@@ -1,16 +1,14 @@
 package com.nightcode.snout.shared.data.activitylog.mapper
 
 import com.nightcode.snout.shared.api.activitylog.model.ActivityLogDto
+import com.nightcode.snout.shared.data.testutils.TestJson
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.serialization.json.Json
 
 class ActivityLogMapperTest :
     ShouldSpec({
-        val json = Json { ignoreUnknownKeys = true }
-
         should("map actor, item and readable changes") {
-            val dto = json.decodeFromString<ActivityLogDto>(
+            val dto = TestJson.decodeFromString<ActivityLogDto>(
                 """{"id":"a1","user":{"first_name":"Jane","last_name":"Doe"},"activity":"updated","scope":"FeatureFlag",
                 "item_id":"7","detail":{"name":"new-checkout","changes":[
                   {"type":"FeatureFlag","action":"changed","field":"active","before":false,"after":true},

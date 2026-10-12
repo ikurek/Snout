@@ -21,7 +21,7 @@ private const val PageSize = 100
 private const val BlockingRefreshTimeoutMillis = 90_000L
 
 @Single
-class InsightsApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class InsightsApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     // Limitation: first 100 saved insights only; add offset paging when a project outgrows that.
     suspend fun getInsights(projectId: Long, search: String? = null) = networkCall<PaginatedResponseDto<InsightDto>> {
