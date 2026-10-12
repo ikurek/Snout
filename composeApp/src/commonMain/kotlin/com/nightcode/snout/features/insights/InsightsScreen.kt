@@ -111,7 +111,7 @@ private fun InsightRow(insight: InsightSummary, divider: Boolean, onClick: () ->
         divider = divider,
         onClick = onClick,
         meta = {
-            Tag(text = insight.kind.label())
+            Tag(text = stringResource(insight.kind.label))
             insight.lastModifiedAt?.let { MetaText(it.formatRelative()) }
         },
         trailing = {

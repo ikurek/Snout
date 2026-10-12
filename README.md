@@ -96,7 +96,8 @@ Checks: `./gradlew testAndroidHostTest detekt`.
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
 generated wrappers in `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Wrappers are
 grouped per preview package, so the reference images under `androidApp/src/screenshotTestDebug/reference`
-mirror the package tree. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
+mirror the package tree. Previews are `public` only because those wrappers live in another module and call
+them; they are not API for anything else. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
 renaming previews run `scripts/generate_screenshot_tests.py`; after an intended UI change regenerate the
 references with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
 

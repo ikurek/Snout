@@ -26,7 +26,25 @@ fun ConfirmationDialogPreviewShot() = ScreenshotEnvironment { ConfirmationDialog
 @Preview(name = "light", showBackground = true)
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun GenericErrorPlaceholderPreviewShot() = ScreenshotEnvironment { GenericErrorPlaceholderPreview() }
+fun ErrorPlaceholderGenericPreviewShot() = ScreenshotEnvironment { ErrorPlaceholderGenericPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ErrorPlaceholderPaymentRequiredPreviewShot() = ScreenshotEnvironment { ErrorPlaceholderPaymentRequiredPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ErrorPlaceholderPermissionDeniedPreviewShot() = ScreenshotEnvironment { ErrorPlaceholderPermissionDeniedPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ErrorPlaceholderRateLimitedPreviewShot() = ScreenshotEnvironment { ErrorPlaceholderRateLimitedPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)
@@ -45,24 +63,6 @@ fun NothingFoundPlaceholderPreviewShot() = ScreenshotEnvironment { NothingFoundP
 @Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun OptionPickerSheetPreviewShot() = ScreenshotEnvironment { OptionPickerSheetPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PaymentRequiredPlaceholderPreviewShot() = ScreenshotEnvironment { PaymentRequiredPlaceholderPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PermissionDeniedPlaceholderPreviewShot() = ScreenshotEnvironment { PermissionDeniedPlaceholderPreview() }
-
-@PreviewTest
-@Preview(name = "light", showBackground = true)
-@Preview(name = "dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun RateLimitedPlaceholderPreviewShot() = ScreenshotEnvironment { RateLimitedPlaceholderPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true)

@@ -26,7 +26,7 @@ import snout.composeapp.generated.resources.ic_chevron_right_24dp
 
 /** Every section that did not get a bottom-bar slot: 20dp leading icon, title, description, trailing chevron. */
 @Composable
-internal fun MoreScreen(sections: List<HomeSection>, onItemClicked: (HomeSection) -> Unit) {
+internal fun MoreContent(sections: List<HomeSection>, onItemClicked: (HomeSection) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         sections.forEachIndexed { index, section ->
             EntityRow(
@@ -57,4 +57,4 @@ internal fun MoreScreen(sections: List<HomeSection>, onItemClicked: (HomeSection
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun MoreScreenPreview() = MoreScreen(sections = NavigationPreferences.Default.hidden, onItemClicked = {})
+fun MoreContentPreview() = MoreContent(sections = NavigationPreferences.Default.hidden, onItemClicked = {})

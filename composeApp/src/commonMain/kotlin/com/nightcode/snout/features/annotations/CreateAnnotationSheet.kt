@@ -1,11 +1,13 @@
 package com.nightcode.snout.features.annotations
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -19,6 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewWrapper
+import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -72,40 +77,13 @@ internal fun CreateAnnotationSheet(
     val dateMarker = LocalDate.parse(selectedDate).atTime(MarkerTime).toInstant(timeZone)
 
     AnimatedBottomSheet(isVisible = isVisible, onDismissRequest = onDismiss) {
-        Column(modifier = Modifier.padding(horizontal = Spacing.large).imePadding()) {
-            Text(text = stringResource(Res.string.annotation_create_title), style = SnoutTheme.typography.titleLarge)
-            VerticalSpacer(Spacing.large)
-            PrimaryTextField(
-                state = contentState,
-                label = stringResource(Res.string.annotation_create_content_label),
-                placeholder = stringResource(Res.string.annotation_create_content_placeholder),
-                enabled = status !is CreateStatus.Saving,
-                lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3, maxHeightInLines = 6),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            VerticalSpacer(Spacing.small)
-            KeyValueRow(
-                label = stringResource(Res.string.annotation_create_date_label),
-                value = dateMarker.formatShortDate(),
-                leadingIcon = painterResource(Res.drawable.ic_schedule_24dp),
-                onClick = { showDatePicker = true },
-                showChevron = false,
-                contentPadding = PaddingValues(vertical = Spacing.small),
-            )
-            if (status is CreateStatus.Failed) {
-                InlineErrorBanner(text = stringResource(status.error.createFailedMessage()))
-                VerticalSpacer(Spacing.small)
-            }
-            VerticalSpacer(Spacing.large)
-            PrimaryButton(
-                text = stringResource(Res.string.annotation_create_save),
-                onClick = { onCreate(contentState.text.toString(), dateMarker) },
-                enabled = contentState.text.isNotBlank(),
-                loading = status is CreateStatus.Saving,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            VerticalSpacer(Spacing.xxLarge)
-        }
+        CreateAnnotationContent(
+            contentState = contentState,
+            dateMarker = dateMarker,
+            status = status,
+            onPickDate = { showDatePicker = true },
+            onSave = { onCreate(contentState.text.toString(), dateMarker) },
+        )
     }
 
     if (showDatePicker) {
@@ -117,6 +95,51 @@ internal fun CreateAnnotationSheet(
             },
             onDismiss = { showDatePicker = false },
         )
+    }
+}
+
+@Composable
+private fun CreateAnnotationContent(
+    contentState: TextFieldState,
+    dateMarker: Instant,
+    status: CreateStatus,
+    onPickDate: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.padding(horizontal = Spacing.large).imePadding()) {
+        Text(text = stringResource(Res.string.annotation_create_title), style = SnoutTheme.typography.titleLarge)
+        VerticalSpacer(Spacing.large)
+        PrimaryTextField(
+            state = contentState,
+            label = stringResource(Res.string.annotation_create_content_label),
+            placeholder = stringResource(Res.string.annotation_create_content_placeholder),
+            enabled = status !is CreateStatus.Saving,
+            lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 3, maxHeightInLines = 6),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        VerticalSpacer(Spacing.small)
+        KeyValueRow(
+            label = stringResource(Res.string.annotation_create_date_label),
+            value = dateMarker.formatShortDate(),
+            leadingIcon = painterResource(Res.drawable.ic_schedule_24dp),
+            onClick = onPickDate,
+            showChevron = false,
+            contentPadding = PaddingValues(vertical = Spacing.small),
+        )
+        if (status is CreateStatus.Failed) {
+            InlineErrorBanner(text = stringResource(status.error.createFailedMessage()))
+            VerticalSpacer(Spacing.small)
+        }
+        VerticalSpacer(Spacing.large)
+        PrimaryButton(
+            text = stringResource(Res.string.annotation_create_save),
+            onClick = onSave,
+            enabled = contentState.text.isNotBlank(),
+            loading = status is CreateStatus.Saving,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        VerticalSpacer(Spacing.xxLarge)
     }
 }
 
@@ -149,4 +172,29 @@ private fun AnnotationDatePickerDialog(initialDate: LocalDate, onConfirm: (Local
 private fun DataError.createFailedMessage() = actionFailedMessage(
     generic = Res.string.annotation_create_error_generic,
     forbidden = Res.string.annotation_create_error_forbidden,
+)
+
+/** The sheet's content on its `surfaceContainer` ground; the modal itself does not render in a static preview. */
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun CreateAnnotationSheetPreview() = CreateAnnotationContent(
+    contentState = rememberTextFieldState(initialText = "Released 2.4 with the new checkout"),
+    dateMarker = Instant.parse("2026-10-06T12:00:00Z"),
+    status = CreateStatus.Idle,
+    onPickDate = {},
+    onSave = {},
+    modifier = Modifier.background(SnoutTheme.colors.surfaceContainer),
+)
+
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun CreateAnnotationSheetErrorPreview() = CreateAnnotationContent(
+    contentState = rememberTextFieldState(initialText = "Released 2.4 with the new checkout"),
+    dateMarker = Instant.parse("2026-10-06T12:00:00Z"),
+    status = CreateStatus.Failed(DataError.Forbidden),
+    onPickDate = {},
+    onSave = {},
+    modifier = Modifier.background(SnoutTheme.colors.surfaceContainer),
 )

@@ -13,7 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
+import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.sections.icon
 import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.atoms.AvatarBox
@@ -21,7 +24,7 @@ import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.organisms.BottomNavigation
 import com.nightcode.snout.designsystem.organisms.BottomNavigationItem
 import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
-import com.nightcode.snout.features.more.MoreScreen
+import com.nightcode.snout.features.more.MoreContent
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
@@ -100,10 +103,35 @@ internal fun HomeScreen(
             modifier = Modifier.padding(innerPadding),
         ) { section ->
             if (section == null) {
-                MoreScreen(sections = preferences.hidden, onItemClicked = onOpenSection)
+                MoreContent(sections = preferences.hidden, onItemClicked = onOpenSection)
             } else {
                 HomeSectionContent(section = section, navigation = navigation)
             }
         }
     }
 }
+
+/**
+ * The shell on More. A landing outside the tabs opens there, and More is the one tab whose content renders without
+ * view models; the other sections have previews of their own.
+ */
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun HomeScreenPreview() = HomeScreen(
+    preferences = NavigationPreferences.Default.copy(landing = HomeSection.Experiments),
+    currentProjectName = "Snout",
+    onOpenProjectSwitcher = {},
+    onNavigateToSettings = {},
+    onOpenLink = {},
+    onOpenSection = {},
+    onOpenInPostHog = {},
+    navigation = SectionNavigation(
+        onOpenDashboard = {},
+        onOpenInsight = {},
+        onOpenFeatureFlag = {},
+        onOpenErrorTrackingIssue = {},
+        onOpenLogService = { _, _ -> },
+        onOpenExperiment = {},
+    ),
+)

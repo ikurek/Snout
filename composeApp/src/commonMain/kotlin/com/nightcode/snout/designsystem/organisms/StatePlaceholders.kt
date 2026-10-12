@@ -145,22 +145,22 @@ private fun ResourcePlaceholder(content: PlaceholderContent, onAction: () -> Uni
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun GenericErrorPlaceholderPreview() = ErrorPlaceholder(error = DataError.UnexpectedError, onRetry = {})
+fun ErrorPlaceholderGenericPreview() = ErrorPlaceholder(error = DataError.UnexpectedError, onRetry = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun PermissionDeniedPlaceholderPreview() = ErrorPlaceholder(error = DataError.Forbidden, onRetry = {})
+fun ErrorPlaceholderPermissionDeniedPreview() = ErrorPlaceholder(error = DataError.Forbidden, onRetry = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun PaymentRequiredPlaceholderPreview() = ErrorPlaceholder(error = DataError.PaymentRequired, onRetry = {})
+fun ErrorPlaceholderPaymentRequiredPreview() = ErrorPlaceholder(error = DataError.PaymentRequired, onRetry = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun RateLimitedPlaceholderPreview() = ErrorPlaceholder(error = DataError.RateLimited, onRetry = {})
+fun ErrorPlaceholderRateLimitedPreview() = ErrorPlaceholder(error = DataError.RateLimited, onRetry = {})
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)

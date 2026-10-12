@@ -23,3 +23,15 @@ fun AnnotationsScreenEmptyPreviewShot() = ScreenshotEnvironment { AnnotationsScr
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun AnnotationsScreenPreviewShot() = ScreenshotEnvironment { AnnotationsScreenPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CreateAnnotationSheetErrorPreviewShot() = ScreenshotEnvironment { CreateAnnotationSheetErrorPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CreateAnnotationSheetPreviewShot() = ScreenshotEnvironment { CreateAnnotationSheetPreview() }

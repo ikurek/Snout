@@ -67,7 +67,6 @@ import snout.composeapp.generated.resources.placeholder_nothing_found_retry
 private const val BodyPreviewLines = 3
 private const val LoadingMoreRows = 2
 
-@Suppress("LongParameterList")
 @Composable
 internal fun LogServiceScreen(
     service: String,

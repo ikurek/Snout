@@ -39,6 +39,7 @@ import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.features.settings.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -73,9 +74,6 @@ import snout.composeapp.generated.resources.settings_open_links_title
 import snout.composeapp.generated.resources.settings_project_label
 import snout.composeapp.generated.resources.settings_project_not_selected
 import snout.composeapp.generated.resources.settings_screen_title
-import snout.composeapp.generated.resources.settings_theme_dark
-import snout.composeapp.generated.resources.settings_theme_light
-import snout.composeapp.generated.resources.settings_theme_system
 import snout.composeapp.generated.resources.settings_version_label
 
 @Composable
@@ -141,7 +139,7 @@ private fun SettingsContent(
     onOpenAnalyticsSettings: () -> Unit,
     onLogoutClicked: () -> Unit,
 ) {
-    val themeLabels = ThemeMode.entries.associateWith { it.label() }
+    val themeLabels = ThemeMode.entries.associateWith { stringResource(it.label) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -293,15 +291,6 @@ private fun Chevron() {
         tint = SnoutTheme.colors.onSurfaceVariant,
     )
 }
-
-@Composable
-private fun ThemeMode.label(): String = stringResource(
-    when (this) {
-        ThemeMode.System -> Res.string.settings_theme_system
-        ThemeMode.Light -> Res.string.settings_theme_light
-        ThemeMode.Dark -> Res.string.settings_theme_dark
-    },
-)
 
 @OptIn(TestData::class)
 @PreviewLightDark

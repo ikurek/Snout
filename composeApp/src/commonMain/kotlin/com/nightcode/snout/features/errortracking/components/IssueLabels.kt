@@ -1,49 +1,16 @@
 package com.nightcode.snout.features.errortracking.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.nightcode.snout.designsystem.atoms.StatusPill
-import com.nightcode.snout.designsystem.atoms.StatusTone
-import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.shared.domain.model.errortracking.IssueSeverity
-import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.error_tracking_severity_critical
 import snout.composeapp.generated.resources.error_tracking_severity_high
 import snout.composeapp.generated.resources.error_tracking_severity_low
 import snout.composeapp.generated.resources.error_tracking_severity_medium
 import snout.composeapp.generated.resources.error_tracking_status_active
-import snout.composeapp.generated.resources.error_tracking_status_archived
-import snout.composeapp.generated.resources.error_tracking_status_pending_release
 import snout.composeapp.generated.resources.error_tracking_status_resolved
 import snout.composeapp.generated.resources.error_tracking_status_suppressed
-import snout.composeapp.generated.resources.error_tracking_status_unknown
-
-/** Active issues are the ones that need attention, so they take the attention tone rather than "on" green. */
-@Composable
-internal fun IssueStatusPill(status: IssueStatus) {
-    val (label, tone) = when (status) {
-        IssueStatus.Active -> Res.string.error_tracking_status_active to StatusTone.Attention
-        IssueStatus.Resolved -> Res.string.error_tracking_status_resolved to StatusTone.Active
-        IssueStatus.PendingRelease -> Res.string.error_tracking_status_pending_release to StatusTone.Info
-        IssueStatus.Suppressed -> Res.string.error_tracking_status_suppressed to StatusTone.Neutral
-        IssueStatus.Archived -> Res.string.error_tracking_status_archived to StatusTone.Neutral
-        IssueStatus.Unknown -> Res.string.error_tracking_status_unknown to StatusTone.Neutral
-    }
-    StatusPill(text = stringResource(label), tone = tone)
-}
-
-@Composable
-internal fun IssueSeverityTag(severity: IssueSeverity, modifier: Modifier = Modifier) {
-    val tone = when (severity) {
-        IssueSeverity.High, IssueSeverity.Critical -> StatusTone.Attention
-        IssueSeverity.Low, IssueSeverity.Medium -> StatusTone.Neutral
-    }
-    Tag(text = stringResource(severity.label), tone = tone, modifier = modifier)
-}
 
 internal val IssueSeverity.label: StringResource
     get() = when (this) {

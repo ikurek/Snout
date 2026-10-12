@@ -3,6 +3,7 @@ package com.nightcode.snout.features.onboarding.login
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -94,7 +95,6 @@ internal fun LoginPage(
     )
 }
 
-@Suppress("LongMethod")
 @Composable
 private fun Content(
     contentPadding: PaddingValues,
@@ -113,84 +113,110 @@ private fun Content(
             .padding(horizontal = Spacing.large),
     ) {
         VerticalSpacer(Spacing.large)
-        Text(
-            text = stringResource(Res.string.login_screen_header),
-            style = SnoutTheme.typography.headlineSmall,
-            modifier = Modifier.semantics { heading() },
-        )
-        VerticalSpacer(Spacing.small)
-        Text(
-            stringResource(Res.string.login_screen_description),
-            style = SnoutTheme.typography.bodyMedium,
-            color = SnoutTheme.colors.onSurfaceVariant,
-        )
-
+        Header()
         VerticalSpacer(Spacing.xxLarge)
-        PrimaryTextField(
+        InstanceUrlInput(
             state = instanceUrlTextFieldState,
-            label = stringResource(Res.string.login_screen_instance_url_input_label),
-            modifier = Modifier.fillMaxWidth(),
             error = instanceUrlTextFieldError,
-            placeholder = stringResource(Res.string.login_screen_instance_url_input_placeholder),
             enabled = isConnecting.not(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Done,
-            ),
         )
-        VerticalSpacer(Spacing.small)
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-            // Selected whenever the field holds that cloud's URL, however it got there (chip, typing, a saved session).
-            val instanceUrl = instanceUrlTextFieldState.text.toString()
-            ChoiceChip(
-                text = stringResource(Res.string.login_screen_cloud_us_chip),
-                selected = instanceUrl.isSameUrl(PostHogCloudUsUrl),
-                enabled = isConnecting.not(),
-                onClick = { instanceUrlTextFieldState.setTextAndPlaceCursorAtEnd(PostHogCloudUsUrl) },
-            )
-            ChoiceChip(
-                text = stringResource(Res.string.login_screen_cloud_eu_chip),
-                selected = instanceUrl.isSameUrl(PostHogCloudEuUrl),
-                enabled = isConnecting.not(),
-                onClick = { instanceUrlTextFieldState.setTextAndPlaceCursorAtEnd(PostHogCloudEuUrl) },
-            )
-        }
         VerticalSpacer(Spacing.large)
-
-        PrimaryTextField(
+        PersonalApiKeyInput(
             state = personalApiKeyTextFieldState,
-            label = stringResource(Res.string.login_screen_personal_api_key_input_label),
-            modifier = Modifier.fillMaxWidth(),
             error = personalApiKeyTextFieldError,
-            placeholder = stringResource(Res.string.login_screen_personal_api_key_input_placeholder),
             enabled = isConnecting.not(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done,
-            ),
+            onApiKeysLinkClicked = onApiKeysLinkClicked,
         )
-
-        VerticalSpacer(Spacing.small)
-
-        Text(
-            text = stringResource(Res.string.login_screen_personal_api_key_create_in_web_button),
-            modifier = Modifier.align(Alignment.End).clickable(onClick = onApiKeysLinkClicked),
-            textAlign = TextAlign.End,
-            style = SnoutTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = SnoutTheme.colors.primary,
-        )
-
         VerticalSpacer(Spacing.large)
         KeyScopes()
         VerticalSpacer(Spacing.xxLarge)
     }
+}
+
+@Composable
+private fun Header() {
+    Text(
+        text = stringResource(Res.string.login_screen_header),
+        style = SnoutTheme.typography.headlineSmall,
+        modifier = Modifier.semantics { heading() },
+    )
+    VerticalSpacer(Spacing.small)
+    Text(
+        stringResource(Res.string.login_screen_description),
+        style = SnoutTheme.typography.bodyMedium,
+        color = SnoutTheme.colors.onSurfaceVariant,
+    )
+}
+
+/** The URL field with Cloud US/EU shortcuts beneath it. */
+@Composable
+private fun InstanceUrlInput(state: TextFieldState, error: TextFieldError?, enabled: Boolean) {
+    PrimaryTextField(
+        state = state,
+        label = stringResource(Res.string.login_screen_instance_url_input_label),
+        modifier = Modifier.fillMaxWidth(),
+        error = error,
+        placeholder = stringResource(Res.string.login_screen_instance_url_input_placeholder),
+        enabled = enabled,
+        lineLimits = TextFieldLineLimits.SingleLine,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Uri,
+            imeAction = ImeAction.Done,
+        ),
+    )
+    VerticalSpacer(Spacing.small)
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
+        // Selected whenever the field holds that cloud's URL, however it got there (chip, typing, a saved session).
+        val instanceUrl = state.text.toString()
+        ChoiceChip(
+            text = stringResource(Res.string.login_screen_cloud_us_chip),
+            selected = instanceUrl.isSameUrl(PostHogCloudUsUrl),
+            enabled = enabled,
+            onClick = { state.setTextAndPlaceCursorAtEnd(PostHogCloudUsUrl) },
+        )
+        ChoiceChip(
+            text = stringResource(Res.string.login_screen_cloud_eu_chip),
+            selected = instanceUrl.isSameUrl(PostHogCloudEuUrl),
+            enabled = enabled,
+            onClick = { state.setTextAndPlaceCursorAtEnd(PostHogCloudEuUrl) },
+        )
+    }
+}
+
+/** The key field with a link to where keys are created, right-aligned beneath it. */
+@Composable
+private fun ColumnScope.PersonalApiKeyInput(
+    state: TextFieldState,
+    error: TextFieldError?,
+    enabled: Boolean,
+    onApiKeysLinkClicked: () -> Unit,
+) {
+    PrimaryTextField(
+        state = state,
+        label = stringResource(Res.string.login_screen_personal_api_key_input_label),
+        modifier = Modifier.fillMaxWidth(),
+        error = error,
+        placeholder = stringResource(Res.string.login_screen_personal_api_key_input_placeholder),
+        enabled = enabled,
+        lineLimits = TextFieldLineLimits.SingleLine,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done,
+        ),
+    )
+    VerticalSpacer(Spacing.small)
+    Text(
+        text = stringResource(Res.string.login_screen_personal_api_key_create_in_web_button),
+        modifier = Modifier.align(Alignment.End).clickable(onClick = onApiKeysLinkClicked),
+        textAlign = TextAlign.End,
+        style = SnoutTheme.typography.bodySmall,
+        fontWeight = FontWeight.Medium,
+        color = SnoutTheme.colors.primary,
+    )
 }
 
 /** Ignores case, surrounding spaces and a trailing slash, so "https://eu.posthog.com/" still counts as EU. */

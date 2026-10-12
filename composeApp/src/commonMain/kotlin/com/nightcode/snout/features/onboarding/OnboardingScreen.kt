@@ -282,17 +282,17 @@ private fun OnboardingPreview(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingIntroPreview() = OnboardingPreview(step = OnboardingStep.Intro)
+fun OnboardingScreenIntroPreview() = OnboardingPreview(step = OnboardingStep.Intro)
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingLoginPreview() = OnboardingPreview(step = OnboardingStep.Login)
+fun OnboardingScreenLoginPreview() = OnboardingPreview(step = OnboardingStep.Login)
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingLoginErrorsPreview() = OnboardingPreview(
+fun OnboardingScreenLoginErrorsPreview() = OnboardingPreview(
     step = OnboardingStep.Login,
     instanceUrlValidationError = InstanceUrlValidationError.UrlIsInvalid,
     personalApiKeyValidationError = PersonalApiKeyValidationError.ServerValidationFailed,
@@ -301,17 +301,17 @@ fun OnboardingLoginErrorsPreview() = OnboardingPreview(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingLoginConnectingPreview() = OnboardingPreview(step = OnboardingStep.Login, isConnecting = true)
+fun OnboardingScreenLoginConnectingPreview() = OnboardingPreview(step = OnboardingStep.Login, isConnecting = true)
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingProjectSelectionPreview() = OnboardingPreview(step = OnboardingStep.ProjectSelection)
+fun OnboardingScreenProjectSelectionPreview() = OnboardingPreview(step = OnboardingStep.ProjectSelection)
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingProjectSelectionLoadingPreview() = OnboardingPreview(
+fun OnboardingScreenProjectSelectionLoadingPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
     projectSelectionState = LoadState.Loading,
 )
@@ -319,7 +319,7 @@ fun OnboardingProjectSelectionLoadingPreview() = OnboardingPreview(
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
-fun OnboardingProjectSelectionErrorPreview() = OnboardingPreview(
+fun OnboardingScreenProjectSelectionErrorPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
     projectSelectionState = LoadState.Error(DataError.UnexpectedError),
 )

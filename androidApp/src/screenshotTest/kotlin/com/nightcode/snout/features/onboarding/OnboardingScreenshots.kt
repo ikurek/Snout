@@ -16,41 +16,42 @@ private const val Phone = "spec:width=411dp,height=891dp"
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingIntroPreviewShot() = ScreenshotEnvironment { OnboardingIntroPreview() }
+fun OnboardingScreenIntroPreviewShot() = ScreenshotEnvironment { OnboardingScreenIntroPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingLoginConnectingPreviewShot() = ScreenshotEnvironment { OnboardingLoginConnectingPreview() }
+fun OnboardingScreenLoginConnectingPreviewShot() = ScreenshotEnvironment { OnboardingScreenLoginConnectingPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingLoginErrorsPreviewShot() = ScreenshotEnvironment { OnboardingLoginErrorsPreview() }
+fun OnboardingScreenLoginErrorsPreviewShot() = ScreenshotEnvironment { OnboardingScreenLoginErrorsPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingLoginPreviewShot() = ScreenshotEnvironment { OnboardingLoginPreview() }
+fun OnboardingScreenLoginPreviewShot() = ScreenshotEnvironment { OnboardingScreenLoginPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingProjectSelectionErrorPreviewShot() = ScreenshotEnvironment { OnboardingProjectSelectionErrorPreview() }
+fun OnboardingScreenProjectSelectionErrorPreviewShot() =
+    ScreenshotEnvironment { OnboardingScreenProjectSelectionErrorPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingProjectSelectionLoadingPreviewShot() =
-    ScreenshotEnvironment { OnboardingProjectSelectionLoadingPreview() }
+fun OnboardingScreenProjectSelectionLoadingPreviewShot() =
+    ScreenshotEnvironment { OnboardingScreenProjectSelectionLoadingPreview() }
 
 @PreviewTest
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun OnboardingProjectSelectionPreviewShot() = ScreenshotEnvironment { OnboardingProjectSelectionPreview() }
+fun OnboardingScreenProjectSelectionPreviewShot() = ScreenshotEnvironment { OnboardingScreenProjectSelectionPreview() }

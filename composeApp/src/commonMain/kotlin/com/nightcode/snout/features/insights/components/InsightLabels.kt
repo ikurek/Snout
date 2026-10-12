@@ -3,12 +3,22 @@ package com.nightcode.snout.features.insights.components
 import androidx.compose.runtime.Composable
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.shared.domain.model.insights.InsightDateRange
+import com.nightcode.snout.shared.domain.model.insights.InsightKind
 import com.nightcode.snout.shared.domain.model.insights.InsightPeriod
 import com.nightcode.snout.shared.domain.model.insights.PeriodUnit
 import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.insight_kind_funnels
+import snout.composeapp.generated.resources.insight_kind_lifecycle
+import snout.composeapp.generated.resources.insight_kind_other
+import snout.composeapp.generated.resources.insight_kind_paths
+import snout.composeapp.generated.resources.insight_kind_retention
+import snout.composeapp.generated.resources.insight_kind_sql
+import snout.composeapp.generated.resources.insight_kind_stickiness
+import snout.composeapp.generated.resources.insight_kind_trends
 import snout.composeapp.generated.resources.insight_period_all_time
 import snout.composeapp.generated.resources.insight_period_between
 import snout.composeapp.generated.resources.insight_period_compared
@@ -27,6 +37,18 @@ import snout.composeapp.generated.resources.insight_period_weekly
 import snout.composeapp.generated.resources.insight_period_year_to_date
 import snout.composeapp.generated.resources.insight_period_yearly
 import snout.composeapp.generated.resources.insight_period_yesterday
+
+internal val InsightKind.label: StringResource
+    get() = when (this) {
+        InsightKind.Trends -> Res.string.insight_kind_trends
+        InsightKind.Funnels -> Res.string.insight_kind_funnels
+        InsightKind.Retention -> Res.string.insight_kind_retention
+        InsightKind.Paths -> Res.string.insight_kind_paths
+        InsightKind.Stickiness -> Res.string.insight_kind_stickiness
+        InsightKind.Lifecycle -> Res.string.insight_kind_lifecycle
+        InsightKind.Sql -> Res.string.insight_kind_sql
+        InsightKind.Unknown -> Res.string.insight_kind_other
+    }
 
 /** "Last 14 days · daily · compared to previous period" */
 @Composable

@@ -45,6 +45,8 @@ import com.nightcode.snout.designsystem.molecules.StatCard
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.features.analytics.components.label
+import com.nightcode.snout.features.analytics.components.labelIsCode
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
@@ -77,7 +79,7 @@ internal fun AnalyticsScreen(
     onRefresh: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val rangeLabels = AnalyticsRange.entries.associateWith { it.label() }
+    val rangeLabels = AnalyticsRange.entries.associateWith { stringResource(it.label) }
     Column(modifier = Modifier.fillMaxSize()) {
         SegmentedControl(
             options = AnalyticsRange.entries,
@@ -185,12 +187,12 @@ private fun SkeletonStatCard(modifier: Modifier = Modifier) {
 private fun TrendCard(trends: List<MetricTrend>) {
     var selected by rememberSaveable { mutableStateOf(TrendMetric.Visitors) }
     val trend = trends.firstOrNull { it.metric == selected } ?: trends.first()
-    SectionCard(title = stringResource(Res.string.analytics_trend_title, trend.metric.label())) {
+    SectionCard(title = stringResource(Res.string.analytics_trend_title, stringResource(trend.metric.label))) {
         if (trends.size > 1) {
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
                 trends.forEach { option ->
                     ChoiceChip(
-                        text = option.metric.label(),
+                        text = stringResource(option.metric.label),
                         selected = option.metric == trend.metric,
                         onClick = { selected = option.metric },
                     )
@@ -227,7 +229,7 @@ private fun TrendCard(trends: List<MetricTrend>) {
 
 @Composable
 private fun BreakdownCard(table: BreakdownTable) {
-    SectionCard(title = table.breakdown.label()) {
+    SectionCard(title = stringResource(table.breakdown.label)) {
         RankedBarList(
             labelIsCode = table.breakdown.labelIsCode,
             rows = table.rows.map { row ->

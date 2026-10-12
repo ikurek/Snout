@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.ic_check_24dp
-import snout.composeapp.generated.resources.initial_project_screen_project_count
+import snout.composeapp.generated.resources.project_list_organization_project_count
 import kotlin.uuid.Uuid
 
 internal fun List<Organization>.toProjectListEntries(): List<ProjectListEntry> = flatMap { organization ->
@@ -68,10 +68,10 @@ internal fun LazyListScope.projectEntries(
 
 /** Organization header: logo or initials, name and the number of active projects. Not clickable, no chevron. */
 @Composable
-internal fun OrganizationRow(organization: Organization, divider: Boolean = true) {
+private fun OrganizationRow(organization: Organization, divider: Boolean = true) {
     EntityRow(
         title = organization.name,
-        subtitle = stringResource(Res.string.initial_project_screen_project_count, organization.projects.size),
+        subtitle = stringResource(Res.string.project_list_organization_project_count, organization.projects.size),
         divider = divider,
         leading = { OrganizationLogo(name = organization.name, logoUrl = organization.logoUrl) },
     )
@@ -79,7 +79,7 @@ internal fun OrganizationRow(organization: Organization, divider: Boolean = true
 
 /** Project entry under its organization; indented 12dp so the hierarchy reads at a glance. */
 @Composable
-internal fun ProjectRow(project: Project, onClick: () -> Unit, isSelected: Boolean = false, divider: Boolean = true) {
+private fun ProjectRow(project: Project, onClick: () -> Unit, isSelected: Boolean = false, divider: Boolean = true) {
     EntityRow(
         title = project.name,
         onClick = onClick,

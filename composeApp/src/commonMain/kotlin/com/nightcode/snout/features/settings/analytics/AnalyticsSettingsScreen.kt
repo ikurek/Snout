@@ -24,7 +24,7 @@ import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
-import com.nightcode.snout.features.analytics.label
+import com.nightcode.snout.features.analytics.components.label
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
@@ -84,7 +84,7 @@ private fun AnalyticsSettingsContent(
     onBreakdownToggled: (WebBreakdown, Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
-    val rangeLabels = AnalyticsRange.entries.associateWith { it.label() }
+    val rangeLabels = AnalyticsRange.entries.associateWith { stringResource(it.label) }
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -105,7 +105,7 @@ private fun AnalyticsSettingsContent(
         metrics.forEachIndexed { index, key ->
             val enabled = key in preferences.metrics
             SwitchRow(
-                title = key.label(),
+                title = stringResource(key.label),
                 checked = enabled,
                 // Keep at least one stat card: the last one on cannot be switched off.
                 enabled = enabled.not() || preferences.metrics.size > 1,
@@ -126,7 +126,7 @@ private fun AnalyticsSettingsContent(
         val breakdowns = WebBreakdown.entries
         breakdowns.forEachIndexed { index, breakdown ->
             SwitchRow(
-                title = breakdown.label(),
+                title = stringResource(breakdown.label),
                 checked = breakdown in preferences.breakdowns,
                 divider = index < breakdowns.lastIndex,
                 onCheckedChange = { onBreakdownToggled(breakdown, it) },

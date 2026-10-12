@@ -110,7 +110,7 @@ private fun InsightTileCard(
     SectionCard(
         title = tile.insight.name,
         subtitle = tile.insight.description,
-        trailing = { Tag(text = tile.insight.kind.label()) },
+        trailing = { Tag(text = stringResource(tile.insight.kind.label)) },
         onClick = onClick,
     ) {
         val result = tile.result

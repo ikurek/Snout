@@ -35,18 +35,14 @@ import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.features.annotations.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.annotations.Annotation
-import com.nightcode.snout.shared.domain.model.annotations.AnnotationScope
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.add_annotation_content_description
 import snout.composeapp.generated.resources.annotation_by
-import snout.composeapp.generated.resources.annotation_scope_dashboard
-import snout.composeapp.generated.resources.annotation_scope_insight
-import snout.composeapp.generated.resources.annotation_scope_organization
-import snout.composeapp.generated.resources.annotation_scope_project
 import snout.composeapp.generated.resources.ic_add_24dp
 import kotlin.time.Instant
 
@@ -127,7 +123,7 @@ private fun AnnotationRow(annotation: Annotation, divider: Boolean) {
             )
         },
         meta = {
-            annotation.scope.label()?.let { Tag(text = annotation.targetName ?: it) }
+            annotation.scope.label?.let { Tag(text = annotation.targetName ?: stringResource(it)) }
         },
         supporting = {
             val meta = listOfNotNull(
@@ -137,15 +133,6 @@ private fun AnnotationRow(annotation: Annotation, divider: Boolean) {
             if (meta.isNotEmpty()) MetaText(meta, modifier = Modifier.padding(top = Spacing.xxSmall))
         },
     )
-}
-
-@Composable
-private fun AnnotationScope.label(): String? = when (this) {
-    AnnotationScope.Project -> stringResource(Res.string.annotation_scope_project)
-    AnnotationScope.Organization -> stringResource(Res.string.annotation_scope_organization)
-    AnnotationScope.Dashboard -> stringResource(Res.string.annotation_scope_dashboard)
-    AnnotationScope.Insight -> stringResource(Res.string.annotation_scope_insight)
-    AnnotationScope.Unknown -> null
 }
 
 @OptIn(TestData::class)

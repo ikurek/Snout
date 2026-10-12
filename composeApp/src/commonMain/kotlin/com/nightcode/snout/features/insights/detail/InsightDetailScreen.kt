@@ -125,7 +125,10 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
             }
         }
         SectionLabel(stringResource(Res.string.insight_detail_section))
-        KeyValueRow(label = stringResource(Res.string.insight_detail_kind), value = detail.summary.kind.label())
+        KeyValueRow(
+            label = stringResource(Res.string.insight_detail_kind),
+            value = stringResource(detail.summary.kind.label),
+        )
         detail.summary.lastModifiedAt?.let {
             KeyValueRow(label = stringResource(Res.string.insight_detail_last_modified), value = it.formatDateTime())
         }
