@@ -26,8 +26,8 @@ except calls to the instance you configure.
 - **Settings**: account, instance, selected project, light/dark/system theme, log out. Customise which four
   sections sit in the bottom bar (the rest live under More) and which opens first, and what the Analytics
   tab shows: default range, stat cards, visitors chart and breakdown tables.
-- Every screen has loading, empty, error, permission-denied and rate-limited states, pull to refresh, offline cache,
-  and an "open in PostHog" action.
+- Every screen has loading, empty, error, permission-denied and rate-limited states, pull to refresh and an
+  "open in PostHog" action.
 
 ## Personal API key scopes
 
@@ -45,11 +45,11 @@ iosApp/       iOS entry point (SwiftUI host), ShareExtension, SnoutLink (URL con
 composeApp/   Shared Compose UI: design system, features (route / screen / view model), navigation
 shared/       Kotlin business logic, one module per layer and feature:
   api/<feature>            Ktor API + DTOs
-  domain/model/<feature>   domain types (serializable so they can be cached)
+  domain/model/<feature>   domain types
   domain/data/<feature>    repository interfaces
-  data/<feature>           repository implementations, mappers, cache
+  data/<feature>           repository implementations, mappers
   domain/usecase/<feature> use cases exposed to the UI
-  storage/                 DataStore preferences, SQLDelight (organizations, JSON payload cache) and the
+  storage/                 DataStore preferences, SQLDelight (organizations and projects) and the
                            secure store (KSafe) for the API key and account
   common/                  coroutine dispatchers, `@TestData` opt-in, test utilities
 buildLogic/   Gradle convention plugins
@@ -61,7 +61,17 @@ scripts/      generate_screenshot_tests.py
 Layers, with dependencies pointing inwards:
 
 - `api` talks to PostHog and returns DTOs. `data` implements the `domain/data` repository interfaces: it calls
-  `api`, maps DTOs to `domain/model` types and caches them (`JsonCacheStore` over SQLDelight).
+  `api` and maps DTOs to `domain/model` types. Repositories fetch (`getX(projectId, …): Either<DataError, T>`);
+  mutations return the updated item where PostHog sends it back.
+- API responses are not stored anywhere: a screen fetches what it shows when it needs it and holds it only in its
+  view model's state. Only user data is persisted: organizations and projects in SQLDelight
+  (`OrganizationRepository`), the API key and account in the secure store, and the instance URL, selected
+  project and preferences in DataStore.
+- Repositories with mutations expose `changes: Flow<Unit>` (a `ChangeSignal` in `data/common`), which emits after
+  each successful mutation and carries no data. Lists reload through `Observe<Feature>Reloads` use cases
+  (`ObserveSelectedProjectId.reloads(repository.changes)`): they emit a `ProjectReload` at once for the selected
+  project, again when another project is selected, and again after each change, so a flag toggled on its detail
+  screen shows in the list without the list knowing about it.
 - DTOs sit in each `api` module's `model/` package, every field with a same-line `@SerialName`: responses are
   `XDto`, request bodies `XRequestDto` (`UpdateXRequestDto` for PATCHes), and what query endpoints take inside
   `{"query": …}` (`QueryRequestDto`) is `XQueryDto`, with its constant `kind` as an `@EncodeDefault` property.
@@ -79,8 +89,8 @@ Layers, with dependencies pointing inwards:
   `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
 - `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
   `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
-  project-scoped wrappers (`observeSelectedProjectId.flatMapProject { repository.observeX(it) }`); that is
-  intentional, so the UI never handles project ids.
+  project-scoped wrappers (`repository.getX(getSelectedProjectId())`); that is intentional, so the UI never
+  handles project ids.
 - Repositories and use cases return Arrow `Either<DataError, T>`. Network failures become `DataError` via
   `NetworkError.toDataError()` (`data/common`). The UI words them with `designsystem/DataErrorMessages.kt` and
   shows full-screen failures with the placeholders in `designsystem/organisms/StatePlaceholders.kt`.
@@ -103,8 +113,13 @@ Screens (`composeApp/.../features/<feature>/`, nested packages such as `detail/`
   `XViewModel.kt`; `XUiState.kt` holds the state, the `XSideEffect` type if any, and `TestX…` fixtures for
   previews. `components/` holds the pieces, with labels in `XLabels.kt`
   (`val X.label: StringResource` and similar).
-- One `uiState: StateFlow` per view model. Cache-observing lists use `CachedUiState` (with `RefreshController`);
-  one-shot fetches such as detail screens use `LoadState`.
+- One `uiState: StateFlow` per view model. Lists and other screens that reload use `RefreshableUiState`, built by
+  `loadRefreshable`/`loadRefreshableList` (`common/state/RefreshableUiState.kt`) from the reload signal (plus any
+  filter that changes what is loaded), the pull-to-refresh flow and the fetch: the first load shows skeletons,
+  a reload keeps what was loaded on screen and shows a failure as a banner over it, a newer reload cancels the one
+  running, and loading something else (another project, range or status) starts from the skeleton. One-shot
+  fetches such as detail screens use `LoadState`. Live search and filter results (`searchResults`,
+  `liveResults`) replace the list while active and fall back to it otherwise.
 - Transient results (a failed favorite, navigation after an action) go through a `Channel` exposed as
   `sideEffects`. A failure is kept in the state only when it renders inline next to what failed (in a sheet or
   under a control).
@@ -143,11 +158,11 @@ The UI follows the "Ember" design: warm paper neutrals, a burnt-orange `primary`
   `KeyValueRow`, `StatCard`, `SectionCard` and `TonalCard`, `CodeBlock` and `CodeChip`, `InfoBanner`,
   `InlineErrorBanner`, `SegmentedControl`, `Placeholder`.
 - `organisms/` are screen-level: `PushedScreenScaffold` (back arrow, title, actions and open in PostHog for every
-  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, `CachedStateContainer` and
+  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, `RefreshableStateContainer` and
   `LoadStateContainer` (skeleton loading, placeholders, refresh banner), `AnimatedBottomSheet` and
   `OptionPickerSheet`, `ConfirmationDialog`, and the state placeholders: `ErrorPlaceholder` (worded per
   `DataError`), `NothingFoundPlaceholder`, `NoSearchResultsPlaceholder` and `UnavailablePlaceholder` (a section
-  the instance answers 404 for, via `CachedStateContainer`'s `notFoundContent`).
+  the instance answers 404 for, via `RefreshableStateContainer`'s `notFoundContent`).
 - `charts/` draw insight results with the `extendedColors.chart` palette.
 
 Rules of thumb: lists are `EntityRow`s separated by `Hairline`s with no card per row; detail screens use

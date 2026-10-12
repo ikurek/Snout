@@ -5,7 +5,6 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.nightcode.snout.shared.api.logs.LogsApi
-import com.nightcode.snout.shared.data.common.JsonCacheStore
 import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.logs.mapper.apiLevels
 import com.nightcode.snout.shared.data.logs.mapper.dateFrom
@@ -20,33 +19,20 @@ import com.nightcode.snout.shared.domain.model.logs.LogService
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.model.logs.LogVolume
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.koin.core.annotation.Single
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
-
-/** Enough for a few pages of scrolling; older lines are fetched again if opened. */
-private const val RecentLogLimit = 1_000
 
 /** PostHog stores timestamps to the microsecond; a second either side always contains the line. */
 private val LookupWindow = 1.seconds
 
 @Single(binds = [LogRepository::class])
-internal class LogRepositoryImpl(private val api: LogsApi, private val cache: JsonCacheStore) : LogRepository {
+internal class LogRepositoryImpl(private val api: LogsApi) : LogRepository {
 
-    // Lines are too volatile for the disk cache, but a line opened from the list should not cost another request.
-    private val recentLock = Mutex()
-    private val recent = LinkedHashMap<String, LogEntry>()
-
-    override fun observeServices(projectId: Long, range: LogsRange): Flow<List<LogService>?> =
-        cache.observe(key(projectId, range))
-
-    override suspend fun refreshServices(projectId: Long, range: LogsRange): Either<DataError, Unit> =
+    override suspend fun getServices(projectId: Long, range: LogsRange): Either<DataError, List<LogService>> =
         api.getServices(projectId, range.dateFrom)
             .mapLeft { it.toDataError() }
-            .map { response -> cache.put(key(projectId, range), response.toServices()) }
+            .map { it.toServices() }
 
     override suspend fun getLogs(
         projectId: Long,
@@ -64,7 +50,6 @@ internal class LogRepositoryImpl(private val api: LogsApi, private val cache: Js
         after = cursor,
     ).mapLeft { it.toDataError() }
         .map { it.toPage() }
-        .onRight { remember(it.entries) }
 
     override suspend fun getVolume(
         projectId: Long,
@@ -85,14 +70,6 @@ internal class LogRepositoryImpl(private val api: LogsApi, private val cache: Js
         service: String,
         id: String,
         timestamp: Instant,
-    ): Either<DataError, LogEntry> =
-        recentLock.withLock { recent[id] }?.right() ?: findAround(projectId, service, id, timestamp)
-
-    private suspend fun findAround(
-        projectId: Long,
-        service: String,
-        id: String,
-        timestamp: Instant,
     ): Either<DataError, LogEntry> = api.getLogs(
         projectId = projectId,
         serviceName = service,
@@ -103,14 +80,5 @@ internal class LogRepositoryImpl(private val api: LogsApi, private val cache: Js
         after = null,
     ).mapLeft { it.toDataError() }
         .map { it.toPage().entries }
-        .onRight { remember(it) }
         .flatMap { entries -> entries.firstOrNull { it.id == id }?.right() ?: DataError.NotFound.left() }
-
-    private suspend fun remember(entries: List<LogEntry>) = recentLock.withLock {
-        entries.forEach { recent[it.id] = it }
-        val overflow = recent.size - RecentLogLimit
-        if (overflow > 0) recent.keys.take(overflow).forEach(recent::remove)
-    }
-
-    private fun key(projectId: Long, range: LogsRange) = "log_services:$projectId:${range.dateFrom}"
 }

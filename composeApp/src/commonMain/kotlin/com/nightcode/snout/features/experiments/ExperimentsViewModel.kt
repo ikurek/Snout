@@ -2,42 +2,30 @@ package com.nightcode.snout.features.experiments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.CachedUiState
-import com.nightcode.snout.common.state.RefreshController
-import com.nightcode.snout.common.state.listUiState
+import com.nightcode.snout.common.state.RefreshableUiState
+import com.nightcode.snout.common.state.loadRefreshableList
 import com.nightcode.snout.shared.domain.model.experiments.Experiment
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperiments
-import com.nightcode.snout.shared.domain.usecase.experiments.RefreshExperiments
-import kotlinx.coroutines.flow.SharingStarted
+import com.nightcode.snout.shared.domain.usecase.experiments.GetExperiments
+import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperimentReloads
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 internal class ExperimentsViewModel(
-    private val refreshExperiments: RefreshExperiments,
-    observeExperiments: ObserveExperiments,
-    observeSelectedProjectId: ObserveSelectedProjectId,
+    getExperiments: GetExperiments,
+    observeExperimentReloads: ObserveExperimentReloads,
 ) : ViewModel() {
 
-    private val refresh = RefreshController()
+    private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    val uiState: StateFlow<CachedUiState<List<Experiment>>> = combine(
-        observeExperiments(),
-        refresh.status,
-    ) { items, status ->
-        listUiState(items?.filterNot { it.archived }, status)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CachedUiState.Loading)
+    val uiState: StateFlow<RefreshableUiState<List<Experiment>>> = observeExperimentReloads()
+        .loadRefreshableList(
+            viewModelScope,
+            refreshes,
+        ) { getExperiments().map { items -> items.filterNot { it.archived } } }
 
-    init {
-        viewModelScope.launch {
-            observeSelectedProjectId().collectLatest { refresh.run { refreshExperiments() } }
-        }
+    fun refresh() {
+        refreshes.tryEmit(Unit)
     }
-
-    fun refresh() = viewModelScope.launch { refresh.run { refreshExperiments() } }
 }

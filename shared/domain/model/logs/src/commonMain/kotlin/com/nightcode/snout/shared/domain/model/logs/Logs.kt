@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.logs
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
 
@@ -31,7 +30,6 @@ enum class LogSeverityFilter(val levels: List<LogSeverity>) {
 }
 
 /** A service sending logs, with its volume in the selected range. */
-@Serializable
 data class LogService(
     val name: String,
     val logCount: Long,
@@ -46,7 +44,6 @@ data class LogService(
 )
 
 /** Log counts per coarse level, the way PostHog buckets them: trace counts as debug, fatal as error. */
-@Serializable
 data class LogLevelCounts(val debug: Long, val info: Long, val warn: Long, val error: Long) {
     val total: Long get() = debug + info + warn + error
 }

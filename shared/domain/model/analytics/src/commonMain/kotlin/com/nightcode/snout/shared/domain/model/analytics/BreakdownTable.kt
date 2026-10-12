@@ -1,7 +1,5 @@
 package com.nightcode.snout.shared.domain.model.analytics
 
-import kotlinx.serialization.Serializable
-
 /** Where a breakdown's numbers come from: PostHog's web analytics tables, or a trends query over an event property. */
 enum class BreakdownSource {
     WebStats,
@@ -27,8 +25,6 @@ enum class WebBreakdown(val apiValue: String, val source: BreakdownSource = Brea
     AppVersion("\$app_version", BreakdownSource.EventProperty),
 }
 
-@Serializable
 data class BreakdownRow(val label: String, val visitors: Double, val views: Double?)
 
-@Serializable
 data class BreakdownTable(val breakdown: WebBreakdown, val rows: List<BreakdownRow>)

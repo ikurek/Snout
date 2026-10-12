@@ -1,6 +1,6 @@
 package com.nightcode.snout.features.errortracking
 
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
@@ -16,14 +16,14 @@ internal data class ErrorTrackingUiState(
     val appVersion: String? = null,
     /** Versions to pick from; empty hides the filter, as for web projects that send no app version. */
     val appVersions: List<AppVersion> = emptyList(),
-    val issues: CachedUiState<List<ErrorTrackingIssue>> = CachedUiState.Loading,
+    val issues: RefreshableUiState<List<ErrorTrackingIssue>> = RefreshableUiState.Loading,
 )
 
 @TestData
 @OptIn(TestData::class)
 internal val TestErrorTrackingUiState = ErrorTrackingUiState(
     appVersions = TestAppVersions,
-    issues = CachedUiState.Content(
+    issues = RefreshableUiState.Content(
         listOf(
             TestErrorTrackingIssue,
             TestErrorTrackingIssue.copy(

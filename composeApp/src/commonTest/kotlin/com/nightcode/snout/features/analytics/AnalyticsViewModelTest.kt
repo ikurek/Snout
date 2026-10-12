@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.analytics
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.analytics.AnalyticsRepository
@@ -13,13 +13,14 @@ import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
-import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.GetAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
-import com.nightcode.snout.shared.domain.usecase.analytics.RefreshAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentially
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -37,7 +38,7 @@ class AnalyticsViewModelTest :
 
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<AnalyticsRepository>()
-        val cached = MutableStateFlow(TestAnalyticsSnapshot)
+        val loaded = Either.Right(TestAnalyticsSnapshot)
         val preferences = MutableStateFlow(AnalyticsPreferences.Default)
         val selectedProject = MutableStateFlow(TestSelectedProject)
 
@@ -47,26 +48,24 @@ class AnalyticsViewModelTest :
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
             every { appStateRepository.observeSelectedProject() } returns selectedProject
             every { appStateRepository.observeAnalyticsPreferences() } returns preferences
-            every { repository.observeSnapshot(any(), any()) } returns cached
             return AnalyticsViewModel(
-                refreshAnalytics = RefreshAnalytics(GetSelectedProjectId(appStateRepository), repository),
-                observeAnalytics = ObserveAnalytics(ObserveSelectedProjectId(appStateRepository), repository),
-                observeSelectedProjectId = ObserveSelectedProjectId(appStateRepository),
+                getAnalytics = GetAnalytics(GetSelectedProjectId(appStateRepository), repository),
+                observeAnalyticsReloads = ObserveAnalyticsReloads(ObserveSelectedProjectId(appStateRepository)),
                 observeAnalyticsPreferences = ObserveAnalyticsPreferences(appStateRepository),
             )
         }
 
-        should("refresh default range on start and expose cached snapshot") {
-            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
+        should("load the default range on start") {
+            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.uiState.value.range shouldBe AnalyticsRange.Last7Days
-                viewModel.uiState.value.snapshot shouldBe CachedUiState.Content(
+                viewModel.uiState.value.snapshot shouldBe RefreshableUiState.Content(
                     TestAnalyticsSnapshot,
                     isRefreshing = false,
                 )
                 verifySuspend {
-                    repository.refreshSnapshot(
+                    repository.getSnapshot(
                         TestSelectedProject.projectId,
                         AnalyticsRange.Last7Days,
                         any(),
@@ -75,14 +74,14 @@ class AnalyticsViewModelTest :
             }
         }
 
-        should("refresh again when range changes") {
-            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
+        should("load again when the range changes") {
+            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.onRangeSelected(AnalyticsRange.Last30Days)
                 viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
                 verifySuspend {
-                    repository.refreshSnapshot(
+                    repository.getSnapshot(
                         TestSelectedProject.projectId,
                         AnalyticsRange.Last30Days,
                         any(),
@@ -92,14 +91,14 @@ class AnalyticsViewModelTest :
         }
 
         should("open on the preferred range and hide deselected cards and tables") {
-            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
+            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             preferences.value = AnalyticsPreferences.Default
                 .copy(defaultRange = AnalyticsRange.Last30Days, showTrendChart = false)
                 .withMetric(OverviewMetricKey.BounceRate, enabled = false)
             viewModel.uiState.subscribed {
                 viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
-                val snapshot = viewModel.uiState.value.snapshot.shouldBeInstanceOf<CachedUiState.Content<*>>()
+                val snapshot = viewModel.uiState.value.snapshot.shouldBeInstanceOf<RefreshableUiState.Content<*>>()
                 val data = snapshot.data.shouldBeInstanceOf<AnalyticsSnapshot>()
                 data.overview.map { it.key } shouldBe listOf(
                     OverviewMetricKey.Visitors,
@@ -111,7 +110,7 @@ class AnalyticsViewModelTest :
                 )
                 data.trends shouldBe emptyList()
                 verifySuspend {
-                    repository.refreshSnapshot(
+                    repository.getSnapshot(
                         TestSelectedProject.projectId,
                         AnalyticsRange.Last30Days,
                         any(),
@@ -120,29 +119,41 @@ class AnalyticsViewModelTest :
             }
         }
 
-        should("refresh again when the selected project changes") {
-            everySuspend { repository.refreshSnapshot(any(), any(), any()) } returns Either.Right(Unit)
+        should("load again when the selected project changes") {
+            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 val otherProject = TestSelectedProject.copy(projectId = 42L)
                 everySuspend { appStateRepository.getSelectedProject() } returns otherProject
                 selectedProject.value = otherProject
-                verifySuspend { repository.refreshSnapshot(42L, AnalyticsRange.Last7Days, any()) }
+                verifySuspend { repository.getSnapshot(42L, AnalyticsRange.Last7Days, any()) }
             }
         }
 
-        should("keep cached content and surface refresh error") {
-            everySuspend {
-                repository.refreshSnapshot(
-                    any(),
-                    any(),
-                    any(),
-                )
-            } returns Either.Left(DataError.ConnectionError)
+        should("keep the snapshot and report a failed pull to refresh") {
+            everySuspend { repository.getSnapshot(any(), any(), any()) } sequentially {
+                returns(loaded)
+                returns(Either.Left(DataError.ConnectionError))
+            }
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                val snapshot = viewModel.uiState.value.snapshot.shouldBeInstanceOf<CachedUiState.Content<*>>()
-                snapshot.refreshError shouldBe DataError.ConnectionError
+                viewModel.refresh()
+                viewModel.uiState.value.snapshot shouldBe RefreshableUiState.Content(
+                    TestAnalyticsSnapshot,
+                    isRefreshing = false,
+                    refreshError = DataError.ConnectionError,
+                )
+            }
+        }
+
+        should("load again, keeping the snapshot, when the preferences ask for more") {
+            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
+            val viewModel = subject()
+            viewModel.uiState.subscribed {
+                val wider = AnalyticsPreferences.Default.copy(showTrendChart = false)
+                preferences.value = wider
+                verifySuspend { repository.getSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, wider) }
+                viewModel.uiState.value.snapshot.shouldBeInstanceOf<RefreshableUiState.Content<*>>()
             }
         }
     })

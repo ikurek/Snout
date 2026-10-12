@@ -2,7 +2,7 @@ package com.nightcode.snout.shared.data.insights
 
 import arrow.core.Either
 import com.nightcode.snout.shared.api.insights.InsightsApi
-import com.nightcode.snout.shared.data.common.JsonCacheStore
+import com.nightcode.snout.shared.data.common.ChangeSignal
 import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.insights.mapper.toDetail
 import com.nightcode.snout.shared.data.insights.mapper.toSummary
@@ -11,18 +11,18 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.InsightDetail
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 
 @Single(binds = [InsightRepository::class])
-internal class InsightRepositoryImpl(private val api: InsightsApi, private val cache: JsonCacheStore) :
-    InsightRepository {
+internal class InsightRepositoryImpl(private val api: InsightsApi) : InsightRepository {
 
-    override fun observeInsights(projectId: Long): Flow<List<InsightSummary>?> = cache.observe(listKey(projectId))
+    private val changeSignal = ChangeSignal()
+    override val changes: Flow<Unit> = changeSignal.changes
 
-    override suspend fun refreshInsights(projectId: Long): Either<DataError, Unit> = api.getInsights(projectId)
-        .mapLeft { it.toDataError() }
-        .map { response -> cache.put(listKey(projectId), response.results.map { it.toSummary() }) }
+    override suspend fun getInsights(projectId: Long): Either<DataError, List<InsightSummary>> =
+        api.getInsights(projectId)
+            .mapLeft { it.toDataError() }
+            .map { response -> response.results.map { it.toSummary() } }
 
     override suspend fun searchInsights(projectId: Long, query: String): Either<DataError, List<InsightSummary>> =
         api.getInsights(projectId, search = query)
@@ -44,10 +44,5 @@ internal class InsightRepositoryImpl(private val api: InsightsApi, private val c
     ): Either<DataError, InsightSummary> = api.setFavorite(projectId, insightId, favorited)
         .mapLeft { it.toDataError() }
         .map { it.toSummary() }
-        .onRight { updated ->
-            val cached = cache.observe<List<InsightSummary>>(listKey(projectId)).first() ?: return@onRight
-            cache.put(listKey(projectId), cached.map { if (it.id == updated.id) updated else it })
-        }
-
-    private fun listKey(projectId: Long) = "insights:$projectId"
+        .onRight { changeSignal.emit() }
 }

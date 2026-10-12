@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.domain.usecase.appstate
 
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -10,12 +11,18 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 @OptIn(TestData::class)
@@ -64,6 +71,22 @@ class ObserveSelectedProjectIdTest :
             subject.flatMapProject<String> { error("observed project $it") }.toList().shouldBeEmpty()
             every { repository.observeSelectedProject() } returns emptyFlow()
             subject.flatMapProject<String> { error("observed project $it") }.toList().shouldBeEmpty()
+        }
+
+        should("reload at once, again for the same project after a change and for each newly selected project") {
+            val selected = MutableStateFlow<SelectedProject?>(TestSelectedProject)
+            every { repository.observeSelectedProject() } returns selected
+            val changes = MutableSharedFlow<Unit>()
+            val reloads = MutableStateFlow(emptyList<ProjectReload>())
+            coroutineScope {
+                val collector = launch { subject.reloads(changes).collect { reload -> reloads.update { it + reload } } }
+                changes.subscriptionCount.first { it > 0 }
+                changes.emit(Unit)
+                reloads.first { it.size == 2 }
+                selected.value = otherProject
+                reloads.first { it.size == 3 } shouldBe listOf(ProjectReload(1), ProjectReload(1), ProjectReload(2))
+                collector.cancel()
+            }
         }
     })
 

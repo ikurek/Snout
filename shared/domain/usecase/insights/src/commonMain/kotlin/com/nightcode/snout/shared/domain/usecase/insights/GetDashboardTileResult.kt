@@ -3,14 +3,16 @@ package com.nightcode.snout.shared.domain.usecase.insights
 import arrow.core.Either
 import com.nightcode.snout.shared.domain.data.insights.DashboardRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
+import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import org.koin.core.annotation.Single
 
+/** Computes the result of a dashboard tile PostHog returned without one; null when it has nothing to show. */
 @Single
-class RefreshDashboard(
+class GetDashboardTileResult(
     private val getSelectedProjectId: GetSelectedProjectId,
     private val repository: DashboardRepository,
 ) {
-    suspend operator fun invoke(dashboardId: Long): Either<DataError, Unit> =
-        repository.refreshDashboard(getSelectedProjectId(), dashboardId)
+    suspend operator fun invoke(dashboardId: Long, insightId: Long): Either<DataError, InsightResult?> =
+        repository.getTileResult(getSelectedProjectId(), dashboardId, insightId)
 }

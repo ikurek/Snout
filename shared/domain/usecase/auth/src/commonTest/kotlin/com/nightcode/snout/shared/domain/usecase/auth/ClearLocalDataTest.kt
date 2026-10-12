@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.usecase.auth
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import dev.mokkery.MockMode.autoUnit
@@ -15,16 +14,14 @@ class ClearLocalDataTest :
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
         val userRepository = mock<UserRepository>(autoUnit)
-        val cacheRepository = mock<CacheRepository>(autoUnit)
-        val subject = ClearLocalData(appStateRepository, organizationRepository, userRepository, cacheRepository)
+        val subject = ClearLocalData(appStateRepository, organizationRepository, userRepository)
 
-        should("clear the selected project, organizations, account and cache and nothing else") {
+        should("clear the selected project, organizations and account and nothing else") {
             subject()
             verifySuspend(exhaustiveOrder) {
                 appStateRepository.clearSelectedProject()
                 organizationRepository.clear()
                 userRepository.clear()
-                cacheRepository.clear()
             }
         }
     })

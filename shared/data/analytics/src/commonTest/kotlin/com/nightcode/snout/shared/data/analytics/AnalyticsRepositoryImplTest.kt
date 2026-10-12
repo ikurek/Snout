@@ -2,10 +2,10 @@ package com.nightcode.snout.shared.data.analytics
 
 import com.nightcode.snout.shared.api.analytics.AnalyticsApi
 import com.nightcode.snout.shared.data.testutils.FakePostHog
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.data.testutils.jsonBody
 import com.nightcode.snout.shared.data.testutils.respondError
 import com.nightcode.snout.shared.data.testutils.respondJson
-import com.nightcode.snout.shared.data.testutils.testJsonCacheStore
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
@@ -16,13 +16,10 @@ import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -62,7 +59,7 @@ class AnalyticsRepositoryImplTest :
         val postHog = FakePostHog()
         val repository = AnalyticsRepositoryImpl(
             AnalyticsApi(postHog.client, postHog.authDataStore),
-            testJsonCacheStore(),
+            TestJson,
         )
         val range = AnalyticsRange.Last7Days
 
@@ -77,9 +74,7 @@ class AnalyticsRepositoryImplTest :
                 }
             }
 
-            repository.refreshSnapshot(ProjectId, range, AnalyticsPreferences.Default).shouldBeRight()
-
-            val snapshot = repository.observeSnapshot(ProjectId, range).first().shouldNotBeNull()
+            val snapshot = repository.getSnapshot(ProjectId, range, AnalyticsPreferences.Default).shouldBeRight()
             snapshot.overview.map { it.key } shouldBe listOf(OverviewMetricKey.Visitors)
             snapshot.trends.map { it.metric } shouldBe listOf(TrendMetric.Visitors)
             snapshot.breakdowns.map { it.breakdown } shouldBe WebBreakdown.entries - WebBreakdown.AppVersion
@@ -94,14 +89,12 @@ class AnalyticsRepositoryImplTest :
                 }
             }
 
-            repository.refreshSnapshot(ProjectId, range, AnalyticsPreferences.Default).shouldBeRight()
-
-            val snapshot = repository.observeSnapshot(ProjectId, range).first().shouldNotBeNull()
+            val snapshot = repository.getSnapshot(ProjectId, range, AnalyticsPreferences.Default).shouldBeRight()
             snapshot.overview.map { it.key } shouldBe listOf(OverviewMetricKey.Visitors)
             snapshot.trends shouldBe emptyList()
         }
 
-        should("fail without caching anything when the overview fails") {
+        should("fail when the overview fails") {
             postHog.onRequest { request ->
                 when (request.analyticsQuery()) {
                     Overview -> respondError(HttpStatusCode.Forbidden)
@@ -111,9 +104,7 @@ class AnalyticsRepositoryImplTest :
                 }
             }
 
-            repository.refreshSnapshot(ProjectId, range, AnalyticsPreferences.Default) shouldBeLeft
-                DataError.Forbidden
-            repository.observeSnapshot(ProjectId, range).first().shouldBeNull()
+            repository.getSnapshot(ProjectId, range, AnalyticsPreferences.Default) shouldBeLeft DataError.Forbidden
         }
 
         should("request only what the preferences ask for") {
@@ -129,7 +120,7 @@ class AnalyticsRepositoryImplTest :
                 breakdowns = setOf(WebBreakdown.Page),
             )
 
-            repository.refreshSnapshot(ProjectId, range, preferences).shouldBeRight()
+            repository.getSnapshot(ProjectId, range, preferences).shouldBeRight()
 
             requested.value shouldContainExactlyInAnyOrder listOf(Overview, StatsTable)
         }

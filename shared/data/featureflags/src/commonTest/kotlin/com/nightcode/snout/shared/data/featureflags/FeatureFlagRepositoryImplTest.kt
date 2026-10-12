@@ -2,17 +2,16 @@ package com.nightcode.snout.shared.data.featureflags
 
 import com.nightcode.snout.shared.api.featureflags.FeatureFlagsApi
 import com.nightcode.snout.shared.data.testutils.FakePostHog
+import com.nightcode.snout.shared.data.testutils.emitsDuring
 import com.nightcode.snout.shared.data.testutils.respondError
 import com.nightcode.snout.shared.data.testutils.respondJson
-import com.nightcode.snout.shared.data.testutils.testJsonCacheStore
+import com.nightcode.snout.shared.domain.model.common.DataError
+import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.flow.first
 
 private const val ProjectId = 1L
 
@@ -22,10 +21,7 @@ private fun flagJson(id: Long, active: Boolean, deleted: Boolean = false) =
 class FeatureFlagRepositoryImplTest :
     ShouldSpec({
         val postHog = FakePostHog()
-        val repository = FeatureFlagRepositoryImpl(
-            FeatureFlagsApi(postHog.client, postHog.authDataStore),
-            testJsonCacheStore(),
-        )
+        val repository = FeatureFlagRepositoryImpl(FeatureFlagsApi(postHog.client, postHog.authDataStore))
         postHog.onRequest { request ->
             when (request.method) {
                 HttpMethod.Get -> respondJson(
@@ -38,25 +34,21 @@ class FeatureFlagRepositoryImplTest :
             }
         }
 
-        suspend fun cachedFlags() = repository.observeFeatureFlags(ProjectId).first()
-
-        should("leave deleted flags out of the cached list") {
-            repository.refreshFeatureFlags(ProjectId).shouldBeRight()
-
-            cachedFlags().shouldNotBeNull().map { it.id } shouldBe listOf(1L, 2L)
+        should("leave deleted flags out of the list") {
+            repository.getFeatureFlags(ProjectId).shouldBeRight().map { it.id } shouldBe listOf(1L, 2L)
         }
 
-        should("replace the toggled flag in the cached list") {
-            repository.refreshFeatureFlags(ProjectId).shouldBeRight()
-
-            repository.setActive(ProjectId, flagId = 2, active = false).shouldBeRight().active shouldBe false
-
-            cachedFlags().shouldNotBeNull().map { it.id to it.active } shouldBe listOf(1L to true, 2L to false)
+        should("return the toggled flag and signal a change") {
+            repository.changes.emitsDuring {
+                repository.setActive(ProjectId, flagId = 2, active = false).shouldBeRight().active shouldBe false
+            } shouldBe true
         }
 
-        should("not create a cached list when none was loaded") {
-            repository.setActive(ProjectId, flagId = 2, active = false).shouldBeRight()
+        should("not signal a change when the toggle fails") {
+            postHog.onRequest { respondError(HttpStatusCode.Forbidden) }
 
-            cachedFlags().shouldBeNull()
+            repository.changes.emitsDuring {
+                repository.setActive(ProjectId, flagId = 2, active = false) shouldBeLeft DataError.Forbidden
+            } shouldBe false
         }
     })

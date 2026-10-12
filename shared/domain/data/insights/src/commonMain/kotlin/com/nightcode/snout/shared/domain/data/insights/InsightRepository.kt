@@ -7,8 +7,10 @@ import com.nightcode.snout.shared.domain.model.insights.InsightSummary
 import kotlinx.coroutines.flow.Flow
 
 interface InsightRepository {
-    fun observeInsights(projectId: Long): Flow<List<InsightSummary>?>
-    suspend fun refreshInsights(projectId: Long): Either<DataError, Unit>
+    /** Emits after each successful change made through this app, so lists showing the old state load again. */
+    val changes: Flow<Unit>
+
+    suspend fun getInsights(projectId: Long): Either<DataError, List<InsightSummary>>
     suspend fun searchInsights(projectId: Long, query: String): Either<DataError, List<InsightSummary>>
     suspend fun getInsight(projectId: Long, insightId: Long): Either<DataError, InsightDetail>
 

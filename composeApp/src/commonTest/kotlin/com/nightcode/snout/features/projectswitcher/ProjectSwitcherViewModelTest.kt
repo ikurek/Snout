@@ -56,7 +56,7 @@ class ProjectSwitcherViewModelTest :
             }
         }
 
-        should("keep showing the cached organizations when the refresh fails") {
+        should("keep showing the stored organizations when the refresh fails") {
             val viewModel = subject(refreshResult = Either.Left(DataError.ConnectionError))
             viewModel.uiState.subscribed {
                 viewModel.uiState.value shouldBe TestProjectSwitcherUiStateLoaded

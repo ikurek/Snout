@@ -11,11 +11,11 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.experiments.components.ExperimentStatusPill
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -30,12 +30,12 @@ import snout.composeapp.generated.resources.experiment_started
 /** Section body only; the home shell or [com.nightcode.snout.features.home.HomeSectionRoute] supplies the chrome. */
 @Composable
 internal fun ExperimentsScreen(
-    state: CachedUiState<List<Experiment>>,
+    state: RefreshableUiState<List<Experiment>>,
     onRefresh: () -> Unit,
     onOpenExperiment: (experimentId: Long) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { experiments ->
+    RefreshableStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { experiments ->
         LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
             itemsIndexed(experiments, key = { _, experiment -> experiment.id }) { index, experiment ->
                 ExperimentRow(
@@ -70,7 +70,7 @@ private fun ExperimentRow(experiment: Experiment, divider: Boolean, onClick: () 
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ExperimentsScreenPreview() = ExperimentsScreen(
-    state = CachedUiState.Content(
+    state = RefreshableUiState.Content(
         listOf(
             TestExperiment,
             TestExperiment.copy(id = 4, name = "Onboarding copy", status = ExperimentStatus.Draft, startDate = null),
@@ -85,7 +85,7 @@ fun ExperimentsScreenPreview() = ExperimentsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ExperimentsScreenEmptyPreview() = ExperimentsScreen(
-    state = CachedUiState.Empty(isRefreshing = false),
+    state = RefreshableUiState.Empty(isRefreshing = false),
     onRefresh = {},
     onOpenExperiment = {},
 )

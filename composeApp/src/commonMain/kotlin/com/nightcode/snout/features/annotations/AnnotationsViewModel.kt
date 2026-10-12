@@ -2,18 +2,16 @@ package com.nightcode.snout.features.annotations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.RefreshController
-import com.nightcode.snout.common.state.listUiState
+import com.nightcode.snout.common.state.loadRefreshableList
 import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotation
-import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotations
-import com.nightcode.snout.shared.domain.usecase.annotations.RefreshAnnotations
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
+import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -23,32 +21,27 @@ import kotlin.time.Instant
 
 @KoinViewModel
 internal class AnnotationsViewModel(
-    private val refreshAnnotations: RefreshAnnotations,
     private val createAnnotation: CreateAnnotation,
-    observeAnnotations: ObserveAnnotations,
-    observeSelectedProjectId: ObserveSelectedProjectId,
+    getAnnotations: GetAnnotations,
+    observeAnnotationReloads: ObserveAnnotationReloads,
 ) : ViewModel() {
 
-    private val refresh = RefreshController()
+    private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val create = MutableStateFlow<CreateStatus>(CreateStatus.Idle)
     private val _sideEffects = Channel<AnnotationsSideEffect>()
     val sideEffects: Flow<AnnotationsSideEffect> = _sideEffects.receiveAsFlow()
 
+    // A created annotation reloads the list through the annotation reloads.
     val uiState: StateFlow<AnnotationsUiState> = combine(
-        observeAnnotations(),
-        refresh.status,
+        observeAnnotationReloads().loadRefreshableList(viewModelScope, refreshes) { getAnnotations() },
         create,
-    ) { items, status, create ->
-        AnnotationsUiState(annotations = listUiState(items, status), create = create)
+    ) { annotations, create ->
+        AnnotationsUiState(annotations = annotations, create = create)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnnotationsUiState())
 
-    init {
-        viewModelScope.launch {
-            observeSelectedProjectId().collectLatest { refresh.run { refreshAnnotations() } }
-        }
+    fun refresh() {
+        refreshes.tryEmit(Unit)
     }
-
-    fun refresh() = viewModelScope.launch { refresh.run { refreshAnnotations() } }
 
     fun create(content: String, dateMarker: Instant) = viewModelScope.launch {
         if (content.isBlank()) return@launch

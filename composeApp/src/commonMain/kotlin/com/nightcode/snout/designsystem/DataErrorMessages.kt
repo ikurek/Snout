@@ -9,7 +9,7 @@ import snout.composeapp.generated.resources.refresh_failed_offline
 import snout.composeapp.generated.resources.refresh_failed_payment_required
 import snout.composeapp.generated.resources.refresh_failed_rate_limited
 
-/** Banner text for a refresh that failed while cached content stays on screen. */
+/** Banner text for a reload that failed while what was loaded before stays on screen. */
 internal fun DataError.refreshFailedMessage(): StringResource = when (this) {
     DataError.Unauthorized, DataError.Forbidden -> Res.string.refresh_failed_forbidden
     DataError.PaymentRequired -> Res.string.refresh_failed_payment_required

@@ -1,10 +1,8 @@
 package com.nightcode.snout.shared.domain.model.insights
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
-@Serializable
 data class DashboardSummary(
     val id: Long,
     val name: String,
@@ -14,18 +12,14 @@ data class DashboardSummary(
     val tags: List<String>,
 )
 
-@Serializable
 data class Dashboard(val id: Long, val name: String, val description: String?, val tiles: List<DashboardTile>)
 
-@Serializable
 sealed interface DashboardTile {
     val id: Long
 
-    @Serializable
     data class InsightTile(override val id: Long, val insight: InsightSummary, val result: InsightResult?) :
         DashboardTile
 
-    @Serializable
     data class TextTile(override val id: Long, val body: String) : DashboardTile
 }
 

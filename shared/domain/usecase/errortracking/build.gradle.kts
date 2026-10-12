@@ -12,6 +12,6 @@ kotlin {
         api(projects.shared.domain.model.errortracking)
         implementation(projects.shared.domain.data.errortracking)
         implementation(projects.shared.domain.data.appstate)
-        implementation(projects.shared.domain.usecase.appstate)
+        api(projects.shared.domain.usecase.appstate)
     }
 }

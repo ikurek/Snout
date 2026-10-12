@@ -1,9 +1,7 @@
 package com.nightcode.snout.shared.domain.model.analytics
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class AnalyticsSnapshot(
     val range: AnalyticsRange,
     val overview: List<OverviewMetric>,

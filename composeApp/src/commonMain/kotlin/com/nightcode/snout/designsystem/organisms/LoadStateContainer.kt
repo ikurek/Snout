@@ -11,7 +11,7 @@ private const val LoadingRowCount = 4
 
 /**
  * Renders a one-shot fetch: skeleton rows while loading, an error placeholder with retry, then [content] filling
- * the container. The loading and error states match [CachedStateContainer]'s.
+ * the container. The loading and error states match [RefreshableStateContainer]'s.
  */
 @Composable
 internal fun <T> LoadStateContainer(

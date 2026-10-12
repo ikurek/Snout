@@ -2,8 +2,8 @@ package com.nightcode.snout.features.logs.service
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.CachedUiState
 import com.nightcode.snout.common.state.RefreshStatus
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.common.state.listUiState
 import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
@@ -77,7 +77,7 @@ internal class LogServiceViewModel(
         val state = _uiState.value
         val after = cursor
         val filter = lastFilter
-        val loaded = (state.logs as? CachedUiState.Content)?.data ?: return
+        val loaded = (state.logs as? RefreshableUiState.Content)?.data ?: return
         val isLoading = state.loadMore == LoadMoreStatus.Loading || loadMoreJob?.isActive == true
         if (after == null || filter == null || isLoading) return
         loadMoreJob = viewModelScope.launch {
@@ -89,7 +89,7 @@ internal class LogServiceViewModel(
                     cursor = page.nextCursor
                     _uiState.update {
                         it.copy(
-                            logs = CachedUiState.Content(loaded + page.entries, isRefreshing = false),
+                            logs = RefreshableUiState.Content(loaded + page.entries, isRefreshing = false),
                             loadMore = page.nextCursor.toLoadMoreStatus(),
                         )
                     }
@@ -107,9 +107,9 @@ internal class LogServiceViewModel(
         lastFilter = filter
         _uiState.update { state ->
             val current = state.logs
-            val keep = isRefresh && current is CachedUiState.Content
+            val keep = isRefresh && current is RefreshableUiState.Content
             state.copy(
-                logs = if (keep) current.copy(isRefreshing = true) else CachedUiState.Loading,
+                logs = if (keep) current.copy(isRefreshing = true) else RefreshableUiState.Loading,
                 volume = state.volume.takeIf { isRefresh },
             )
         }
@@ -119,7 +119,7 @@ internal class LogServiceViewModel(
             _uiState.update { it.copy(volume = volume?.takeUnless { v -> v.isEmpty }) }
         }
         getLogs(navKey.service, navKey.range, filter.severity, filter.query).fold(
-            ifLeft = { error -> _uiState.update { it.copy(logs = CachedUiState.Error(error)) } },
+            ifLeft = { error -> _uiState.update { it.copy(logs = RefreshableUiState.Error(error)) } },
             ifRight = { page ->
                 cursor = page.nextCursor
                 _uiState.update {

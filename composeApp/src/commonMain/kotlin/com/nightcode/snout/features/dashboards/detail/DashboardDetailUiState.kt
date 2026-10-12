@@ -1,6 +1,6 @@
 package com.nightcode.snout.features.dashboards.detail
 
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.Dashboard
@@ -13,7 +13,7 @@ internal sealed interface TileStatus {
 }
 
 internal data class DashboardDetailUiState(
-    val dashboard: CachedUiState<Dashboard> = CachedUiState.Loading,
+    val dashboard: RefreshableUiState<Dashboard> = RefreshableUiState.Loading,
     /** Status of tiles whose result is still being computed, keyed by insight id. */
     val tiles: Map<Long, TileStatus> = emptyMap(),
 )
@@ -21,5 +21,5 @@ internal data class DashboardDetailUiState(
 @TestData
 @OptIn(TestData::class)
 internal val TestDashboardDetailUiState = DashboardDetailUiState(
-    dashboard = CachedUiState.Content(TestDashboard, isRefreshing = false),
+    dashboard = RefreshableUiState.Content(TestDashboard, isRefreshing = false),
 )

@@ -22,29 +22,29 @@ class LiveResultsTest :
 
         beforeTest { searched.clear() }
 
-        should("fall back to the cache while the query is blank") {
+        should("fall back to the base list while the query is blank") {
             flowOf(" ").searchResults(Duration.ZERO, search).toList() shouldBe listOf(null)
             searched shouldBe emptyList()
         }
 
         should("load results for a typed query") {
             flowOf("dark").searchResults(Duration.ZERO, search).toList() shouldBe listOf(
-                CachedUiState.Loading,
-                CachedUiState.Content(listOf("dark-1", "dark-2"), isRefreshing = false),
+                RefreshableUiState.Loading,
+                RefreshableUiState.Content(listOf("dark-1", "dark-2"), isRefreshing = false),
             )
         }
 
         should("report empty results") {
             flowOf("none").searchResults(Duration.ZERO, search).toList() shouldBe listOf(
-                CachedUiState.Loading,
-                CachedUiState.Empty(isRefreshing = false),
+                RefreshableUiState.Loading,
+                RefreshableUiState.Empty(isRefreshing = false),
             )
         }
 
         should("report a failed search") {
             flowOf("fail").searchResults(Duration.ZERO, search).toList() shouldBe listOf(
-                CachedUiState.Loading,
-                CachedUiState.Error(DataError.RateLimited),
+                RefreshableUiState.Loading,
+                RefreshableUiState.Error(DataError.RateLimited),
             )
         }
 
@@ -57,8 +57,8 @@ class LiveResultsTest :
             val fetch: suspend (Int) -> Either<DataError, List<Int>> = { Either.Right(listOf(it)) }
             flowOf(2).liveResults(isLive = { it != 2 }, fetch = fetch).toList() shouldBe listOf(null)
             flowOf(3).liveResults(isLive = { it != 2 }, fetch = fetch).toList() shouldBe listOf(
-                CachedUiState.Loading,
-                CachedUiState.Content(listOf(3), isRefreshing = false),
+                RefreshableUiState.Loading,
+                RefreshableUiState.Content(listOf(3), isRefreshing = false),
             )
         }
     })

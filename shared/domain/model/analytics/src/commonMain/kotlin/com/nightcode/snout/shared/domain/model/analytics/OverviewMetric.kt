@@ -1,7 +1,5 @@
 package com.nightcode.snout.shared.domain.model.analytics
 
-import kotlinx.serialization.Serializable
-
 enum class OverviewMetricKey {
     Visitors,
     Views,
@@ -19,7 +17,6 @@ enum class OverviewMetricKind {
     Percentage,
 }
 
-@Serializable
 data class OverviewMetric(
     val key: OverviewMetricKey,
     val label: String,

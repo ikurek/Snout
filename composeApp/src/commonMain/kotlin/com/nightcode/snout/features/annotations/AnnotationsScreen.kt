@@ -28,11 +28,11 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.formatShortDate
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.annotations.components.label
@@ -68,7 +68,7 @@ internal fun AnnotationsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = { AddAnnotationButton(onClick = onAddClicked) },
     ) { innerPadding ->
-        CachedStateContainer(
+        RefreshableStateContainer(
             state = state.annotations,
             onRefresh = onRefresh,
             modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
@@ -153,7 +153,7 @@ fun AnnotationsScreenPreview() = AnnotationsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
-    state = AnnotationsUiState(annotations = CachedUiState.Empty(isRefreshing = false)),
+    state = AnnotationsUiState(annotations = RefreshableUiState.Empty(isRefreshing = false)),
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
     onRefresh = {},

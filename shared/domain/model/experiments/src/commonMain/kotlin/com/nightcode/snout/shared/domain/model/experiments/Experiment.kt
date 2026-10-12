@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.experiments
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 enum class ExperimentStatus {
@@ -13,10 +12,8 @@ enum class ExperimentStatus {
     Unknown,
 }
 
-@Serializable
 data class ExperimentVariant(val key: String, val name: String?, val rolloutPercentage: Int)
 
-@Serializable
 data class Experiment(
     val id: Long,
     val name: String,

@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.insights
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 enum class InsightKind {
@@ -36,36 +35,26 @@ enum class PeriodUnit {
 }
 
 /** The dates an insight covers, as PostHog's date filter describes them. */
-@Serializable
 sealed interface InsightDateRange {
-    @Serializable
     data class Last(val amount: Int, val unit: PeriodUnit) : InsightDateRange
 
-    @Serializable
     data object Today : InsightDateRange
 
-    @Serializable
     data object Yesterday : InsightDateRange
 
-    @Serializable
     data object MonthToDate : InsightDateRange
 
-    @Serializable
     data object YearToDate : InsightDateRange
 
-    @Serializable
     data object AllTime : InsightDateRange
 
     /** ISO dates; [to] is null for "until now". */
-    @Serializable
     data class Between(val from: String, val to: String?) : InsightDateRange
 }
 
 /** What the numbers cover: the date range, how points are bucketed and whether a previous period is drawn. */
-@Serializable
 data class InsightPeriod(val range: InsightDateRange, val interval: PeriodUnit? = null, val compared: Boolean = false)
 
-@Serializable
 data class InsightSummary(
     val id: Long,
     val shortId: String,

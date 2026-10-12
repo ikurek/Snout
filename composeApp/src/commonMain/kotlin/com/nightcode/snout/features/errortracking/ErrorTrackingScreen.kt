@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.charts.Sparkline
 import com.nightcode.snout.designsystem.molecules.EntityRow
@@ -30,8 +30,8 @@ import com.nightcode.snout.designsystem.molecules.FilterMenuChip
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.organisms.UnavailablePlaceholder
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
@@ -92,7 +92,7 @@ internal fun ErrorTrackingScreen(
             appVersions = state.appVersions,
             onAppVersionChanged = onAppVersionChanged,
         )
-        CachedStateContainer(
+        RefreshableStateContainer(
             state = state.issues,
             onRefresh = onRefresh,
             notFoundContent = {
@@ -261,7 +261,7 @@ fun ErrorTrackingScreenPreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = CachedUiState.Empty(isRefreshing = false)),
+    state = ErrorTrackingUiState(issues = RefreshableUiState.Empty(isRefreshing = false)),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -273,7 +273,7 @@ fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = CachedUiState.Error(DataError.NotFound)),
+    state = ErrorTrackingUiState(issues = RefreshableUiState.Error(DataError.NotFound)),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -285,7 +285,7 @@ fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenForbiddenPreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = CachedUiState.Error(DataError.Forbidden)),
+    state = ErrorTrackingUiState(issues = RefreshableUiState.Error(DataError.Forbidden)),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -301,7 +301,7 @@ fun ErrorTrackingScreenVersionEmptyPreview() = ErrorTrackingScreen(
     state = ErrorTrackingUiState(
         appVersion = "2.13.2",
         appVersions = TestAppVersions,
-        issues = CachedUiState.Empty(isRefreshing = false),
+        issues = RefreshableUiState.Empty(isRefreshing = false),
     ),
     onQueryChanged = {},
     onStatusChanged = {},

@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.domain.data.analytics.AnalyticsRepository
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import dev.mokkery.answering.returns
@@ -16,21 +17,21 @@ import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
 
 @OptIn(TestData::class)
-class RefreshAnalyticsTest :
+class GetAnalyticsTest :
     ShouldSpec({
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<AnalyticsRepository>()
-        val subject = RefreshAnalytics(GetSelectedProjectId(appStateRepository), repository)
+        val subject = GetAnalytics(GetSelectedProjectId(appStateRepository), repository)
 
-        should("refresh snapshot of the selected project") {
+        should("get the snapshot of the selected project") {
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
             val preferences = AnalyticsPreferences.Default
             everySuspend {
-                repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
-            } returns Either.Right(Unit)
-            subject(AnalyticsRange.Last7Days, preferences).shouldBeRight()
+                repository.getSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
+            } returns Either.Right(TestAnalyticsSnapshot)
+            subject(AnalyticsRange.Last7Days, preferences) shouldBeRight TestAnalyticsSnapshot
             verifySuspend {
-                repository.refreshSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
+                repository.getSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, preferences)
             }
         }
     })

@@ -50,7 +50,7 @@ internal class ProjectSwitcherViewModel(
     )
 
     init {
-        // The cached list shows meanwhile; a failed refresh just leaves it.
+        // The stored list shows meanwhile; a failed refresh just leaves it.
         viewModelScope.launch { refreshOrganizations() }
     }
 

@@ -26,14 +26,14 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.components.label
@@ -69,7 +69,7 @@ internal fun InsightsScreen(
                 placeholder = stringResource(Res.string.insights_search_placeholder),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
-            CachedStateContainer(
+            RefreshableStateContainer(
                 state = state.insights,
                 onRefresh = onRefresh,
                 emptyContent = {
@@ -156,7 +156,7 @@ fun InsightsScreenPreview() = InsightsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightsScreenEmptyPreview() = InsightsScreen(
-    state = InsightsUiState(query = "retention", insights = CachedUiState.Empty(isRefreshing = false)),
+    state = InsightsUiState(query = "retention", insights = RefreshableUiState.Empty(isRefreshing = false)),
     snackbarHostState = remember { SnackbarHostState() },
     onQueryChanged = {},
     onRefresh = {},

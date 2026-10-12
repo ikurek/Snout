@@ -1,7 +1,7 @@
 package com.nightcode.snout.features.logs
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -13,11 +13,12 @@ import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import com.nightcode.snout.shared.domain.model.logs.TestLogServices
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.logs.ObserveLogServices
-import com.nightcode.snout.shared.domain.usecase.logs.RefreshLogServices
+import com.nightcode.snout.shared.domain.usecase.logs.GetLogServices
+import com.nightcode.snout.shared.domain.usecase.logs.ObserveLogServiceReloads
 import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentially
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -26,7 +27,6 @@ import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 
 @OptIn(TestData::class)
 class LogsViewModelTest :
@@ -35,40 +35,45 @@ class LogsViewModelTest :
 
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<LogRepository>()
-
         val selected = MutableStateFlow<SelectedProject?>(TestSelectedProject)
 
-        fun subject(refreshResult: Either<DataError, Unit> = Either.Right(Unit)): LogsViewModel {
+        fun subject(): LogsViewModel {
+            selected.value = TestSelectedProject
             everySuspend { appStateRepository.getSelectedProject() } calls { selected.value }
             every { appStateRepository.observeSelectedProject() } returns selected
-            every { repository.observeServices(any(), LogsRange.Last24Hours) } returns flowOf(TestLogServices)
-            every { repository.observeServices(any(), LogsRange.LastHour) } returns flowOf(TestLogServices.take(1))
-            everySuspend { repository.refreshServices(any(), any()) } returns refreshResult
+            everySuspend { repository.getServices(any(), LogsRange.LastHour) } returns
+                Either.Right(TestLogServices.take(1))
             return LogsViewModel(
-                refreshServices = RefreshLogServices(GetSelectedProjectId(appStateRepository), repository),
-                observeServices = ObserveLogServices(ObserveSelectedProjectId(appStateRepository), repository),
-                observeSelectedProjectId = ObserveSelectedProjectId(appStateRepository),
+                getServices = GetLogServices(GetSelectedProjectId(appStateRepository), repository),
+                observeLogServiceReloads = ObserveLogServiceReloads(ObserveSelectedProjectId(appStateRepository)),
             )
         }
 
-        should("show the last day's services and switch ranges") {
+        should("load the last day's services on start and switch ranges") {
+            everySuspend { repository.getServices(any(), LogsRange.Last24Hours) } returns Either.Right(TestLogServices)
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value.services shouldBe CachedUiState.Content(TestLogServices, isRefreshing = false)
-                viewModel.onRangeSelected(LogsRange.LastHour)
-                viewModel.uiState.value.range shouldBe LogsRange.LastHour
-                viewModel.uiState.value.services shouldBe CachedUiState.Content(
-                    TestLogServices.take(1),
+                viewModel.uiState.value.services shouldBe RefreshableUiState.Content(
+                    TestLogServices,
                     isRefreshing = false,
                 )
-                verifySuspend { repository.refreshServices(TestSelectedProject.projectId, LogsRange.LastHour) }
+                viewModel.onRangeSelected(LogsRange.LastHour)
+                viewModel.uiState.value.range shouldBe LogsRange.LastHour
+                viewModel.uiState.value.services shouldBe
+                    RefreshableUiState.Content(TestLogServices.take(1), isRefreshing = false)
+                verifySuspend { repository.getServices(TestSelectedProject.projectId, LogsRange.LastHour) }
             }
         }
 
-        should("keep the cached services and report a failed refresh") {
-            val viewModel = subject(refreshResult = Either.Left(DataError.ConnectionError))
+        should("keep the services and report a failed pull to refresh") {
+            everySuspend { repository.getServices(any(), LogsRange.Last24Hours) } sequentially {
+                returns(Either.Right(TestLogServices))
+                returns(Either.Left(DataError.ConnectionError))
+            }
+            val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value.services shouldBe CachedUiState.Content(
+                viewModel.refresh()
+                viewModel.uiState.value.services shouldBe RefreshableUiState.Content(
                     TestLogServices,
                     isRefreshing = false,
                     refreshError = DataError.ConnectionError,
@@ -76,12 +81,13 @@ class LogsViewModelTest :
             }
         }
 
-        should("refresh the selected range again when another project is selected") {
+        should("load the selected range again when another project is selected") {
+            everySuspend { repository.getServices(any(), LogsRange.Last24Hours) } returns Either.Right(TestLogServices)
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.onRangeSelected(LogsRange.LastHour)
                 selected.value = TestSelectedProject.copy(projectId = 2)
-                verifySuspend { repository.refreshServices(2, LogsRange.LastHour) }
+                verifySuspend { repository.getServices(2, LogsRange.LastHour) }
             }
         }
     })

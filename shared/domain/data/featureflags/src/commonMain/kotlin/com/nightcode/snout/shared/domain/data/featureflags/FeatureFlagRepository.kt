@@ -6,8 +6,10 @@ import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
 import kotlinx.coroutines.flow.Flow
 
 interface FeatureFlagRepository {
-    fun observeFeatureFlags(projectId: Long): Flow<List<FeatureFlag>?>
-    suspend fun refreshFeatureFlags(projectId: Long): Either<DataError, Unit>
+    /** Emits after each successful change made through this app, so lists showing the old state load again. */
+    val changes: Flow<Unit>
+
+    suspend fun getFeatureFlags(projectId: Long): Either<DataError, List<FeatureFlag>>
     suspend fun searchFeatureFlags(projectId: Long, query: String): Either<DataError, List<FeatureFlag>>
     suspend fun getFeatureFlag(projectId: Long, flagId: Long): Either<DataError, FeatureFlag>
     suspend fun setActive(projectId: Long, flagId: Long, active: Boolean): Either<DataError, FeatureFlag>

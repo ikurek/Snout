@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatPercent
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.StatusTone
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.charts.BarSegment
@@ -25,7 +25,7 @@ import com.nightcode.snout.designsystem.molecules.FilterMenuChip
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogsUnavailablePlaceholder
@@ -67,7 +67,7 @@ internal fun LogsScreen(
             onSelect = onRangeSelected,
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        CachedStateContainer(
+        RefreshableStateContainer(
             state = state.services,
             onRefresh = onRefresh,
             notFoundContent = { LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize()) },
@@ -156,7 +156,7 @@ fun LogsScreenPreview() = LogsScreen(state = TestLogsUiState, onRangeSelected = 
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LogsScreenEmptyPreview() = LogsScreen(
-    state = LogsUiState(services = CachedUiState.Empty(isRefreshing = false)),
+    state = LogsUiState(services = RefreshableUiState.Empty(isRefreshing = false)),
     onRangeSelected = {},
     onRefresh = {},
     onOpenService = {},
@@ -166,7 +166,7 @@ fun LogsScreenEmptyPreview() = LogsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LogsScreenUnavailablePreview() = LogsScreen(
-    state = LogsUiState(services = CachedUiState.Error(DataError.NotFound)),
+    state = LogsUiState(services = RefreshableUiState.Error(DataError.NotFound)),
     onRangeSelected = {},
     onRefresh = {},
     onOpenService = {},

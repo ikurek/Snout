@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.components.FeatureFlagStatusPill
@@ -53,7 +53,7 @@ internal fun FeatureFlagsScreen(
             placeholder = stringResource(Res.string.feature_flags_search_placeholder),
             modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        CachedStateContainer(
+        RefreshableStateContainer(
             state = state.flags,
             onRefresh = onRefresh,
             emptyContent = {
@@ -117,7 +117,7 @@ fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
-    state = FeatureFlagsUiState(flags = CachedUiState.Empty(isRefreshing = false)),
+    state = FeatureFlagsUiState(flags = RefreshableUiState.Empty(isRefreshing = false)),
     onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},
@@ -127,7 +127,7 @@ fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagsScreenForbiddenPreview() = FeatureFlagsScreen(
-    state = FeatureFlagsUiState(flags = CachedUiState.Error(DataError.Forbidden)),
+    state = FeatureFlagsUiState(flags = RefreshableUiState.Error(DataError.Forbidden)),
     onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},

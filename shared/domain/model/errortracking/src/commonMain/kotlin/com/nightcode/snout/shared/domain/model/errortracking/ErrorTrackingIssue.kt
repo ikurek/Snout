@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.errortracking
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 enum class IssueStatus {
@@ -30,14 +29,11 @@ enum class IssueSeverity {
 }
 
 /** Where the exception was thrown: the topmost frame of the app's own code. */
-@Serializable
 data class StackFrame(val function: String?, val source: String?, val line: Int?, val column: Int?)
 
-@Serializable
 data class IssueRelease(val version: String?, val commitId: String?, val branch: String?)
 
 /** A group of exceptions PostHog considers the same bug, with its impact over the last seven days. */
-@Serializable
 data class ErrorTrackingIssue(
     val id: String,
     /** Exception type, such as `TypeError`. */

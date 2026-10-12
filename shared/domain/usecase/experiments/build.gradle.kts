@@ -12,6 +12,6 @@ kotlin {
         api(projects.shared.domain.model.experiments)
         implementation(projects.shared.domain.data.experiments)
         implementation(projects.shared.domain.data.appstate)
-        implementation(projects.shared.domain.usecase.appstate)
+        api(projects.shared.domain.usecase.appstate)
     }
 }

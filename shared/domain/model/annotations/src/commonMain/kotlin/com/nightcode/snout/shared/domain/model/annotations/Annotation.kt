@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.annotations
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 enum class AnnotationScope {
@@ -12,7 +11,6 @@ enum class AnnotationScope {
     Unknown,
 }
 
-@Serializable
 data class Annotation(
     val id: Long,
     val content: String,

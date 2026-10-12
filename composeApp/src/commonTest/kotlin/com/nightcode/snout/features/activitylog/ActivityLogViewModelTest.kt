@@ -1,23 +1,23 @@
 package com.nightcode.snout.features.activitylog
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.activitylog.ActivityLogRepository
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import com.nightcode.snout.shared.domain.model.activitylog.ActivityEntry
 import com.nightcode.snout.shared.domain.model.activitylog.TestActivityEntry
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
-import com.nightcode.snout.shared.domain.usecase.activitylog.ObserveActivityLog
-import com.nightcode.snout.shared.domain.usecase.activitylog.RefreshActivityLog
+import com.nightcode.snout.shared.domain.usecase.activitylog.GetActivityLog
+import com.nightcode.snout.shared.domain.usecase.activitylog.ObserveActivityLogReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
+import dev.mokkery.answering.sequentially
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
@@ -26,7 +26,6 @@ import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 
 @OptIn(TestData::class)
 class ActivityLogViewModelTest :
@@ -37,31 +36,37 @@ class ActivityLogViewModelTest :
         val repository = mock<ActivityLogRepository>()
         val selected = MutableStateFlow<SelectedProject?>(TestSelectedProject)
 
-        fun subject(cached: List<ActivityEntry>? = listOf(TestActivityEntry)): ActivityLogViewModel {
+        fun subject(): ActivityLogViewModel {
+            selected.value = TestSelectedProject
             everySuspend { appStateRepository.getSelectedProject() } calls { selected.value }
             every { appStateRepository.observeSelectedProject() } returns selected
-            every { repository.observeActivity(any()) } returns flowOf(cached)
             return ActivityLogViewModel(
-                refreshActivityLog = RefreshActivityLog(GetSelectedProjectId(appStateRepository), repository),
-                observeActivityLog = ObserveActivityLog(ObserveSelectedProjectId(appStateRepository), repository),
-                observeSelectedProjectId = ObserveSelectedProjectId(appStateRepository),
+                getActivityLog = GetActivityLog(GetSelectedProjectId(appStateRepository), repository),
+                observeActivityLogReloads = ObserveActivityLogReloads(ObserveSelectedProjectId(appStateRepository)),
             )
         }
 
-        should("refresh on start and list the cached entries") {
-            everySuspend { repository.refreshActivity(any()) } returns Either.Right(Unit)
+        should("load the entries of the selected project on start") {
+            everySuspend { repository.getActivity(any()) } returns Either.Right(listOf(TestActivityEntry))
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe CachedUiState.Content(listOf(TestActivityEntry), isRefreshing = false)
-                verifySuspend { repository.refreshActivity(TestSelectedProject.projectId) }
+                viewModel.uiState.value shouldBe RefreshableUiState.Content(
+                    listOf(TestActivityEntry),
+                    isRefreshing = false,
+                )
+                verifySuspend { repository.getActivity(TestSelectedProject.projectId) }
             }
         }
 
-        should("keep the cached entries and report a failed refresh") {
-            everySuspend { repository.refreshActivity(any()) } returns Either.Left(DataError.ConnectionError)
+        should("keep the entries and report a failed pull to refresh") {
+            everySuspend { repository.getActivity(any()) } sequentially {
+                returns(Either.Right(listOf(TestActivityEntry)))
+                returns(Either.Left(DataError.ConnectionError))
+            }
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe CachedUiState.Content(
+                viewModel.refresh()
+                viewModel.uiState.value shouldBe RefreshableUiState.Content(
                     listOf(TestActivityEntry),
                     isRefreshing = false,
                     refreshError = DataError.ConnectionError,
@@ -69,28 +74,28 @@ class ActivityLogViewModelTest :
             }
         }
 
-        should("show the error when nothing is cached and the refresh fails") {
-            everySuspend { repository.refreshActivity(any()) } returns Either.Left(DataError.Unauthorized)
-            val viewModel = subject(cached = null)
+        should("show the error when the first load fails") {
+            everySuspend { repository.getActivity(any()) } returns Either.Left(DataError.Unauthorized)
+            val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe CachedUiState.Error(DataError.Unauthorized)
+                viewModel.uiState.value shouldBe RefreshableUiState.Error(DataError.Unauthorized)
             }
         }
 
         should("show the empty state when the project has no activity") {
-            everySuspend { repository.refreshActivity(any()) } returns Either.Right(Unit)
-            val viewModel = subject(cached = emptyList())
+            everySuspend { repository.getActivity(any()) } returns Either.Right(emptyList())
+            val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe CachedUiState.Empty(isRefreshing = false)
+                viewModel.uiState.value shouldBe RefreshableUiState.Empty(isRefreshing = false)
             }
         }
 
-        should("refresh again when another project is selected") {
-            everySuspend { repository.refreshActivity(any()) } returns Either.Right(Unit)
+        should("load again when another project is selected") {
+            everySuspend { repository.getActivity(any()) } returns Either.Right(listOf(TestActivityEntry))
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 selected.value = TestSelectedProject.copy(projectId = 2)
-                verifySuspend { repository.refreshActivity(2) }
+                verifySuspend { repository.getActivity(2) }
             }
         }
     })

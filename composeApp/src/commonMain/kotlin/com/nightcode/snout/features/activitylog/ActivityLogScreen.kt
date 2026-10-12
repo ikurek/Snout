@@ -25,12 +25,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -50,11 +50,11 @@ private const val Arrow = "→"
 /** Section body only; the home shell or [com.nightcode.snout.features.home.HomeSectionRoute] supplies the chrome. */
 @Composable
 internal fun ActivityLogScreen(
-    state: CachedUiState<List<ActivityEntry>>,
+    state: RefreshableUiState<List<ActivityEntry>>,
     onRefresh: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    CachedStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { entries ->
+    RefreshableStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { entries ->
         LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
             itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
                 ActivityRow(entry = entry, divider = index < entries.lastIndex)
@@ -136,7 +136,7 @@ private fun String.humanizeScope(): String = replace(Regex("(?<=[a-z])(?=[A-Z])"
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ActivityLogScreenPreview() = ActivityLogScreen(
-    state = CachedUiState.Content(
+    state = RefreshableUiState.Content(
         listOf(
             TestActivityEntry,
             TestActivityEntry.copy(
@@ -158,6 +158,6 @@ fun ActivityLogScreenPreview() = ActivityLogScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ActivityLogScreenPaymentRequiredPreview() = ActivityLogScreen(
-    state = CachedUiState.Error(DataError.PaymentRequired),
+    state = RefreshableUiState.Error(DataError.PaymentRequired),
     onRefresh = {},
 )

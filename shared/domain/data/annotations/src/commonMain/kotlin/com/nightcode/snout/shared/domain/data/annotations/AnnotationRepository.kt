@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
 interface AnnotationRepository {
-    fun observeAnnotations(projectId: Long): Flow<List<Annotation>?>
-    suspend fun refreshAnnotations(projectId: Long): Either<DataError, Unit>
+    /** Emits after each successful change made through this app, so lists showing the old state load again. */
+    val changes: Flow<Unit>
+
+    suspend fun getAnnotations(projectId: Long): Either<DataError, List<Annotation>>
     suspend fun createAnnotation(projectId: Long, content: String, dateMarker: Instant): Either<DataError, Annotation>
 }

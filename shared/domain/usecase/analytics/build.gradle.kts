@@ -13,6 +13,6 @@ kotlin {
         api(projects.shared.domain.model.analytics)
         implementation(projects.shared.domain.data.analytics)
         implementation(projects.shared.domain.data.appstate)
-        implementation(projects.shared.domain.usecase.appstate)
+        api(projects.shared.domain.usecase.appstate)
     }
 }

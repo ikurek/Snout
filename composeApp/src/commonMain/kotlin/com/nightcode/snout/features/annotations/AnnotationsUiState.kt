@@ -1,6 +1,6 @@
 package com.nightcode.snout.features.annotations
 
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.annotations.TestAnnotation
@@ -20,14 +20,14 @@ internal sealed interface AnnotationsSideEffect {
 }
 
 internal data class AnnotationsUiState(
-    val annotations: CachedUiState<List<Annotation>> = CachedUiState.Loading,
+    val annotations: RefreshableUiState<List<Annotation>> = RefreshableUiState.Loading,
     val create: CreateStatus = CreateStatus.Idle,
 )
 
 @TestData
 @OptIn(TestData::class)
 internal val TestAnnotationsUiState = AnnotationsUiState(
-    annotations = CachedUiState.Content(
+    annotations = RefreshableUiState.Content(
         listOf(TestAnnotation, TestAnnotation.copy(id = 6, content = "Marketing campaign started", createdBy = null)),
         isRefreshing = false,
     ),

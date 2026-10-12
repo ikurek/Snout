@@ -16,12 +16,6 @@ class DatabaseModule {
     @Single
     internal fun provideSnoutDatabase(sqlDriver: SqlDriver): SnoutDatabase = SnoutDatabase(sqlDriver)
 
-    @Single(binds = [JsonCache::class])
-    internal fun provideJsonCache(
-        database: SnoutDatabase,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): JsonCache = JsonCacheImpl(database, ioDispatcher)
-
     @Single(binds = [OrganizationsDatabase::class])
     internal fun provideOrganizationsDatabase(
         database: SnoutDatabase,

@@ -23,7 +23,7 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatChartTime
 import com.nightcode.snout.common.format.formatLogTime
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
@@ -35,9 +35,9 @@ import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogSeverityTag
@@ -90,7 +90,7 @@ internal fun LogServiceScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())) {
             LogFilters(searchState = searchState, severity = state.severity, onSeverityChanged = onSeverityChanged)
-            CachedStateContainer(
+            RefreshableStateContainer(
                 state = state.logs,
                 onRefresh = onRefresh,
                 notFoundContent = {
@@ -236,7 +236,7 @@ fun LogServiceScreenEmptyPreview() = LogServiceScreen(
     range = LogsRange.Last24Hours,
     state = LogServiceUiState(
         severity = LogSeverityFilter.Errors,
-        logs = CachedUiState.Empty(isRefreshing = false),
+        logs = RefreshableUiState.Empty(isRefreshing = false),
     ),
     onNavigateBack = {},
     onQueryChanged = {},

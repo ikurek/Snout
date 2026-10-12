@@ -14,19 +14,19 @@ import kotlin.time.Duration
 
 /**
  * Fetches a list live for every filter that [isLive] accepts, cancelling the previous request. Emits `null` for the
- * other filters, so the screen falls back to its cached list.
+ * other filters, so the screen falls back to its base list.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 internal fun <F, T> Flow<F>.liveResults(
     isLive: (F) -> Boolean,
     fetch: suspend (F) -> Either<DataError, List<T>>,
-): Flow<CachedUiState<List<T>>?> = flatMapLatest { filter ->
+): Flow<RefreshableUiState<List<T>>?> = flatMapLatest { filter ->
     if (isLive(filter)) {
         flow {
-            emit(CachedUiState.Loading)
+            emit(RefreshableUiState.Loading)
             emit(
                 fetch(filter).fold(
-                    ifLeft = { CachedUiState.Error(it) },
+                    ifLeft = { RefreshableUiState.Error(it) },
                     ifRight = { listUiState(it, RefreshStatus.Idle) },
                 ),
             )
@@ -41,6 +41,6 @@ internal fun <F, T> Flow<F>.liveResults(
 internal fun <T> Flow<String>.searchResults(
     debounceTimeout: Duration,
     search: suspend (String) -> Either<DataError, List<T>>,
-): Flow<CachedUiState<List<T>>?> = debounce(debounceTimeout)
+): Flow<RefreshableUiState<List<T>>?> = debounce(debounceTimeout)
     .distinctUntilChanged()
     .liveResults(isLive = { it.isNotBlank() }, fetch = search)

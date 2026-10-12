@@ -2,34 +2,30 @@ package com.nightcode.snout.features.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.RefreshController
-import com.nightcode.snout.common.state.cachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
+import com.nightcode.snout.common.state.loadRefreshable
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.applying
-import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.GetAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
-import com.nightcode.snout.shared.domain.usecase.analytics.RefreshAnalytics
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsReloads
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
 internal class AnalyticsViewModel(
-    private val refreshAnalytics: RefreshAnalytics,
-    observeAnalytics: ObserveAnalytics,
-    observeSelectedProjectId: ObserveSelectedProjectId,
+    getAnalytics: GetAnalytics,
+    observeAnalyticsReloads: ObserveAnalyticsReloads,
     observeAnalyticsPreferences: ObserveAnalyticsPreferences,
 ) : ViewModel() {
 
@@ -40,31 +36,33 @@ internal class AnalyticsViewModel(
     private val range: Flow<AnalyticsRange> = combine(selectedRange, preferences) { selected, preferences ->
         selected ?: preferences.defaultRange
     }.distinctUntilChanged()
-    private val refresh = RefreshController()
+    private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    val uiState: StateFlow<AnalyticsUiState> = combine(
+    /**
+     * Reloads for the project, the range and what the preferences ask to query. A new range starts from the skeleton;
+     * new preferences keep the snapshot on screen while the cards and tables they add load.
+     */
+    private val snapshot = combine(
+        observeAnalyticsReloads(),
         range,
-        range.flatMapLatest { observeAnalytics(it) },
         preferences,
-        refresh.status,
-    ) { range, snapshot, preferences, status ->
-        AnalyticsUiState(range = range, snapshot = cachedUiState(snapshot?.applying(preferences), status))
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsUiState())
+    ) { reload, range, _ -> reload to range }
+        .loadRefreshable(viewModelScope, refreshes) { (_, range) -> getAnalytics(range, preferences.first()) }
 
-    init {
-        viewModelScope.launch {
-            // Refresh whenever the project, the range or what the preferences ask to query changes.
-            combine(range, preferences, observeSelectedProjectId()) { range, preferences, projectId ->
-                Triple(range, preferences, projectId)
-            }
-                .distinctUntilChanged()
-                .collectLatest { (range, preferences, _) -> refresh.run { refreshAnalytics(range, preferences) } }
-        }
-    }
+    val uiState: StateFlow<AnalyticsUiState> = combine(range, snapshot, preferences) { range, snapshot, preferences ->
+        AnalyticsUiState(range = range, snapshot = snapshot.applying(preferences))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsUiState())
 
     fun onRangeSelected(selected: AnalyticsRange) {
         selectedRange.value = selected
     }
 
-    fun refresh() = viewModelScope.launch { refresh.run { refreshAnalytics(range.first(), preferences.first()) } }
+    fun refresh() {
+        refreshes.tryEmit(Unit)
+    }
+}
+
+private fun RefreshableUiState<AnalyticsSnapshot>.applying(preferences: AnalyticsPreferences) = when (this) {
+    is RefreshableUiState.Content -> copy(data = data.applying(preferences))
+    else -> this
 }

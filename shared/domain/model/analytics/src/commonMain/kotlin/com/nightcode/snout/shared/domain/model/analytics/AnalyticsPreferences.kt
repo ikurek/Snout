@@ -30,7 +30,7 @@ data class AnalyticsPreferences(
     }
 }
 
-/** The snapshot reduced to what [preferences] asks for; a cached snapshot may hold more than is currently enabled. */
+/** The snapshot reduced to what [preferences] asks for; a snapshot loaded earlier may hold more than is now enabled. */
 fun AnalyticsSnapshot.applying(preferences: AnalyticsPreferences): AnalyticsSnapshot = copy(
     overview = overview.filter { it.key == OverviewMetricKey.Other || it.key in preferences.metrics },
     trends = if (preferences.showTrendChart) trends else emptyList(),

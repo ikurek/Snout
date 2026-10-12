@@ -1,6 +1,6 @@
 package com.nightcode.snout.features.logs.service
 
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.logs.LogEntry
@@ -25,7 +25,7 @@ internal sealed interface LoadMoreStatus {
 internal data class LogServiceUiState(
     val query: String = "",
     val severity: LogSeverityFilter = LogSeverityFilter.All,
-    val logs: CachedUiState<List<LogEntry>> = CachedUiState.Loading,
+    val logs: RefreshableUiState<List<LogEntry>> = RefreshableUiState.Loading,
     val loadMore: LoadMoreStatus = LoadMoreStatus.Done,
     /** Volume per level for the same filter; null while loading, when empty or when it failed. */
     val volume: LogVolume? = null,
@@ -34,7 +34,7 @@ internal data class LogServiceUiState(
 @TestData
 @OptIn(TestData::class)
 internal val TestLogServiceUiState = LogServiceUiState(
-    logs = CachedUiState.Content(TestLogEntries, isRefreshing = false),
+    logs = RefreshableUiState.Content(TestLogEntries, isRefreshing = false),
     loadMore = LoadMoreStatus.Idle,
     volume = TestLogVolume,
 )

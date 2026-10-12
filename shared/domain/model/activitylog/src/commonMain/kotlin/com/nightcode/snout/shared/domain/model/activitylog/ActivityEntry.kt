@@ -1,13 +1,10 @@
 package com.nightcode.snout.shared.domain.model.activitylog
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
-@Serializable
 data class ActivityChange(val field: String, val action: String?, val before: String?, val after: String?)
 
-@Serializable
 data class ActivityEntry(
     val id: String,
     val actor: String?,

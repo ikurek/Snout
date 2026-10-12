@@ -24,7 +24,7 @@ import snout.composeapp.generated.resources.inline_error_retry
 
 /**
  * Strip for a recoverable failure that leaves the rest of the screen usable: a refresh that failed, a tile
- * that could not compute, a refused toggle. Cached content stays visible beneath it.
+ * that could not compute, a refused toggle. Loaded content stays visible beneath it.
  */
 @Composable
 internal fun InlineErrorBanner(

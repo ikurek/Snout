@@ -9,10 +9,12 @@ import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import kotlinx.coroutines.flow.Flow
 
 interface ErrorTrackingRepository {
-    fun observeIssues(projectId: Long, status: IssueStatusFilter): Flow<List<ErrorTrackingIssue>?>
-    suspend fun refreshIssues(projectId: Long, status: IssueStatusFilter): Either<DataError, Unit>
+    /** Emits after each successful change made through this app, so lists showing the old state load again. */
+    val changes: Flow<Unit>
 
-    /** Fetches without caching; a blank [query] or null [appVersion] leaves that filter out. */
+    suspend fun getIssues(projectId: Long, status: IssueStatusFilter): Either<DataError, List<ErrorTrackingIssue>>
+
+    /** A blank [query] or null [appVersion] leaves that filter out. */
     suspend fun searchIssues(
         projectId: Long,
         status: IssueStatusFilter,
@@ -21,7 +23,7 @@ interface ErrorTrackingRepository {
     ): Either<DataError, List<ErrorTrackingIssue>>
     suspend fun getIssue(projectId: Long, issueId: String): Either<DataError, ErrorTrackingIssue>
 
-    /** Changes the issue's status and drops it from cached lists, since it now belongs under another filter. */
+    /** Changes the issue's status, which moves it to another status filter's list. */
     suspend fun setStatus(projectId: Long, issueId: String, status: IssueStatusFilter): Either<DataError, IssueStatus>
     suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>>
 }

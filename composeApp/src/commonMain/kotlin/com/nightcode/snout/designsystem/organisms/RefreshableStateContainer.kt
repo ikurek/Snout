@@ -13,7 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.refreshFailedMessage
@@ -22,15 +22,15 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Renders loading, error, empty and content states of cache-first data with pull to refresh.
- * Loading is skeleton rows, never a spinner; a failed refresh keeps the cached content under an inline banner.
+ * Renders loading, error, empty and content states of data that reloads, with pull to refresh.
+ * Loading is skeleton rows, never a spinner; a failed reload keeps the loaded content under an inline banner.
  * [notFoundContent] replaces the error placeholder when the API answered 404, for sections an instance may lack
  * altogether (usually an [UnavailablePlaceholder]).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun <T> CachedStateContainer(
-    state: CachedUiState<T>,
+internal fun <T> RefreshableStateContainer(
+    state: RefreshableUiState<T>,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     loadingContent: @Composable () -> Unit = { SkeletonRows() },
@@ -41,15 +41,15 @@ internal fun <T> CachedStateContainer(
     content: @Composable (data: T) -> Unit,
 ) {
     when (state) {
-        CachedUiState.Loading -> Box(modifier = modifier.fillMaxSize()) { loadingContent() }
+        RefreshableUiState.Loading -> Box(modifier = modifier.fillMaxSize()) { loadingContent() }
 
-        is CachedUiState.Error -> if (state.error == DataError.NotFound && notFoundContent != null) {
+        is RefreshableUiState.Error -> if (state.error == DataError.NotFound && notFoundContent != null) {
             Box(modifier = modifier.fillMaxSize()) { notFoundContent() }
         } else {
             ErrorPlaceholder(error = state.error, onRetry = onRefresh, modifier = modifier.fillMaxSize())
         }
 
-        is CachedUiState.Empty -> PullToRefreshBox(
+        is RefreshableUiState.Empty -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = modifier.fillMaxSize(),
@@ -63,7 +63,7 @@ internal fun <T> CachedStateContainer(
             }
         }
 
-        is CachedUiState.Content -> PullToRefreshBox(
+        is RefreshableUiState.Content -> PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = modifier.fillMaxSize(),

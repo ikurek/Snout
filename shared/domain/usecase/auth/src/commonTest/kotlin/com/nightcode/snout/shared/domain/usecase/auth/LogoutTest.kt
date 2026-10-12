@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.usecase.auth
 
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
@@ -16,10 +15,9 @@ class LogoutTest :
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
         val userRepository = mock<UserRepository>(autoUnit)
-        val cacheRepository = mock<CacheRepository>(autoUnit)
         val subject = Logout(
             authRepository,
-            ClearLocalData(appStateRepository, organizationRepository, userRepository, cacheRepository),
+            ClearLocalData(appStateRepository, organizationRepository, userRepository),
         )
 
         should("clear local data and credentials") {
@@ -28,7 +26,6 @@ class LogoutTest :
                 appStateRepository.clearSelectedProject()
                 organizationRepository.clear()
                 userRepository.clear()
-                cacheRepository.clear()
                 authRepository.clear()
             }
         }

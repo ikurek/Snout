@@ -97,11 +97,11 @@
     <string name="section_annotations_description">Mark releases and events on your charts</string>
     <string name="section_activity_log_label">Activity log</string>
     <string name="section_activity_log_description">Who changed what in this project</string>
-    <string name="refresh_failed_generic">Couldn't refresh. Showing cached data.</string>
-    <string name="refresh_failed_offline">You're offline. Showing cached data.</string>
-    <string name="refresh_failed_rate_limited">Rate limited by PostHog. Showing cached data.</string>
-    <string name="refresh_failed_payment_required">This feature needs a paid PostHog plan. Showing cached data.</string>
-    <string name="refresh_failed_forbidden">Your API key can't read this data. Showing cached data.</string>
+    <string name="refresh_failed_generic">Couldn't refresh. Showing what was loaded before.</string>
+    <string name="refresh_failed_offline">You're offline. Showing what was loaded before.</string>
+    <string name="refresh_failed_rate_limited">Rate limited by PostHog. Showing what was loaded before.</string>
+    <string name="refresh_failed_payment_required">This feature needs a paid PostHog plan. Showing what was loaded before.</string>
+    <string name="refresh_failed_forbidden">Your API key can't read this data. Showing what was loaded before.</string>
     <string name="relative_time_just_now">just now</string>
     <string name="relative_time_minutes_ago">%1$d min ago</string>
     <string name="relative_time_hours_ago">%1$d h ago</string>

@@ -4,14 +4,14 @@ import arrow.core.Either
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.Dashboard
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
-import kotlinx.coroutines.flow.Flow
+import com.nightcode.snout.shared.domain.model.insights.InsightResult
 
 interface DashboardRepository {
-    fun observeDashboards(projectId: Long): Flow<List<DashboardSummary>?>
-    suspend fun refreshDashboards(projectId: Long): Either<DataError, Unit>
-    fun observeDashboard(projectId: Long, dashboardId: Long): Flow<Dashboard?>
-    suspend fun refreshDashboard(projectId: Long, dashboardId: Long): Either<DataError, Unit>
+    suspend fun getDashboards(projectId: Long): Either<DataError, List<DashboardSummary>>
 
-    /** Computes one tile's insight and stores the result into the cached dashboard. */
-    suspend fun refreshTile(projectId: Long, dashboardId: Long, insightId: Long): Either<DataError, Unit>
+    /** The dashboard with the tile results PostHog already has; tiles without one have a null result. */
+    suspend fun getDashboard(projectId: Long, dashboardId: Long): Either<DataError, Dashboard>
+
+    /** Computes one tile's insight in the context of its dashboard; null when it has no result to show. */
+    suspend fun getTileResult(projectId: Long, dashboardId: Long, insightId: Long): Either<DataError, InsightResult?>
 }

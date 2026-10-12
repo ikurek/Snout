@@ -5,7 +5,6 @@ import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
-import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.links.ExternalAppLauncher
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
@@ -63,7 +62,6 @@ class SettingsViewModelTest :
         val authRepository = mock<AuthRepository>(autoUnit)
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
-        val cacheRepository = mock<CacheRepository>(autoUnit)
         val externalAppLauncher = mock<ExternalAppLauncher>(autoUnit) {
             every { canOpenLinkSettings } returns true
         }
@@ -80,7 +78,7 @@ class SettingsViewModelTest :
                 saveThemeMode = SaveThemeMode(appStateRepository),
                 logout = Logout(
                     authRepository,
-                    ClearLocalData(appStateRepository, organizationRepository, userRepository, cacheRepository),
+                    ClearLocalData(appStateRepository, organizationRepository, userRepository),
                 ),
                 observeOrganizations = ObserveOrganizations(organizationRepository),
                 observeSelectedProject = ObserveSelectedProject(appStateRepository),

@@ -17,8 +17,8 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
 /**
- * The app's single [Json], for PostHog and the JSON cache; tests use it too. Request DTOs rely on `encodeDefaults`
- * being off: their optional fields default to null and are then left out, as PostHog expects.
+ * The app's single [Json], for PostHog and for the account kept in the secure store; tests use it too. Request DTOs
+ * rely on `encodeDefaults` being off: their optional fields default to null and are then left out, as PostHog expects.
  */
 val ApiJson = Json {
     ignoreUnknownKeys = true

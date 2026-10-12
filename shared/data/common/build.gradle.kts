@@ -14,6 +14,5 @@ kotlin {
         api(projects.shared.domain.model.common)
         api(projects.shared.storage.database)
         api(projects.shared.storage.datastore)
-        api(projects.shared.domain.data.appstate)
     }
 }

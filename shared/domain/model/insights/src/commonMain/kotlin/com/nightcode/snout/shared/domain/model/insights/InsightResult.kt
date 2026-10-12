@@ -1,25 +1,20 @@
 package com.nightcode.snout.shared.domain.model.insights
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.math.abs
 
 private const val Hundred = 100.0
 
-@Serializable
 sealed interface InsightResult {
 
     /** Trends, stickiness and lifecycle: one or more series over the same periods. */
-    @Serializable
     data class Series(val series: List<TrendSeries>, val format: ValueFormat = ValueFormat()) : InsightResult
 
     /** [steps] cover everyone; [breakdowns] split them per breakdown value when the funnel has more than one. */
-    @Serializable
     data class Funnel(val steps: List<FunnelStep>, val breakdowns: List<FunnelBreakdown> = emptyList()) :
         InsightResult
 
     /** One cohort per start period; [intervals] label the columns ("Day 0", "Day 1", ...). */
-    @Serializable
     data class Retention(val intervals: List<String>, val cohorts: List<RetentionCohort>) : InsightResult {
 
         /**
@@ -35,16 +30,13 @@ sealed interface InsightResult {
     }
 
     /** SQL and table displays: already stringified cells; [totalRows] counts rows dropped from [rows]. */
-    @Serializable
     data class Table(val columns: List<String>, val rows: List<List<String>>, val totalRows: Int = rows.size) :
         InsightResult
 
-    @Serializable
     data object Unsupported : InsightResult
 }
 
 /** [previous] is the same series over the comparison period, when the insight compares to one. */
-@Serializable
 data class TrendSeries(
     val label: String,
     val values: List<Double>,
@@ -59,7 +51,6 @@ data class TrendSeries(
         get() = previous?.total?.takeIf { it != 0.0 }?.let { (total - it) / abs(it) * Hundred }
 }
 
-@Serializable
 data class RetentionCohort(val date: String, val counts: List<Double>) {
     val size: Double get() = counts.firstOrNull() ?: 0.0
 
@@ -68,7 +59,6 @@ data class RetentionCohort(val date: String, val counts: List<Double>) {
 }
 
 /** PostHog's y-axis format: how a value is written, plus the user's prefix, postfix and decimal places. */
-@Serializable
 data class ValueFormat(
     val unit: ValueUnit = ValueUnit.Numeric,
     val prefix: String? = null,
@@ -90,7 +80,6 @@ enum class ValueUnit {
     PercentageScaled,
 }
 
-@Serializable
 data class FunnelStep(
     val name: String,
     val count: Double,
@@ -100,7 +89,6 @@ data class FunnelStep(
 )
 
 /** One breakdown value's own funnel; [label] is empty when PostHog had no value for it. */
-@Serializable
 data class FunnelBreakdown(val label: String, val steps: List<FunnelStep>) {
     val entered: Double get() = steps.firstOrNull()?.count ?: 0.0
     val converted: Double get() = steps.lastOrNull()?.count ?: 0.0
@@ -109,7 +97,6 @@ data class FunnelBreakdown(val label: String, val steps: List<FunnelStep>) {
     val conversionRate: Double get() = if (entered > 0) converted / entered else 0.0
 }
 
-@Serializable
 data class InsightDetail(val summary: InsightSummary, val result: InsightResult?)
 
 @TestData

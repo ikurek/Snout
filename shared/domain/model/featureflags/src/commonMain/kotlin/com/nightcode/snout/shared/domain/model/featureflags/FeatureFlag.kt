@@ -1,7 +1,6 @@
 package com.nightcode.snout.shared.domain.model.featureflags
 
 import com.nightcode.snout.shared.common.testdata.TestData
-import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 enum class FeatureFlagStatus {
@@ -11,16 +10,12 @@ enum class FeatureFlagStatus {
     Unknown,
 }
 
-@Serializable
 data class PropertyFilter(val key: String, val operator: String?, val value: String)
 
-@Serializable
 data class ReleaseCondition(val rolloutPercentage: Int, val properties: List<PropertyFilter>, val variant: String?)
 
-@Serializable
 data class FlagVariant(val key: String, val name: String?, val rolloutPercentage: Int)
 
-@Serializable
 data class FeatureFlag(
     val id: Long,
     val key: String,

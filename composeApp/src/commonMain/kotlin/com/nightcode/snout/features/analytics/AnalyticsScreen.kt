@@ -29,7 +29,7 @@ import com.nightcode.snout.common.format.formatChartLabel
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDurationSeconds
 import com.nightcode.snout.common.format.formatPercent
-import com.nightcode.snout.common.state.CachedUiState
+import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonBlock
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -42,7 +42,7 @@ import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.molecules.StatCard
-import com.nightcode.snout.designsystem.organisms.CachedStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.analytics.components.label
@@ -88,7 +88,7 @@ internal fun AnalyticsScreen(
             label = { rangeLabels.getValue(it) },
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        CachedStateContainer(
+        RefreshableStateContainer(
             state = state.snapshot,
             onRefresh = onRefresh,
             loadingContent = { SnapshotSkeleton() },
@@ -273,7 +273,7 @@ fun AnalyticsScreenPreview() = AnalyticsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
-    state = AnalyticsUiState(snapshot = CachedUiState.Error(DataError.Forbidden)),
+    state = AnalyticsUiState(snapshot = RefreshableUiState.Error(DataError.Forbidden)),
     onRangeSelected = {},
     onRefresh = {},
 )
@@ -284,7 +284,7 @@ fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
 @Composable
 fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
     state = AnalyticsUiState(
-        snapshot = CachedUiState.Content(
+        snapshot = RefreshableUiState.Content(
             TestAnalyticsSnapshot,
             isRefreshing = false,
             refreshError = DataError.ConnectionError,
@@ -298,7 +298,7 @@ fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsScreenLoadingPreview() = AnalyticsScreen(
-    state = AnalyticsUiState(snapshot = CachedUiState.Loading),
+    state = AnalyticsUiState(snapshot = RefreshableUiState.Loading),
     onRangeSelected = {},
     onRefresh = {},
 )
