@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CancellationException
 import kotlinx.io.IOException
 
 @Suppress("SwallowedException", "TooGenericExceptionCaught")
@@ -24,6 +25,8 @@ suspend fun <T> networkCall(call: suspend () -> T): Either<NetworkError, T> = ei
         )
     } catch (e: ServerResponseException) {
         raise(NetworkError.Api.ServerError(e.response.status.value))
+    } catch (e: CancellationException) {
+        throw e
     } catch (_: IOException) {
         raise(NetworkError.NoConnection)
     } catch (e: Exception) {

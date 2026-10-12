@@ -63,11 +63,16 @@ internal class AnalyticsRepositoryImpl(private val api: AnalyticsApi, private va
                 .filter { it in preferences.breakdowns }
                 .map { breakdown -> async { fetchTable(projectId, range, breakdown) } }
 
-            val metrics = overview.await().mapLeft { it.toDataError() }.bind().toOverviewMetrics(cache.json)
+            val overviewResponse = overview.await().mapLeft { it.toDataError() }.bind()
+            val metrics = Either.catch { overviewResponse.toOverviewMetrics(cache.json) }
+                .mapLeft { DataError.UnexpectedError }
+                .bind()
             AnalyticsSnapshot(
                 range = range,
-                overview = metrics + activeUsers?.await()?.getOrNull()?.toActiveUserMetrics(cache.json).orEmpty(),
-                trends = trends?.await()?.getOrNull()?.toMetricTrends(cache.json).orEmpty(),
+                overview = metrics + activeUsers?.await()?.getOrNull()
+                    ?.let { optional { it.toActiveUserMetrics(cache.json) } }
+                    .orEmpty(),
+                trends = trends?.await()?.getOrNull()?.let { optional { it.toMetricTrends(cache.json) } }.orEmpty(),
                 breakdowns = tables.mapNotNull { it.await() },
             )
         }
@@ -79,13 +84,16 @@ internal class AnalyticsRepositoryImpl(private val api: AnalyticsApi, private va
             BreakdownSource.WebStats ->
                 api.getWebStatsTable(projectId, range.dateFrom, breakdown.apiValue, BreakdownRowLimit)
                     .getOrNull()
-                    ?.toBreakdownTable(breakdown)
+                    ?.let { optional { it.toBreakdownTable(breakdown) } }
 
             BreakdownSource.EventProperty ->
                 api.getPropertyBreakdown(projectId, range.dateFrom, breakdown.apiValue, BreakdownRowLimit)
                     .getOrNull()
-                    ?.toPropertyBreakdownTable(cache.json, breakdown)
+                    ?.let { optional { it.toPropertyBreakdownTable(cache.json, breakdown) } }
         }
+
+    /** Maps an optional part, leaving it out when PostHog answered with a shape the mapper can't read. */
+    private inline fun <T> optional(map: () -> T): T? = Either.catch(map).getOrNull()
 
     private fun cacheKey(projectId: Long, range: AnalyticsRange) = "analytics:$CacheVersion:$projectId:${range.name}"
 }
