@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.koin)
+    alias(libs.plugins.snout.multiplatform.unittest)
 }
 
 kotlin {
@@ -9,6 +10,7 @@ kotlin {
     }
 
     sourceSets.commonMain.dependencies {
+        api(projects.shared.storage.securestore)
         implementation(libs.datastore)
         implementation(libs.datastore.preferences)
     }

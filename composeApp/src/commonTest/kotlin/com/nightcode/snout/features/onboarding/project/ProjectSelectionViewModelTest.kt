@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.appstate.CacheRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
+import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
 import com.nightcode.snout.shared.domain.model.organization.TestProject
@@ -38,6 +39,7 @@ class ProjectSelectionViewModelTest :
         val organizationRepository = mock<OrganizationRepository>(autoUnit) {
             every { observeOrganizations() } returns flowOf(listOf(TestOrganization))
         }
+        val userRepository = mock<UserRepository>(autoUnit)
         val cacheRepository = mock<CacheRepository>(autoUnit)
         val authRepository = mock<AuthRepository>(autoUnit)
 
@@ -47,7 +49,7 @@ class ProjectSelectionViewModelTest :
             saveSelectedProject = SaveSelectedProject(appStateRepository),
             logout = Logout(
                 authRepository,
-                ClearLocalData(appStateRepository, organizationRepository, cacheRepository),
+                ClearLocalData(appStateRepository, organizationRepository, userRepository, cacheRepository),
             ),
         )
 
@@ -89,6 +91,7 @@ class ProjectSelectionViewModelTest :
             verifySuspend {
                 appStateRepository.clearSelectedProject()
                 organizationRepository.clear()
+                userRepository.clear()
                 cacheRepository.clear()
                 authRepository.clear()
             }

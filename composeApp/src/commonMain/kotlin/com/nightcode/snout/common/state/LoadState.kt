@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.nightcode.snout.shared.domain.model.common.DataError
 
 /**
- * Screen state for a one-shot fetch with no cache behind it, such as a detail screen or the account in Settings.
- * Cache-observing screens use [CachedUiState] instead.
+ * Screen state for a one-shot fetch with no cache behind it, such as a detail screen. Cache-observing screens use
+ * [CachedUiState] instead.
  *
  * Only the fetch itself fails into [Error]. A failed action on loaded data (a toggle, a status change) is a one-shot
  * side effect shown as a snackbar, unless it must stay on screen next to what failed, as in a sheet or under the

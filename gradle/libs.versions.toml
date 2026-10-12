@@ -15,6 +15,7 @@ datastore = "1.2.1"
 detekt = "2.0.0-alpha.6"
 koin = "4.2.2"
 koin-plugin = "1.2.1"
+ksafe = "3.3.0"
 kotlin = "2.4.20"
 kotlin-serialization = "1.11.0"
 kotlin-datetime = "0.8.0"
@@ -43,6 +44,9 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 # DataStore
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# Secure storage
+ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
 
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }

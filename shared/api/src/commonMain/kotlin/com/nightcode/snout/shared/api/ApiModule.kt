@@ -34,7 +34,7 @@ class ApiModule {
     fun provideJson(): Json = ApiJson
 
     @Single
-    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore) = HttpClient {
+    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore): HttpClient = platformHttpClient {
         expectSuccess = true
         install(ContentNegotiation) {
             json(json)

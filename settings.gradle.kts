@@ -118,3 +118,4 @@ include(":shared:common:testutils")
 // Storage
 include(":shared:storage:database")
 include(":shared:storage:datastore")
+include(":shared:storage:securestore")

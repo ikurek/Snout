@@ -10,7 +10,7 @@ import io.ktor.client.request.get
 import org.koin.core.annotation.Single
 
 @Single
-class UsersApi internal constructor(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class UsersApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
 
     suspend fun getCurrentUser() = networkCall<UserDto> {
         client.get(authDataStore.instanceUrl("users/@me")).body()

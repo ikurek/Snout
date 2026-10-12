@@ -49,7 +49,8 @@ shared/       Kotlin business logic, one module per layer and feature:
   domain/data/<feature>    repository interfaces
   data/<feature>           repository implementations, mappers, cache
   domain/usecase/<feature> use cases exposed to the UI
-  storage/                 DataStore preferences and SQLDelight (organizations, JSON payload cache)
+  storage/                 DataStore preferences, SQLDelight (organizations, JSON payload cache) and the
+                           secure store (KSafe) for the API key and account
   common/                  coroutine dispatchers, `@TestData` opt-in, test utilities
 buildLogic/   Gradle convention plugins
 scripts/      generate_screenshot_tests.py
@@ -65,6 +66,17 @@ Layers, with dependencies pointing inwards:
   `XDto`, request bodies `XRequestDto` (`UpdateXRequestDto` for PATCHes), and what query endpoints take inside
   `{"query": …}` (`QueryRequestDto`) is `XQueryDto`, with its constant `kind` as an `@EncodeDefault` property.
   Optional request fields default to null and are left out, since `ApiJson` doesn't encode defaults.
+- Secrets and personal data live in `SecureStore` (`storage/securestore`), never in DataStore. It is backed by
+  [KSafe](https://github.com/ioannisa/KSafe): values encrypted with AES-256-GCM in KSafe's own `secure` file, under
+  a key held in the Keychain on iOS (`AfterFirstUnlockThisDeviceOnly`, so it stays out of backups and device
+  transfers) and in the Android Keystore on Android, with no decrypted copy cached in memory
+  (`KSafeMemoryPolicy.ENCRYPTED`); a value that no longer decrypts reads as missing. The library is wrapped behind
+  `SecureStore` so the rest of the app depends on a three-method interface it can fake (`InMemorySecureStore`),
+  and swapping or upgrading the library stays inside this module. It holds the personal API key (`AuthDataStore`)
+  and the signed-in account (`UserRepositoryImpl`, so Settings shows it at once). The instance URL, selected
+  project and preferences stay in DataStore. Logging out removes the key and the account; a 401 removes the key and `ClearLocalData` the rest.
+- HTTP responses are not cached by the platform: on iOS the Darwin engine's URLSession has no `URLCache`, and
+  `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
 - `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
   `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
   project-scoped wrappers (`observeSelectedProjectId.flatMapProject { repository.observeX(it) }`); that is

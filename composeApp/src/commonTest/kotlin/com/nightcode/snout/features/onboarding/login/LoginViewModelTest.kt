@@ -48,7 +48,7 @@ class LoginViewModelTest :
         }
 
         should("clear a rejected key and unlock Connect when the instance url changes") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.Unauthorized)
+            everySuspend { userRepository.refreshCurrentUser() } returns Either.Left(DataError.Unauthorized)
             val viewModel = subject()
 
             viewModel.connect(PostHogCloudEuUrl, "phx_rejected")
@@ -71,7 +71,7 @@ class LoginViewModelTest :
         }
 
         should("report a failed connection that isn't about the key as a side effect") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.RateLimited)
+            everySuspend { userRepository.refreshCurrentUser() } returns Either.Left(DataError.RateLimited)
             val viewModel = subject()
             val effect = async(Dispatchers.Main) { viewModel.sideEffects.first() }
 

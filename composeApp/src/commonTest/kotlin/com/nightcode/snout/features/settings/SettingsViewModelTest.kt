@@ -15,6 +15,7 @@ import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
 import com.nightcode.snout.shared.domain.model.user.TestUser
+import com.nightcode.snout.shared.domain.model.user.User
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveThemeMode
@@ -25,9 +26,11 @@ import com.nightcode.snout.shared.domain.usecase.links.CanOpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
-import com.nightcode.snout.shared.domain.usecase.user.GetCurrentUser
+import com.nightcode.snout.shared.domain.usecase.user.ObserveCurrentUser
+import com.nightcode.snout.shared.domain.usecase.user.RefreshCurrentUser
 import com.nightcode.snout.testing.subscribed
 import dev.mokkery.MockMode.autoUnit
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
@@ -36,6 +39,7 @@ import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(TestData::class)
@@ -43,7 +47,19 @@ class SettingsViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
-        val userRepository = mock<UserRepository>()
+        val storedUser = MutableStateFlow<User?>(null)
+        val userRepository = mock<UserRepository>(autoUnit) {
+            every { observeCurrentUser() } returns storedUser
+        }
+
+        /** Answers account fetches like the repository: a success stores the account. */
+        fun fetchAnswers(result: Either<DataError, User>) {
+            everySuspend { userRepository.refreshCurrentUser() } calls {
+                result.map { storedUser.value = it }
+            }
+        }
+        fetchAnswers(Either.Right(TestUser))
+
         val authRepository = mock<AuthRepository>(autoUnit)
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>(autoUnit)
@@ -58,12 +74,13 @@ class SettingsViewModelTest :
             every { appStateRepository.observeSelectedProject() } returns flowOf(TestSelectedProject)
             every { appStateRepository.observeThemeMode() } returns flowOf(ThemeMode.Dark)
             return SettingsViewModel(
-                getCurrentUser = GetCurrentUser(userRepository),
+                refreshCurrentUser = RefreshCurrentUser(userRepository),
+                observeCurrentUser = ObserveCurrentUser(userRepository),
                 getInstanceUrl = GetInstanceUrl(authRepository),
                 saveThemeMode = SaveThemeMode(appStateRepository),
                 logout = Logout(
                     authRepository,
-                    ClearLocalData(appStateRepository, organizationRepository, cacheRepository),
+                    ClearLocalData(appStateRepository, organizationRepository, userRepository, cacheRepository),
                 ),
                 observeOrganizations = ObserveOrganizations(organizationRepository),
                 observeSelectedProject = ObserveSelectedProject(appStateRepository),
@@ -75,7 +92,6 @@ class SettingsViewModelTest :
         }
 
         should("expose account, connection and theme once loaded") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.uiState.value shouldBe SettingsUiState(
@@ -97,30 +113,39 @@ class SettingsViewModelTest :
             verify { externalAppLauncher.openLinkSettings() }
         }
 
-        should("expose account error and allow retry") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Left(DataError.ConnectionError)
+        should("show the stored account and keep it when the background refresh fails") {
+            storedUser.value = TestUser
+            fetchAnswers(Either.Left(DataError.ConnectionError))
+            val viewModel = subject()
+            viewModel.uiState.subscribed {
+                viewModel.uiState.value.account shouldBe LoadState.Loaded(TestUser)
+                verifySuspend { userRepository.refreshCurrentUser() }
+            }
+        }
+
+        should("expose account error without a stored account and allow retry") {
+            fetchAnswers(Either.Left(DataError.ConnectionError))
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.uiState.value.account shouldBe LoadState.Error(DataError.ConnectionError)
 
-                everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
+                fetchAnswers(Either.Right(TestUser))
                 viewModel.refresh()
                 viewModel.uiState.value.account shouldBe LoadState.Loaded(TestUser)
             }
         }
 
         should("persist selected theme mode") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
             subject().onThemeModeSelected(ThemeMode.Light)
             verifySuspend { appStateRepository.saveThemeMode(ThemeMode.Light) }
         }
 
         should("clear local data and credentials on logout") {
-            everySuspend { userRepository.getCurrentUser() } returns Either.Right(TestUser)
             subject().onLogoutConfirmed()
             verifySuspend {
                 appStateRepository.clearSelectedProject()
                 organizationRepository.clear()
+                userRepository.clear()
                 authRepository.clear()
             }
         }
