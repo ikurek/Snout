@@ -27,6 +27,13 @@ class GetPostHogUrlTest :
 
         should("return null when not signed in") {
             everySuspend { authRepository.getInstanceUrl() } returns null
+            everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
+            subject(PostHogResource.Project) shouldBe null
+        }
+
+        should("return null when no project is selected") {
+            everySuspend { authRepository.getInstanceUrl() } returns "https://eu.posthog.com"
+            everySuspend { appStateRepository.getSelectedProject() } returns null
             subject(PostHogResource.Project) shouldBe null
         }
     })

@@ -16,7 +16,14 @@ class MultiplatformUnitTestPlugin : Plugin<Project> {
             pluginManager.apply(libs.findPlugin("mokkery").id)
 
             tasks.withType<Test>().configureEach {
-                if (name == "testAndroidHostTest") useJUnitPlatform()
+                if (name == "testAndroidHostTest") {
+                    useJUnitPlatform()
+                    // Kotest only finds project config at a fixed name unless told where it is.
+                    systemProperty(
+                        "kotest.framework.config.fqn",
+                        "com.nightcode.snout.shared.common.testutils.KotestProjectConfig",
+                    )
+                }
             }
 
             configure<KotlinMultiplatformExtension> {
