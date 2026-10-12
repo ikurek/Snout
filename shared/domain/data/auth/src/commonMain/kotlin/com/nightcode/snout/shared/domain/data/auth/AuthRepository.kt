@@ -9,5 +9,6 @@ interface AuthRepository {
     suspend fun saveInstanceUrl(url: String)
     suspend fun getInstanceUrl(): String?
     suspend fun clear()
+    suspend fun clearPersonalApiKey()
     fun observePersonalApiKey(): Flow<String?>
 }

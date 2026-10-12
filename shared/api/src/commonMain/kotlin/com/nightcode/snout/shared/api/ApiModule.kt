@@ -37,7 +37,8 @@ class ApiModule {
         install(HttpTimeout)
         install(Auth) {
             bearer {
-                cacheTokens = true
+                // Read the key per request: a cached one would outlive logging out and connecting another key.
+                cacheTokens = false
                 loadTokens {
                     dataStore.getPersonalApiKey()?.let {
                         BearerTokens(accessToken = it, refreshToken = null)
@@ -51,7 +52,8 @@ class ApiModule {
                 if (exception is ClientRequestException &&
                     exception.response.status == HttpStatusCode.Unauthorized
                 ) {
-                    dataStore.clear()
+                    // Keep the instance URL so the app reopens straight at the key step, not the intro.
+                    dataStore.clearPersonalApiKey()
                 }
             }
         }

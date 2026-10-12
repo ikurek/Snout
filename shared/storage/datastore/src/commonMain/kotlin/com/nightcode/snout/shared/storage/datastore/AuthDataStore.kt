@@ -35,6 +35,11 @@ class AuthDataStore internal constructor(private val dataStore: DataStore<Prefer
         }
     }
 
+    /** Drops only the key, so signing in again can start from the instance the user already chose. */
+    suspend fun clearPersonalApiKey() {
+        dataStore.edit { it.remove(PersonalApiKeyPreferenceKey) }
+    }
+
     fun observePersonalApiKey(): Flow<String?> =
         dataStore.data.map { it[PersonalApiKeyPreferenceKey]?.takeIf { key -> key.isNotBlank() } }
 }
