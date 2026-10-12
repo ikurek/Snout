@@ -12,9 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.compose.ui.unit.TextUnit
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import org.jetbrains.compose.resources.stringResource
+
+/**
+ * Input and placeholder text: `bodyLarge` without its line height. On iOS an empty line with a line height measures
+ * about 1.3dp taller than one with text, so the box grew while empty and shrank on the first character.
+ */
+private val FieldTextStyle
+    @Composable get() = SnoutTheme.typography.bodyLarge.copy(lineHeight = TextUnit.Unspecified)
 
 /** Form input with its label above the box; outlined so forms stay distinct from the tonal [SearchField]. */
 @Composable
@@ -38,6 +46,7 @@ internal fun PrimaryTextField(
         labelPosition = TextFieldLabelPosition.Above(),
         isError = error != null,
         lineLimits = lineLimits,
+        textStyle = FieldTextStyle,
         keyboardOptions = keyboardOptions,
         shape = SnoutTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
@@ -61,7 +70,7 @@ internal fun PrimaryTextField(
                 )
             }
         },
-        placeholder = placeholder?.let { { Text(it, style = SnoutTheme.typography.bodyLarge) } },
+        placeholder = placeholder?.let { { Text(it, style = FieldTextStyle) } },
     )
 }
 
