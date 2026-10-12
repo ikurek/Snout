@@ -1,13 +1,8 @@
 package com.nightcode.snout.designsystem.atoms
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -21,26 +16,21 @@ import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.brand_snout_logo
 
 private val LargeMarkThreshold = 48.dp
-private const val LogoInsetFraction = 5
 
-/** The Snout logo on a `primary` square, 36dp beside the app name on login; marks from 48dp get larger corners. */
+/**
+ * The app icon itself, in its own colours in both themes so it matches the launcher; marks from 48dp get larger
+ * corners.
+ */
 @Composable
 internal fun BrandMark(modifier: Modifier = Modifier, size: Dp = 36.dp) {
     val shape = if (size >= LargeMarkThreshold) SnoutTheme.shapes.large else SnoutTheme.shapes.medium
-    Box(
+    Image(
+        painter = painterResource(Res.drawable.brand_snout_logo),
+        contentDescription = null,
         modifier = modifier
             .size(size)
-            .clip(shape)
-            .background(SnoutTheme.colors.primary),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(Res.drawable.brand_snout_logo),
-            contentDescription = null,
-            tint = SnoutTheme.colors.onPrimary,
-            modifier = Modifier.fillMaxSize().padding(size / LogoInsetFraction),
-        )
-    }
+            .clip(shape),
+    )
 }
 
 @PreviewLightDark
