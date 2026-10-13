@@ -63,6 +63,8 @@ import snout.composeapp.generated.resources.settings_appearance_section
 import snout.composeapp.generated.resources.settings_connection_section
 import snout.composeapp.generated.resources.settings_customise_section
 import snout.composeapp.generated.resources.settings_instance_label
+import snout.composeapp.generated.resources.settings_libraries_description
+import snout.composeapp.generated.resources.settings_libraries_title
 import snout.composeapp.generated.resources.settings_logout_button
 import snout.composeapp.generated.resources.settings_logout_dialog_confirm
 import snout.composeapp.generated.resources.settings_logout_dialog_text
@@ -87,6 +89,7 @@ internal fun SettingsScreen(
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenLibraries: () -> Unit,
     onLogoutConfirmed: () -> Unit,
 ) {
     var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
@@ -106,6 +109,7 @@ internal fun SettingsScreen(
             onThemeModeSelected = onThemeModeSelected,
             onOpenNavigationSettings = onOpenNavigationSettings,
             onOpenAnalyticsSettings = onOpenAnalyticsSettings,
+            onOpenLibraries = onOpenLibraries,
             onLogoutClicked = { showLogoutDialog = true },
         )
     }
@@ -137,6 +141,7 @@ private fun SettingsContent(
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenLibraries: () -> Unit,
     onLogoutClicked: () -> Unit,
 ) {
     val themeLabels = ThemeMode.entries.associateWith { stringResource(it.label) }
@@ -166,6 +171,14 @@ private fun SettingsContent(
 
         SectionLabel(stringResource(Res.string.settings_about_section))
         KeyValueRow(label = stringResource(Res.string.settings_version_label), value = appVersionName())
+        EntityRow(
+            title = stringResource(Res.string.settings_libraries_title),
+            subtitle = stringResource(Res.string.settings_libraries_description),
+            subtitleStyle = SnoutTheme.typography.bodySmall,
+            divider = false,
+            onClick = onOpenLibraries,
+            trailing = { Chevron() },
+        )
 
         VerticalSpacer(Spacing.xxLarge)
         Hairline(inset = true)
@@ -306,6 +319,7 @@ fun SettingsScreenPreview() = SettingsScreen(
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
+    onOpenLibraries = {},
     onLogoutConfirmed = {},
 )
 
@@ -323,5 +337,6 @@ fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
+    onOpenLibraries = {},
     onLogoutConfirmed = {},
 )

@@ -15,6 +15,7 @@ internal fun SettingsRoute(
     onNavigateBack: () -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenLibraries: () -> Unit,
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,6 +33,7 @@ internal fun SettingsRoute(
         onThemeModeSelected = viewModel::onThemeModeSelected,
         onOpenNavigationSettings = onOpenNavigationSettings,
         onOpenAnalyticsSettings = onOpenAnalyticsSettings,
+        onOpenLibraries = onOpenLibraries,
         onLogoutConfirmed = viewModel::onLogoutConfirmed,
     )
 

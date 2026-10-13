@@ -1,8 +1,11 @@
+import com.mikepenz.aboutlibraries.plugin.StrictMode
+
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.compose)
     alias(libs.plugins.snout.multiplatform.koin)
     alias(libs.plugins.snout.multiplatform.unittest)
+    alias(libs.plugins.aboutLibraries)
 }
 
 kotlin {
@@ -25,6 +28,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.shared)
+            implementation(libs.aboutlibraries.core)
             // Compose
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -64,6 +68,40 @@ kotlin {
             implementation(libs.koin.test)
         }
     }
+}
+
+// Open-source licenses for the Libraries screen. The export collects this module's non-test classpaths (Android
+// runtime plus the common and iOS metadata, so :shared's dependencies are included) offline, with the license texts
+// from aboutlibraries/licenses. A license without a text there fails the build: add its file and allow it below.
+val libraryDefinitionsDir = "generated/aboutLibraries/composeResources"
+
+aboutLibraries {
+    offlineMode = true
+    collect {
+        configPath = file("aboutlibraries")
+        includePlatform = false
+    }
+    export {
+        outputFile = layout.buildDirectory.file("$libraryDefinitionsDir/files/aboutlibraries.json")
+    }
+    library {
+        mergePlatformArtifacts = true
+    }
+    license {
+        strictMode = StrictMode.FAIL
+        allowedLicenses.addAll("Apache-2.0", "BSD-3-Clause", "MIT")
+    }
+}
+
+// The export is generated on every build rather than committed: the platform source sets' compose resources come
+// from its output directory, so Android and iOS both package files/aboutlibraries.json and Gradle runs the export
+// before their resources are prepared. commonMain keeps its own src/commonMain/composeResources.
+val libraryDefinitions = tasks.named("exportLibraryDefinitions").map {
+    layout.buildDirectory.dir(libraryDefinitionsDir).get()
+}
+compose.resources {
+    customDirectory("androidMain", libraryDefinitions)
+    customDirectory("iosMain", libraryDefinitions)
 }
 
 composeCompiler {

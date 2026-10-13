@@ -37,6 +37,13 @@ internal data object NavigationSettingsNavKey : SnoutNavKey
 internal data object AnalyticsSettingsNavKey : SnoutNavKey
 
 @Serializable
+internal data object LibrariesNavKey : SnoutNavKey
+
+/** A bundled open-source library, by its Maven `group:artifact`. */
+@Serializable
+internal data class LibraryDetailNavKey(val uniqueId: String) : SnoutNavKey
+
+@Serializable
 internal data class DashboardDetailNavKey(val dashboardId: Long) : SnoutNavKey
 
 @Serializable

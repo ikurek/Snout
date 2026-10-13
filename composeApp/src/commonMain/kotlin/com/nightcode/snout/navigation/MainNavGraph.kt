@@ -30,6 +30,8 @@ import com.nightcode.snout.features.logs.service.LogServiceRoute
 import com.nightcode.snout.features.onboarding.OnboardingRoute
 import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
+import com.nightcode.snout.features.settings.libraries.LibrariesRoute
+import com.nightcode.snout.features.settings.libraries.detail.LibraryDetailRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
@@ -180,10 +182,15 @@ private fun EntryProviderScope<NavKey>.settingsEntries(backStack: NavBackStack<N
             onNavigateBack = back,
             onOpenNavigationSettings = { backStack.add(NavigationSettingsNavKey) },
             onOpenAnalyticsSettings = { backStack.add(AnalyticsSettingsNavKey) },
+            onOpenLibraries = { backStack.add(LibrariesNavKey) },
         )
     }
     entry<NavigationSettingsNavKey> { NavigationSettingsRoute(onNavigateBack = back) }
     entry<AnalyticsSettingsNavKey> { AnalyticsSettingsRoute(onNavigateBack = back) }
+    entry<LibrariesNavKey> {
+        LibrariesRoute(onNavigateBack = back, onOpenLibrary = { backStack.add(LibraryDetailNavKey(it)) })
+    }
+    entry<LibraryDetailNavKey> { key -> LibraryDetailRoute(navKey = key, onNavigateBack = back) }
 }
 
 /** A single dashboard, insight, flag, issue or experiment, opened from a list or a link. */

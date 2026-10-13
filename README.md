@@ -25,7 +25,8 @@ except calls to the instance you configure.
 - **Activity log**: who changed what in the project, with before/after values.
 - **Settings**: account, instance, selected project, light/dark/system theme, log out. Customise which four
   sections sit in the bottom bar (the rest live under More) and which opens first, and what the Analytics
-  tab shows: default range, stat cards, visitors chart and breakdown tables.
+  tab shows: default range, stat cards, visitors chart and breakdown tables. An open-source libraries screen lists
+  every bundled library with its version, author and license, and opens each for its full license text and website.
 - Every screen has loading, empty, error, permission-denied and rate-limited states, pull to refresh and an
   "open in PostHog" action.
 
@@ -191,5 +192,15 @@ mirror the package tree. Previews are `public` only because those wrappers live 
 them; they are not API for anything else. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
 renaming previews run `scripts/generate_screenshot_tests.py`; after an intended UI change regenerate the
 references with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
+
+Open-source licenses: the [AboutLibraries](https://github.com/mikepenz/AboutLibraries) plugin in `composeApp` runs
+`exportLibraryDefinitions` as part of every build. It collects the non-test classpaths of `composeApp` (Android
+runtime plus the common and iOS metadata, so everything `:shared` pulls in is listed) into
+`composeApp/build/generated/aboutLibraries/composeResources/files/aboutlibraries.json`, which is the
+`androidMain` and `iosMain` compose resource directory, so both apps (including the Xcode-run Gradle build) bundle
+it without a manual step; it is not committed. The export runs offline: license texts come from
+`composeApp/aboutlibraries/licenses/`, and only the licenses in `aboutLibraries.license.allowedLicenses` are
+accepted. A dependency bringing a new license fails the build; add its text there (same JSON shape, `hash` = SPDX id)
+and allow it. `./gradlew :composeApp:findLibraries` lists what is collected.
 
 If Gradle cannot find the Android SDK, add a `local.properties` with `sdk.dir=/path/to/Android/sdk`.
