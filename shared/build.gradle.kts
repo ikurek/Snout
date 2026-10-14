@@ -62,6 +62,5 @@ kotlin {
         implementation(projects.shared.api.logs)
         implementation(projects.shared.api.organizations)
         implementation(projects.shared.api.users)
-        implementation(projects.shared.common.coroutines)
     }
 }

@@ -9,7 +9,6 @@ kotlin {
     }
 
     sourceSets.commonMain.dependencies {
-        implementation(projects.shared.common.coroutines)
         implementation(libs.ksafe)
     }
 }

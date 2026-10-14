@@ -4,27 +4,25 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.nightcode.snout.shared.storage.database.entity.OrganizationEntity
 import com.nightcode.snout.shared.storage.database.entity.ProjectEntity
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 
 /** The stored organizations, each with its projects. */
-class OrganizationsDatabase internal constructor(
-    private val database: SnoutDatabase,
-    private val ioDispatcher: CoroutineDispatcher,
-) {
+class OrganizationsDatabase internal constructor(private val database: SnoutDatabase) {
 
     fun observe(): Flow<List<OrganizationEntity>> {
         val orgsFlow = database.organizationQueries
             .selectAll()
             .asFlow()
-            .mapToList(ioDispatcher)
+            .mapToList(Dispatchers.IO)
 
         val projectsFlow = database.projectQueries
             .selectAll()
             .asFlow()
-            .mapToList(ioDispatcher)
+            .mapToList(Dispatchers.IO)
 
         return combine(orgsFlow, projectsFlow) { orgs, projects ->
             val projectsByOrgId = projects.groupBy { it.organization_id }
@@ -47,7 +45,7 @@ class OrganizationsDatabase internal constructor(
     }
 
     suspend fun replaceAll(organizations: List<OrganizationEntity>) {
-        withContext(ioDispatcher) {
+        withContext(Dispatchers.IO) {
             database.transaction {
                 database.organizationQueries.deleteAll()
                 database.projectQueries.deleteAll()

@@ -52,7 +52,7 @@ shared/       Kotlin business logic, one module per layer and feature:
   domain/usecase/<feature> use cases exposed to the UI
   storage/                 DataStore preferences, SQLDelight (organizations and projects) and the
                            secure store (KSafe) for the API key and account
-  common/                  coroutine dispatchers, `@TestData` opt-in, test utilities
+  common/                  `@TestData` opt-in, test utilities
 buildLogic/   Gradle convention plugins
 scripts/      generate_screenshot_tests.py
 ```

@@ -13,7 +13,6 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)
-            implementation(projects.shared.common.coroutines)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.driver.android)

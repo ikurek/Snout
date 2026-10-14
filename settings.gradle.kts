@@ -111,7 +111,6 @@ include(":shared:domain:usecase:organization")
 include(":shared:domain:usecase:user")
 
 // Common
-include(":shared:common:coroutines")
 include(":shared:common:testdata")
 include(":shared:common:testutils")
 
