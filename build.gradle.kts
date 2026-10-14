@@ -17,8 +17,9 @@ plugins {
     alias(libs.plugins.composeScreenshot) apply false
 }
 
+// `detekt` only checks; `detektFormat` rewrites what the ktlint rules can fix.
 detekt {
-    autoCorrect = true
+    autoCorrect = false
     buildUponDefaultConfig = true
     config.setFrom("$rootDir/detekt.yml")
     parallel = true
@@ -27,6 +28,17 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     exclude("**/build/**")
+}
+
+// Same sources and config as `detekt` (every Detekt task takes its settings from the extension), but fixing what it
+// can. It doesn't fail on what is left: run `detekt` afterwards to see that.
+tasks.register<Detekt>("detektFormat") {
+    description = "Fixes formatting with detekt's autocorrecting rules (ktlint)."
+    group = "formatting"
+    autoCorrect = true
+    ignoreFailures = true
+    setSource(detekt.source)
+    include("**/*.kt", "**/*.kts")
 }
 
 dependencies {

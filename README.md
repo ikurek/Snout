@@ -182,8 +182,9 @@ Checks before a pull request:
 ./gradlew :androidApp:validateDebugScreenshotTest
 ```
 
-The Android tasks never compile Kotlin/Native, so the iOS compile is needed to catch iOS-only breakage. detekt
-(with ktlint rules) runs with `autoCorrect` on and rewrites files, so review the diff after it.
+The Android tasks never compile Kotlin/Native, so the iOS compile is needed to catch iOS-only breakage. `detekt`
+(with ktlint rules) only checks; `./gradlew detektFormat` fixes what the formatting rules can (it rewrites files,
+so review the diff after it) and then `detekt` reports what is left.
 
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
 generated wrappers in `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Wrappers are
