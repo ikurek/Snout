@@ -7,8 +7,6 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.designsystem.molecules.Placeholder
 import com.nightcode.snout.shared.domain.model.common.DataError
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
@@ -39,13 +37,58 @@ import snout.composeapp.generated.resources.placeholder_search_empty_message
 /** A load that failed: an icon and wording for the kind of [error], and a retry. */
 @Composable
 internal fun ErrorPlaceholder(error: DataError, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    ResourcePlaceholder(content = error.placeholderContent(), onAction = onRetry, modifier = modifier)
+    when (error) {
+        DataError.Unauthorized, DataError.Forbidden -> Placeholder(
+            icon = painterResource(Res.drawable.ic_lock_outlined_24dp),
+            title = stringResource(Res.string.placeholder_permission_denied_title),
+            message = stringResource(Res.string.placeholder_permission_denied_subtitle),
+            actionLabel = stringResource(Res.string.placeholder_permission_denied_retry),
+            onAction = onRetry,
+            modifier = modifier,
+        )
+
+        DataError.PaymentRequired -> Placeholder(
+            icon = painterResource(Res.drawable.ic_credit_card_24dp),
+            title = stringResource(Res.string.placeholder_payment_required_title),
+            message = stringResource(Res.string.placeholder_payment_required_subtitle),
+            actionLabel = stringResource(Res.string.placeholder_payment_required_retry),
+            onAction = onRetry,
+            modifier = modifier,
+        )
+
+        DataError.RateLimited -> Placeholder(
+            icon = painterResource(Res.drawable.ic_schedule_24dp),
+            title = stringResource(Res.string.placeholder_rate_limited_title),
+            message = stringResource(Res.string.placeholder_rate_limited_subtitle),
+            actionLabel = stringResource(Res.string.placeholder_rate_limited_retry),
+            onAction = onRetry,
+            modifier = modifier,
+        )
+
+        DataError.NotFound -> NothingFoundPlaceholder(onRetry = onRetry, modifier = modifier)
+
+        DataError.ConnectionError, DataError.UnexpectedError -> Placeholder(
+            icon = painterResource(Res.drawable.ic_warning_outlined_24dp),
+            title = stringResource(Res.string.placeholder_generic_error_title),
+            message = stringResource(Res.string.placeholder_generic_error_subtitle),
+            actionLabel = stringResource(Res.string.placeholder_generic_error_retry),
+            onAction = onRetry,
+            modifier = modifier,
+        )
+    }
 }
 
 /** A load that succeeded with nothing to show; the action refreshes. */
 @Composable
 internal fun NothingFoundPlaceholder(onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    ResourcePlaceholder(content = NothingFound, onAction = onRetry, modifier = modifier)
+    Placeholder(
+        icon = painterResource(Res.drawable.ic_info_outlined_24dp),
+        title = stringResource(Res.string.placeholder_nothing_found_title),
+        message = stringResource(Res.string.placeholder_nothing_found_subtitle),
+        actionLabel = stringResource(Res.string.placeholder_nothing_found_retry),
+        onAction = onRetry,
+        modifier = modifier,
+    )
 }
 
 /** Empty result of a filter query; the search field stays visible above it so the query can be edited. */
@@ -81,66 +124,6 @@ internal fun UnavailablePlaceholder(
         modifier = modifier,
     )
 }
-
-private class PlaceholderContent(
-    val icon: DrawableResource,
-    val title: StringResource,
-    val message: StringResource,
-    val action: StringResource,
-)
-
-private val NothingFound = PlaceholderContent(
-    icon = Res.drawable.ic_info_outlined_24dp,
-    title = Res.string.placeholder_nothing_found_title,
-    message = Res.string.placeholder_nothing_found_subtitle,
-    action = Res.string.placeholder_nothing_found_retry,
-)
-
-private fun DataError.placeholderContent(): PlaceholderContent = when (this) {
-    DataError.Unauthorized, DataError.Forbidden -> PlaceholderContent(
-        icon = Res.drawable.ic_lock_outlined_24dp,
-        title = Res.string.placeholder_permission_denied_title,
-        message = Res.string.placeholder_permission_denied_subtitle,
-        action = Res.string.placeholder_permission_denied_retry,
-    )
-
-    DataError.PaymentRequired -> PlaceholderContent(
-        icon = Res.drawable.ic_credit_card_24dp,
-        title = Res.string.placeholder_payment_required_title,
-        message = Res.string.placeholder_payment_required_subtitle,
-        action = Res.string.placeholder_payment_required_retry,
-    )
-
-    DataError.RateLimited -> PlaceholderContent(
-        icon = Res.drawable.ic_schedule_24dp,
-        title = Res.string.placeholder_rate_limited_title,
-        message = Res.string.placeholder_rate_limited_subtitle,
-        action = Res.string.placeholder_rate_limited_retry,
-    )
-
-    DataError.NotFound -> NothingFound
-
-    DataError.ConnectionError, DataError.UnexpectedError -> PlaceholderContent(
-        icon = Res.drawable.ic_warning_outlined_24dp,
-        title = Res.string.placeholder_generic_error_title,
-        message = Res.string.placeholder_generic_error_subtitle,
-        action = Res.string.placeholder_generic_error_retry,
-    )
-}
-
-@Composable
-private fun ResourcePlaceholder(content: PlaceholderContent, onAction: () -> Unit, modifier: Modifier) {
-    Placeholder(
-        icon = painterResource(content.icon),
-        title = stringResource(content.title),
-        message = stringResource(content.message),
-        actionLabel = stringResource(content.action),
-        onAction = onAction,
-        modifier = modifier,
-    )
-}
-
-// The error previews keep the names they had as separate components, so their reference images carry over.
 
 @PreviewLightDark
 @PreviewWrapper(ThemePreviewWrapper::class)
