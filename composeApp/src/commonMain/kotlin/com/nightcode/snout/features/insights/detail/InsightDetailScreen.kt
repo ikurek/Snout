@@ -18,15 +18,14 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatDateTime
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.TagList
-import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.FavoriteIconButton
@@ -64,7 +63,7 @@ internal fun InsightDetailScreen(
     onToggleFavorite: () -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    val detail = state.dataOrNull
+    val detail = state.insight
     PushedScreenScaffold(
         title = detail?.summary?.name ?: stringResource(Res.string.insight_title_placeholder),
         onNavigateBack = onNavigateBack,
@@ -77,13 +76,24 @@ internal fun InsightDetailScreen(
         },
         snackbarHostState = snackbarHostState,
     ) { innerPadding ->
-        LoadStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.padding(innerPadding.withoutBottom()),
-            loadingContent = { SkeletonRows(count = LoadingRowCount) },
-        ) { detail ->
-            DetailContent(detail, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+        val modifier = Modifier.padding(innerPadding.withoutBottom())
+        if (detail == null) {
+            LoadingOrErrorContent(
+                error = state.error,
+                onRetry = onRefresh,
+                modifier = modifier,
+                loadingContent = { SkeletonRows(count = LoadingRowCount) },
+            )
+        } else {
+            RefreshableContent(
+                isRefreshing = state.isRefreshing,
+                refreshError = state.error,
+                onRefresh = onRefresh,
+                modifier = modifier,
+                isPullToRefreshEnabled = false,
+            ) {
+                DetailContent(detail, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+            }
         }
     }
 }
@@ -143,7 +153,7 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenPreview() = InsightDetailScreen(
-    state = LoadState.Loaded(TestInsightDetail),
+    state = InsightDetailUiState(insight = TestInsightDetail),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRefresh = {},
@@ -156,8 +166,8 @@ fun InsightDetailScreenPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
-    state = LoadState.Loaded(
-        TestInsightDetail.copy(
+    state = InsightDetailUiState(
+        insight = TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Day 1 retention",
                 kind = InsightKind.Retention,
@@ -178,8 +188,8 @@ fun InsightDetailScreenRetentionPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
-    state = LoadState.Loaded(
-        TestInsightDetail.copy(
+    state = InsightDetailUiState(
+        insight = TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Pageviews by browser",
                 description = null,
@@ -200,8 +210,8 @@ fun InsightDetailScreenComparisonPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
-    state = LoadState.Loaded(
-        TestInsightDetail.copy(
+    state = InsightDetailUiState(
+        insight = TestInsightDetail.copy(
             summary = TestInsightSummary.copy(
                 name = "Checkout by browser",
                 description = null,
@@ -224,7 +234,7 @@ fun InsightDetailScreenFunnelPreview() = InsightDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightDetailScreenPendingPreview() = InsightDetailScreen(
-    state = LoadState.Loaded(TestInsightDetail.copy(result = null)),
+    state = InsightDetailUiState(insight = TestInsightDetail.copy(result = null)),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRefresh = {},

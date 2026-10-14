@@ -117,13 +117,23 @@ Screens (`composeApp/.../features/<feature>/`, nested packages such as `detail/`
   `XViewModel.kt`; `XUiState.kt` holds the state, the `XSideEffect` type if any, and `TestX…` fixtures for
   previews. `components/` holds the pieces, with labels in `XLabels.kt`
   (`val X.label: StringResource` and similar).
-- One `uiState: StateFlow` per view model. Lists and other screens that reload use `RefreshableUiState`, built by
-  `loadRefreshable`/`loadRefreshableList` (`common/state/RefreshableUiState.kt`) from the reload signal (plus any
-  filter that changes what is loaded), the pull-to-refresh flow and the fetch: the first load shows skeletons,
-  a reload keeps what was loaded on screen and shows a failure as a banner over it, a newer reload cancels the one
-  running, and loading something else (another project, range or status) starts from the skeleton. One-shot
-  fetches such as detail screens use `LoadState`. Live search and filter results (`searchResults`,
-  `liveResults`) replace the list while active and fall back to it otherwise.
+- One `uiState: StateFlow` per view model, backed by a `MutableStateFlow<XUiState>` it changes with `update {}`.
+  Each screen's state is its own data class with fields named for its data: the loaded data, null until the first
+  load succeeds (`flags: List<FeatureFlag>?`), `error: DataError?` and `isRefreshing`, next to the screen's filters
+  and statuses. Nothing loaded and no error is the skeleton; an error with nothing loaded is the error placeholder;
+  an error with data loaded is a banner over it. There are no shared state types or loading helpers: each view
+  model has a private `load()` that cancels the previous load's `Job`, keeps what is loaded on screen marked as
+  refreshing, calls the use case and folds the `Either` into the state. Lists collect their `Observe<Feature>Reloads`
+  and call `load()` on each `ProjectReload`; another project (or range, or status) clears the data first, so it
+  starts from the skeleton. Live search and filter results (feature flags, insights, error tracking) sit in their
+  own fields (`searchResults`, `filteredIssues`), fetched by the view model once typing pauses (`debounce` with
+  `collectLatest`), and replace the list on screen while a query or filter is set.
+- Every screen showing fetched data refreshes each time it is entered: its Route calls
+  `RefreshOnEnter(viewModel::onScreenEntered)` (`common/compose`, a `LifecycleResumeEffect`), which runs on every
+  resume: navigating to the screen or back to its tab, popping the screen pushed over it (Navigation 3 resumes an
+  entry once its transition settles), and returning from the background (iOS too). `onScreenEntered` refreshes as
+  pull to refresh does except on the first call (the first load is already running then) and while a load runs, so
+  loads never stack. Settings refreshes the account the same way; onboarding and bundled data (libraries) don't.
 - Transient results (a failed favorite, navigation after an action) go through a `Channel` exposed as
   `sideEffects`. A failure is kept in the state only when it renders inline next to what failed (in a sheet or
   under a control).
@@ -162,11 +172,13 @@ The UI follows the "Ember" design: warm paper neutrals, a burnt-orange `primary`
   `KeyValueRow`, `StatCard`, `SectionCard` and `TonalCard`, `CodeBlock` and `CodeChip`, `InfoBanner`,
   `InlineErrorBanner`, `SegmentedControl`, `Placeholder`.
 - `organisms/` are screen-level: `PushedScreenScaffold` (back arrow, title, actions and open in PostHog for every
-  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, `RefreshableStateContainer` and
-  `LoadStateContainer` (skeleton loading, placeholders, refresh banner), `AnimatedBottomSheet` and
-  `OptionPickerSheet`, `ConfirmationDialog`, and the state placeholders: `ErrorPlaceholder` (worded per
-  `DataError`), `NothingFoundPlaceholder`, `NoSearchResultsPlaceholder` and `UnavailablePlaceholder` (a section
-  the instance answers 404 for, via `RefreshableStateContainer`'s `notFoundContent`).
+  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, the pieces a screen picks from its own
+  state (`RefreshableContent.kt`: `LoadingOrErrorContent` for the skeleton or the error placeholder,
+  `RefreshableContent` for loaded data under pull to refresh and the refresh-failed banner,
+  `RefreshableEmptyContent`), `AnimatedBottomSheet` and `OptionPickerSheet`, `ConfirmationDialog`, and the state
+  placeholders: `ErrorPlaceholder` (worded per `DataError`), `NothingFoundPlaceholder`,
+  `NoSearchResultsPlaceholder` and `UnavailablePlaceholder` (a section the instance answers 404 for, via
+  `LoadingOrErrorContent`'s `notFoundContent`).
 - `charts/` draw insight results with the `extendedColors.chart` palette.
 
 Rules of thumb: lists are `EntityRow`s separated by `Hairline`s with no card per row; detail screens use

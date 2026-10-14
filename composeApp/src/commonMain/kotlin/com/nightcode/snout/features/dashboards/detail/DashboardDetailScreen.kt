@@ -14,15 +14,15 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.SectionCard
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.components.InsightResultView
 import com.nightcode.snout.features.insights.components.label
@@ -45,28 +45,34 @@ internal fun DashboardDetailScreen(
     onOpenInsight: (insightId: Long) -> Unit,
     onOpenInPostHog: () -> Unit,
 ) {
-    val title = (state.dashboard as? RefreshableUiState.Content)?.data?.name
-        ?: stringResource(Res.string.dashboard_title_placeholder)
+    val dashboard = state.dashboard
+    val title = dashboard?.name ?: stringResource(Res.string.dashboard_title_placeholder)
     PushedScreenScaffold(
         title = title,
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        RefreshableStateContainer(
-            state = state.dashboard,
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
-        ) { dashboard ->
-            if (dashboard.tiles.isEmpty()) {
-                NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-            } else {
-                TileList(
-                    state = state,
-                    tiles = dashboard.tiles,
-                    onRetryTile = onRetryTile,
-                    onOpenInsight = onOpenInsight,
-                    contentPadding = innerPadding.bottomOnly(),
-                )
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
+        if (dashboard == null) {
+            LoadingOrErrorContent(error = state.error, onRetry = onRefresh, modifier = modifier)
+        } else {
+            RefreshableContent(
+                isRefreshing = state.isRefreshing,
+                refreshError = state.error,
+                onRefresh = onRefresh,
+                modifier = modifier,
+            ) {
+                if (dashboard.tiles.isEmpty()) {
+                    NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
+                } else {
+                    TileList(
+                        state = state,
+                        tiles = dashboard.tiles,
+                        onRetryTile = onRetryTile,
+                        onOpenInsight = onOpenInsight,
+                        contentPadding = innerPadding.bottomOnly(),
+                    )
+                }
             }
         }
     }
@@ -146,13 +152,10 @@ fun DashboardDetailScreenPreview() = DashboardDetailScreen(
 @Composable
 fun DashboardDetailScreenTilesPendingPreview() = DashboardDetailScreen(
     state = TestDashboardDetailUiState.copy(
-        dashboard = RefreshableUiState.Content(
-            TestDashboard.copy(
-                tiles = TestDashboard.tiles.map { tile ->
-                    if (tile is DashboardTile.InsightTile) tile.copy(result = null) else tile
-                },
-            ),
-            isRefreshing = false,
+        dashboard = TestDashboard.copy(
+            tiles = TestDashboard.tiles.map { tile ->
+                if (tile is DashboardTile.InsightTile) tile.copy(result = null) else tile
+            },
         ),
         tiles = mapOf(
             TestInsightSummary.id to TileStatus.Loading,
@@ -170,7 +173,7 @@ fun DashboardDetailScreenTilesPendingPreview() = DashboardDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun DashboardDetailScreenErrorPreview() = DashboardDetailScreen(
-    state = DashboardDetailUiState(dashboard = RefreshableUiState.Error(DataError.NotFound)),
+    state = DashboardDetailUiState(error = DataError.NotFound),
     onNavigateBack = {},
     onRefresh = {},
     onRetryTile = {},

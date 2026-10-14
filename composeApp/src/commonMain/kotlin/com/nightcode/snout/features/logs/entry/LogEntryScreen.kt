@@ -17,13 +17,15 @@ import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatLogTime
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.CodeBlock
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogSeverityTag
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -47,7 +49,7 @@ private const val AttributeValueLines = 4
 @Composable
 internal fun LogEntryScreen(
     service: String,
-    state: LoadState<LogEntry>,
+    state: LogEntryUiState,
     onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     onOpenInPostHog: () -> Unit,
@@ -57,12 +59,25 @@ internal fun LogEntryScreen(
         onNavigateBack = onNavigateBack,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        LoadStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.padding(innerPadding.withoutBottom()),
-        ) { entry ->
-            LogEntryContent(entry, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+        val entry = state.entry
+        val modifier = Modifier.padding(innerPadding.withoutBottom())
+        if (entry == null) {
+            LoadingOrErrorContent(
+                error = state.error,
+                onRetry = onRefresh,
+                modifier = modifier,
+                loadingContent = { SkeletonRows(count = DetailLoadingRowCount) },
+            )
+        } else {
+            RefreshableContent(
+                isRefreshing = state.isRefreshing,
+                refreshError = state.error,
+                onRefresh = onRefresh,
+                modifier = modifier,
+                isPullToRefreshEnabled = false,
+            ) {
+                LogEntryContent(entry, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+            }
         }
     }
 }
@@ -121,7 +136,7 @@ private fun AttributeSection(title: String, attributes: Map<String, String>) {
 @Composable
 fun LogEntryScreenPreview() = LogEntryScreen(
     service = "checkout-api",
-    state = LoadState.Loaded(TestLogEntries.first()),
+    state = LogEntryUiState(entry = TestLogEntries.first()),
     onNavigateBack = {},
     onRefresh = {},
     onOpenInPostHog = {},
@@ -132,7 +147,7 @@ fun LogEntryScreenPreview() = LogEntryScreen(
 @Composable
 fun LogEntryScreenNotFoundPreview() = LogEntryScreen(
     service = "checkout-api",
-    state = LoadState.Error(DataError.NotFound),
+    state = LogEntryUiState(error = DataError.NotFound),
     onNavigateBack = {},
     onRefresh = {},
     onOpenInPostHog = {},

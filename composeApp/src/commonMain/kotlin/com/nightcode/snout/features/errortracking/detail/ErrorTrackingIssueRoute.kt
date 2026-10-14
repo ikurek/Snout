@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.navigation.ErrorTrackingIssueNavKey
@@ -27,6 +28,7 @@ import snout.composeapp.generated.resources.error_tracking_undo
 internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<ErrorTrackingIssueViewModel> { parametersOf(navKey.issueId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val openInPostHog = rememberPostHogOpener()
     val snackbarHostState = remember { SnackbarHostState() }
 

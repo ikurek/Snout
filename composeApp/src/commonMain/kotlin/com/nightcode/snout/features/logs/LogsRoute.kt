@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -14,6 +15,7 @@ internal fun LogsRoute(
 ) {
     val viewModel = koinViewModel<LogsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
 
     LogsScreen(
         state = state,

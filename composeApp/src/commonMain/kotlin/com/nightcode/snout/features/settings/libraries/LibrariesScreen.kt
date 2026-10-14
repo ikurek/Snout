@@ -13,12 +13,14 @@ import com.mikepenz.aboutlibraries.entity.Library
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.state.LoadState
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.settings.libraries.components.author
@@ -32,7 +34,7 @@ import snout.composeapp.generated.resources.libraries_unknown_license
 /** Every open-source library the app ships with, by name, with its version, author and license. */
 @Composable
 internal fun LibrariesScreen(
-    state: LoadState<List<Library>>,
+    state: LibrariesUiState,
     onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     onOpenLibrary: (uniqueId: String) -> Unit,
@@ -41,18 +43,31 @@ internal fun LibrariesScreen(
         title = stringResource(Res.string.libraries_screen_title),
         onNavigateBack = onNavigateBack,
     ) { innerPadding ->
-        LoadStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.padding(innerPadding.withoutBottom()),
-        ) { libraries ->
-            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
-                itemsIndexed(libraries, key = { _, library -> library.uniqueId }) { index, library ->
-                    LibraryRow(
-                        library = library,
-                        divider = index < libraries.lastIndex,
-                        onClick = { onOpenLibrary(library.uniqueId) },
-                    )
+        val libraries = state.libraries
+        val modifier = Modifier.padding(innerPadding.withoutBottom())
+        if (libraries == null) {
+            LoadingOrErrorContent(
+                error = state.error,
+                onRetry = onRefresh,
+                modifier = modifier,
+                loadingContent = { SkeletonRows(count = DetailLoadingRowCount) },
+            )
+        } else {
+            RefreshableContent(
+                isRefreshing = false,
+                refreshError = null,
+                onRefresh = onRefresh,
+                modifier = modifier,
+                isPullToRefreshEnabled = false,
+            ) {
+                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
+                    itemsIndexed(libraries, key = { _, library -> library.uniqueId }) { index, library ->
+                        LibraryRow(
+                            library = library,
+                            divider = index < libraries.lastIndex,
+                            onClick = { onOpenLibrary(library.uniqueId) },
+                        )
+                    }
                 }
             }
         }
@@ -85,7 +100,7 @@ private fun LibraryRow(library: Library, divider: Boolean, onClick: () -> Unit) 
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LibrariesScreenPreview() = LibrariesScreen(
-    state = LoadState.Loaded(TestLibraries),
+    state = LibrariesUiState(libraries = TestLibraries),
     onNavigateBack = {},
     onRefresh = {},
     onOpenLibrary = {},
@@ -95,7 +110,7 @@ fun LibrariesScreenPreview() = LibrariesScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LibrariesScreenLoadingPreview() = LibrariesScreen(
-    state = LoadState.Loading,
+    state = LibrariesUiState(),
     onNavigateBack = {},
     onRefresh = {},
     onOpenLibrary = {},

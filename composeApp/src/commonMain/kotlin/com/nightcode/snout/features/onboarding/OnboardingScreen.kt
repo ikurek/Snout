@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
@@ -313,7 +312,7 @@ fun OnboardingScreenProjectSelectionPreview() = OnboardingPreview(step = Onboard
 @Composable
 fun OnboardingScreenProjectSelectionLoadingPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
-    projectSelectionState = LoadState.Loading,
+    projectSelectionState = ProjectSelectionUiState(),
 )
 
 @PreviewLightDark
@@ -321,5 +320,5 @@ fun OnboardingScreenProjectSelectionLoadingPreview() = OnboardingPreview(
 @Composable
 fun OnboardingScreenProjectSelectionErrorPreview() = OnboardingPreview(
     step = OnboardingStep.ProjectSelection,
-    projectSelectionState = LoadState.Error(DataError.UnexpectedError),
+    projectSelectionState = ProjectSelectionUiState(error = DataError.UnexpectedError),
 )

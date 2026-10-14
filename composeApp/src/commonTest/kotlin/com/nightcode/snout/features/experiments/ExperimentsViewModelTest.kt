@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.experiments
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -14,7 +13,6 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.experiments.GetExperiments
 import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperimentReloads
-import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -50,13 +48,8 @@ class ExperimentsViewModelTest :
         should("load the experiments on start and hide archived ones") {
             everySuspend { repository.getExperiments(any()) } returns loaded
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe RefreshableUiState.Content(
-                    listOf(TestExperiment),
-                    isRefreshing = false,
-                )
-                verifySuspend { repository.getExperiments(TestSelectedProject.projectId) }
-            }
+            viewModel.uiState.value shouldBe ExperimentsUiState(experiments = listOf(TestExperiment))
+            verifySuspend { repository.getExperiments(TestSelectedProject.projectId) }
         }
 
         should("keep the experiments and report a failed pull to refresh") {
@@ -65,22 +58,17 @@ class ExperimentsViewModelTest :
                 returns(Either.Left(DataError.RateLimited))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.refresh()
-                viewModel.uiState.value shouldBe RefreshableUiState.Content(
-                    listOf(TestExperiment),
-                    isRefreshing = false,
-                    refreshError = DataError.RateLimited,
-                )
-            }
+            viewModel.refresh()
+            viewModel.uiState.value shouldBe ExperimentsUiState(
+                experiments = listOf(TestExperiment),
+                error = DataError.RateLimited,
+            )
         }
 
         should("load again when another project is selected") {
             everySuspend { repository.getExperiments(any()) } returns loaded
-            val viewModel = subject()
-            viewModel.uiState.subscribed {
-                selected.value = TestSelectedProject.copy(projectId = 2)
-                verifySuspend { repository.getExperiments(2) }
-            }
+            subject()
+            selected.value = TestSelectedProject.copy(projectId = 2)
+            verifySuspend { repository.getExperiments(2) }
         }
     })

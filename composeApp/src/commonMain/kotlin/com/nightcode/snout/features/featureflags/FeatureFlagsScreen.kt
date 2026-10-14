@@ -16,14 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.molecules.CodeChip
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.components.FeatureFlagStatusPill
@@ -53,24 +54,35 @@ internal fun FeatureFlagsScreen(
             placeholder = stringResource(Res.string.feature_flags_search_placeholder),
             modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        RefreshableStateContainer(
-            state = state.flags,
-            onRefresh = onRefresh,
-            emptyContent = {
-                if (state.query.isBlank()) {
-                    NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-                } else {
+        // A query shows its search results instead of the project's flags.
+        val isSearching = state.query.isNotBlank()
+        val flags = if (isSearching) state.searchResults else state.flags
+        val error = if (isSearching) state.searchError else state.error
+        val isRefreshing = !isSearching && state.isRefreshing
+        when {
+            flags == null -> LoadingOrErrorContent(error = error, onRetry = onRefresh)
+
+            flags.isEmpty() -> RefreshableEmptyContent(isRefreshing = isRefreshing, onRefresh = onRefresh) {
+                if (isSearching) {
                     NoSearchResultsPlaceholder(
                         title = stringResource(Res.string.feature_flags_search_empty_title),
                         onClearSearch = { searchState.clearText() },
                         modifier = Modifier.fillMaxSize(),
                     )
+                } else {
+                    NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
                 }
-            },
-        ) { flags ->
-            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
-                itemsIndexed(flags, key = { _, flag -> flag.id }) { index, flag ->
-                    FeatureFlagRow(flag = flag, divider = index < flags.lastIndex, onClick = { onOpenFlag(flag.id) })
+            }
+
+            else -> RefreshableContent(isRefreshing = isRefreshing, refreshError = error, onRefresh = onRefresh) {
+                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
+                    itemsIndexed(flags, key = { _, flag -> flag.id }) { index, flag ->
+                        FeatureFlagRow(
+                            flag = flag,
+                            divider = index < flags.lastIndex,
+                            onClick = { onOpenFlag(flag.id) },
+                        )
+                    }
                 }
             }
         }
@@ -117,7 +129,7 @@ fun FeatureFlagsScreenPreview() = FeatureFlagsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
-    state = FeatureFlagsUiState(flags = RefreshableUiState.Empty(isRefreshing = false)),
+    state = FeatureFlagsUiState(flags = emptyList()),
     onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},
@@ -127,7 +139,7 @@ fun FeatureFlagsScreenEmptyPreview() = FeatureFlagsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagsScreenForbiddenPreview() = FeatureFlagsScreen(
-    state = FeatureFlagsUiState(flags = RefreshableUiState.Error(DataError.Forbidden)),
+    state = FeatureFlagsUiState(error = DataError.Forbidden),
     onQueryChanged = {},
     onRefresh = {},
     onOpenFlag = {},

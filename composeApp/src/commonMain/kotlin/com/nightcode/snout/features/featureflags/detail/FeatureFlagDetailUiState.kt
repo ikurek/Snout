@@ -1,6 +1,5 @@
 package com.nightcode.snout.features.featureflags.detail
 
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.FeatureFlag
@@ -16,12 +15,16 @@ internal sealed interface ToggleStatus {
 }
 
 internal data class FeatureFlagDetailUiState(
-    val flag: LoadState<FeatureFlag> = LoadState.Loading,
+    /** The flag; null until the first load succeeds. */
+    val flag: FeatureFlag? = null,
+    /** Why the last load failed; a banner over [flag] once it's loaded. */
+    val error: DataError? = null,
+    val isRefreshing: Boolean = false,
     val toggle: ToggleStatus = ToggleStatus.Idle,
 )
 
 @TestData
 @OptIn(TestData::class)
 internal val TestFeatureFlagDetailUiState = FeatureFlagDetailUiState(
-    flag = LoadState.Loaded(TestFeatureFlag),
+    flag = TestFeatureFlag,
 )

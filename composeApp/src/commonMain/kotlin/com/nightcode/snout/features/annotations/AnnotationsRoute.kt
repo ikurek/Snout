@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
@@ -19,6 +20,7 @@ import snout.composeapp.generated.resources.annotations_created_snackbar
 internal fun AnnotationsRoute(contentPadding: PaddingValues = PaddingValues()) {
     val viewModel = koinViewModel<AnnotationsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val snackbarHostState = remember { SnackbarHostState() }
     var showCreateSheet by rememberSaveable { mutableStateOf(false) }
 

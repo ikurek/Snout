@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.insights.detail
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -49,7 +48,7 @@ class InsightDetailViewModelTest :
 
         should("load the insight on start") {
             everySuspend { repository.getInsight(any(), insightId) } returns Either.Right(TestInsightDetail)
-            subject().uiState.value shouldBe LoadState.Loaded(TestInsightDetail)
+            subject().uiState.value shouldBe InsightDetailUiState(insight = TestInsightDetail)
         }
 
         should("show the favorite change before the server confirms it") {
@@ -60,11 +59,11 @@ class InsightDetailViewModelTest :
             val viewModel = subject()
 
             val toggle = viewModel.toggleFavorite()
-            viewModel.uiState.value shouldBe LoadState.Loaded(unfavorited)
+            viewModel.uiState.value shouldBe InsightDetailUiState(insight = unfavorited)
 
             response.complete(Either.Right(unfavorited.summary))
             toggle.join()
-            viewModel.uiState.value shouldBe LoadState.Loaded(unfavorited)
+            viewModel.uiState.value shouldBe InsightDetailUiState(insight = unfavorited)
         }
 
         should("roll the favorite back and report when the server rejects it") {
@@ -75,7 +74,7 @@ class InsightDetailViewModelTest :
             viewModel.toggleFavorite()
 
             viewModel.sideEffects.first() shouldBe InsightDetailSideEffect.FavoriteUpdateFailed
-            viewModel.uiState.value shouldBe LoadState.Loaded(TestInsightDetail)
+            viewModel.uiState.value shouldBe InsightDetailUiState(insight = TestInsightDetail)
         }
 
         should("ignore the favorite toggle until the insight has loaded") {
@@ -84,7 +83,7 @@ class InsightDetailViewModelTest :
 
             viewModel.toggleFavorite().join()
 
-            viewModel.uiState.value shouldBe LoadState.Error(DataError.ConnectionError)
+            viewModel.uiState.value shouldBe InsightDetailUiState(error = DataError.ConnectionError)
             verifySuspend(VerifyMode.not) { repository.setFavorite(any(), any(), any()) }
         }
     })

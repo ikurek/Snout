@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.insights
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -16,7 +15,6 @@ import com.nightcode.snout.shared.domain.usecase.insights.GetInsights
 import com.nightcode.snout.shared.domain.usecase.insights.ObserveInsightReloads
 import com.nightcode.snout.shared.domain.usecase.insights.SearchInsights
 import com.nightcode.snout.shared.domain.usecase.insights.SetInsightFavorite
-import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -27,7 +25,6 @@ import dev.mokkery.mock
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,23 +62,17 @@ class InsightsViewModelTest :
         should("load the insights on start while the query is blank") {
             everySuspend { repository.getInsights(any()) } returns Either.Right(listOf(TestInsightSummary))
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.uiState.value.insights shouldBe
-                    RefreshableUiState.Content(listOf(TestInsightSummary), isRefreshing = false)
-                verifySuspend { repository.getInsights(TestSelectedProject.projectId) }
-            }
+            viewModel.uiState.value shouldBe InsightsUiState(insights = listOf(TestInsightSummary))
+            verifySuspend { repository.getInsights(TestSelectedProject.projectId) }
         }
 
         should("search the server when a query is typed") {
             everySuspend { repository.getInsights(any()) } returns Either.Right(listOf(TestInsightSummary))
             everySuspend { repository.searchInsights(any(), "sign") } returns Either.Right(listOf(searched))
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.onQueryChanged("sign")
-                viewModel.uiState.value.query shouldBe "sign"
-                viewModel.uiState.value.insights.shouldBeInstanceOf<RefreshableUiState.Content<*>>().data shouldBe
-                    listOf(searched)
-            }
+            viewModel.onQueryChanged("sign")
+            viewModel.uiState.value.query shouldBe "sign"
+            viewModel.uiState.value.searchResults shouldBe listOf(searched)
         }
 
         should("keep the insights and report a failed pull to refresh") {
@@ -90,14 +81,11 @@ class InsightsViewModelTest :
                 returns(Either.Left(DataError.ConnectionError))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.refresh()
-                viewModel.uiState.value.insights shouldBe RefreshableUiState.Content(
-                    listOf(TestInsightSummary),
-                    isRefreshing = false,
-                    refreshError = DataError.ConnectionError,
-                )
-            }
+            viewModel.refresh()
+            viewModel.uiState.value shouldBe InsightsUiState(
+                insights = listOf(TestInsightSummary),
+                error = DataError.ConnectionError,
+            )
         }
 
         should("load again after an insight changed in the app") {
@@ -106,20 +94,15 @@ class InsightsViewModelTest :
                 returns(Either.Right(listOf(favorited)))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                changes.emit(Unit)
-                viewModel.uiState.value.insights shouldBe
-                    RefreshableUiState.Content(listOf(favorited), isRefreshing = false)
-            }
+            changes.emit(Unit)
+            viewModel.uiState.value shouldBe InsightsUiState(insights = listOf(favorited))
         }
 
         should("load again when another project is selected") {
             everySuspend { repository.getInsights(any()) } returns Either.Right(listOf(TestInsightSummary))
-            val viewModel = subject()
-            viewModel.uiState.subscribed {
-                selected.value = TestSelectedProject.copy(projectId = 2)
-                verifySuspend { repository.getInsights(2) }
-            }
+            subject()
+            selected.value = TestSelectedProject.copy(projectId = 2)
+            verifySuspend { repository.getInsights(2) }
         }
 
         should("emit side effect when favoriting fails") {

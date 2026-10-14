@@ -19,14 +19,15 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.SectionLabel
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
-import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.detail.components.ConditionCard
@@ -63,7 +64,7 @@ internal fun FeatureFlagDetailScreen(
     onOpenInPostHog: () -> Unit,
 ) {
     var pendingToggle by rememberSaveable { mutableStateOf<Boolean?>(null) }
-    val flag = state.flag.dataOrNull
+    val flag = state.flag
 
     PushedScreenScaffold(
         title = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
@@ -71,19 +72,31 @@ internal fun FeatureFlagDetailScreen(
         titleStyle = SnoutTheme.code.large,
         onOpenInPostHog = onOpenInPostHog,
     ) { innerPadding ->
-        LoadStateContainer(
-            state = state.flag,
-            onRefresh = onRefresh,
-            modifier = Modifier.padding(innerPadding.withoutBottom()),
-        ) { flag ->
-            FlagContent(
-                flag = flag,
-                toggle = state.toggle,
-                onToggleRequest = { pendingToggle = it },
-                onToggleErrorDismissed = onToggleErrorDismissed,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = innerPadding.bottomOnly(),
+        val modifier = Modifier.padding(innerPadding.withoutBottom())
+        if (flag == null) {
+            LoadingOrErrorContent(
+                error = state.error,
+                onRetry = onRefresh,
+                modifier = modifier,
+                loadingContent = { SkeletonRows(count = DetailLoadingRowCount) },
             )
+        } else {
+            RefreshableContent(
+                isRefreshing = state.isRefreshing,
+                refreshError = state.error,
+                onRefresh = onRefresh,
+                modifier = modifier,
+                isPullToRefreshEnabled = false,
+            ) {
+                FlagContent(
+                    flag = flag,
+                    toggle = state.toggle,
+                    onToggleRequest = { pendingToggle = it },
+                    onToggleErrorDismissed = onToggleErrorDismissed,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = innerPadding.bottomOnly(),
+                )
+            }
         }
     }
 
@@ -216,7 +229,7 @@ fun FeatureFlagDetailScreenForbiddenPreview() = FeatureFlagDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun FeatureFlagDetailScreenRemoteConfigPreview() = FeatureFlagDetailScreen(
-    state = FeatureFlagDetailUiState(flag = LoadState.Loaded(TestRemoteConfigFeatureFlag)),
+    state = FeatureFlagDetailUiState(flag = TestRemoteConfigFeatureFlag),
     onNavigateBack = {},
     onRefresh = {},
     onToggleConfirmed = {},

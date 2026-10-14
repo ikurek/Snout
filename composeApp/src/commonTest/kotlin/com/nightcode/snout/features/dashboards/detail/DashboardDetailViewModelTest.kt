@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.dashboards.detail
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -15,7 +14,6 @@ import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboard
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboardTileResult
-import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
 import dev.mokkery.everySuspend
@@ -24,6 +22,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 
@@ -50,8 +49,7 @@ class DashboardDetailViewModelTest :
             )
         }
 
-        fun DashboardDetailViewModel.shownDashboard(): Dashboard =
-            uiState.value.dashboard.shouldBeInstanceOf<RefreshableUiState.Content<Dashboard>>().data
+        fun DashboardDetailViewModel.shownDashboard(): Dashboard = uiState.value.dashboard.shouldNotBeNull()
 
         fun Dashboard.pendingResult() = tiles.single { it.id == pendingTile.id }
             .shouldBeInstanceOf<DashboardTile.InsightTile>()
@@ -61,20 +59,16 @@ class DashboardDetailViewModelTest :
             everySuspend { repository.getDashboard(any(), any()) } returns Either.Right(dashboard)
             everySuspend { repository.getTileResult(any(), any(), any()) } returns Either.Right(computed)
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                verifySuspend { repository.getTileResult(TestSelectedProject.projectId, dashboard.id, 99) }
-                viewModel.shownDashboard().pendingResult() shouldBe computed
-                viewModel.uiState.value.tiles shouldBe emptyMap()
-            }
+            verifySuspend { repository.getTileResult(TestSelectedProject.projectId, dashboard.id, 99) }
+            viewModel.shownDashboard().pendingResult() shouldBe computed
+            viewModel.uiState.value.tiles shouldBe emptyMap()
         }
 
         should("keep a failed status for tiles that could not be computed") {
             everySuspend { repository.getDashboard(any(), any()) } returns Either.Right(dashboard)
             everySuspend { repository.getTileResult(any(), any(), any()) } returns Either.Left(DataError.RateLimited)
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.RateLimited))
-            }
+            viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.RateLimited))
         }
 
         should("compute a failed tile again on retry without loading the dashboard again") {
@@ -84,14 +78,12 @@ class DashboardDetailViewModelTest :
                 returns(Either.Right(computed))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.ConnectionError))
-                viewModel.retryTile(99)
-                viewModel.uiState.value.tiles shouldBe emptyMap()
-                viewModel.shownDashboard().pendingResult() shouldBe computed
-                verifySuspend(exactly(2)) { repository.getTileResult(TestSelectedProject.projectId, dashboard.id, 99) }
-                verifySuspend(exactly(1)) { repository.getDashboard(TestSelectedProject.projectId, dashboard.id) }
-            }
+            viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.ConnectionError))
+            viewModel.retryTile(99)
+            viewModel.uiState.value.tiles shouldBe emptyMap()
+            viewModel.shownDashboard().pendingResult() shouldBe computed
+            verifySuspend(exactly(2)) { repository.getTileResult(TestSelectedProject.projectId, dashboard.id, 99) }
+            verifySuspend(exactly(1)) { repository.getDashboard(TestSelectedProject.projectId, dashboard.id) }
         }
 
         should("keep the dashboard and its computed tiles and report a failed pull to refresh") {
@@ -101,12 +93,22 @@ class DashboardDetailViewModelTest :
             }
             everySuspend { repository.getTileResult(any(), any(), any()) } returns Either.Right(computed)
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.refresh()
-                val state = viewModel.uiState.value.dashboard
-                    .shouldBeInstanceOf<RefreshableUiState.Content<Dashboard>>()
-                state.refreshError shouldBe DataError.ConnectionError
-                state.data.pendingResult() shouldBe computed
+            viewModel.refresh()
+            viewModel.uiState.value.error shouldBe DataError.ConnectionError
+            viewModel.shownDashboard().pendingResult() shouldBe computed
+        }
+
+        should("compute the failed tiles again on pull to refresh") {
+            everySuspend { repository.getDashboard(any(), any()) } returns Either.Right(dashboard)
+            everySuspend { repository.getTileResult(any(), any(), any()) } sequentially {
+                returns(Either.Left(DataError.ConnectionError))
+                returns(Either.Right(computed))
             }
+            val viewModel = subject()
+            viewModel.uiState.value.tiles shouldBe mapOf(99L to TileStatus.Failed(DataError.ConnectionError))
+            viewModel.refresh()
+            viewModel.uiState.value.tiles shouldBe emptyMap()
+            viewModel.shownDashboard().pendingResult() shouldBe computed
+            verifySuspend(exactly(2)) { repository.getDashboard(TestSelectedProject.projectId, dashboard.id) }
         }
     })

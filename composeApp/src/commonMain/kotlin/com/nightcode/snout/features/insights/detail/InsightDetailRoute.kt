@@ -6,8 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.common.compose.rememberPostHogOpener
-import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.navigation.InsightDetailNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import org.jetbrains.compose.resources.getString
@@ -20,6 +20,7 @@ import snout.composeapp.generated.resources.insights_favorite_failed
 internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () -> Unit) {
     val viewModel = koinViewModel<InsightDetailViewModel> { parametersOf(navKey.insightId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val snackbarHostState = remember { SnackbarHostState() }
     val openInPostHog = rememberPostHogOpener()
 
@@ -32,7 +33,7 @@ internal fun InsightDetailRoute(navKey: InsightDetailNavKey, onNavigateBack: () 
         }
     }
 
-    val shortId = state.dataOrNull?.summary?.shortId
+    val shortId = state.insight?.summary?.shortId
     InsightDetailScreen(
         state = state,
         snackbarHostState = snackbarHostState,

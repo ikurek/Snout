@@ -23,7 +23,6 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatChartTime
 import com.nightcode.snout.common.format.formatLogTime
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
@@ -35,9 +34,11 @@ import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogSeverityTag
@@ -90,13 +91,17 @@ internal fun LogServiceScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())) {
             LogFilters(searchState = searchState, severity = state.severity, onSeverityChanged = onSeverityChanged)
-            RefreshableStateContainer(
-                state = state.logs,
-                onRefresh = onRefresh,
-                notFoundContent = {
-                    LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-                },
-                emptyContent = {
+            val logs = state.logs
+            when {
+                logs == null -> LoadingOrErrorContent(
+                    error = state.error,
+                    onRetry = onRefresh,
+                    notFoundContent = {
+                        LogsUnavailablePlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
+                    },
+                )
+
+                logs.isEmpty() -> RefreshableEmptyContent(isRefreshing = state.isRefreshing, onRefresh = onRefresh) {
                     if (state.query.isBlank()) {
                         Placeholder(
                             icon = painterResource(Res.drawable.ic_subject_24dp),
@@ -113,23 +118,28 @@ internal fun LogServiceScreen(
                             modifier = Modifier.fillMaxSize(),
                         )
                     }
-                },
-            ) { entries ->
-                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
-                    state.volume?.let { volume ->
-                        item(key = "volume") { VolumeChart(volume, includeDate = range != LogsRange.LastHour) }
+                }
+
+                else -> RefreshableContent(
+                    isRefreshing = state.isRefreshing,
+                    refreshError = state.error,
+                    onRefresh = onRefresh,
+                ) {
+                    LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
+                        state.volume?.let { volume ->
+                            item(key = "volume") { VolumeChart(volume, includeDate = range != LogsRange.LastHour) }
+                        }
+                        itemsIndexed(logs, key = { _, entry -> entry.id }) { index, entry ->
+                            LogRow(entry = entry, divider = index < logs.lastIndex, onClick = { onOpenEntry(entry) })
+                        }
+                        item(key = "load-more") { LoadMoreFooter(status = state.loadMore, onLoadMore = onLoadMore) }
                     }
-                    itemsIndexed(entries, key = { _, entry -> entry.id }) { index, entry ->
-                        LogRow(entry = entry, divider = index < entries.lastIndex, onClick = { onOpenEntry(entry) })
-                    }
-                    item(key = "load-more") { LoadMoreFooter(status = state.loadMore, onLoadMore = onLoadMore) }
                 }
             }
         }
     }
 }
 
-/** Search over messages and the level dropdown, above the chart and the lines. */
 @Composable
 private fun LogFilters(
     searchState: TextFieldState,
@@ -236,7 +246,7 @@ fun LogServiceScreenEmptyPreview() = LogServiceScreen(
     range = LogsRange.Last24Hours,
     state = LogServiceUiState(
         severity = LogSeverityFilter.Errors,
-        logs = RefreshableUiState.Empty(isRefreshing = false),
+        logs = emptyList(),
     ),
     onNavigateBack = {},
     onQueryChanged = {},

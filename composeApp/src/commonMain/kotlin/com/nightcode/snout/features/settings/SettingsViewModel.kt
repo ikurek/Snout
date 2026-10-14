@@ -2,10 +2,8 @@ package com.nightcode.snout.features.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.model.common.DataError
-import com.nightcode.snout.shared.domain.model.user.User
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveThemeMode
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveThemeMode
@@ -18,7 +16,6 @@ import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizatio
 import com.nightcode.snout.shared.domain.usecase.user.ObserveCurrentUser
 import com.nightcode.snout.shared.domain.usecase.user.RefreshCurrentUser
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +41,8 @@ internal class SettingsViewModel(
 
     /** Why the last account fetch failed; null while one runs or after it succeeded. */
     private val accountError = MutableStateFlow<DataError?>(null)
-    private var accountRefresh: Job? = null
+    private var accountLoad: Job? = null
+    private var hasEntered = false
     private val instanceUrl = MutableStateFlow<String?>(null)
     private val isLoggingOut = MutableStateFlow(false)
     private val showLinkSettings = canOpenLinkSettings()
@@ -59,13 +57,7 @@ internal class SettingsViewModel(
     }
 
     /** The stored account shows at once; a fetch failure only shows while there is no stored account. */
-    private val account: Flow<LoadState<User>> = combine(observeCurrentUser(), accountError) { user, error ->
-        when {
-            user != null -> LoadState.Loaded(user)
-            error != null -> LoadState.Error(error)
-            else -> LoadState.Loading
-        }
-    }
+    private val account = combine(observeCurrentUser(), accountError, ::Pair)
 
     val uiState: StateFlow<SettingsUiState> = combine(
         account,
@@ -73,9 +65,10 @@ internal class SettingsViewModel(
         selectedProjectNames,
         observeThemeMode(),
         isLoggingOut,
-    ) { account, instanceUrl, (organizationName, projectName), themeMode, isLoggingOut ->
+    ) { (account, accountError), instanceUrl, (organizationName, projectName), themeMode, isLoggingOut ->
         SettingsUiState(
             account = account,
+            accountError = accountError,
             instanceUrl = instanceUrl,
             organizationName = organizationName,
             projectName = projectName,
@@ -96,11 +89,19 @@ internal class SettingsViewModel(
 
     /** Refreshes the account, the only part of the screen fetched from PostHog. */
     fun refresh() {
-        accountRefresh?.cancel()
-        accountRefresh = viewModelScope.launch {
+        // A fetch finishing after the logout would store the account again.
+        if (isLoggingOut.value) return
+        accountLoad?.cancel()
+        accountLoad = viewModelScope.launch {
             accountError.value = null
             accountError.value = refreshCurrentUser().leftOrNull()
         }
+    }
+
+    /** Refreshes the account each time the screen is entered again, but not the first time nor while it loads. */
+    fun onScreenEntered() {
+        if (hasEntered && accountLoad?.isActive != true) refresh()
+        hasEntered = true
     }
 
     fun openInstance(url: String) = openInBrowser(url)
@@ -111,8 +112,7 @@ internal class SettingsViewModel(
 
     fun onLogoutConfirmed() = viewModelScope.launch {
         isLoggingOut.value = true
-        // A fetch finishing after the logout would store the account again.
-        accountRefresh?.cancel()
+        accountLoad?.cancel()
         logout()
     }
 }

@@ -5,9 +5,6 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
-import com.mikepenz.aboutlibraries.entity.Library
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.features.settings.libraries.LibraryDefinitions
 import com.nightcode.snout.features.settings.libraries.loadLibraries
 import com.nightcode.snout.navigation.LibraryDetailNavKey
@@ -27,20 +24,23 @@ internal class LibraryDetailViewModel(
     private val openInBrowser: OpenInBrowser,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<LoadState<Library>>(LoadState.Loading)
-    val uiState: StateFlow<LoadState<Library>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(LibraryDetailUiState())
+    val uiState: StateFlow<LibraryDetailUiState> = _uiState.asStateFlow()
 
     init {
         refresh()
     }
 
     fun refresh() = viewModelScope.launch {
-        _uiState.value = LoadState.Loading
+        _uiState.value = LibraryDetailUiState()
         _uiState.value = libraryDefinitions.loadLibraries()
             .flatMap { libraries ->
                 libraries.firstOrNull { it.uniqueId == navKey.uniqueId }?.right() ?: DataError.NotFound.left()
             }
-            .toLoadState()
+            .fold(
+                ifLeft = { LibraryDetailUiState(error = it) },
+                ifRight = { LibraryDetailUiState(library = it) },
+            )
     }
 
     fun openWebsite(url: String) = openInBrowser(url)

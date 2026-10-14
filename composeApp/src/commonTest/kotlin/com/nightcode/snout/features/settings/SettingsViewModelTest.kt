@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.settings
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -93,7 +92,7 @@ class SettingsViewModelTest :
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.uiState.value shouldBe SettingsUiState(
-                    account = LoadState.Loaded(TestUser),
+                    account = TestUser,
                     instanceUrl = "https://eu.posthog.com",
                     organizationName = TestOrganization.name,
                     projectName = TestOrganization.projects.first().name,
@@ -116,7 +115,7 @@ class SettingsViewModelTest :
             fetchAnswers(Either.Left(DataError.ConnectionError))
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value.account shouldBe LoadState.Loaded(TestUser)
+                viewModel.uiState.value.account shouldBe TestUser
                 verifySuspend { userRepository.refreshCurrentUser() }
             }
         }
@@ -125,11 +124,12 @@ class SettingsViewModelTest :
             fetchAnswers(Either.Left(DataError.ConnectionError))
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value.account shouldBe LoadState.Error(DataError.ConnectionError)
+                viewModel.uiState.value.account shouldBe null
+                viewModel.uiState.value.accountError shouldBe DataError.ConnectionError
 
                 fetchAnswers(Either.Right(TestUser))
                 viewModel.refresh()
-                viewModel.uiState.value.account shouldBe LoadState.Loaded(TestUser)
+                viewModel.uiState.value.account shouldBe TestUser
             }
         }
 

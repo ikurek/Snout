@@ -2,11 +2,9 @@ package com.nightcode.snout.features.insights.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.dataOrNull
-import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.usecase.insights.GetInsightDetail
 import com.nightcode.snout.shared.domain.usecase.insights.SetInsightFavorite
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,23 +23,29 @@ internal class InsightDetailViewModel(
     private val setInsightFavorite: SetInsightFavorite,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<InsightDetailUiState>(LoadState.Loading)
+    private val _uiState = MutableStateFlow(InsightDetailUiState())
     val uiState: StateFlow<InsightDetailUiState> = _uiState.asStateFlow()
 
     private val _sideEffects = Channel<InsightDetailSideEffect>()
     val sideEffects: Flow<InsightDetailSideEffect> = _sideEffects.receiveAsFlow()
 
+    private var loadJob: Job? = null
+    private var hasEntered = false
+
     init {
-        refresh()
+        load()
     }
 
-    fun refresh() = viewModelScope.launch {
-        _uiState.value = LoadState.Loading
-        _uiState.value = getInsightDetail(insightId).toLoadState()
+    fun refresh() = load()
+
+    /** Refreshes each time the screen is entered again, but not the first time nor while a load runs. */
+    fun onScreenEntered() {
+        if (hasEntered && loadJob?.isActive != true) refresh()
+        hasEntered = true
     }
 
     fun toggleFavorite() = viewModelScope.launch {
-        val current = _uiState.value.dataOrNull ?: return@launch
+        val current = _uiState.value.insight ?: return@launch
         val target = current.summary.favorited.not()
         updateFavorited(target)
         setInsightFavorite(insightId, target).onLeft {
@@ -51,10 +55,20 @@ internal class InsightDetailViewModel(
     }
 
     private fun updateFavorited(favorited: Boolean) = _uiState.update { state ->
-        if (state is LoadState.Loaded) {
-            state.copy(data = state.data.copy(summary = state.data.summary.copy(favorited = favorited)))
-        } else {
-            state
+        state.copy(insight = state.insight?.let { it.copy(summary = it.summary.copy(favorited = favorited)) })
+    }
+
+    private fun load() {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = it.insight != null, error = null) }
+            val result = getInsightDetail(insightId)
+            _uiState.update { state ->
+                result.fold(
+                    ifLeft = { state.copy(isRefreshing = false, error = it) },
+                    ifRight = { state.copy(insight = it, isRefreshing = false, error = null) },
+                )
+            }
         }
     }
 }

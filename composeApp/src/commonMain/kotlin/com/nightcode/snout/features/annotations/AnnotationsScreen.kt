@@ -28,11 +28,12 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.formatShortDate
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.annotations.components.label
@@ -68,14 +69,27 @@ internal fun AnnotationsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = { AddAnnotationButton(onClick = onAddClicked) },
     ) { innerPadding ->
-        RefreshableStateContainer(
-            state = state.annotations,
-            onRefresh = onRefresh,
-            modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom()),
-        ) { annotations ->
-            LazyColumn(contentPadding = PaddingValues(bottom = 88.dp) + innerPadding.bottomOnly()) {
-                itemsIndexed(annotations, key = { _, annotation -> annotation.id }) { index, annotation ->
-                    AnnotationRow(annotation = annotation, divider = index < annotations.lastIndex)
+        val annotations = state.annotations
+        val modifier = Modifier.fillMaxSize().padding(innerPadding.withoutBottom())
+        when {
+            annotations == null -> LoadingOrErrorContent(error = state.error, onRetry = onRefresh, modifier = modifier)
+
+            annotations.isEmpty() -> RefreshableEmptyContent(
+                isRefreshing = state.isRefreshing,
+                onRefresh = onRefresh,
+                modifier = modifier,
+            )
+
+            else -> RefreshableContent(
+                isRefreshing = state.isRefreshing,
+                refreshError = state.error,
+                onRefresh = onRefresh,
+                modifier = modifier,
+            ) {
+                LazyColumn(contentPadding = PaddingValues(bottom = 88.dp) + innerPadding.bottomOnly()) {
+                    itemsIndexed(annotations, key = { _, annotation -> annotation.id }) { index, annotation ->
+                        AnnotationRow(annotation = annotation, divider = index < annotations.lastIndex)
+                    }
                 }
             }
         }
@@ -153,7 +167,7 @@ fun AnnotationsScreenPreview() = AnnotationsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnnotationsScreenEmptyPreview() = AnnotationsScreen(
-    state = AnnotationsUiState(annotations = RefreshableUiState.Empty(isRefreshing = false)),
+    state = AnnotationsUiState(annotations = emptyList()),
     snackbarHostState = remember { SnackbarHostState() },
     showCreateSheet = false,
     onRefresh = {},

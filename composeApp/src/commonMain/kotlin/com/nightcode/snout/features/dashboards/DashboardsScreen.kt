@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.dashboards
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,11 +13,12 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.shared.common.testdata.TestData
@@ -36,19 +36,30 @@ private const val MaxTags = 3
 
 @Composable
 internal fun DashboardsScreen(
-    state: RefreshableUiState<List<DashboardSummary>>,
+    state: DashboardsUiState,
     onRefresh: () -> Unit,
     onOpenDashboard: (dashboardId: Long) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    RefreshableStateContainer(state = state, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) { dashboards ->
-        LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
-            itemsIndexed(dashboards, key = { _, dashboard -> dashboard.id }) { index, dashboard ->
-                DashboardRow(
-                    dashboard = dashboard,
-                    divider = index < dashboards.lastIndex,
-                    onClick = { onOpenDashboard(dashboard.id) },
-                )
+    val dashboards = state.dashboards
+    when {
+        dashboards == null -> LoadingOrErrorContent(error = state.error, onRetry = onRefresh)
+
+        dashboards.isEmpty() -> RefreshableEmptyContent(isRefreshing = state.isRefreshing, onRefresh = onRefresh)
+
+        else -> RefreshableContent(
+            isRefreshing = state.isRefreshing,
+            refreshError = state.error,
+            onRefresh = onRefresh,
+        ) {
+            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
+                itemsIndexed(dashboards, key = { _, dashboard -> dashboard.id }) { index, dashboard ->
+                    DashboardRow(
+                        dashboard = dashboard,
+                        divider = index < dashboards.lastIndex,
+                        onClick = { onOpenDashboard(dashboard.id) },
+                    )
+                }
             }
         }
     }
@@ -87,8 +98,8 @@ private fun DashboardRow(dashboard: DashboardSummary, divider: Boolean, onClick:
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun DashboardsScreenPreview() = DashboardsScreen(
-    state = RefreshableUiState.Content(
-        listOf(
+    state = DashboardsUiState(
+        dashboards = listOf(
             TestDashboardSummary,
             TestDashboardSummary.copy(
                 id = 2,
@@ -98,7 +109,6 @@ fun DashboardsScreenPreview() = DashboardsScreen(
                 tags = emptyList(),
             ),
         ),
-        isRefreshing = false,
     ),
     onRefresh = {},
     onOpenDashboard = {},
@@ -108,7 +118,7 @@ fun DashboardsScreenPreview() = DashboardsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun DashboardsScreenEmptyPreview() = DashboardsScreen(
-    state = RefreshableUiState.Empty(isRefreshing = false),
+    state = DashboardsUiState(dashboards = emptyList()),
     onRefresh = {},
     onOpenDashboard = {},
 )
@@ -117,7 +127,7 @@ fun DashboardsScreenEmptyPreview() = DashboardsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun DashboardsScreenErrorPreview() = DashboardsScreen(
-    state = RefreshableUiState.Error(DataError.ConnectionError),
+    state = DashboardsUiState(error = DataError.ConnectionError),
     onRefresh = {},
     onOpenDashboard = {},
 )
@@ -126,7 +136,7 @@ fun DashboardsScreenErrorPreview() = DashboardsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun DashboardsScreenLoadingPreview() = DashboardsScreen(
-    state = RefreshableUiState.Loading,
+    state = DashboardsUiState(),
     onRefresh = {},
     onOpenDashboard = {},
 )

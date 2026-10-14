@@ -18,12 +18,13 @@ import com.mikepenz.aboutlibraries.entity.License
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.dataOrNull
 import com.nightcode.snout.designsystem.atoms.SectionLabel
+import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
-import com.nightcode.snout.designsystem.organisms.LoadStateContainer
+import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.settings.libraries.TestLibrary
@@ -47,21 +48,34 @@ import snout.composeapp.generated.resources.library_website_label
 /** One library: what it is, who makes it, a link to its website, and the full text of each of its licenses. */
 @Composable
 internal fun LibraryDetailScreen(
-    state: LoadState<Library>,
+    state: LibraryDetailUiState,
     onNavigateBack: () -> Unit,
     onRefresh: () -> Unit,
     onOpenWebsite: (url: String) -> Unit,
 ) {
+    val library = state.library
     PushedScreenScaffold(
-        title = state.dataOrNull?.name ?: stringResource(Res.string.library_title_placeholder),
+        title = library?.name ?: stringResource(Res.string.library_title_placeholder),
         onNavigateBack = onNavigateBack,
     ) { innerPadding ->
-        LoadStateContainer(
-            state = state,
-            onRefresh = onRefresh,
-            modifier = Modifier.padding(innerPadding.withoutBottom()),
-        ) { library ->
-            LibraryContent(library, onOpenWebsite, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+        val modifier = Modifier.padding(innerPadding.withoutBottom())
+        if (library == null) {
+            LoadingOrErrorContent(
+                error = state.error,
+                onRetry = onRefresh,
+                modifier = modifier,
+                loadingContent = { SkeletonRows(count = DetailLoadingRowCount) },
+            )
+        } else {
+            RefreshableContent(
+                isRefreshing = false,
+                refreshError = null,
+                onRefresh = onRefresh,
+                modifier = modifier,
+                isPullToRefreshEnabled = false,
+            ) {
+                LibraryContent(library, onOpenWebsite, Modifier.fillMaxSize(), innerPadding.bottomOnly())
+            }
         }
     }
 }
@@ -147,7 +161,7 @@ private fun LinkRow(label: String, url: String, onOpen: (url: String) -> Unit) {
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LibraryDetailScreenPreview() = LibraryDetailScreen(
-    state = LoadState.Loaded(TestMitLibrary),
+    state = LibraryDetailUiState(library = TestMitLibrary),
     onNavigateBack = {},
     onRefresh = {},
     onOpenWebsite = {},
@@ -158,8 +172,8 @@ fun LibraryDetailScreenPreview() = LibraryDetailScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun LibraryDetailScreenLicenseLinkPreview() = LibraryDetailScreen(
-    state = LoadState.Loaded(
-        TestLibrary.copy(licenses = TestLibrary.licenses.map { it.copy(licenseContent = null) }.toSet()),
+    state = LibraryDetailUiState(
+        library = TestLibrary.copy(licenses = TestLibrary.licenses.map { it.copy(licenseContent = null) }.toSet()),
     ),
     onNavigateBack = {},
     onRefresh = {},

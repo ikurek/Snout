@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
@@ -16,6 +17,7 @@ import snout.composeapp.generated.resources.insights_favorite_failed
 internal fun InsightsRoute(onOpenInsight: (insightId: Long) -> Unit, contentPadding: PaddingValues = PaddingValues()) {
     val viewModel = koinViewModel<InsightsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel.sideEffects) {

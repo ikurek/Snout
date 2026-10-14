@@ -2,7 +2,6 @@ package com.nightcode.snout.features.onboarding.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
@@ -41,14 +40,14 @@ internal class ProjectSelectionViewModel(
         error,
     ) { organizations, isLoading, error ->
         when {
-            isLoading -> LoadState.Loading
-            error != null -> LoadState.Error(error)
-            else -> LoadState.Loaded(organizations)
+            isLoading -> ProjectSelectionUiState()
+            error != null -> ProjectSelectionUiState(error = error)
+            else -> ProjectSelectionUiState(organizations = organizations)
         }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        LoadState.Loading,
+        ProjectSelectionUiState(),
     )
 
     /** Called on every arrival at this step: the key may have changed since the last visit. */

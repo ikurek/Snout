@@ -6,11 +6,14 @@ import com.mikepenz.aboutlibraries.entity.License
 import com.mikepenz.aboutlibraries.entity.Organization
 import com.mikepenz.aboutlibraries.entity.Scm
 import com.nightcode.snout.shared.common.testdata.TestData
+import com.nightcode.snout.shared.domain.model.common.DataError
 
-/*
- * The Libraries screens show AboutLibraries' own models in a LoadState: the list as LoadState<List<Library>>, a
- * library as LoadState<Library>. The fixtures below stand in for the generated files/aboutlibraries.json.
- */
+/** The Libraries screens show AboutLibraries' own models; the fixtures below stand in for files/aboutlibraries.json. */
+internal data class LibrariesUiState(
+    /** Every library the app ships with; null until read. */
+    val libraries: List<Library>? = null,
+    val error: DataError? = null,
+)
 
 @TestData
 internal val TestApacheLicense = License(

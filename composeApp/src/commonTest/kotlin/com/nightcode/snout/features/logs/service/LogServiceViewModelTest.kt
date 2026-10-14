@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.logs.service
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
@@ -59,11 +58,11 @@ class LogServiceViewModelTest :
             } returns Either.Right(LogPage(secondPage, nextCursor = null))
             val viewModel = subject()
 
-            viewModel.uiState.value.logs shouldBe RefreshableUiState.Content(firstPage, isRefreshing = false)
+            viewModel.uiState.value.logs shouldBe firstPage
             viewModel.uiState.value.volume shouldBe TestLogVolume
             viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Idle
             viewModel.loadMore()
-            viewModel.uiState.value.logs shouldBe RefreshableUiState.Content(TestLogEntries, isRefreshing = false)
+            viewModel.uiState.value.logs shouldBe TestLogEntries
             viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Done
         }
 
@@ -74,7 +73,7 @@ class LogServiceViewModelTest :
             val viewModel = subject()
 
             viewModel.loadMore()
-            viewModel.uiState.value.logs shouldBe RefreshableUiState.Content(firstPage, isRefreshing = false)
+            viewModel.uiState.value.logs shouldBe firstPage
             viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Failed(DataError.RateLimited)
         }
 
@@ -86,10 +85,7 @@ class LogServiceViewModelTest :
 
             viewModel.onSeverityChanged(LogSeverityFilter.Errors)
             viewModel.uiState.value.severity shouldBe LogSeverityFilter.Errors
-            viewModel.uiState.value.logs shouldBe RefreshableUiState.Content(
-                TestLogEntries.take(1),
-                isRefreshing = false,
-            )
+            viewModel.uiState.value.logs shouldBe TestLogEntries.take(1)
             viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Done
         }
 
@@ -100,6 +96,41 @@ class LogServiceViewModelTest :
 
             viewModel.refresh()
             viewModel.uiState.value.volume shouldBe null
-            viewModel.uiState.value.logs shouldBe RefreshableUiState.Content(firstPage, isRefreshing = false)
+            viewModel.uiState.value.logs shouldBe firstPage
+        }
+
+        should("reload the lines when the screen is entered again, but not the first time") {
+            val viewModel = subject()
+            everySuspend {
+                repository.getLogs(any(), Service, LogsRange.LastHour, LogSeverityFilter.All, "", null)
+            } returns Either.Right(LogPage(secondPage, nextCursor = null))
+
+            viewModel.onScreenEntered()
+            viewModel.uiState.value.logs shouldBe firstPage
+            viewModel.onScreenEntered()
+            viewModel.uiState.value.logs shouldBe secondPage
+        }
+
+        should("keep the lines under a banner when a refresh fails") {
+            val viewModel = subject()
+            everySuspend {
+                repository.getLogs(any(), Service, LogsRange.LastHour, LogSeverityFilter.All, "", null)
+            } returns Either.Left(DataError.ConnectionError)
+
+            viewModel.refresh()
+            viewModel.uiState.value.logs shouldBe firstPage
+            viewModel.uiState.value.error shouldBe DataError.ConnectionError
+        }
+
+        should("load the lines matching a typed query") {
+            everySuspend {
+                repository.getLogs(any(), Service, LogsRange.LastHour, LogSeverityFilter.All, "timeout", null)
+            } returns Either.Right(LogPage(secondPage, nextCursor = null))
+            val viewModel = subject()
+
+            viewModel.onQueryChanged("timeout")
+            viewModel.uiState.value.query shouldBe "timeout"
+            viewModel.uiState.value.logs shouldBe secondPage
+            viewModel.uiState.value.loadMore shouldBe LoadMoreStatus.Done
         }
     })

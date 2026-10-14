@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.errortracking.detail
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -45,7 +44,7 @@ class ErrorTrackingIssueViewModelTest :
         should("load the issue on start") {
             everySuspend { repository.getIssue(any(), TestErrorTrackingIssue.id) } returns
                 Either.Right(TestErrorTrackingIssue)
-            subject().uiState.value.issue shouldBe LoadState.Loaded(TestErrorTrackingIssue)
+            subject().uiState.value.issue shouldBe TestErrorTrackingIssue
         }
 
         should("show the error and recover on retry") {
@@ -54,9 +53,9 @@ class ErrorTrackingIssueViewModelTest :
                 returns(Either.Right(TestErrorTrackingIssue))
             }
             val viewModel = subject()
-            viewModel.uiState.value.issue shouldBe LoadState.Error(DataError.ConnectionError)
+            viewModel.uiState.value.error shouldBe DataError.ConnectionError
             viewModel.refresh()
-            viewModel.uiState.value.issue shouldBe LoadState.Loaded(TestErrorTrackingIssue)
+            viewModel.uiState.value.issue shouldBe TestErrorTrackingIssue
         }
 
         should("resolve the issue and offer to reopen it") {
@@ -72,7 +71,7 @@ class ErrorTrackingIssueViewModelTest :
             viewModel.sideEffects.first() shouldBe
                 ErrorTrackingIssueSideEffect.StatusChanged(IssueStatusFilter.Resolved, undo = IssueStatusFilter.Active)
             viewModel.uiState.value shouldBe ErrorTrackingIssueUiState(
-                issue = LoadState.Loaded(TestErrorTrackingIssue.copy(status = IssueStatus.Resolved)),
+                issue = TestErrorTrackingIssue.copy(status = IssueStatus.Resolved),
             )
         }
 
@@ -86,7 +85,7 @@ class ErrorTrackingIssueViewModelTest :
 
             viewModel.sideEffects.first() shouldBe ErrorTrackingIssueSideEffect.StatusChangeFailed(DataError.Forbidden)
             viewModel.uiState.value shouldBe ErrorTrackingIssueUiState(
-                issue = LoadState.Loaded(TestErrorTrackingIssue),
+                issue = TestErrorTrackingIssue,
             )
         }
     })

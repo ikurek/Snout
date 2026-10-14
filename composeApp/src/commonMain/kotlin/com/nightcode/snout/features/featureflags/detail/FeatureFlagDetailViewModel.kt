@@ -2,10 +2,9 @@ package com.nightcode.snout.features.featureflags.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.common.state.LoadState
-import com.nightcode.snout.common.state.toLoadState
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlag
 import com.nightcode.snout.shared.domain.usecase.featureflags.SetFeatureFlagActive
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,14 +23,19 @@ internal class FeatureFlagDetailViewModel(
     private val _uiState = MutableStateFlow(FeatureFlagDetailUiState())
     val uiState: StateFlow<FeatureFlagDetailUiState> = _uiState.asStateFlow()
 
+    private var loadJob: Job? = null
+    private var hasEntered = false
+
     init {
-        refresh()
+        load()
     }
 
-    fun refresh() = viewModelScope.launch {
-        _uiState.update { it.copy(flag = LoadState.Loading) }
-        val flag = getFeatureFlag(flagId).toLoadState()
-        _uiState.update { it.copy(flag = flag) }
+    fun refresh() = load()
+
+    /** Refreshes each time the screen is entered again, but not the first time nor while a load runs. */
+    fun onScreenEntered() {
+        if (hasEntered && loadJob?.isActive != true) refresh()
+        hasEntered = true
     }
 
     fun onToggleConfirmed(active: Boolean) = viewModelScope.launch {
@@ -40,11 +44,25 @@ internal class FeatureFlagDetailViewModel(
             ifLeft = { error -> _uiState.update { it.copy(toggle = ToggleStatus.Failed(error)) } },
             ifRight = { updated ->
                 _uiState.update {
-                    it.copy(flag = LoadState.Loaded(updated), toggle = ToggleStatus.Idle)
+                    it.copy(flag = updated, error = null, isRefreshing = false, toggle = ToggleStatus.Idle)
                 }
             },
         )
     }
 
     fun onToggleErrorDismissed() = _uiState.update { it.copy(toggle = ToggleStatus.Idle) }
+
+    private fun load() {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = it.flag != null, error = null) }
+            val result = getFeatureFlag(flagId)
+            _uiState.update { state ->
+                result.fold(
+                    ifLeft = { state.copy(isRefreshing = false, error = it) },
+                    ifRight = { state.copy(flag = it, isRefreshing = false, error = null) },
+                )
+            }
+        }
+    }
 }

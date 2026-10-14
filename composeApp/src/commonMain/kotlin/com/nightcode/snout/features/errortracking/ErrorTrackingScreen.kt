@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.charts.Sparkline
 import com.nightcode.snout.designsystem.molecules.EntityRow
@@ -30,8 +29,10 @@ import com.nightcode.snout.designsystem.molecules.FilterMenuChip
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.organisms.UnavailablePlaceholder
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
@@ -92,18 +93,25 @@ internal fun ErrorTrackingScreen(
             appVersions = state.appVersions,
             onAppVersionChanged = onAppVersionChanged,
         )
-        RefreshableStateContainer(
-            state = state.issues,
-            onRefresh = onRefresh,
-            notFoundContent = {
-                UnavailablePlaceholder(
-                    title = stringResource(Res.string.error_tracking_unavailable_title),
-                    message = stringResource(Res.string.error_tracking_unavailable_subtitle),
-                    onRetry = onRefresh,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            },
-            emptyContent = {
+        // A query or an app version shows the issues matching them instead of the status's list.
+        val issues = if (state.isFiltered) state.filteredIssues else state.issues
+        val error = if (state.isFiltered) state.filterError else state.error
+        val isRefreshing = !state.isFiltered && state.isRefreshing
+        when {
+            issues == null -> LoadingOrErrorContent(
+                error = error,
+                onRetry = onRefresh,
+                notFoundContent = {
+                    UnavailablePlaceholder(
+                        title = stringResource(Res.string.error_tracking_unavailable_title),
+                        message = stringResource(Res.string.error_tracking_unavailable_subtitle),
+                        onRetry = onRefresh,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                },
+            )
+
+            issues.isEmpty() -> RefreshableEmptyContent(isRefreshing = isRefreshing, onRefresh = onRefresh) {
                 IssuesEmptyContent(
                     query = state.query,
                     appVersion = state.appVersion,
@@ -111,11 +119,13 @@ internal fun ErrorTrackingScreen(
                     onClearAppVersion = { onAppVersionChanged(null) },
                     onRefresh = onRefresh,
                 )
-            },
-        ) { list ->
-            LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
-                itemsIndexed(list, key = { _, issue -> issue.id }) { index, issue ->
-                    IssueRow(issue = issue, divider = index < list.lastIndex, onClick = { onOpenIssue(issue.id) })
+            }
+
+            else -> RefreshableContent(isRefreshing = isRefreshing, refreshError = error, onRefresh = onRefresh) {
+                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
+                    itemsIndexed(issues, key = { _, issue -> issue.id }) { index, issue ->
+                        IssueRow(issue = issue, divider = index < issues.lastIndex, onClick = { onOpenIssue(issue.id) })
+                    }
                 }
             }
         }
@@ -261,7 +271,7 @@ fun ErrorTrackingScreenPreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = RefreshableUiState.Empty(isRefreshing = false)),
+    state = ErrorTrackingUiState(issues = emptyList()),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -273,7 +283,7 @@ fun ErrorTrackingScreenEmptyPreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = RefreshableUiState.Error(DataError.NotFound)),
+    state = ErrorTrackingUiState(error = DataError.NotFound),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -285,7 +295,7 @@ fun ErrorTrackingScreenUnavailablePreview() = ErrorTrackingScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingScreenForbiddenPreview() = ErrorTrackingScreen(
-    state = ErrorTrackingUiState(issues = RefreshableUiState.Error(DataError.Forbidden)),
+    state = ErrorTrackingUiState(error = DataError.Forbidden),
     onQueryChanged = {},
     onStatusChanged = {},
     onAppVersionChanged = {},
@@ -301,7 +311,7 @@ fun ErrorTrackingScreenVersionEmptyPreview() = ErrorTrackingScreen(
     state = ErrorTrackingUiState(
         appVersion = "2.13.2",
         appVersions = TestAppVersions,
-        issues = RefreshableUiState.Empty(isRefreshing = false),
+        filteredIssues = emptyList(),
     ),
     onQueryChanged = {},
     onStatusChanged = {},

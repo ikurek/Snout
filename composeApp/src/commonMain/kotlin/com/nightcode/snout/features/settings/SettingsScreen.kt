@@ -31,7 +31,6 @@ import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatMonthYear
 import com.nightcode.snout.common.platform.appVersionName
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.AvatarBox
 import com.nightcode.snout.designsystem.atoms.SectionLabel
@@ -159,6 +158,7 @@ private fun SettingsContent(
     ) {
         AccountHeader(
             account = state.account,
+            error = state.accountError,
             onRetry = onRetryAccount,
             modifier = Modifier.padding(horizontal = Spacing.large).padding(top = Spacing.small),
         )
@@ -207,15 +207,15 @@ private fun SettingsContent(
 
 /** Who is signed in, on a tonal card at the top: the one place on the screen that is fetched from PostHog. */
 @Composable
-private fun AccountHeader(account: LoadState<User>, onRetry: () -> Unit, modifier: Modifier) {
-    when (account) {
-        LoadState.Loading -> TonalCard(modifier = modifier, contentPadding = PaddingValues(Spacing.large)) {
-            AccountHeaderSkeleton()
+private fun AccountHeader(account: User?, error: DataError?, onRetry: () -> Unit, modifier: Modifier) {
+    when {
+        account != null -> TonalCard(modifier = modifier, contentPadding = PaddingValues(Spacing.large)) {
+            AccountHeaderContent(account)
         }
 
-        is LoadState.Error -> InlineErrorBanner(
+        error != null -> InlineErrorBanner(
             text = stringResource(
-                account.error.actionFailedMessage(
+                error.actionFailedMessage(
                     generic = Res.string.settings_account_error,
                     forbidden = Res.string.settings_account_error_permission,
                     rateLimited = Res.string.settings_account_error_rate_limited,
@@ -225,8 +225,8 @@ private fun AccountHeader(account: LoadState<User>, onRetry: () -> Unit, modifie
             modifier = modifier,
         )
 
-        is LoadState.Loaded -> TonalCard(modifier = modifier, contentPadding = PaddingValues(Spacing.large)) {
-            AccountHeaderContent(account.data)
+        else -> TonalCard(modifier = modifier, contentPadding = PaddingValues(Spacing.large)) {
+            AccountHeaderSkeleton()
         }
     }
 }
@@ -425,7 +425,7 @@ fun SettingsScreenPreview() = SettingsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun SettingsScreenAccountErrorPreview() = SettingsScreen(
-    state = TestSettingsUiState.copy(account = LoadState.Error(DataError.ConnectionError)),
+    state = TestSettingsUiState.copy(account = null, accountError = DataError.ConnectionError),
     onNavigateBack = {},
     onRetryAccount = {},
     onOpenInstance = {},

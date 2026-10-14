@@ -1,12 +1,15 @@
 package com.nightcode.snout.features.errortracking.detail
 
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 
 internal data class ErrorTrackingIssueUiState(
-    val issue: LoadState<ErrorTrackingIssue> = LoadState.Loading,
+    /** The issue; null until the first load succeeds. */
+    val issue: ErrorTrackingIssue? = null,
+    /** Why the last load failed; a banner over [issue] once it's loaded. */
+    val error: DataError? = null,
+    val isRefreshing: Boolean = false,
     /** Status being applied right now; the matching button shows progress and the others wait. */
     val updatingTo: IssueStatusFilter? = null,
 )

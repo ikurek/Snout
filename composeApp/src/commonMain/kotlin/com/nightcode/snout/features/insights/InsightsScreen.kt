@@ -26,14 +26,15 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatRelative
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.MetaText
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.RefreshableEmptyContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.insights.components.label
@@ -69,29 +70,36 @@ internal fun InsightsScreen(
                 placeholder = stringResource(Res.string.insights_search_placeholder),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
-            RefreshableStateContainer(
-                state = state.insights,
-                onRefresh = onRefresh,
-                emptyContent = {
-                    if (state.query.isBlank()) {
-                        NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
-                    } else {
+            // A query shows its search results instead of the project's insights.
+            val isSearching = state.query.isNotBlank()
+            val insights = if (isSearching) state.searchResults else state.insights
+            val error = if (isSearching) state.searchError else state.error
+            val isRefreshing = !isSearching && state.isRefreshing
+            when {
+                insights == null -> LoadingOrErrorContent(error = error, onRetry = onRefresh)
+
+                insights.isEmpty() -> RefreshableEmptyContent(isRefreshing = isRefreshing, onRefresh = onRefresh) {
+                    if (isSearching) {
                         NoSearchResultsPlaceholder(
                             title = stringResource(Res.string.insights_search_empty_title),
                             onClearSearch = { searchState.clearText() },
                             modifier = Modifier.fillMaxSize(),
                         )
+                    } else {
+                        NothingFoundPlaceholder(onRetry = onRefresh, modifier = Modifier.fillMaxSize())
                     }
-                },
-            ) { insights ->
-                LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
-                    itemsIndexed(insights, key = { _, insight -> insight.id }) { index, insight ->
-                        InsightRow(
-                            insight = insight,
-                            divider = index < insights.lastIndex,
-                            onClick = { onOpenInsight(insight.id) },
-                            onToggleFavorite = { onToggleFavorite(insight) },
-                        )
+                }
+
+                else -> RefreshableContent(isRefreshing = isRefreshing, refreshError = error, onRefresh = onRefresh) {
+                    LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + contentPadding) {
+                        itemsIndexed(insights, key = { _, insight -> insight.id }) { index, insight ->
+                            InsightRow(
+                                insight = insight,
+                                divider = index < insights.lastIndex,
+                                onClick = { onOpenInsight(insight.id) },
+                                onToggleFavorite = { onToggleFavorite(insight) },
+                            )
+                        }
                     }
                 }
             }
@@ -156,7 +164,7 @@ fun InsightsScreenPreview() = InsightsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun InsightsScreenEmptyPreview() = InsightsScreen(
-    state = InsightsUiState(query = "retention", insights = RefreshableUiState.Empty(isRefreshing = false)),
+    state = InsightsUiState(query = "retention", searchResults = emptyList()),
     snackbarHostState = remember { SnackbarHostState() },
     onQueryChanged = {},
     onRefresh = {},

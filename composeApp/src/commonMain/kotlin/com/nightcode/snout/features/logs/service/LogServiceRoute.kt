@@ -3,6 +3,7 @@ package com.nightcode.snout.features.logs.service
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
@@ -18,6 +19,7 @@ internal fun LogServiceRoute(
 ) {
     val viewModel = koinViewModel<LogServiceViewModel> { parametersOf(navKey) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val openInPostHog = rememberPostHogOpener()
 
     LogServiceScreen(

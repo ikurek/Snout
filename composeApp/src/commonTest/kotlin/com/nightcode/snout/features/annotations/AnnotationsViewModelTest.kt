@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.annotations
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.annotations.AnnotationRepository
@@ -15,7 +14,6 @@ import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
-import com.nightcode.snout.testing.subscribed
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -63,11 +61,8 @@ class AnnotationsViewModelTest :
         should("load the annotations on start") {
             everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.uiState.value.annotations shouldBe
-                    RefreshableUiState.Content(listOf(TestAnnotation), isRefreshing = false)
-                verifySuspend { repository.getAnnotations(TestSelectedProject.projectId) }
-            }
+            viewModel.uiState.value.annotations shouldBe listOf(TestAnnotation)
+            verifySuspend { repository.getAnnotations(TestSelectedProject.projectId) }
         }
 
         should("keep the annotations and report a failed pull to refresh") {
@@ -76,14 +71,9 @@ class AnnotationsViewModelTest :
                 returns(Either.Left(DataError.ConnectionError))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.refresh()
-                viewModel.uiState.value.annotations shouldBe RefreshableUiState.Content(
-                    listOf(TestAnnotation),
-                    isRefreshing = false,
-                    refreshError = DataError.ConnectionError,
-                )
-            }
+            viewModel.refresh()
+            viewModel.uiState.value.annotations shouldBe listOf(TestAnnotation)
+            viewModel.uiState.value.error shouldBe DataError.ConnectionError
         }
 
         should("load again after an annotation was created in the app") {
@@ -92,53 +82,42 @@ class AnnotationsViewModelTest :
                 returns(Either.Right(listOf(created, TestAnnotation)))
             }
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                changes.emit(Unit)
-                viewModel.uiState.value.annotations shouldBe
-                    RefreshableUiState.Content(listOf(created, TestAnnotation), isRefreshing = false)
-            }
+            changes.emit(Unit)
+            viewModel.uiState.value.annotations shouldBe listOf(created, TestAnnotation)
         }
 
         should("load again when another project is selected") {
             everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
-            val viewModel = subject()
-            viewModel.uiState.subscribed {
-                selected.value = TestSelectedProject.copy(projectId = 2)
-                verifySuspend { repository.getAnnotations(2) }
-            }
+            subject()
+            selected.value = TestSelectedProject.copy(projectId = 2)
+            verifySuspend { repository.getAnnotations(2) }
         }
 
         should("emit Created and reset status after a successful create") {
             everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
             everySuspend { repository.createAnnotation(any(), "Release", any()) } returns Either.Right(created)
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                val effects = launch(
-                    Dispatchers.Main,
-                ) { viewModel.sideEffects.first() shouldBe AnnotationsSideEffect.Created }
-                viewModel.create("Release", TestAnnotation.dateMarker)
-                effects.join()
-                viewModel.uiState.value.create shouldBe CreateStatus.Idle
-            }
+            val effects = launch(
+                Dispatchers.Main,
+            ) { viewModel.sideEffects.first() shouldBe AnnotationsSideEffect.Created }
+            viewModel.create("Release", TestAnnotation.dateMarker)
+            effects.join()
+            viewModel.uiState.value.create shouldBe CreateStatus.Idle
         }
 
         should("expose failure when creation is forbidden") {
             everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
             everySuspend { repository.createAnnotation(any(), any(), any()) } returns Either.Left(DataError.Forbidden)
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.create("Release", TestAnnotation.dateMarker)
-                viewModel.uiState.value.create shouldBe CreateStatus.Failed(DataError.Forbidden)
-            }
+            viewModel.create("Release", TestAnnotation.dateMarker)
+            viewModel.uiState.value.create shouldBe CreateStatus.Failed(DataError.Forbidden)
         }
 
         should("send nothing for blank content and stay idle") {
             everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.create("  \n ", TestAnnotation.dateMarker)
-                viewModel.uiState.value.create shouldBe CreateStatus.Idle
-                verifySuspend(not) { repository.createAnnotation(any(), "", any()) }
-            }
+            viewModel.create("  \n ", TestAnnotation.dateMarker)
+            viewModel.uiState.value.create shouldBe CreateStatus.Idle
+            verifySuspend(not) { repository.createAnnotation(any(), "", any()) }
         }
     })

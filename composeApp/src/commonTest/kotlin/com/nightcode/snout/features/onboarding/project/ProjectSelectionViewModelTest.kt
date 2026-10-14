@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.onboarding.project
 
 import arrow.core.Either
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
@@ -55,7 +54,7 @@ class ProjectSelectionViewModelTest :
             everySuspend { organizationRepository.refreshOrganizations() } returns Either.Right(Unit)
             val viewModel = subject()
             viewModel.uiState.subscribed {
-                viewModel.uiState.value shouldBe LoadState.Loading
+                viewModel.uiState.value shouldBe ProjectSelectionUiState()
                 viewModel.refresh()
                 viewModel.uiState.value shouldBe TestProjectSelectionUiStateLoaded
             }
@@ -69,7 +68,7 @@ class ProjectSelectionViewModelTest :
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.refresh()
-                viewModel.uiState.value shouldBe LoadState.Error(DataError.Unauthorized)
+                viewModel.uiState.value shouldBe ProjectSelectionUiState(error = DataError.Unauthorized)
                 viewModel.refresh()
                 viewModel.uiState.value shouldBe TestProjectSelectionUiStateLoaded
             }

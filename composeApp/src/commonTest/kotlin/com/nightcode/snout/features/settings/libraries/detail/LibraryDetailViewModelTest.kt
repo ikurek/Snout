@@ -1,7 +1,6 @@
 package com.nightcode.snout.features.settings.libraries.detail
 
 import com.mikepenz.aboutlibraries.Libs
-import com.nightcode.snout.common.state.LoadState
 import com.nightcode.snout.features.settings.libraries.LibraryDefinitions
 import com.nightcode.snout.features.settings.libraries.TestApacheLicense
 import com.nightcode.snout.features.settings.libraries.TestLibraries
@@ -34,17 +33,17 @@ class LibraryDetailViewModelTest :
         )
 
         should("show the library with its licenses") {
-            subject(TestMitLibrary.uniqueId).uiState.value shouldBe LoadState.Loaded(TestMitLibrary)
+            subject(TestMitLibrary.uniqueId).uiState.value shouldBe LibraryDetailUiState(library = TestMitLibrary)
         }
 
         should("report a library the app no longer ships") {
-            subject("com.example:gone").uiState.value shouldBe LoadState.Error(DataError.NotFound)
+            subject("com.example:gone").uiState.value shouldBe LibraryDetailUiState(error = DataError.NotFound)
         }
 
         should("fail when the bundled file can't be read") {
             val viewModel = subject(TestMitLibrary.uniqueId) { error("files/aboutlibraries.json is missing") }
 
-            viewModel.uiState.value shouldBe LoadState.Error(DataError.UnexpectedError)
+            viewModel.uiState.value shouldBe LibraryDetailUiState(error = DataError.UnexpectedError)
         }
 
         should("open the website in the browser") {

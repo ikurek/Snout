@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -19,6 +20,7 @@ internal fun SettingsRoute(
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    RefreshOnEnter(viewModel::onScreenEntered)
     val switcherViewModel = koinViewModel<ProjectSwitcherViewModel>()
     val switcherState by switcherViewModel.uiState.collectAsStateWithLifecycle()
     var showProjectSwitcher by rememberSaveable { mutableStateOf(false) }

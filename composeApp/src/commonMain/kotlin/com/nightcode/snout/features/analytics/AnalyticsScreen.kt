@@ -29,7 +29,6 @@ import com.nightcode.snout.common.format.formatChartLabel
 import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDurationSeconds
 import com.nightcode.snout.common.format.formatPercent
-import com.nightcode.snout.common.state.RefreshableUiState
 import com.nightcode.snout.designsystem.atoms.SkeletonBlock
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
@@ -42,7 +41,8 @@ import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.SegmentedControl
 import com.nightcode.snout.designsystem.molecules.StatCard
-import com.nightcode.snout.designsystem.organisms.RefreshableStateContainer
+import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
+import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.analytics.components.label
@@ -88,12 +88,13 @@ internal fun AnalyticsScreen(
             label = { rangeLabels.getValue(it) },
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
-        RefreshableStateContainer(
-            state = state.snapshot,
-            onRefresh = onRefresh,
-            loadingContent = { SnapshotSkeleton() },
-        ) { snapshot ->
-            SnapshotContent(snapshot, contentPadding)
+        val snapshot = state.snapshot
+        if (snapshot == null) {
+            LoadingOrErrorContent(error = state.error, onRetry = onRefresh, loadingContent = { SnapshotSkeleton() })
+        } else {
+            RefreshableContent(isRefreshing = state.isRefreshing, refreshError = state.error, onRefresh = onRefresh) {
+                SnapshotContent(snapshot, contentPadding)
+            }
         }
     }
 }
@@ -273,7 +274,7 @@ fun AnalyticsScreenPreview() = AnalyticsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
-    state = AnalyticsUiState(snapshot = RefreshableUiState.Error(DataError.Forbidden)),
+    state = AnalyticsUiState(error = DataError.Forbidden),
     onRangeSelected = {},
     onRefresh = {},
 )
@@ -283,13 +284,7 @@ fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
-    state = AnalyticsUiState(
-        snapshot = RefreshableUiState.Content(
-            TestAnalyticsSnapshot,
-            isRefreshing = false,
-            refreshError = DataError.ConnectionError,
-        ),
-    ),
+    state = AnalyticsUiState(snapshot = TestAnalyticsSnapshot, error = DataError.ConnectionError),
     onRangeSelected = {},
     onRefresh = {},
 )
@@ -298,7 +293,7 @@ fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsScreenLoadingPreview() = AnalyticsScreen(
-    state = AnalyticsUiState(snapshot = RefreshableUiState.Loading),
+    state = AnalyticsUiState(),
     onRangeSelected = {},
     onRefresh = {},
 )
