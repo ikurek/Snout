@@ -207,7 +207,6 @@
     <string name="insight_kind_lifecycle">Lifecycle</string>
     <string name="insight_kind_sql">SQL</string>
     <string name="insight_kind_other">Other</string>
-    <string name="analytics_screen_title">Analytics</string>
     <string name="analytics_range_today">Today</string>
     <string name="analytics_range_7d">7 days</string>
     <string name="analytics_range_30d">30 days</string>
