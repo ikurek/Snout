@@ -7,21 +7,18 @@ import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
-@Module(includes = [DatabaseDriverFactoryModule::class, CoroutineDispatchersModule::class])
+@Module(includes = [PlatformDatabaseModule::class, CoroutineDispatchersModule::class])
 class DatabaseModule {
-    @Single
-    internal fun provideSqlDriver(databaseDriverFactory: DatabaseDriverFactory): SqlDriver =
-        databaseDriverFactory.createDriver()
-
     @Single
     internal fun provideSnoutDatabase(sqlDriver: SqlDriver): SnoutDatabase = SnoutDatabase(sqlDriver)
 
-    @Single(binds = [OrganizationsDatabase::class])
+    @Single
     internal fun provideOrganizationsDatabase(
         database: SnoutDatabase,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): OrganizationsDatabase = OrganizationsDatabaseImpl(database, ioDispatcher)
+    ): OrganizationsDatabase = OrganizationsDatabase(database, ioDispatcher)
 }
 
+/** Provides the platform's [SqlDriver] for the app's database file. */
 @Module
-internal expect class DatabaseDriverFactoryModule()
+internal expect class PlatformDatabaseModule()
