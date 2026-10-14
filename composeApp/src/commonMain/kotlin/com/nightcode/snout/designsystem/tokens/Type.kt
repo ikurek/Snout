@@ -2,7 +2,6 @@ package com.nightcode.snout.designsystem.tokens
 
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -73,5 +72,3 @@ internal val SnoutCodeStyles = SnoutCodeTypography(
     medium = Code,
     small = Code.copy(fontSize = 12.sp, lineHeight = 16.sp),
 )
-
-internal val LocalSnoutCodeTypography = staticCompositionLocalOf { SnoutCodeStyles }

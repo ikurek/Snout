@@ -95,10 +95,7 @@ fun SnoutTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable 
     val materialColorScheme = if (darkTheme) DarkColors else LightColors
     val extendedColorScheme = if (darkTheme) DarkExtendedColors else LightExtendedColors
 
-    CompositionLocalProvider(
-        LocalSnoutExtendedColors provides extendedColorScheme,
-        LocalSnoutCodeTypography provides SnoutCodeStyles,
-    ) {
+    CompositionLocalProvider(LocalSnoutExtendedColors provides extendedColorScheme) {
         MaterialTheme(
             colorScheme = materialColorScheme,
             typography = SnoutTypography,
@@ -121,9 +118,8 @@ object SnoutTheme {
         @Composable @ReadOnlyComposable
         get() = MaterialTheme.typography
 
-    val code: SnoutCodeTypography
-        @Composable @ReadOnlyComposable
-        get() = LocalSnoutCodeTypography.current
+    /** The monospace styles; the same in both themes. */
+    val code: SnoutCodeTypography = SnoutCodeStyles
 
     val shapes: Shapes
         @Composable @ReadOnlyComposable
