@@ -204,3 +204,8 @@ accepted. A dependency bringing a new license fails the build; add its text ther
 and allow it. `./gradlew :composeApp:findLibraries` lists what is collected.
 
 If Gradle cannot find the Android SDK, add a `local.properties` with `sdk.dir=/path/to/Android/sdk`.
+
+## License
+
+Snout is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 [The Snout Authors](AUTHORS). See
+[CONTRIBUTING.md](CONTRIBUTING.md) to get involved.
