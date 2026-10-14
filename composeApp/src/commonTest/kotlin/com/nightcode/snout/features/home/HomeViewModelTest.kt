@@ -17,9 +17,6 @@ import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 
 private const val InsightLink = "https://eu.posthog.com/project/1/insights/aBc123"
@@ -50,39 +47,27 @@ class HomeViewModelTest :
             }
         }
 
-        should("queue the PostHog link found in pasted text and close the sheet") {
+        should("queue the PostHog link found in pasted text and accept it") {
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                val effect = async(Dispatchers.Main) { viewModel.sideEffects.first() }
 
-                viewModel.onLinkSubmitted("Checkout funnel\n$InsightLink")
+            viewModel.onLinkSubmitted("Checkout funnel\n$InsightLink") shouldBe true
 
-                effect.await() shouldBe HomeSideEffect.LinkAccepted
-                verifySuspend { incomingLinkRepository.savePendingLink(InsightLink) }
-                viewModel.uiState.value.rejectedLink shouldBe null
-            }
+            verifySuspend { incomingLinkRepository.savePendingLink(InsightLink) }
         }
 
         should("reject a link Snout can't show, without queueing it") {
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.onLinkSubmitted("https://eu.posthog.com/project/1/replay/home")
 
-                viewModel.uiState.value.rejectedLink shouldBe "https://eu.posthog.com/project/1/replay/home"
-                verifySuspend(VerifyMode.not) { incomingLinkRepository.savePendingLink(any()) }
-            }
+            viewModel.onLinkSubmitted("https://eu.posthog.com/project/1/replay/home") shouldBe false
+
+            verifySuspend(VerifyMode.not) { incomingLinkRepository.savePendingLink(any()) }
         }
 
-        should("reject text without a link, and forget the rejection once a link is accepted") {
+        should("reject text without a link") {
             val viewModel = subject()
-            viewModel.uiState.subscribed {
-                viewModel.onLinkSubmitted("no link here")
-                viewModel.uiState.value.rejectedLink shouldBe "no link here"
 
-                val effect = async(Dispatchers.Main) { viewModel.sideEffects.first() }
-                viewModel.onLinkSubmitted(InsightLink)
-                effect.await() shouldBe HomeSideEffect.LinkAccepted
-                viewModel.uiState.value.rejectedLink shouldBe null
-            }
+            viewModel.onLinkSubmitted("no link here") shouldBe false
+
+            verifySuspend(VerifyMode.not) { incomingLinkRepository.savePendingLink(any()) }
         }
     })

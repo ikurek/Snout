@@ -6,8 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nightcode.snout.common.compose.HoldSplash
 import com.nightcode.snout.common.compose.rememberPostHogOpener
@@ -29,16 +31,10 @@ internal fun HomeRoute(
     var showProjectSwitcher by rememberSaveable { mutableStateOf(false) }
     var showOpenLink by rememberSaveable { mutableStateOf(false) }
     val linkState = rememberTextFieldState()
-
-    LaunchedEffect(viewModel.sideEffects) {
-        viewModel.sideEffects.collect { effect ->
-            when (effect) {
-                HomeSideEffect.LinkAccepted -> {
-                    showOpenLink = false
-                    linkState.clearText()
-                }
-            }
-        }
+    // The open-link sheet's error: its link was turned down, until the text changes.
+    var linkRejected by remember { mutableStateOf(false) }
+    LaunchedEffect(linkState) {
+        snapshotFlow { linkState.text.toString() }.collect { linkRejected = false }
     }
 
     // The bar and the landing tab come from preferences: draw nothing for the few milliseconds they take to read
@@ -70,8 +66,15 @@ internal fun HomeRoute(
     OpenLinkSheet(
         isVisible = showOpenLink,
         linkState = linkState,
-        showError = state.rejectedLink != null && state.rejectedLink == linkState.text.toString(),
+        showError = linkRejected,
         onDismiss = { showOpenLink = false },
-        onOpen = { viewModel.onLinkSubmitted(linkState.text.toString()) },
+        onOpen = {
+            if (viewModel.onLinkSubmitted(linkState.text.toString())) {
+                showOpenLink = false
+                linkState.clearText()
+            } else {
+                linkRejected = true
+            }
+        },
     )
 }
