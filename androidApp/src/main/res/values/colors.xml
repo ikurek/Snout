@@ -1,4 +1,4 @@
 <resources>
-    <!-- Mirrors SnoutLightTokens.Background. -->
+    <!-- Mirrors the light background in SnoutTheme (LightColors). -->
     <color name="snout_background">#FBF7F1</color>
 </resources>

@@ -19,19 +19,31 @@ data class SnoutExtendedColors(
 )
 
 internal val LightExtendedColors = SnoutExtendedColors(
-    success = SnoutLightTokens.Success,
-    onSuccess = SnoutLightTokens.OnSuccess,
-    successContainer = SnoutLightTokens.SuccessContainer,
-    onSuccessContainer = SnoutLightTokens.OnSuccessContainer,
-    chart = SnoutLightTokens.Chart,
+    success = Color(0xFF276B43),
+    onSuccess = Color(0xFFFFFFFF),
+    successContainer = Color(0xFFD4F0DF),
+    onSuccessContainer = Color(0xFF0F3D24),
+    chart = listOf(
+        Color(0xFFBC3D0A),
+        Color(0xFF1D4ED8),
+        Color(0xFF0F766E),
+        Color(0xFF7E22CE),
+        Color(0xFFB45309),
+    ),
 )
 
 internal val DarkExtendedColors = SnoutExtendedColors(
-    success = SnoutDarkTokens.Success,
-    onSuccess = SnoutDarkTokens.OnSuccess,
-    successContainer = SnoutDarkTokens.SuccessContainer,
-    onSuccessContainer = SnoutDarkTokens.OnSuccessContainer,
-    chart = SnoutDarkTokens.Chart,
+    success = Color(0xFF7FD79F),
+    onSuccess = Color(0xFF0F3D24),
+    successContainer = Color(0xFF1E4A30),
+    onSuccessContainer = Color(0xFFCFF3DB),
+    chart = listOf(
+        Color(0xFFFF9466),
+        Color(0xFF7EA6FF),
+        Color(0xFF4FD1C5),
+        Color(0xFFC79BFF),
+        Color(0xFFF2C14E),
+    ),
 )
 
 internal val LocalSnoutExtendedColors = staticCompositionLocalOf { LightExtendedColors }
