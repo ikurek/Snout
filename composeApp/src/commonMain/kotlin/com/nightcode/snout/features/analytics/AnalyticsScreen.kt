@@ -79,13 +79,12 @@ internal fun AnalyticsScreen(
     onRefresh: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val rangeLabels = AnalyticsRange.entries.associateWith { stringResource(it.label) }
     Column(modifier = Modifier.fillMaxSize()) {
         SegmentedControl(
             options = AnalyticsRange.entries,
             selected = state.range,
             onSelect = onRangeSelected,
-            label = { rangeLabels.getValue(it) },
+            label = { stringResource(it.label) },
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
         val snapshot = state.snapshot

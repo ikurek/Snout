@@ -84,7 +84,6 @@ private fun AnalyticsSettingsContent(
     onBreakdownToggled: (WebBreakdown, Boolean) -> Unit,
     onReset: () -> Unit,
 ) {
-    val rangeLabels = AnalyticsRange.entries.associateWith { stringResource(it.label) }
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -96,7 +95,7 @@ private fun AnalyticsSettingsContent(
             options = AnalyticsRange.entries,
             selected = preferences.defaultRange,
             onSelect = onDefaultRangeSelected,
-            label = { rangeLabels.getValue(it) },
+            label = { stringResource(it.label) },
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.xxSmall),
         )
 
