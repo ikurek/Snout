@@ -11,9 +11,8 @@ import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.activitylog.GetActivityLog
-import com.nightcode.snout.shared.domain.usecase.activitylog.ObserveActivityLogReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -43,7 +42,7 @@ class ActivityLogViewModelTest :
             every { appStateRepository.observeSelectedProject() } returns selected
             return ActivityLogViewModel(
                 getActivityLog = GetActivityLog(GetSelectedProjectId(appStateRepository), repository),
-                observeActivityLogReloads = ObserveActivityLogReloads(ObserveSelectedProjectId(appStateRepository)),
+                observeProjectReloads = ObserveProjectReloads(appStateRepository),
             )
         }
 

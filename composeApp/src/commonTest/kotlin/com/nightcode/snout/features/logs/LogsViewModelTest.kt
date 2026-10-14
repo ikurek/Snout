@@ -11,9 +11,8 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 import com.nightcode.snout.shared.domain.model.logs.TestLogServices
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.logs.GetLogServices
-import com.nightcode.snout.shared.domain.usecase.logs.ObserveLogServiceReloads
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -43,7 +42,7 @@ class LogsViewModelTest :
                 Either.Right(TestLogServices.take(1))
             return LogsViewModel(
                 getServices = GetLogServices(GetSelectedProjectId(appStateRepository), repository),
-                observeLogServiceReloads = ObserveLogServiceReloads(ObserveSelectedProjectId(appStateRepository)),
+                observeProjectReloads = ObserveProjectReloads(appStateRepository),
             )
         }
 

@@ -13,9 +13,8 @@ import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.analytics.GetAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
-import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
 import dev.mokkery.every
@@ -47,7 +46,7 @@ class AnalyticsViewModelTest :
             every { appStateRepository.observeAnalyticsPreferences() } returns preferences
             return AnalyticsViewModel(
                 getAnalytics = GetAnalytics(GetSelectedProjectId(appStateRepository), repository),
-                observeAnalyticsReloads = ObserveAnalyticsReloads(ObserveSelectedProjectId(appStateRepository)),
+                observeProjectReloads = ObserveProjectReloads(appStateRepository),
                 observeAnalyticsPreferences = ObserveAnalyticsPreferences(appStateRepository),
             )
         }

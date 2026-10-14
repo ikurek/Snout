@@ -3,9 +3,8 @@ package com.nightcode.snout.features.logs
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.logs.GetLogServices
-import com.nightcode.snout.shared.domain.usecase.logs.ObserveLogServiceReloads
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,24 +14,20 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
-internal class LogsViewModel(
-    private val getServices: GetLogServices,
-    observeLogServiceReloads: ObserveLogServiceReloads,
-) : ViewModel() {
+internal class LogsViewModel(private val getServices: GetLogServices, observeProjectReloads: ObserveProjectReloads) :
+    ViewModel() {
 
     private val _uiState = MutableStateFlow(LogsUiState())
     val uiState: StateFlow<LogsUiState> = _uiState.asStateFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
     init {
         viewModelScope.launch {
-            observeLogServiceReloads().collect { reload ->
+            observeProjectReloads().collect { reload ->
                 // Another project's services start from the skeleton; the same project's stay on screen meanwhile.
-                if (reload != lastReload) _uiState.update { it.copy(services = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(services = null) }
                 load()
             }
         }

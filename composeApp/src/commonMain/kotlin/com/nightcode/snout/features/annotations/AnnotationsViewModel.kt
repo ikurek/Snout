@@ -6,7 +6,6 @@ import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotation
 import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotationError
 import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +31,6 @@ internal class AnnotationsViewModel(
     private val _sideEffects = Channel<AnnotationsSideEffect>()
     val sideEffects: Flow<AnnotationsSideEffect> = _sideEffects.receiveAsFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
@@ -41,8 +39,7 @@ internal class AnnotationsViewModel(
             // A created annotation reloads the list through the annotation reloads.
             observeAnnotationReloads().collect { reload ->
                 // Another project's annotations start from the skeleton; the same project's stay on screen meanwhile.
-                if (reload != lastReload) _uiState.update { it.copy(annotations = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(annotations = null) }
                 load()
             }
         }

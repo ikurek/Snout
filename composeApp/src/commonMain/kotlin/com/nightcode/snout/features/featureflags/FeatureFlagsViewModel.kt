@@ -2,7 +2,6 @@ package com.nightcode.snout.features.featureflags
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlags
 import com.nightcode.snout.shared.domain.usecase.featureflags.ObserveFeatureFlagReloads
 import com.nightcode.snout.shared.domain.usecase.featureflags.SearchFeatureFlags
@@ -33,7 +32,6 @@ internal class FeatureFlagsViewModel(
     private val _uiState = MutableStateFlow(FeatureFlagsUiState())
     val uiState: StateFlow<FeatureFlagsUiState> = _uiState.asStateFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
@@ -41,8 +39,7 @@ internal class FeatureFlagsViewModel(
         viewModelScope.launch {
             observeFeatureFlagReloads().collect { reload ->
                 // Another project's flags start from the skeleton; the same project's stay on screen while reloading.
-                if (reload != lastReload) _uiState.update { it.copy(flags = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(flags = null) }
                 load()
             }
         }

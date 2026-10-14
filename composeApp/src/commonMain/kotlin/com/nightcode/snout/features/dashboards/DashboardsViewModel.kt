@@ -3,9 +3,8 @@ package com.nightcode.snout.features.dashboards
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboards
-import com.nightcode.snout.shared.domain.usecase.insights.ObserveDashboardReloads
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,22 +16,20 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 internal class DashboardsViewModel(
     private val getDashboards: GetDashboards,
-    observeDashboardReloads: ObserveDashboardReloads,
+    observeProjectReloads: ObserveProjectReloads,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardsUiState())
     val uiState: StateFlow<DashboardsUiState> = _uiState.asStateFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
     init {
         viewModelScope.launch {
-            observeDashboardReloads().collect { reload ->
+            observeProjectReloads().collect { reload ->
                 // Another project's dashboards start from the skeleton; the same project's stay on screen meanwhile.
-                if (reload != lastReload) _uiState.update { it.copy(dashboards = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(dashboards = null) }
                 load()
             }
         }

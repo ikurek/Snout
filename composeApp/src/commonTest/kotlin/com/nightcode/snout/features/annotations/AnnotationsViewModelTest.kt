@@ -13,7 +13,7 @@ import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotation
 import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -52,7 +52,7 @@ class AnnotationsViewModelTest :
                 createAnnotation = CreateAnnotation(projectId, repository),
                 getAnnotations = GetAnnotations(projectId, repository),
                 observeAnnotationReloads = ObserveAnnotationReloads(
-                    ObserveSelectedProjectId(appStateRepository),
+                    ObserveProjectReloads(appStateRepository),
                     repository,
                 ),
             )

@@ -10,9 +10,8 @@ import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.experiments.TestExperiment
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.experiments.GetExperiments
-import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperimentReloads
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -41,7 +40,7 @@ class ExperimentsViewModelTest :
             every { appStateRepository.observeSelectedProject() } returns selected
             return ExperimentsViewModel(
                 getExperiments = GetExperiments(GetSelectedProjectId(appStateRepository), repository),
-                observeExperimentReloads = ObserveExperimentReloads(ObserveSelectedProjectId(appStateRepository)),
+                observeProjectReloads = ObserveProjectReloads(appStateRepository),
             )
         }
 

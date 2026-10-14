@@ -2,9 +2,8 @@ package com.nightcode.snout.features.experiments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.experiments.GetExperiments
-import com.nightcode.snout.shared.domain.usecase.experiments.ObserveExperimentReloads
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,22 +15,20 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 internal class ExperimentsViewModel(
     private val getExperiments: GetExperiments,
-    observeExperimentReloads: ObserveExperimentReloads,
+    observeProjectReloads: ObserveProjectReloads,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExperimentsUiState())
     val uiState: StateFlow<ExperimentsUiState> = _uiState.asStateFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
     init {
         viewModelScope.launch {
-            observeExperimentReloads().collect { reload ->
+            observeProjectReloads().collect { reload ->
                 // Another project's experiments start from the skeleton; the same project's stay on screen meanwhile.
-                if (reload != lastReload) _uiState.update { it.copy(experiments = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(experiments = null) }
                 load()
             }
         }

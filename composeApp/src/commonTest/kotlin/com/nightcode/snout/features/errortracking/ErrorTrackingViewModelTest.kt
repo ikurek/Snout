@@ -14,7 +14,7 @@ import com.nightcode.snout.shared.domain.model.errortracking.TestAppVersions
 import com.nightcode.snout.shared.domain.model.errortracking.TestErrorTrackingIssue
 import com.nightcode.snout.shared.domain.model.errortracking.TestResolvedErrorTrackingIssue
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorAppVersions
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorTrackingIssues
 import com.nightcode.snout.shared.domain.usecase.errortracking.ObserveErrorTrackingReloads
@@ -60,7 +60,7 @@ class ErrorTrackingViewModelTest :
                 searchIssues = SearchErrorTrackingIssues(projectId, repository),
                 getAppVersions = GetErrorAppVersions(projectId, repository),
                 observeErrorTrackingReloads = ObserveErrorTrackingReloads(
-                    ObserveSelectedProjectId(appStateRepository),
+                    ObserveProjectReloads(appStateRepository),
                     repository,
                 ),
                 searchDebounce = Duration.ZERO,

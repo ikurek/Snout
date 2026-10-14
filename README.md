@@ -69,10 +69,11 @@ Layers, with dependencies pointing inwards:
   (`OrganizationRepository`), the API key and account in the secure store, and the instance URL, selected
   project and preferences in DataStore.
 - Repositories with mutations expose `changes: Flow<Unit>` (a `ChangeSignal` in `data/common`), which emits after
-  each successful mutation and carries no data. Lists reload through `Observe<Feature>Reloads` use cases
-  (`ObserveSelectedProjectId.reloads(repository.changes)`): they emit a `ProjectReload` at once for the selected
-  project, again when another project is selected, and again after each change, so a flag toggled on its detail
-  screen shows in the list without the list knowing about it.
+  each successful mutation and carries no data. Lists reload through `ObserveProjectReloads`, or for a feature with
+  mutations its `Observe<Feature>Reloads` (`observeProjectReloads(repository.changes)`): they emit a `ProjectReload`
+  at once for the selected project and again when another project is selected (`projectChanged = true`), and again
+  after each change (`projectChanged = false`), so a flag toggled on its detail screen shows in the list without the
+  list knowing about it.
 - DTOs sit in each `api` module's `model/` package, every field with a same-line `@SerialName`: responses are
   `XDto`, request bodies `XRequestDto` (`UpdateXRequestDto` for PATCHes), and what query endpoints take inside
   `{"query": …}` (`QueryRequestDto`) is `XQueryDto`, with its constant `kind` as an `@EncodeDefault` property.
@@ -123,8 +124,8 @@ Screens (`composeApp/.../features/<feature>/`, nested packages such as `detail/`
   and statuses. Nothing loaded and no error is the skeleton; an error with nothing loaded is the error placeholder;
   an error with data loaded is a banner over it. There are no shared state types or loading helpers: each view
   model has a private `load()` that cancels the previous load's `Job`, keeps what is loaded on screen marked as
-  refreshing, calls the use case and folds the `Either` into the state. Lists collect their `Observe<Feature>Reloads`
-  and call `load()` on each `ProjectReload`; another project (or range, or status) clears the data first, so it
+  refreshing, calls the use case and folds the `Either` into the state. Lists collect their reloads and call `load()`
+  on each `ProjectReload`; another project (`projectChanged`, or range, or status) clears the data first, so it
   starts from the skeleton. Live search and filter results (feature flags, insights, error tracking) sit in their
   own fields (`searchResults`, `filteredIssues`), fetched by the view model once typing pauses (`debounce` with
   `collectLatest`), and replace the list on screen while a query or filter is set.

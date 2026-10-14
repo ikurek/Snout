@@ -3,7 +3,6 @@ package com.nightcode.snout.features.insights
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
 import com.nightcode.snout.shared.domain.usecase.insights.GetInsights
 import com.nightcode.snout.shared.domain.usecase.insights.ObserveInsightReloads
 import com.nightcode.snout.shared.domain.usecase.insights.SearchInsights
@@ -42,7 +41,6 @@ internal class InsightsViewModel(
     private val _sideEffects = Channel<InsightsSideEffect>()
     val sideEffects: Flow<InsightsSideEffect> = _sideEffects.receiveAsFlow()
 
-    private var lastReload: ProjectReload? = null
     private var loadJob: Job? = null
     private var hasEntered = false
 
@@ -51,8 +49,7 @@ internal class InsightsViewModel(
             // A favorite changed here or on the detail screen reloads the list through the insight reloads.
             observeInsightReloads().collect { reload ->
                 // Another project's insights start from the skeleton; the same project's stay on screen meanwhile.
-                if (reload != lastReload) _uiState.update { it.copy(insights = null) }
-                lastReload = reload
+                if (reload.projectChanged) _uiState.update { it.copy(insights = null) }
                 load()
             }
         }

@@ -11,9 +11,8 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.DashboardSummary
 import com.nightcode.snout.shared.domain.model.insights.TestDashboardSummary
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboards
-import com.nightcode.snout.shared.domain.usecase.insights.ObserveDashboardReloads
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -44,7 +43,7 @@ class DashboardsViewModelTest :
             every { appStateRepository.observeSelectedProject() } returns selected
             return DashboardsViewModel(
                 getDashboards = GetDashboards(GetSelectedProjectId(appStateRepository), repository),
-                observeDashboardReloads = ObserveDashboardReloads(ObserveSelectedProjectId(appStateRepository)),
+                observeProjectReloads = ObserveProjectReloads(appStateRepository),
             )
         }
 

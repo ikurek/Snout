@@ -10,29 +10,27 @@ import dev.mokkery.mock
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
 @OptIn(TestData::class)
-class ObserveSelectedProjectIdTest :
+class ObserveProjectReloadsTest :
     ShouldSpec({
         val repository = mock<AppStateRepository>()
-        val subject = ObserveSelectedProjectId(repository)
+        val subject = ObserveProjectReloads(repository)
         val otherProject = TestSelectedProject.copy(projectId = 2L)
+        val projectChanged = ProjectReload(projectChanged = true)
+        val dataChanged = ProjectReload(projectChanged = false)
 
-        should("emit each selected project id once, skipping no selection") {
+        should("reload once per selected project, skipping no selection and the same project again") {
             every { repository.observeSelectedProject() } returns flowOf(
                 null,
                 TestSelectedProject,
@@ -43,34 +41,14 @@ class ObserveSelectedProjectIdTest :
                 otherProject,
                 TestSelectedProject,
             )
-            subject().toList() shouldBe listOf(1L, 2L, 1L)
+            subject().toList() shouldBe listOf(projectChanged, projectChanged, projectChanged)
         }
 
-        should("emit nothing while no project is selected") {
+        should("not reload before a project is selected") {
             every { repository.observeSelectedProject() } returns flowOf(null)
             subject().toList().shouldBeEmpty()
-        }
-
-        should("switch to the newly selected project's flow") {
-            every { repository.observeSelectedProject() } returns flow {
-                emit(TestSelectedProject)
-                delay(SwitchDelayMillis)
-                emit(otherProject)
-                awaitCancellation()
-            }
-            subject.flatMapProject { projectId ->
-                flow {
-                    emit("project $projectId")
-                    awaitCancellation()
-                }
-            }.take(2).toList() shouldBe listOf("project 1", "project 2")
-        }
-
-        should("not observe anything before a project is selected") {
-            every { repository.observeSelectedProject() } returns flowOf(null)
-            subject.flatMapProject<String> { error("observed project $it") }.toList().shouldBeEmpty()
             every { repository.observeSelectedProject() } returns emptyFlow()
-            subject.flatMapProject<String> { error("observed project $it") }.toList().shouldBeEmpty()
+            subject().toList().shouldBeEmpty()
         }
 
         should("reload at once, again for the same project after a change and for each newly selected project") {
@@ -79,15 +57,13 @@ class ObserveSelectedProjectIdTest :
             val changes = MutableSharedFlow<Unit>()
             val reloads = MutableStateFlow(emptyList<ProjectReload>())
             coroutineScope {
-                val collector = launch { subject.reloads(changes).collect { reload -> reloads.update { it + reload } } }
+                val collector = launch { subject(changes).collect { reload -> reloads.update { it + reload } } }
                 changes.subscriptionCount.first { it > 0 }
                 changes.emit(Unit)
                 reloads.first { it.size == 2 }
                 selected.value = otherProject
-                reloads.first { it.size == 3 } shouldBe listOf(ProjectReload(1), ProjectReload(1), ProjectReload(2))
+                reloads.first { it.size == 3 } shouldBe listOf(projectChanged, dataChanged, projectChanged)
                 collector.cancel()
             }
         }
     })
-
-private const val SwitchDelayMillis = 10L

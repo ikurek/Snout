@@ -10,7 +10,7 @@ import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.TestFeatureFlag
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlags
 import com.nightcode.snout.shared.domain.usecase.featureflags.ObserveFeatureFlagReloads
 import com.nightcode.snout.shared.domain.usecase.featureflags.SearchFeatureFlags
@@ -50,7 +50,7 @@ class FeatureFlagsViewModelTest :
                 searchFeatureFlags = SearchFeatureFlags(projectId, repository),
                 getFeatureFlags = GetFeatureFlags(projectId, repository),
                 observeFeatureFlagReloads = ObserveFeatureFlagReloads(
-                    ObserveSelectedProjectId(appStateRepository),
+                    ObserveProjectReloads(appStateRepository),
                     repository,
                 ),
                 searchDebounce = Duration.ZERO,

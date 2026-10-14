@@ -3,7 +3,6 @@ package com.nightcode.snout.features.errortracking
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
-import com.nightcode.snout.shared.domain.usecase.appstate.ProjectReload
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorAppVersions
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorTrackingIssues
 import com.nightcode.snout.shared.domain.usecase.errortracking.ObserveErrorTrackingReloads
@@ -35,8 +34,6 @@ internal class ErrorTrackingViewModel(
     private val _uiState = MutableStateFlow(ErrorTrackingUiState())
     val uiState: StateFlow<ErrorTrackingUiState> = _uiState.asStateFlow()
 
-    private var lastReload: ProjectReload? = null
-
     /** The query once typing paused; filtered issues are fetched for it rather than for each keystroke. */
     private var settledQuery = ""
     private var loadJob: Job? = null
@@ -48,14 +45,13 @@ internal class ErrorTrackingViewModel(
         viewModelScope.launch {
             // A status changed in the app reloads the list it left, through the error tracking reloads.
             observeErrorTrackingReloads().collect { reload ->
-                if (reload != lastReload) {
+                if (reload.projectChanged) {
                     // Another project's issues start from the skeleton, and its versions differ, so the version
                     // filter goes too.
                     _uiState.update { it.copy(issues = null, appVersion = null, appVersions = emptyList()) }
                     appVersionsJob?.cancel()
                     appVersionsJob = viewModelScope.launch { loadAppVersions() }
                 }
-                lastReload = reload
                 load()
                 loadFiltered()
             }

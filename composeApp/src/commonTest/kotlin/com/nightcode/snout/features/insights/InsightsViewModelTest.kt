@@ -10,7 +10,7 @@ import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
-import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProjectId
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import com.nightcode.snout.shared.domain.usecase.insights.GetInsights
 import com.nightcode.snout.shared.domain.usecase.insights.ObserveInsightReloads
 import com.nightcode.snout.shared.domain.usecase.insights.SearchInsights
@@ -54,7 +54,7 @@ class InsightsViewModelTest :
                 searchInsights = SearchInsights(projectId, repository),
                 setInsightFavorite = SetInsightFavorite(projectId, repository),
                 getInsights = GetInsights(projectId, repository),
-                observeInsightReloads = ObserveInsightReloads(ObserveSelectedProjectId(appStateRepository), repository),
+                observeInsightReloads = ObserveInsightReloads(ObserveProjectReloads(appStateRepository), repository),
                 searchDebounce = Duration.ZERO,
             )
         }

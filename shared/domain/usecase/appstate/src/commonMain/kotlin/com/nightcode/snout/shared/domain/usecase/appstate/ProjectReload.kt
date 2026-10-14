@@ -1,14 +1,8 @@
 package com.nightcode.snout.shared.domain.usecase.appstate
 
 /**
- * A request to load the selected project's data again, emitted by the `Observe…Reloads` use cases. Equal values
- * belong to the same project, so a screen may keep what it shows while it reloads; a different value means another
- * project was selected and what is on screen belongs to the previous one.
+ * A request to load the selected project's data again, emitted by [ObserveProjectReloads]. [projectChanged] is true
+ * for the first selected project and whenever another one is selected, so what is on screen belongs to another
+ * project; false when the same project's data changed, so a screen may keep what it shows while it reloads.
  */
-class ProjectReload internal constructor(private val projectId: Long) {
-    override fun equals(other: Any?): Boolean = other is ProjectReload && other.projectId == projectId
-
-    override fun hashCode(): Int = projectId.hashCode()
-
-    override fun toString(): String = "ProjectReload($projectId)"
-}
+data class ProjectReload(val projectChanged: Boolean)
