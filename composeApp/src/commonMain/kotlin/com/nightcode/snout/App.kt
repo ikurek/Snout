@@ -4,16 +4,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nightcode.snout.common.compose.LocalSplashGate
-import com.nightcode.snout.common.compose.SplashGate
 import com.nightcode.snout.common.platform.PlatformThemeEffects
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.navigation.MainNavGraph
@@ -26,8 +21,8 @@ import org.koin.compose.koinInject
 
 /**
  * The whole app, on a Koin graph the platform started first (see [startSnoutKoin]). [onReady] fires once the
- * first screen can draw what it's meant to show; Android keeps its system splash up until then, so the app never
- * shows an empty frame of its own.
+ * initial location and the stored theme are in and the start screen is composed; Android keeps its system splash
+ * up until then, so the app never shows a frame in the wrong theme.
  */
 @Composable
 fun App(onReady: () -> Unit = {}) {
@@ -46,8 +41,6 @@ fun App(onReady: () -> Unit = {}) {
     }
     PlatformThemeEffects(themeMode = storedThemeMode, darkTheme = darkTheme)
 
-    val currentOnReady by rememberUpdatedState(onReady)
-    val splashGate = remember { SplashGate { currentOnReady() } }
     SnoutTheme(darkTheme = darkTheme) {
         // Paint the theme background edge to edge: screens that pad themselves away from the system bars
         // (login, project selection) would otherwise show the host's default white on iOS.
@@ -55,10 +48,8 @@ fun App(onReady: () -> Unit = {}) {
             // Wait for the theme too, so the first frame is never drawn in the wrong one.
             val start = initial
             if (start != null && storedThemeMode != null) {
-                CompositionLocalProvider(LocalSplashGate provides splashGate) {
-                    MainNavGraph(initial = start)
-                }
-                SideEffect(splashGate::onStartScreenComposed)
+                MainNavGraph(initial = start)
+                LaunchedEffect(Unit) { onReady() }
             }
         }
     }

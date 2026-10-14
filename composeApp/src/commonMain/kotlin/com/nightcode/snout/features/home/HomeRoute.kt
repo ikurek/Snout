@@ -11,7 +11,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nightcode.snout.common.compose.HoldSplash
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
@@ -37,13 +36,9 @@ internal fun HomeRoute(
         snapshotFlow { linkState.text.toString() }.collect { linkRejected = false }
     }
 
-    // The bar and the landing tab come from preferences: draw nothing for the few milliseconds they take to read
-    // rather than flash the defaults, and on app start keep the splash up meanwhile.
-    val preferences = state.navigationPreferences
-    if (preferences == null) {
-        HoldSplash()
-        return
-    }
+    // The bar and the landing tab come from preferences: draw only the background for the few milliseconds they
+    // take to read rather than flash the defaults.
+    val preferences = state.navigationPreferences ?: return
 
     HomeScreen(
         preferences = preferences,
