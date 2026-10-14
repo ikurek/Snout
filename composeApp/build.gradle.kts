@@ -2,7 +2,8 @@ import com.mikepenz.aboutlibraries.plugin.StrictMode
 
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
-    alias(libs.plugins.snout.multiplatform.compose)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.snout.multiplatform.koin)
     alias(libs.plugins.snout.multiplatform.unittest)
     alias(libs.plugins.aboutLibraries)

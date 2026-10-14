@@ -123,8 +123,6 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 composeScreenshot = { id = "com.android.compose.screenshot", version.ref = "compose-screenshot" }
 
 # Convention plugins
-snout-android-application = { id = "com.nightcode.snout.android.application" }
 snout-multiplatform-library = { id = "com.nightcode.snout.multiplatform.library" }
-snout-multiplatform-compose = { id = "com.nightcode.snout.multiplatform.compose" }
 snout-multiplatform-koin = { id = "com.nightcode.snout.multiplatform.koin" }
 snout-multiplatform-unittest = { id = "com.nightcode.snout.multiplatform.unittest" }
