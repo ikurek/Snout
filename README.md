@@ -88,6 +88,9 @@ Layers, with dependencies pointing inwards:
   project and preferences stay in DataStore. Logging out removes the key and the account; a 401 removes the key and `ClearLocalData` the rest.
 - HTTP responses are not cached by the platform: on iOS the Darwin engine's URLSession has no `URLCache`, and
   `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
+- Debug builds log HTTP traffic (Ktor `Logging`, to logcat and the iOS unified log; `shared/api/DebugLogging.kt`):
+  request lines, statuses and headers, with `Authorization` masked and bodies left out. Release builds log nothing;
+  `PlatformApiModule` tells them apart (Android's `FLAG_DEBUGGABLE`, Kotlin/Native's `Platform.isDebugBinary`).
 - `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
   `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
   project-scoped wrappers (`repository.getX(getSelectedProjectId())`); that is intentional, so the UI never

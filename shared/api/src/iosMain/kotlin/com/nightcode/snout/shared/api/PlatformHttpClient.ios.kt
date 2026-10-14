@@ -3,6 +3,8 @@ package com.nightcode.snout.shared.api
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.darwin.Darwin
+import io.ktor.client.plugins.logging.Logger
+import platform.Foundation.NSLog
 import platform.Foundation.NSURLRequestReloadIgnoringLocalCacheData
 
 /**
@@ -18,4 +20,10 @@ internal actual fun platformHttpClient(block: HttpClientConfig<*>.() -> Unit): H
         }
     }
     block()
+}
+
+/** The unified log (Console, `log stream`), where `Logger.SIMPLE`'s stdout doesn't reach. */
+internal actual val PlatformHttpLogger: Logger = object : Logger {
+    // The message is the format, escaped: Kotlin/Native doesn't bridge a String passed through NSLog's varargs.
+    override fun log(message: String) = NSLog(message.replace("%", "%%"))
 }

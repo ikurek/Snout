@@ -26,7 +26,7 @@ val ApiJson = Json {
 }
 
 @Module(
-    includes = [DataStoreModule::class],
+    includes = [DataStoreModule::class, PlatformApiModule::class],
 )
 class ApiModule {
 
@@ -34,34 +34,36 @@ class ApiModule {
     fun provideJson(): Json = ApiJson
 
     @Single
-    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore): HttpClient = platformHttpClient {
-        expectSuccess = true
-        install(ContentNegotiation) {
-            json(json)
-        }
-        // No defaults: engine timeouts stay as they are; slow endpoints opt into longer ones per request.
-        install(HttpTimeout)
-        install(Auth) {
-            bearer {
-                // Read the key per request: a cached one would outlive logging out and connecting another key.
-                cacheTokens = false
-                loadTokens {
-                    dataStore.getPersonalApiKey()?.let {
-                        BearerTokens(accessToken = it, refreshToken = null)
+    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore, appBuild: AppBuild): HttpClient =
+        platformHttpClient {
+            if (appBuild == AppBuild.Debug) installDebugLogging()
+            expectSuccess = true
+            install(ContentNegotiation) {
+                json(json)
+            }
+            // No defaults: engine timeouts stay as they are; slow endpoints opt into longer ones per request.
+            install(HttpTimeout)
+            install(Auth) {
+                bearer {
+                    // Read the key per request: a cached one would outlive logging out and connecting another key.
+                    cacheTokens = false
+                    loadTokens {
+                        dataStore.getPersonalApiKey()?.let {
+                            BearerTokens(accessToken = it, refreshToken = null)
+                        }
+                    }
+                    sendWithoutRequest { true }
+                }
+            }
+            HttpResponseValidator {
+                handleResponseExceptionWithRequest { exception, _ ->
+                    if (exception is ClientRequestException &&
+                        exception.response.status == HttpStatusCode.Unauthorized
+                    ) {
+                        // Keep the instance URL so the app reopens straight at the key step, not the intro.
+                        dataStore.clearPersonalApiKey()
                     }
                 }
-                sendWithoutRequest { true }
             }
         }
-        HttpResponseValidator {
-            handleResponseExceptionWithRequest { exception, _ ->
-                if (exception is ClientRequestException &&
-                    exception.response.status == HttpStatusCode.Unauthorized
-                ) {
-                    // Keep the instance URL so the app reopens straight at the key step, not the intro.
-                    dataStore.clearPersonalApiKey()
-                }
-            }
-        }
-    }
 }
