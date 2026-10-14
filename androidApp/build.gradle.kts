@@ -31,6 +31,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    // The screenshot test plugin refuses to apply unless this and the same flag in gradle.properties are both set.
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
