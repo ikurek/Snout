@@ -23,6 +23,7 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.not
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -128,6 +129,16 @@ class AnnotationsViewModelTest :
             viewModel.uiState.subscribed {
                 viewModel.create("Release", TestAnnotation.dateMarker)
                 viewModel.uiState.value.create shouldBe CreateStatus.Failed(DataError.Forbidden)
+            }
+        }
+
+        should("send nothing for blank content and stay idle") {
+            everySuspend { repository.getAnnotations(any()) } returns Either.Right(listOf(TestAnnotation))
+            val viewModel = subject()
+            viewModel.uiState.subscribed {
+                viewModel.create("  \n ", TestAnnotation.dateMarker)
+                viewModel.uiState.value.create shouldBe CreateStatus.Idle
+                verifySuspend(not) { repository.createAnnotation(any(), "", any()) }
             }
         }
     })

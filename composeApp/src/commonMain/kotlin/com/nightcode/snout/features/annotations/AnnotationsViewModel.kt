@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.common.state.loadRefreshableList
 import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotation
+import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotationError
 import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
 import kotlinx.coroutines.channels.Channel
@@ -44,10 +45,16 @@ internal class AnnotationsViewModel(
     }
 
     fun create(content: String, dateMarker: Instant) = viewModelScope.launch {
-        if (content.isBlank()) return@launch
         create.value = CreateStatus.Saving
         createAnnotation(content, dateMarker).fold(
-            ifLeft = { create.value = CreateStatus.Failed(it) },
+            ifLeft = { error ->
+                create.value = when (error) {
+                    // The sheet only enables saving for non-blank content, so there is nothing to tell.
+                    CreateAnnotationError.ContentIsBlank -> CreateStatus.Idle
+
+                    is CreateAnnotationError.Failed -> CreateStatus.Failed(error.error)
+                }
+            },
             ifRight = {
                 create.value = CreateStatus.Idle
                 _sideEffects.send(AnnotationsSideEffect.Created)

@@ -10,7 +10,9 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode.Companion.not
 import dev.mokkery.verifySuspend
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
@@ -41,7 +43,15 @@ class CreateAnnotationTest :
             everySuspend {
                 repository.createAnnotation(TestSelectedProject.projectId, TestAnnotation.content, dateMarker)
             } returns Either.Left(DataError.Forbidden)
-            subject(TestAnnotation.content, dateMarker) shouldBeLeft DataError.Forbidden
+            subject(TestAnnotation.content, dateMarker) shouldBeLeft CreateAnnotationError.Failed(DataError.Forbidden)
+        }
+
+        should("refuse blank content without calling the repository") {
+            // Its own repository, so the other tests' calls don't count.
+            val untouched = mock<AnnotationRepository>()
+            val blankSubject = CreateAnnotation(GetSelectedProjectId(appStateRepository), untouched)
+            blankSubject(" \n\t", dateMarker) shouldBeLeft CreateAnnotationError.ContentIsBlank
+            verifySuspend(not) { untouched.createAnnotation(any(), any(), any()) }
         }
 
         should("fail without a selected project") {
