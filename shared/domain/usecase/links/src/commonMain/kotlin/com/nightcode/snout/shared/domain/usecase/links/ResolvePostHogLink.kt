@@ -23,7 +23,6 @@ import org.koin.core.annotation.Single
 @Single
 @Suppress("LongParameterList") // every step of opening a link is its own use case
 class ResolvePostHogLink(
-    private val parsePostHogLink: ParsePostHogLink,
     private val getInstanceUrl: GetInstanceUrl,
     private val getSelectedProject: GetSelectedProject,
     private val observeOrganizations: ObserveOrganizations,
@@ -32,7 +31,7 @@ class ResolvePostHogLink(
     private val findInsightIdByShortId: FindInsightIdByShortId,
 ) {
     suspend operator fun invoke(url: String): LinkResolution {
-        val link = parsePostHogLink(url).getOrNull()
+        val link = parsePostHogLink(url)
         val destination = if (link != null && isSignedInTo(link) && selectProject(link)) {
             link.resource.toDestination()
         } else {

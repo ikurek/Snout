@@ -5,14 +5,13 @@ import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.links.PostHogLink
-import com.nightcode.snout.shared.domain.model.links.PostHogLinkError
 import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import io.kotest.assertions.arrow.core.shouldBeLeft
-import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
 private const val IssueId = "01890ab1-2c3d-7e4f-8a9b-0c1d2e3f4a5b"
@@ -20,8 +19,6 @@ private const val IssueId = "01890ab1-2c3d-7e4f-8a9b-0c1d2e3f4a5b"
 @OptIn(TestData::class)
 class ParsePostHogLinkTest :
     ShouldSpec({
-        val subject = ParsePostHogLink()
-
         should("parse every link Snout builds back into the same resource") {
             val authRepository = mock<AuthRepository>()
             val appStateRepository = mock<AppStateRepository>()
@@ -46,7 +43,7 @@ class ParsePostHogLinkTest :
                 PostHogResource.Annotations,
                 PostHogResource.ActivityLog,
             ).forEach { resource ->
-                subject(getPostHogUrl(resource)!!) shouldBeRight PostHogLink(
+                parsePostHogLink(getPostHogUrl(resource)!!) shouldBe PostHogLink(
                     instanceUrl = "https://eu.posthog.com",
                     projectId = TestSelectedProject.projectId,
                     resource = resource,
@@ -55,18 +52,20 @@ class ParsePostHogLinkTest :
         }
 
         should("ignore query, fragment, trailing slash and the insight editor suffix") {
-            subject("https://us.posthog.com/project/42/dashboard/5/?foo=bar#tile").shouldBeRight().resource shouldBe
+            parsePostHogLink(
+                "https://us.posthog.com/project/42/dashboard/5/?foo=bar#tile",
+            ).shouldNotBeNull().resource shouldBe
                 PostHogResource.Dashboard(5)
-            subject(
+            parsePostHogLink(
                 "https://us.posthog.com/project/42/insights/xYz9/edit?dashboard=3",
-            ).shouldBeRight().resource shouldBe
+            ).shouldNotBeNull().resource shouldBe
                 PostHogResource.Insight("xYz9")
-            subject("  https://US.PostHog.com/project/42  ") shouldBeRight
+            parsePostHogLink("  https://US.PostHog.com/project/42  ") shouldBe
                 PostHogLink("https://us.posthog.com", 42, PostHogResource.Project)
         }
 
         should("keep a self-hosted host and port") {
-            subject("https://posthog.example.com:8443/project/2/feature_flags/9") shouldBeRight
+            parsePostHogLink("https://posthog.example.com:8443/project/2/feature_flags/9") shouldBe
                 PostHogLink("https://posthog.example.com:8443", 2, PostHogResource.FeatureFlag(9))
         }
 
@@ -78,7 +77,7 @@ class ParsePostHogLinkTest :
                 "https://us.posthog.com",
                 "https://us.posthog.com/insights/abc",
                 "https://us.posthog.com/project/abc/insights",
-            ).forEach { subject(it) shouldBeLeft PostHogLinkError.NotAProjectLink }
+            ).forEach { parsePostHogLink(it).shouldBeNull() }
         }
 
         should("reject project pages Snout can't show") {
@@ -92,6 +91,6 @@ class ParsePostHogLinkTest :
                 "https://us.posthog.com/project/1/error_tracking/configuration",
                 "https://us.posthog.com/project/1/data-management/events",
                 "https://us.posthog.com/project/1/web/web-vitals",
-            ).forEach { subject(it) shouldBeLeft PostHogLinkError.UnsupportedPage }
+            ).forEach { parsePostHogLink(it).shouldBeNull() }
         }
     })

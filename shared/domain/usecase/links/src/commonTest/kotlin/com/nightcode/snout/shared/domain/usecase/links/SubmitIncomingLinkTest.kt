@@ -11,7 +11,7 @@ import io.kotest.core.spec.style.ShouldSpec
 class SubmitIncomingLinkTest :
     ShouldSpec({
         val repository = mock<IncomingLinkRepository>(autoUnit)
-        val subject = SubmitIncomingLink(FindLinkInText(ParsePostHogLink()), repository)
+        val subject = SubmitIncomingLink(FindLinkInText(), repository)
 
         should("queue the link found in shared text") {
             subject("Check this: https://eu.posthog.com/project/1/dashboard/5")

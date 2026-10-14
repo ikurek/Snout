@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 
 class FindLinkInTextTest :
     ShouldSpec({
-        val subject = FindLinkInText(ParsePostHogLink())
+        val subject = FindLinkInText()
 
         should("prefer a PostHog link and drop trailing punctuation") {
             subject("Look at https://example.com and https://eu.posthog.com/project/1/insights/aB1.") shouldBe

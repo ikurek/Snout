@@ -10,9 +10,9 @@ private val UrlPattern = Regex("""https?://[^\s<>"']+""")
  * text has no web link.
  */
 @Single
-class FindLinkInText(private val parsePostHogLink: ParsePostHogLink) {
+class FindLinkInText {
     operator fun invoke(text: String): String? {
         val urls = UrlPattern.findAll(text).map { it.value.trimEnd('.', ',', ';', ':', ')', ']', '!', '?') }.toList()
-        return urls.firstOrNull { parsePostHogLink(it).isRight() } ?: urls.firstOrNull()
+        return urls.firstOrNull { parsePostHogLink(it) != null } ?: urls.firstOrNull()
     }
 }

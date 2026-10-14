@@ -46,7 +46,6 @@ class ResolvePostHogLinkTest :
         val insightRepository = mock<InsightRepository>()
 
         val subject = ResolvePostHogLink(
-            parsePostHogLink = ParsePostHogLink(),
             getInstanceUrl = GetInstanceUrl(authRepository),
             getSelectedProject = GetSelectedProject(appStateRepository),
             observeOrganizations = ObserveOrganizations(organizationRepository),

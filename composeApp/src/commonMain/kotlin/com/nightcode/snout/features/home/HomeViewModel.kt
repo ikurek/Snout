@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.links.FindLinkInText
-import com.nightcode.snout.shared.domain.usecase.links.ParsePostHogLink
 import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
+import com.nightcode.snout.shared.domain.usecase.links.parsePostHogLink
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,6 @@ import org.koin.core.annotation.KoinViewModel
 internal class HomeViewModel(
     observeNavigationPreferences: ObserveNavigationPreferences,
     private val findLinkInText: FindLinkInText,
-    private val parsePostHogLink: ParsePostHogLink,
     private val submitIncomingLink: SubmitIncomingLink,
 ) : ViewModel() {
 
@@ -46,7 +45,7 @@ internal class HomeViewModel(
      * isn't a way to open the browser, so anything else is rejected.
      */
     fun onLinkSubmitted(text: String) {
-        val url = findLinkInText(text)?.takeIf { parsePostHogLink(it).isRight() }
+        val url = findLinkInText(text)?.takeIf { parsePostHogLink(it) != null }
         if (url == null) {
             rejectedLink.value = text
             return

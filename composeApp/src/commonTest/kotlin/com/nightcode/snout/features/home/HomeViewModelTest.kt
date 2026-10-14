@@ -6,7 +6,6 @@ import com.nightcode.snout.shared.domain.data.links.IncomingLinkRepository
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.links.FindLinkInText
-import com.nightcode.snout.shared.domain.usecase.links.ParsePostHogLink
 import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
 import com.nightcode.snout.testing.subscribed
 import dev.mokkery.MockMode.autoUnit
@@ -36,12 +35,10 @@ class HomeViewModelTest :
             appStateRepository = mock<AppStateRepository>(autoUnit)
             incomingLinkRepository = mock<IncomingLinkRepository>(autoUnit)
             every { appStateRepository.observeNavigationPreferences() } returns flowOf(NavigationPreferences.Default)
-            val parsePostHogLink = ParsePostHogLink()
-            val findLinkInText = FindLinkInText(parsePostHogLink)
+            val findLinkInText = FindLinkInText()
             return HomeViewModel(
                 observeNavigationPreferences = ObserveNavigationPreferences(appStateRepository),
                 findLinkInText = findLinkInText,
-                parsePostHogLink = parsePostHogLink,
                 submitIncomingLink = SubmitIncomingLink(findLinkInText, incomingLinkRepository),
             )
         }

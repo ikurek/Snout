@@ -8,7 +8,6 @@ import com.nightcode.snout.shared.domain.model.links.PostHogResource
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
-import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import kotlin.uuid.Uuid
@@ -53,10 +52,9 @@ class PostHogPathsTest :
             everySuspend { appStateRepository.getSelectedProject() } returns
                 SelectedProject(Uuid.parse("00000000-0000-0000-0000-000000000009"), ProjectId)
             val getPostHogUrl = GetPostHogUrl(authRepository, appStateRepository)
-            val parse = ParsePostHogLink()
 
             EveryResource.forEach { resource ->
-                parse(getPostHogUrl(resource)!!) shouldBeRight PostHogLink(SelfHosted, ProjectId, resource)
+                parsePostHogLink(getPostHogUrl(resource)!!) shouldBe PostHogLink(SelfHosted, ProjectId, resource)
             }
         }
     })
