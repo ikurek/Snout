@@ -1,17 +1,21 @@
 package com.nightcode.snout.features.annotations
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -20,9 +24,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatShortDate
 import com.nightcode.snout.designsystem.actionFailedMessage
@@ -30,7 +36,6 @@ import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.buttons.PrimaryButton
 import com.nightcode.snout.designsystem.atoms.textfields.PrimaryTextField
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
-import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.organisms.AnimatedBottomSheet
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
@@ -119,14 +124,26 @@ private fun CreateAnnotationContent(
             modifier = Modifier.fillMaxWidth(),
         )
         VerticalSpacer(Spacing.small)
-        KeyValueRow(
-            label = stringResource(Res.string.annotation_create_date_label),
-            value = dateMarker.formatShortDate(),
-            leadingIcon = painterResource(Res.drawable.ic_schedule_24dp),
-            onClick = onPickDate,
-            showChevron = false,
-            contentPadding = PaddingValues(vertical = Spacing.small),
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onPickDate).padding(vertical = Spacing.small),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.large),
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_schedule_24dp),
+                contentDescription = null,
+                tint = SnoutTheme.colors.onSurfaceVariant,
+                modifier = Modifier.size(20.dp),
+            )
+            Column {
+                Text(
+                    text = stringResource(Res.string.annotation_create_date_label),
+                    style = SnoutTheme.typography.bodySmall,
+                    color = SnoutTheme.colors.onSurfaceVariant,
+                )
+                Text(text = dateMarker.formatShortDate(), style = SnoutTheme.typography.bodyLarge)
+            }
+        }
         if (status is CreateStatus.Failed) {
             InlineErrorBanner(text = stringResource(status.error.createFailedMessage()))
             VerticalSpacer(Spacing.small)

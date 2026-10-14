@@ -146,26 +146,25 @@ internal fun KeyScopes(modifier: Modifier = Modifier, initiallyExpanded: Boolean
 /** Tonal card of grouped feature rows, with a closing note that missing scopes only lock their own section. */
 @Composable
 private fun ScopesCard(modifier: Modifier = Modifier) {
-    TonalCard(
-        modifier = modifier,
-        contentPadding = PaddingValues(bottom = Spacing.large),
-        verticalArrangement = Arrangement.Top,
-    ) {
-        ScopeGroups.forEach { group ->
-            SectionLabel(text = stringResource(group.title))
-            group.features.forEachIndexed { index, feature ->
-                FeatureScopesRow(feature = feature)
-                if (index < group.features.lastIndex) {
-                    Hairline(inset = true)
+    TonalCard(modifier = modifier, contentPadding = PaddingValues(bottom = Spacing.large)) {
+        // One child, so the card's spacing doesn't open gaps between the rows.
+        Column {
+            ScopeGroups.forEach { group ->
+                SectionLabel(text = stringResource(group.title))
+                group.features.forEachIndexed { index, feature ->
+                    FeatureScopesRow(feature = feature)
+                    if (index < group.features.lastIndex) {
+                        Hairline(inset = true)
+                    }
                 }
             }
+            Text(
+                text = stringResource(Res.string.login_scopes_footnote),
+                modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.large),
+                style = SnoutTheme.typography.bodySmall,
+                color = SnoutTheme.colors.onSurfaceVariant,
+            )
         }
-        Text(
-            text = stringResource(Res.string.login_scopes_footnote),
-            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.large),
-            style = SnoutTheme.typography.bodySmall,
-            color = SnoutTheme.colors.onSurfaceVariant,
-        )
     }
 }
 

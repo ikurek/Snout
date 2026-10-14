@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,12 +23,14 @@ import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.actionFailedMessage
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
+import com.nightcode.snout.designsystem.atoms.buttons.NavigationBackIconButton
+import com.nightcode.snout.designsystem.atoms.buttons.OpenInPostHogIconButton
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.organisms.ConfirmationDialog
 import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
-import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.organisms.RefreshableContent
+import com.nightcode.snout.designsystem.organisms.SnoutTopAppBar
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.featureflags.detail.components.ConditionCard
@@ -66,11 +69,16 @@ internal fun FeatureFlagDetailScreen(
     var pendingToggle by rememberSaveable { mutableStateOf<Boolean?>(null) }
     val flag = state.flag
 
-    PushedScreenScaffold(
-        title = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
-        onNavigateBack = onNavigateBack,
-        titleStyle = SnoutTheme.code.large,
-        onOpenInPostHog = onOpenInPostHog,
+    // PushedScreenScaffold's chrome, with the flag key as a monospace title.
+    Scaffold(
+        topBar = {
+            SnoutTopAppBar(
+                title = flag?.key ?: stringResource(Res.string.feature_flag_title_placeholder),
+                titleStyle = SnoutTheme.code.large,
+                navigationIcon = { NavigationBackIconButton(onClick = onNavigateBack) },
+                actions = { OpenInPostHogIconButton(onClick = onOpenInPostHog) },
+            )
+        },
     ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding.withoutBottom())
         if (flag == null) {

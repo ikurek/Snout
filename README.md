@@ -174,7 +174,7 @@ The UI follows the "Ember" design: warm paper neutrals, a burnt-orange `primary`
   `KeyValueRow`, `StatCard`, `SectionCard` and `TonalCard`, `CodeBlock` and `CodeChip`, `InfoBanner`,
   `InlineErrorBanner`, `SegmentedControl`, `Placeholder`.
 - `organisms/` are screen-level: `PushedScreenScaffold` (back arrow, title, actions and open in PostHog for every
-  screen pushed over the home shell), `SnoutTopAppBar`, `BottomNavigation`, the pieces a screen picks from its own
+  screen pushed over the home shell; the feature flag detail builds the same bar itself for its monospace title), `SnoutTopAppBar`, `BottomNavigation`, the pieces a screen picks from its own
   state (`RefreshableContent.kt`: `LoadingOrErrorContent` for the skeleton or the error placeholder,
   `RefreshableContent` for loaded data under pull to refresh and the refresh-failed banner,
   `RefreshableEmptyContent`), `AnimatedBottomSheet` and `OptionPickerSheet`, `ConfirmationDialog`, and the state

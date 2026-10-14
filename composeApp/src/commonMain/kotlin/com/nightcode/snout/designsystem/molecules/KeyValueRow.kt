@@ -3,7 +3,6 @@ package com.nightcode.snout.designsystem.molecules
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,16 +36,14 @@ internal fun KeyValueRow(
     valueIsCode: Boolean = false,
     leadingIcon: Painter? = null,
     valueMaxLines: Int = 2,
-    contentPadding: PaddingValues = PaddingValues(horizontal = Spacing.large, vertical = Spacing.small),
     onClick: (() -> Unit)? = null,
-    showChevron: Boolean = true,
     trailing: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(contentPadding),
+            .padding(horizontal = Spacing.large, vertical = Spacing.small),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.large),
     ) {
@@ -76,7 +73,7 @@ internal fun KeyValueRow(
         when {
             trailing != null -> trailing()
 
-            onClick != null && showChevron -> Icon(
+            onClick != null -> Icon(
                 painter = painterResource(Res.drawable.ic_chevron_right_24dp),
                 contentDescription = null,
                 tint = SnoutTheme.colors.onSurfaceVariant,

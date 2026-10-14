@@ -86,7 +86,6 @@ private fun SectionCardContent(
 internal fun TonalCard(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(Spacing.medium),
-    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(Spacing.xxSmall),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Surface(
@@ -96,7 +95,7 @@ internal fun TonalCard(
     ) {
         Column(
             modifier = Modifier.padding(contentPadding),
-            verticalArrangement = verticalArrangement,
+            verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
             content = content,
         )
     }

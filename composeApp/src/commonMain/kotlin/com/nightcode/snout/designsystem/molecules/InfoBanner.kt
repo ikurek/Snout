@@ -24,7 +24,7 @@ import snout.composeapp.generated.resources.ic_info_outlined_24dp
 
 /** Inline, non-dismissable note about a limitation or context ("Values can only be edited in PostHog"). Tonal. */
 @Composable
-internal fun InfoBanner(text: String, modifier: Modifier = Modifier, showIcon: Boolean = true) {
+internal fun InfoBanner(text: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = SnoutTheme.shapes.medium,
@@ -35,13 +35,11 @@ internal fun InfoBanner(text: String, modifier: Modifier = Modifier, showIcon: B
             modifier = Modifier.padding(horizontal = Spacing.medium, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            if (showIcon) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_info_outlined_24dp),
-                    contentDescription = null,
-                    modifier = Modifier.size(BannerIconSize),
-                )
-            }
+            Icon(
+                painter = painterResource(Res.drawable.ic_info_outlined_24dp),
+                contentDescription = null,
+                modifier = Modifier.size(BannerIconSize),
+            )
             Text(text = text, style = SnoutTheme.typography.bodyMedium)
         }
     }
