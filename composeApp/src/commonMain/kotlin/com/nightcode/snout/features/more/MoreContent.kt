@@ -12,11 +12,11 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.sections.description
-import com.nightcode.snout.common.sections.icon
-import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.features.home.description
+import com.nightcode.snout.features.home.icon
+import com.nightcode.snout.features.home.label
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import org.jetbrains.compose.resources.painterResource

@@ -1,4 +1,4 @@
-package com.nightcode.snout.common.sections
+package com.nightcode.snout.features.home
 
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import org.jetbrains.compose.resources.DrawableResource

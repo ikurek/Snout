@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.sections.label
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.links.resource
