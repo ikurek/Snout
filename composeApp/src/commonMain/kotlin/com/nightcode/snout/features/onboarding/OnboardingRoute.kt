@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -25,6 +27,7 @@ import com.nightcode.snout.features.onboarding.project.ProjectSelectionSideEffec
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionUiState
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionViewModel
 import com.nightcode.snout.navigation.OnboardingNavKey
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
@@ -39,10 +42,22 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     val projectSelectionState by projectSelectionViewModel.uiState.collectAsStateWithLifecycle()
 
     val pagerState = rememberPagerState(initialPage = navKey.startStep.ordinal) { OnboardingStep.entries.size }
-    val navigator = rememberOnboardingNavigator(
-        pagerState = pagerState,
-        onLeaveProjectSelection = projectSelectionViewModel::disconnect,
-    )
+    val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // The pager only moves in code, so every step change goes through here.
+    fun goTo(step: OnboardingStep, hideKeyboard: Boolean = false) {
+        if (hideKeyboard) keyboardController?.hide()
+        scope.launch { pagerState.animateScrollToPage(step.ordinal) }
+    }
+
+    // Leaving project selection drops the key that got the user there.
+    fun navigateBack() {
+        val step = OnboardingStep.entries[pagerState.targetPage]
+        if (step == OnboardingStep.ProjectSelection) projectSelectionViewModel.disconnect()
+        if (step != OnboardingStep.Intro) goTo(OnboardingStep.entries[step.ordinal - 1], hideKeyboard = true)
+    }
+
     // Owned here rather than by the login page: the fixed Connect button reads them.
     val instanceUrlTextFieldState = rememberTextFieldState()
     val personalApiKeyTextFieldState = rememberTextFieldState()
@@ -51,8 +66,8 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
     // On the intro, back falls through to the system and leaves the app.
     NavigationBackHandler(
         state = rememberNavigationEventState(currentInfo = NavigationEventInfo.None),
-        isBackEnabled = navigator.canNavigateBack,
-        onBackCompleted = navigator::navigateBack,
+        isBackEnabled = pagerState.targetPage != OnboardingStep.Intro.ordinal,
+        onBackCompleted = ::navigateBack,
     )
 
     // Every arrival loads afresh: the key may have changed since the last visit.
@@ -66,7 +81,7 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
         loginViewModel = loginViewModel,
         projectSelectionViewModel = projectSelectionViewModel,
         snackbarHostState = snackbarHostState,
-        onAuthorized = { navigator.goTo(OnboardingStep.ProjectSelection, hideKeyboard = true) },
+        onAuthorized = { goTo(OnboardingStep.ProjectSelection, hideKeyboard = true) },
         onFinished = onFinished,
     )
 
@@ -75,8 +90,8 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
         snackbarHostState = snackbarHostState,
         isConnectEnabled = loginState.isConnectEnabled,
         isConnecting = loginState.isConnecting,
-        onNavigateBack = navigator::navigateBack,
-        onGetStartedClicked = { navigator.goTo(OnboardingStep.Login) },
+        onNavigateBack = ::navigateBack,
+        onGetStartedClicked = { goTo(OnboardingStep.Login) },
         onConnectClicked = {
             loginViewModel.connect(
                 instanceUrlTextFieldState.text.toString(),
