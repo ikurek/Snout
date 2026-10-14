@@ -107,7 +107,6 @@
     <string name="relative_time_hours_ago">%1$d h ago</string>
     <string name="relative_time_days_ago">%1$d d ago</string>
     <string name="settings_screen_title">Settings</string>
-    <string name="settings_account_section">Account</string>
     <string name="settings_account_member_since">Member since %1$s</string>
     <string name="settings_account_error">Couldn't load your account details.</string>
     <string name="settings_account_error_permission">Your API key can't read user details.</string>
@@ -135,12 +134,12 @@
     <string name="settings_analytics_chart_label">Trend over time (visitors, views, sessions)</string>
     <string name="settings_analytics_breakdowns_section">Tables</string>
     <string name="settings_analytics_reset">Reset to default</string>
-    <string name="settings_appearance_section">Appearance</string>
+    <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_about_section">About</string>
-    <string name="settings_version_label">Version</string>
+    <string name="settings_version_footer">Snout %1$s</string>
     <string name="settings_libraries_title">Open-source libraries</string>
     <string name="settings_libraries_description">The libraries Snout is built with and their licenses</string>
     <string name="settings_logout_button">Log out</string>
