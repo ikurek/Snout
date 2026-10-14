@@ -19,6 +19,7 @@ kotlin {
             implementation(libs.ktor.client.contentNegotiation)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.json)
+            api(projects.shared.domain.model.common)
             implementation(projects.shared.storage.datastore)
         }
         commonTest.dependencies {

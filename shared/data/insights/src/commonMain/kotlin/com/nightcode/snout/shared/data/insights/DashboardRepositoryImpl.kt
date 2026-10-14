@@ -3,7 +3,6 @@ package com.nightcode.snout.shared.data.insights
 import arrow.core.Either
 import com.nightcode.snout.shared.api.insights.DashboardsApi
 import com.nightcode.snout.shared.api.insights.InsightsApi
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.insights.mapper.toDashboard
 import com.nightcode.snout.shared.data.insights.mapper.toResult
 import com.nightcode.snout.shared.data.insights.mapper.toSummary
@@ -20,17 +19,15 @@ internal class DashboardRepositoryImpl(private val dashboardsApi: DashboardsApi,
 
     override suspend fun getDashboards(projectId: Long): Either<DataError, List<DashboardSummary>> = dashboardsApi
         .getDashboards(projectId)
-        .mapLeft { it.toDataError() }
         .map { response -> response.results.map { it.toSummary() } }
 
     override suspend fun getDashboard(projectId: Long, dashboardId: Long): Either<DataError, Dashboard> =
-        dashboardsApi.getDashboard(projectId, dashboardId).mapLeft { it.toDataError() }.map { it.toDashboard() }
+        dashboardsApi.getDashboard(projectId, dashboardId).map { it.toDashboard() }
 
     override suspend fun getTileResult(
         projectId: Long,
         dashboardId: Long,
         insightId: Long,
     ): Either<DataError, InsightResult?> = insightsApi.getInsight(projectId, insightId, fromDashboardId = dashboardId)
-        .mapLeft { it.toDataError() }
         .map { it.toResult() }
 }

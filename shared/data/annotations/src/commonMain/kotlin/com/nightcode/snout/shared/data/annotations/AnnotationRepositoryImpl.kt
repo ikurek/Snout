@@ -7,7 +7,6 @@ import com.nightcode.snout.shared.api.annotations.AnnotationsApi
 import com.nightcode.snout.shared.api.annotations.model.CreateAnnotationRequestDto
 import com.nightcode.snout.shared.data.annotations.mapper.toAnnotation
 import com.nightcode.snout.shared.data.common.ChangeSignal
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.domain.data.annotations.AnnotationRepository
 import com.nightcode.snout.shared.domain.model.annotations.Annotation
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -23,7 +22,6 @@ internal class AnnotationRepositoryImpl(private val api: AnnotationsApi) : Annot
 
     override suspend fun getAnnotations(projectId: Long): Either<DataError, List<Annotation>> =
         api.getAnnotations(projectId)
-            .mapLeft { it.toDataError() }
             .map { response ->
                 response.results
                     .filterNot { it.deleted }
@@ -40,7 +38,6 @@ internal class AnnotationRepositoryImpl(private val api: AnnotationsApi) : Annot
             projectId,
             CreateAnnotationRequestDto(content = content, dateMarker = dateMarker),
         )
-            .mapLeft { it.toDataError() }
             .bind()
         ensureNotNull(created.toAnnotation()) { DataError.UnexpectedError }
     }.onRight { changeSignal.emit() }

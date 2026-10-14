@@ -3,7 +3,6 @@ package com.nightcode.snout.shared.data.errortracking
 import arrow.core.Either
 import com.nightcode.snout.shared.api.errortracking.ErrorTrackingApi
 import com.nightcode.snout.shared.data.common.ChangeSignal
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.errortracking.mapper.apiValue
 import com.nightcode.snout.shared.data.errortracking.mapper.toAppVersions
 import com.nightcode.snout.shared.data.errortracking.mapper.toIssue
@@ -27,7 +26,6 @@ internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi) : 
         projectId: Long,
         status: IssueStatusFilter,
     ): Either<DataError, List<ErrorTrackingIssue>> = api.getIssues(projectId, status.apiValue)
-        .mapLeft { it.toDataError() }
         .map { response -> response.results.map { it.toIssue() } }
 
     override suspend fun searchIssues(
@@ -37,21 +35,19 @@ internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi) : 
         appVersion: String?,
     ): Either<DataError, List<ErrorTrackingIssue>> =
         api.getIssues(projectId, status.apiValue, search = query, appVersion = appVersion)
-            .mapLeft { it.toDataError() }
             .map { response -> response.results.map { it.toIssue() } }
 
     override suspend fun getIssue(projectId: Long, issueId: String): Either<DataError, ErrorTrackingIssue> =
-        api.getIssue(projectId, issueId).mapLeft { it.toDataError() }.map { it.toIssue() }
+        api.getIssue(projectId, issueId).map { it.toIssue() }
 
     override suspend fun setStatus(
         projectId: Long,
         issueId: String,
         status: IssueStatusFilter,
     ): Either<DataError, IssueStatus> = api.setStatus(projectId, issueId, status.apiValue)
-        .mapLeft { it.toDataError() }
         .map { it.status.toIssueStatus() }
         .onRight { changeSignal.emit() }
 
     override suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>> =
-        api.getAppVersions(projectId).mapLeft { it.toDataError() }.map { it.toAppVersions() }
+        api.getAppVersions(projectId).map { it.toAppVersions() }
 }

@@ -5,7 +5,6 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.nightcode.snout.shared.api.logs.LogsApi
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.logs.mapper.apiLevels
 import com.nightcode.snout.shared.data.logs.mapper.dateFrom
 import com.nightcode.snout.shared.data.logs.mapper.toPage
@@ -31,7 +30,6 @@ internal class LogRepositoryImpl(private val api: LogsApi) : LogRepository {
 
     override suspend fun getServices(projectId: Long, range: LogsRange): Either<DataError, List<LogService>> =
         api.getServices(projectId, range.dateFrom)
-            .mapLeft { it.toDataError() }
             .map { it.toServices() }
 
     override suspend fun getLogs(
@@ -48,8 +46,7 @@ internal class LogRepositoryImpl(private val api: LogsApi) : LogRepository {
         severityLevels = severity.apiLevels,
         search = query,
         after = cursor,
-    ).mapLeft { it.toDataError() }
-        .map { it.toPage() }
+    ).map { it.toPage() }
 
     override suspend fun getVolume(
         projectId: Long,
@@ -63,7 +60,7 @@ internal class LogRepositoryImpl(private val api: LogsApi) : LogRepository {
         dateFrom = range.dateFrom,
         severityLevels = severity.apiLevels,
         search = query,
-    ).mapLeft { it.toDataError() }.map { it.toVolume() }
+    ).map { it.toVolume() }
 
     override suspend fun getLog(
         projectId: Long,
@@ -78,7 +75,6 @@ internal class LogRepositoryImpl(private val api: LogsApi) : LogRepository {
         severityLevels = emptyList(),
         search = null,
         after = null,
-    ).mapLeft { it.toDataError() }
-        .map { it.toPage().entries }
+    ).map { it.toPage().entries }
         .flatMap { entries -> entries.firstOrNull { it.id == id }?.right() ?: DataError.NotFound.left() }
 }

@@ -90,15 +90,16 @@ Layers, with dependencies pointing inwards:
 - HTTP responses are not cached by the platform: on iOS the Darwin engine's URLSession has no `URLCache`, and
   `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
 - Debug builds log HTTP traffic (Ktor `Logging`, to logcat and the iOS unified log; `shared/api/DebugLogging.kt`):
-  request lines, statuses and headers, with `Authorization` masked and bodies left out. Release builds log nothing;
+  request lines, statuses and headers, with `Authorization` masked and bodies left out, plus the cause of each failure
+  `networkCall` reports as `UnexpectedError` (an exception, or a status and request line). Release builds log nothing;
   `PlatformApiModule` tells them apart (Android's `FLAG_DEBUGGABLE`, Kotlin/Native's `Platform.isDebugBinary`).
 - `domain/usecase` depends only on repository interfaces. `composeApp` sees models and use cases (through
   `:shared`), never repositories or `data`; view models only call use cases. Many use cases are thin
   project-scoped wrappers (`repository.getX(getSelectedProjectId())`); that is intentional, so the UI never
   handles project ids.
-- Repositories and use cases return Arrow `Either<DataError, T>`. Network failures become `DataError` via
-  `NetworkError.toDataError()` (`data/common`). The UI words them with `designsystem/DataErrorMessages.kt` and
-  shows full-screen failures with the placeholders in `designsystem/organisms/StatePlaceholders.kt`.
+- Repositories and use cases return Arrow `Either<DataError, T>`, as `api` calls already do: `networkCall`
+  (`shared/api`) maps a failed call to its `DataError`. The UI words them with `designsystem/DataErrorMessages.kt`
+  and shows full-screen failures with the placeholders in `designsystem/organisms/StatePlaceholders.kt`.
 
 DI (Koin annotations with the Koin compiler plugin):
 

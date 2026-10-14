@@ -2,7 +2,6 @@ package com.nightcode.snout.shared.data.experiments
 
 import arrow.core.Either
 import com.nightcode.snout.shared.api.experiments.ExperimentsApi
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.experiments.mapper.toExperiment
 import com.nightcode.snout.shared.domain.data.experiments.ExperimentRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -14,9 +13,8 @@ internal class ExperimentRepositoryImpl(private val api: ExperimentsApi) : Exper
 
     override suspend fun getExperiments(projectId: Long): Either<DataError, List<Experiment>> =
         api.getExperiments(projectId)
-            .mapLeft { it.toDataError() }
             .map { response -> response.results.filterNot { it.deleted }.map { it.toExperiment() } }
 
     override suspend fun getExperiment(projectId: Long, experimentId: Long): Either<DataError, Experiment> =
-        api.getExperiment(projectId, experimentId).mapLeft { it.toDataError() }.map { it.toExperiment() }
+        api.getExperiment(projectId, experimentId).map { it.toExperiment() }
 }

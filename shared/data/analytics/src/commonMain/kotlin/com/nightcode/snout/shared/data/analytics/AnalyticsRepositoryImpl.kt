@@ -8,7 +8,6 @@ import com.nightcode.snout.shared.data.analytics.mapper.toBreakdownTable
 import com.nightcode.snout.shared.data.analytics.mapper.toMetricTrends
 import com.nightcode.snout.shared.data.analytics.mapper.toOverviewMetrics
 import com.nightcode.snout.shared.data.analytics.mapper.toPropertyBreakdownTable
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.domain.data.analytics.AnalyticsRepository
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
@@ -56,7 +55,7 @@ internal class AnalyticsRepositoryImpl(private val api: AnalyticsApi, private va
                 .filter { it in preferences.breakdowns }
                 .map { breakdown -> async { fetchTable(projectId, range, breakdown) } }
 
-            val overviewResponse = overview.await().mapLeft { it.toDataError() }.bind()
+            val overviewResponse = overview.await().bind()
             val metrics = Either.catch { overviewResponse.toOverviewMetrics(json) }
                 .mapLeft { DataError.UnexpectedError }
                 .bind()

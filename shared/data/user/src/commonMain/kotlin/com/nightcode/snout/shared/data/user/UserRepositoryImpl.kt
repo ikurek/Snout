@@ -2,7 +2,6 @@ package com.nightcode.snout.shared.data.user
 
 import arrow.core.Either
 import com.nightcode.snout.shared.api.users.UsersApi
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.data.user.mapper.toStoredUser
 import com.nightcode.snout.shared.data.user.mapper.toUser
 import com.nightcode.snout.shared.data.user.model.StoredUser
@@ -44,7 +43,6 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun refreshCurrentUser(): Either<DataError, Unit> = api.getCurrentUser()
-        .mapLeft { it.toDataError() }
         .map { dto -> store(dto.toUser()) }
 
     override suspend fun clear() = withCurrentUser {

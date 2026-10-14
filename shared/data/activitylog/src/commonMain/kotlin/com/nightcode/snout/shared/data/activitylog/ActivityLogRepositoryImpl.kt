@@ -3,7 +3,6 @@ package com.nightcode.snout.shared.data.activitylog
 import arrow.core.Either
 import com.nightcode.snout.shared.api.activitylog.ActivityLogApi
 import com.nightcode.snout.shared.data.activitylog.mapper.toEntry
-import com.nightcode.snout.shared.data.common.toDataError
 import com.nightcode.snout.shared.domain.data.activitylog.ActivityLogRepository
 import com.nightcode.snout.shared.domain.model.activitylog.ActivityEntry
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -14,6 +13,5 @@ internal class ActivityLogRepositoryImpl(private val api: ActivityLogApi) : Acti
 
     override suspend fun getActivity(projectId: Long): Either<DataError, List<ActivityEntry>> =
         api.getActivityLog(projectId)
-            .mapLeft { it.toDataError() }
             .map { response -> response.results.map { it.toEntry() }.sortedByDescending { it.createdAt } }
 }
