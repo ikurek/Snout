@@ -203,8 +203,10 @@ The Android tasks never compile Kotlin/Native, so the iOS compile is needed to c
 (with ktlint rules) only checks; `./gradlew detektFormat` fixes what the formatting rules can (it rewrites files,
 so review the diff after it) and then `detekt` reports what is left.
 
-Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered in light and dark mode by
-generated wrappers in `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing). Wrappers are
+Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered by generated wrappers in
+`androidApp/src/screenshotTest` (Compose Preview Screenshot Testing): screens (previews under `features/`) in light
+and dark mode on a phone-sized device, design-system previews (`designsystem/`) in light mode only, since their dark
+colours come from the same theme the screens' dark shots cover. Wrappers are
 grouped per preview package, so the reference images under `androidApp/src/screenshotTestDebug/reference`
 mirror the package tree. Previews are `public` only because those wrappers live in another module and call
 them; they are not API for anything else. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
