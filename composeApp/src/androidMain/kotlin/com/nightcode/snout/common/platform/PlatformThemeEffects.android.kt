@@ -12,7 +12,7 @@ import androidx.core.view.WindowCompat
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 
 @Composable
-internal actual fun PlatformThemeEffects(themeMode: ThemeMode?, darkTheme: Boolean) {
+internal actual fun PlatformThemeEffects(themeMode: ThemeMode, darkTheme: Boolean) {
     ApplicationNightMode(themeMode)
     SystemBarsAppearance(darkTheme)
 }
@@ -22,10 +22,10 @@ internal actual fun PlatformThemeEffects(themeMode: ThemeMode?, darkTheme: Boole
  * Changing it recreates the activity once; later launches open straight into the matching splash.
  */
 @Composable
-private fun ApplicationNightMode(themeMode: ThemeMode?) {
+private fun ApplicationNightMode(themeMode: ThemeMode) {
     val context = LocalContext.current
     LaunchedEffect(themeMode) {
-        if (themeMode == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return@LaunchedEffect
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return@LaunchedEffect
         val uiModeManager = context.getSystemService(UiModeManager::class.java) ?: return@LaunchedEffect
         uiModeManager.setApplicationNightMode(
             when (themeMode) {

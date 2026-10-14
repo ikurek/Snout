@@ -3,6 +3,7 @@ package com.nightcode.snout.features.home
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.links.IncomingLinkRepository
+import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.links.FindLinkInText
@@ -21,6 +22,8 @@ import kotlinx.coroutines.flow.flowOf
 
 private const val InsightLink = "https://eu.posthog.com/project/1/insights/aBc123"
 
+private val StartupPreferences = NavigationPreferences.Default.withLanding(HomeSection.Insights)
+
 class HomeViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
@@ -34,13 +37,18 @@ class HomeViewModelTest :
             every { appStateRepository.observeNavigationPreferences() } returns flowOf(NavigationPreferences.Default)
             val findLinkInText = FindLinkInText()
             return HomeViewModel(
+                initialNavigationPreferences = StartupPreferences,
                 observeNavigationPreferences = ObserveNavigationPreferences(appStateRepository),
                 findLinkInText = findLinkInText,
                 submitIncomingLink = SubmitIncomingLink(findLinkInText, incomingLinkRepository),
             )
         }
 
-        should("expose the stored navigation preferences") {
+        should("start from the preferences read at startup") {
+            subject().uiState.value.navigationPreferences shouldBe StartupPreferences
+        }
+
+        should("follow the stored navigation preferences") {
             val viewModel = subject()
             viewModel.uiState.subscribed {
                 viewModel.uiState.value.navigationPreferences shouldBe NavigationPreferences.Default

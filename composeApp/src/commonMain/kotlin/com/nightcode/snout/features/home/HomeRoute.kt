@@ -15,15 +15,18 @@ import com.nightcode.snout.common.compose.rememberPostHogOpener
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 internal fun HomeRoute(
+    initialNavigationPreferences: NavigationPreferences,
     onNavigateToSettings: () -> Unit,
     onOpenSection: (HomeSection) -> Unit,
     navigation: SectionNavigation,
 ) {
-    val viewModel = koinViewModel<HomeViewModel>()
+    val viewModel = koinViewModel<HomeViewModel> { parametersOf(initialNavigationPreferences) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val switcherViewModel = koinViewModel<ProjectSwitcherViewModel>()
     val switcherState by switcherViewModel.uiState.collectAsStateWithLifecycle()
@@ -36,12 +39,8 @@ internal fun HomeRoute(
         snapshotFlow { linkState.text.toString() }.collect { linkRejected = false }
     }
 
-    // The bar and the landing tab come from preferences: draw only the background for the few milliseconds they
-    // take to read rather than flash the defaults.
-    val preferences = state.navigationPreferences ?: return
-
     HomeScreen(
-        preferences = preferences,
+        preferences = state.navigationPreferences,
         currentProjectName = switcherState.currentProjectName,
         onOpenProjectSwitcher = { showProjectSwitcher = true },
         onNavigateToSettings = onNavigateToSettings,

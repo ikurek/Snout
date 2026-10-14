@@ -2,6 +2,7 @@ package com.nightcode.snout.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.links.FindLinkInText
 import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
@@ -11,10 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 internal class HomeViewModel(
+    @InjectedParam initialNavigationPreferences: NavigationPreferences,
     observeNavigationPreferences: ObserveNavigationPreferences,
     private val findLinkInText: FindLinkInText,
     private val submitIncomingLink: SubmitIncomingLink,
@@ -25,7 +28,7 @@ internal class HomeViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeUiState(),
+            initialValue = HomeUiState(navigationPreferences = initialNavigationPreferences),
         )
 
     /**

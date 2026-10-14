@@ -1,6 +1,16 @@
 <resources>
-    <!-- The window background is what the system splash and the first frames show; match the app's own. -->
+    <!-- The window background is what the first frames show; match the app's own. -->
     <style name="Theme.Snout" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/snout_background</item>
+    </style>
+
+    <!--
+        The launch screen: the launcher icon on the app's background. MainActivity keeps it up until the startup data
+        is read, then switches to Theme.Snout.
+    -->
+    <style name="Theme.Snout.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/snout_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Snout</item>
     </style>
 </resources>

@@ -33,6 +33,7 @@ import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.libraries.LibrariesRoute
 import com.nightcode.snout.features.settings.libraries.detail.LibraryDetailRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
+import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
 import com.nightcode.snout.shared.domain.usecase.auth.ClearLocalData
@@ -52,8 +53,9 @@ private val PopTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> C
     slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(targetOffsetX = { it })
 }
 
+/** [initialNavigationPreferences] seeds Home, so it draws its bar on its first frame. */
 @Composable
-internal fun MainNavGraph(initial: SnoutNavKey) {
+internal fun MainNavGraph(initial: SnoutNavKey, initialNavigationPreferences: NavigationPreferences) {
     val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
     ReturnToLoginOnSessionExpiry(backStack)
     HandleIncomingLinks(backStack)
@@ -68,7 +70,7 @@ internal fun MainNavGraph(initial: SnoutNavKey) {
         transitionSpec = PushTransition,
         popTransitionSpec = PopTransition,
         predictivePopTransitionSpec = { PopTransition() },
-        entryProvider = mainEntryProvider(backStack),
+        entryProvider = mainEntryProvider(backStack, initialNavigationPreferences),
     )
 }
 
@@ -131,11 +133,14 @@ private fun NavBackStack<NavKey>.popUpTo(key: SnoutNavKey) {
 
 /* One group of entries per area of the app, each with the navigation its screens need. */
 
-private fun mainEntryProvider(backStack: NavBackStack<NavKey>): (NavKey) -> NavEntry<NavKey> {
+private fun mainEntryProvider(
+    backStack: NavBackStack<NavKey>,
+    initialNavigationPreferences: NavigationPreferences,
+): (NavKey) -> NavEntry<NavKey> {
     val back: () -> Unit = { backStack.removeLastOrNull() }
     return entryProvider {
         onboardingEntries(backStack)
-        homeEntries(backStack, back)
+        homeEntries(backStack, back, initialNavigationPreferences)
         settingsEntries(backStack, back)
         detailEntries(backStack, back)
         logsEntries(backStack, back)
@@ -155,7 +160,11 @@ private fun EntryProviderScope<NavKey>.onboardingEntries(backStack: NavBackStack
 }
 
 /** Home with its tabs, and a section opened from More; both open the same detail screens. */
-private fun EntryProviderScope<NavKey>.homeEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
+private fun EntryProviderScope<NavKey>.homeEntries(
+    backStack: NavBackStack<NavKey>,
+    back: () -> Unit,
+    initialNavigationPreferences: NavigationPreferences,
+) {
     val sectionNavigation = SectionNavigation(
         onOpenDashboard = { backStack.add(DashboardDetailNavKey(it)) },
         onOpenInsight = { backStack.add(InsightDetailNavKey(it)) },
@@ -166,6 +175,7 @@ private fun EntryProviderScope<NavKey>.homeEntries(backStack: NavBackStack<NavKe
     )
     entry<HomeNavKey> {
         HomeRoute(
+            initialNavigationPreferences = initialNavigationPreferences,
             onNavigateToSettings = { backStack.add(SettingsNavKey) },
             onOpenSection = { backStack.add(HomeSectionNavKey(it)) },
             navigation = sectionNavigation,

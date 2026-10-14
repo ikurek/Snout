@@ -110,6 +110,12 @@ DI (Koin annotations with the Koin compiler plugin):
   case module. `composeApp`'s `AppModule` includes it and scans the view models.
 - `composeApp/.../Snout.kt` starts Koin once, before any UI: `SnoutApplication` on Android, `startSnout()` from
   `iOSApp.init` on iOS.
+- Before any UI the platform also reads `Startup` with `loadStartup()` (`composeApp/.../Startup.kt`): the first
+  screen, the theme and Home's bar, local reads only. `App(startup)` opens straight on them, so the first frame is
+  already the right screen in the right theme, and keeps following theme and bar changes afterwards. Android keeps
+  its launch screen (`core-splashscreen`, `Theme.Snout.Starting`) up while `MainActivity` reads it in a view model
+  that survives rotation; iOS can't extend its launch screen, so `MainViewController` reads it with `runBlocking`
+  while the launch screen still shows.
 - Missing definitions fail the build through the compiler plugin's check of `SharedGraph`, and fail
   `AppModuleTest` for the app graph (view models included), which the plugin can't see.
 

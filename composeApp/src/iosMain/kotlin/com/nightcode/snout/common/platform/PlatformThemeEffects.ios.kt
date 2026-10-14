@@ -14,10 +14,9 @@ import platform.UIKit.UIWindowScene
  * [darkTheme] needs no handling: Compose on iOS already derives the status bar style from the content under it.
  */
 @Composable
-internal actual fun PlatformThemeEffects(themeMode: ThemeMode?, darkTheme: Boolean) {
+internal actual fun PlatformThemeEffects(themeMode: ThemeMode, darkTheme: Boolean) {
     LaunchedEffect(themeMode) {
         val style = when (themeMode) {
-            null -> return@LaunchedEffect
             ThemeMode.System -> UIUserInterfaceStyle.UIUserInterfaceStyleUnspecified
             ThemeMode.Light -> UIUserInterfaceStyle.UIUserInterfaceStyleLight
             ThemeMode.Dark -> UIUserInterfaceStyle.UIUserInterfaceStyleDark
