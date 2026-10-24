@@ -7,6 +7,7 @@
 **Pocket-sized PostHog.**<br>
 Your analytics, dashboards, feature flags, errors and logs, in a native Android and iOS app.
 
+[![Quality gate](https://github.com/ikurek/snout/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/ikurek/snout/actions/workflows/quality-gate.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-BC3D0A.svg)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4-7F52FF.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.12-4285F4.svg?logo=jetpackcompose&logoColor=white)](https://www.jetbrains.com/compose-multiplatform/)

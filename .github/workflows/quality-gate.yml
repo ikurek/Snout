@@ -1,0 +1,109 @@
+name: Quality gate
+
+# Every check from CONTRIBUTING.md, one job each so they run in parallel and a failure says which check it was.
+# Branch protection only needs to require the final "Quality gate" job.
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Pull requests from forks run with this read-only token and no secrets; Dependabot keeps the actions current.
+permissions:
+  contents: read
+
+jobs:
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-gradle
+      - run: ./gradlew detekt lint --continue
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis-reports
+          path: |
+            build/reports/detekt/
+            androidApp/build/reports/lint-results-*
+
+  architecture:
+    name: Architecture (Konsist)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-gradle
+      - run: ./gradlew :konsist:test
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-report
+          path: konsist/build/reports/tests/
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-gradle
+      - run: ./gradlew testAndroidHostTest --continue
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: '**/build/reports/tests/'
+
+  screenshot-tests:
+    name: Screenshot tests
+    # The references are recorded on macOS; rendering on Linux can differ by a few pixels.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-gradle
+      - run: ./gradlew :androidApp:validateDebugScreenshotTest
+      - name: Upload diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-test-report
+          path: androidApp/build/reports/screenshotTest/
+
+  ios:
+    name: iOS compile
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-gradle
+      - uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - run: ./gradlew :composeApp:compileKotlinIosSimulatorArm64
+
+  gate:
+    name: Quality gate
+    if: always()
+    needs: [static-analysis, architecture, unit-tests, screenshot-tests, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check to pass
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

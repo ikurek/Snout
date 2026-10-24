@@ -1,0 +1,15 @@
+# Weekly pull requests for outdated dependencies; the Quality gate checks each before it's merged.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories: ["/", "/.github/actions/*"]
+    schedule:
+      interval: weekly
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # One pull request for the toolchain that has to move together.
+      kotlin:
+        patterns: ["org.jetbrains.kotlin*", "org.jetbrains.compose*"]

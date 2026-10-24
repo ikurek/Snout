@@ -25,16 +25,24 @@ follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 ## Building and checks
 
 Android: `./gradlew :androidApp:assembleDebug`. iOS: open `iosApp` in Xcode (the framework is built by Gradle).
-Checks before a pull request:
+Checks before a pull request, the same ones the Quality gate workflow runs on every pull request:
 
 ```
-./gradlew testAndroidHostTest detekt :composeApp:compileKotlinIosSimulatorArm64
-./gradlew :androidApp:validateDebugScreenshotTest
+./gradlew detekt lint                                   # static analysis
+./gradlew :konsist:test                                 # architecture rules
+./gradlew testAndroidHostTest                           # unit tests
+./gradlew :androidApp:validateDebugScreenshotTest       # screenshot tests
+./gradlew :composeApp:compileKotlinIosSimulatorArm64    # iOS compile
 ```
 
 The Android tasks never compile Kotlin/Native, so the iOS compile is needed to catch iOS-only breakage. `detekt`
 (with ktlint rules) only checks; `./gradlew detektFormat` fixes what the formatting rules can (it rewrites files,
 so review the diff after it) and then `detekt` reports what is left.
+
+Architecture rules: `konsist/` holds [Konsist](https://docs.konsist.lemonappdev.com) tests that read every module's
+sources and check the layering and conventions in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): which layer may
+import which, DTO, repository, use case and view model shapes, and previews. A failure names the rule and the
+offending files. When a convention changes on purpose, change its rule in the same pull request.
 
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered by generated wrappers in
 `androidApp/src/screenshotTest` (Compose Preview Screenshot Testing): screens (previews under `features/`) in light
