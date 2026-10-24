@@ -19,6 +19,7 @@ shared/       Kotlin business logic, one module per layer and feature:
                            secure store (KSafe) for the API key and account
   common/                  `@TestData` opt-in, test utilities
 buildLogic/   Gradle convention plugins
+konsist/      Konsist architecture tests (JVM; reads the other modules' sources)
 scripts/      generate_screenshot_tests.py
 ```
 
@@ -125,6 +126,7 @@ Tests are Kotest `ShouldSpec` with Mokkery mocks: mappers in `shared/data/*`, us
 `shared/domain/usecase/*`, view models in `composeApp/src/commonTest` (real use cases over mocked repositories),
 request bodies in `shared/api/*` (pinned JSON against `FakePostHog`), the Koin graph in `AppModuleTest`, and
 previews as screenshot tests (see [CONTRIBUTING.md](../CONTRIBUTING.md#building-and-checks)). Shared fixtures sit next to the models behind the `@TestData` opt-in.
+The layering and naming conventions on this page are enforced by the Konsist tests in `konsist/`.
 
 ## Design system
 

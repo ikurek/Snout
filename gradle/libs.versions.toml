@@ -24,6 +24,7 @@ kotlin-datetime = "0.8.0"
 ktor = "3.6.0"
 sqldelight = "2.4.0"
 kotest = "6.2.5"
+konsist = "0.18.1"
 mokkery = "3.5.1"
 compose-screenshot = "0.0.1-alpha16"
 
@@ -100,6 +101,9 @@ kotest-assertions-arrow = { module = "io.kotest:kotest-assertions-arrow", versio
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 
+# Architecture tests
+konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
+
 # Networking
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -118,6 +122,7 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 koinCompiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

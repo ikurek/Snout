@@ -33,6 +33,7 @@ dependencyResolutionManagement {
 include(":androidApp")
 include(":composeApp")
 include(":shared")
+include(":konsist")
 
 // API
 include(":shared:api")
