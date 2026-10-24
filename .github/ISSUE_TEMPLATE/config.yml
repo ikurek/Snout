@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/ikurek/snout/security/advisories/new
+    about: Report security issues privately, not as a public issue.
+  - name: Problem with PostHog itself
+    url: https://github.com/PostHog/posthog/issues
+    about: Issues with PostHog's product or API belong in PostHog's own tracker.

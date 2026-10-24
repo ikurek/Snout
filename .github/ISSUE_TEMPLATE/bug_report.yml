@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in Snout doesn't work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Don't paste API keys, and leave out project data you don't want public.
+        Security issues go through [private reporting](https://github.com/ikurek/snout/security/advisories/new) instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you got. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Feature flags
+        2. Toggle a flag
+        3. ...
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android
+        - iOS
+        - Both
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: App and OS version
+      placeholder: Snout 1.0 (or commit), Android 15 / iOS 18.4
+    validations:
+      required: true
+  - type: dropdown
+    id: instance
+    attributes:
+      label: PostHog instance
+      options:
+        - US cloud
+        - EU cloud
+        - Self-hosted
+    validations:
+      required: true
