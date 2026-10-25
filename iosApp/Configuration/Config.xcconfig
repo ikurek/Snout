@@ -1,8 +1,11 @@
+// Release signing leaves the team to Codemagic's provisioning profiles; set it locally to run on a device.
 TEAM_ID=
 
 PRODUCT_NAME=snout
-PRODUCT_BUNDLE_IDENTIFIER=com.nightcode.snout.snout$(TEAM_ID)
+// The bundle ids (com.nightcode.snout and com.nightcode.snout.share) are the targets' build settings, where
+// Codemagic's code signing reads them; it doesn't resolve them from this file.
 
+// Codemagic overrides both from the release tag: 1.2.3 and its version code, 10203 (see androidApp/build.gradle.kts).
 CURRENT_PROJECT_VERSION=1
-MARKETING_VERSION=1.0
+MARKETING_VERSION=0.0.1
 OTHER_LDFLAGS = $(inherited) -lsqlite3

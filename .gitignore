@@ -17,3 +17,18 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# Release signing (the upload key), see androidApp/build.gradle.kts
+*.jks
+*.keystore
+
+# Apple signing and App Store Connect keys, and local environment files: never in the repository
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+.env
+.env.*
+
+# Claude Code's per-machine settings (local permissions and paths)
+.claude/settings.local.json

@@ -6,6 +6,8 @@
         <true/>
         <key>CFBundleDisplayName</key>
         <string>Snout</string>
+        <key>ITSAppUsesNonExemptEncryption</key>
+        <false/>
         <key>CFBundleURLTypes</key>
         <array>
             <dict>
