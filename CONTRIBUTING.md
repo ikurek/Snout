@@ -66,6 +66,25 @@ and allow it. `./gradlew :composeApp:findLibraries` lists what is collected.
 
 If Gradle cannot find the Android SDK, add a `local.properties` with `sdk.dir=/path/to/Android/sdk`.
 
+## Releasing
+
+Maintainers release by pushing a `major.minor.patch` tag (`1.2.0`, no `v`) on `master`. Codemagic
+(`codemagic.yaml`) builds both apps from it, uploads them to the Google Play internal track and TestFlight, and
+publishes a GitHub release with the APK and the commits since the previous tag. Promote a build to production in the
+Play Console and App Store Connect.
+
+The tag is the only version: the Android `versionName` and iOS `MARKETING_VERSION` are the tag, and both version codes
+are `major * 10000 + minor * 100 + patch` (1.2.3 is 10203), so minor and patch stay under 100. Local builds default to
+0.0.1. Release builds are shrunk with R8; a signed local release build needs the upload key, named in
+`local.properties` (ignored by git):
+
+```
+signing.storeFile=androidApp/keystore.jks
+signing.storePassword=…
+signing.keyAlias=upload
+signing.keyPassword=…
+```
+
 ## Pull requests
 
 - Keep each pull request to one change, with focused commits whose subject says what changed in the imperative

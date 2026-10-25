@@ -1,0 +1,118 @@
+# Releases only: pull requests are checked by the Quality gate workflow on GitHub Actions. Signing identities and
+# store credentials live in Codemagic, so nothing here is secret.
+definitions:
+  machine: &machine
+    # Mac for both apps: the iOS app needs Xcode.
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+  versions: &versions
+    java: 21
+    xcode: latest
+  cache: &cache
+    cache_paths:
+      - $HOME/.gradle/caches
+      - $HOME/.gradle/wrapper
+      - $HOME/.konan
+  scripts:
+    - &set-sdk-location
+      name: Set Android SDK location
+      script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+    - &set-version-code
+      name: Derive the version code from the tag
+      script: |
+        #!/usr/bin/env sh
+        set -e # exit on first failed command
+        # 1.2.3 is 10203 on both platforms, as androidApp/build.gradle.kts computes it.
+        echo "VERSION_CODE=$(echo "$CM_TAG" | awk -F. '{ print $1 * 10000 + $2 * 100 + $3 }')" >> "$CM_ENV"
+    - &generate-release-notes
+      name: Generate release notes since the last tag
+      script: |
+        #!/usr/bin/env sh
+        set -e # exit on first failed command
+        git fetch --unshallow --tags 2>/dev/null || git fetch --tags
+        # HEAD^ leaves out the tag being released, so a release lists what changed since the previous one.
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "Changes since $PREVIOUS_TAG:" > release_notes.txt
+          git log --pretty=format:"* %s" "$PREVIOUS_TAG..HEAD" >> release_notes.txt
+        else
+          echo "Latest changes:" > release_notes.txt
+          git log --pretty=format:"* %s" --max-count=20 >> release_notes.txt
+        fi
+        cat release_notes.txt
+    - &ios-use-profiles
+      name: Set up iOS code signing
+      script: |
+        #!/usr/bin/env sh
+        set -e # exit on first failed command
+        # The preinstalled xcodeproj gem predates Xcode 16's synchronized folders and cannot open the project.
+        gem install xcodeproj
+        xcode-project use-profiles --verbose
+    - &android-build-release
+      name: Build Android release bundle and APK
+      # The bundle goes to Google Play, the APK to the GitHub release.
+      script: ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease -PversionName=$CM_TAG
+    - &ios-build-release
+      name: Build iOS release IPA
+      script: |
+        #!/usr/bin/env sh
+        set -e # exit on first failed command
+        xcode-project build-ipa \
+          --project iosApp/iosApp.xcodeproj \
+          --scheme iosApp \
+          --config Release \
+          --archive-xcargs "CURRENT_PROJECT_VERSION=$VERSION_CODE MARKETING_VERSION=$CM_TAG"
+workflows:
+  deploy_release:
+    name: Release to Google Play, TestFlight and GitHub
+    <<: *machine
+    integrations:
+      app_store_connect: NightCode
+    environment:
+      <<: *versions
+      groups:
+        - google-play
+        - github
+      android_signing:
+        - snout-keystore
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.nightcode.snout
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "+([0-9]).+([0-9]).+([0-9])"
+          include: true
+      cancel_previous_builds: true
+    scripts:
+      - *set-sdk-location
+      - *set-version-code
+      - *generate-release-notes
+      - *ios-use-profiles
+      - *android-build-release
+      - *ios-build-release
+    artifacts:
+      - androidApp/build/outputs/bundle/release/*.aab
+      - androidApp/build/outputs/apk/release/*.apk
+      - androidApp/build/outputs/mapping/release/mapping.txt
+      - build/ios/ipa/*.ipa
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+      app_store_connect:
+        auth: integration
+      scripts:
+        - name: Publish the GitHub release
+          script: |
+            #!/usr/bin/env sh
+            set -e # exit on first failed command
+            # Post-publish scripts run even after a failed build; a failed release shouldn't show up on GitHub.
+            if [ "$CM_BUILD_STEP_STATUS" != "success" ]; then exit 0; fi
+            APK="snout-$CM_TAG.apk"
+            cp androidApp/build/outputs/apk/release/androidApp-release.apk "$APK"
+            gh release create "$CM_TAG" "$APK" --title "$CM_TAG" --notes-file release_notes.txt
+    cache: *cache
