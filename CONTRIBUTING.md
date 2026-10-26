@@ -50,7 +50,8 @@ and dark mode on a phone-sized device, design-system previews (`designsystem/`) 
 colours come from the same theme the screens' dark shots cover. Wrappers are
 grouped per preview package, so the reference images under `androidApp/src/screenshotTestDebug/reference`
 mirror the package tree. Previews are `public` only because those wrappers live in another module and call
-them; they are not API for anything else. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
+them; they are not API for anything else. The tests render in UTC (set in `androidApp/build.gradle.kts`), so times in
+the references match on every machine whatever its time zone. Verify with `./gradlew :androidApp:validateDebugScreenshotTest`. After adding or
 renaming previews run `scripts/generate_screenshot_tests.py`; after an intended UI change regenerate the
 references with `./gradlew :androidApp:updateDebugScreenshotTest` and commit them.
 

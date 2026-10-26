@@ -70,6 +70,11 @@ android {
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
+// Previews show times in the system time zone, so screenshots render in UTC to come out the same on every machine.
+tasks.withType<Test>().matching { it.name.endsWith("ScreenshotTest") }.configureEach {
+    systemProperty("user.timezone", "UTC")
+}
+
 dependencies {
     implementation(projects.composeApp)
     implementation(libs.androidx.activity.compose)
