@@ -8,8 +8,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -48,11 +50,15 @@ internal fun HomeScreen(
     onOpenSection: (HomeSection) -> Unit,
     onOpenInPostHog: (PostHogResource) -> Unit,
     navigation: SectionNavigation,
+    onSectionShown: (HomeSection?) -> Unit = {},
 ) {
     var selected by rememberSaveable { mutableStateOf<HomeSection?>(preferences.landing) }
     // A tab removed in settings while it was open falls back to More rather than showing a bar with nothing lit.
     val current = selected?.takeIf { it in preferences.tabs }
     val title = current?.let { stringResource(it.label) } ?: stringResource(Res.string.bottom_nav_more)
+    // Tabs aren't destinations, so the shown one is reported from here: each time it changes or Home comes back.
+    val currentOnSectionShown by rememberUpdatedState(onSectionShown)
+    LaunchedEffect(current) { currentOnSectionShown(current) }
 
     Scaffold(
         topBar = {

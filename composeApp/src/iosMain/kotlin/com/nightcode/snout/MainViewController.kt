@@ -10,11 +10,13 @@ import platform.UIKit.UIViewController
  *
  * Also empties the shared URL cache: earlier versions let URLSession store PostHog responses there
  * (`Library/Caches/<bundle id>/Cache.db`). The API client no longer uses it; the image loader still may, for
- * logos, which this clears on every launch too.
+ * logos, which this clears on every launch too. Then starts reporting, which needs one local read (the person's
+ * choice), taking milliseconds.
  */
 fun startSnout() {
     NSURLCache.sharedURLCache.removeAllCachedResponses()
     startSnoutKoin {}
+    runBlocking { applyTelemetrySettings() }
 }
 
 /**

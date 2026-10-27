@@ -7,6 +7,7 @@ import com.nightcode.snout.shared.domain.model.insights.DashboardTile
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboard
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboardTileResult
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackDashboardViewed
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,7 @@ internal class DashboardDetailViewModel(
     @InjectedParam private val dashboardId: Long,
     private val getDashboard: GetDashboard,
     private val getDashboardTileResult: GetDashboardTileResult,
+    private val trackDashboardViewed: TrackDashboardViewed,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardDetailUiState())
@@ -35,6 +37,7 @@ internal class DashboardDetailViewModel(
     private val tileLoads = Semaphore(ParallelTileLoads)
     private var loadJob: Job? = null
     private var hasEntered = false
+    private var hasReportedView = false
 
     init {
         load()
@@ -66,7 +69,11 @@ internal class DashboardDetailViewModel(
                     ifRight = { state.copy(dashboard = it.withResults(results), isRefreshing = false, error = null) },
                 )
             }
-            result.onRight { loadMissingTiles(it) }
+            result.onRight { dashboard ->
+                loadMissingTiles(dashboard)
+                // Once per visit: refreshes aren't views.
+                if (!hasReportedView) trackDashboardViewed(dashboard.tiles.size).also { hasReportedView = true }
+            }
         }
     }
 

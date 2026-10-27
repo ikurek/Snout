@@ -139,6 +139,17 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_about_section">About</string>
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="settings_privacy_description">Usage and error reports, and the privacy policy</string>
+    <string name="settings_privacy_note">Reports are anonymous and go to Snout's own PostHog project. They never include your PostHog data: no names, keys, links or anything your instance sends.</string>
+    <string name="settings_privacy_unavailable">This build of Snout doesn't send usage or error reports, so there is nothing to switch off.</string>
+    <string name="settings_privacy_reports_section">Help improve Snout</string>
+    <string name="settings_privacy_usage_title">Share usage</string>
+    <string name="settings_privacy_usage_description">Which screens you open and which features you use</string>
+    <string name="settings_privacy_errors_title">Share error reports</string>
+    <string name="settings_privacy_errors_description">Crashes and unexpected errors, without their messages</string>
+    <string name="settings_privacy_policy_title">Privacy policy</string>
+    <string name="settings_privacy_policy_description">What Snout handles and where it goes</string>
     <string name="settings_version_footer">Snout %1$s</string>
     <string name="settings_libraries_title">Open-source libraries</string>
     <string name="settings_libraries_description">The libraries Snout is built with and their licenses</string>

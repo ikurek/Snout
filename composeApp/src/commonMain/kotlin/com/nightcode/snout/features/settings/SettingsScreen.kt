@@ -78,6 +78,8 @@ import snout.composeapp.generated.resources.settings_navigation_description
 import snout.composeapp.generated.resources.settings_navigation_title
 import snout.composeapp.generated.resources.settings_open_links_description
 import snout.composeapp.generated.resources.settings_open_links_title
+import snout.composeapp.generated.resources.settings_privacy_description
+import snout.composeapp.generated.resources.settings_privacy_title
 import snout.composeapp.generated.resources.settings_project_label
 import snout.composeapp.generated.resources.settings_project_not_selected
 import snout.composeapp.generated.resources.settings_screen_title
@@ -95,6 +97,7 @@ internal fun SettingsScreen(
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     onOpenLibraries: () -> Unit,
     onLogoutConfirmed: () -> Unit,
 ) {
@@ -115,6 +118,7 @@ internal fun SettingsScreen(
             onThemeModeSelected = onThemeModeSelected,
             onOpenNavigationSettings = onOpenNavigationSettings,
             onOpenAnalyticsSettings = onOpenAnalyticsSettings,
+            onOpenPrivacy = onOpenPrivacy,
             onOpenLibraries = onOpenLibraries,
             onLogoutClicked = { showLogoutDialog = true },
         )
@@ -147,6 +151,7 @@ private fun SettingsContent(
     onThemeModeSelected: (ThemeMode) -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     onOpenLibraries: () -> Unit,
     onLogoutClicked: () -> Unit,
 ) {
@@ -177,6 +182,11 @@ private fun SettingsContent(
         )
 
         SectionLabel(stringResource(Res.string.settings_about_section))
+        SettingsRow(
+            title = stringResource(Res.string.settings_privacy_title),
+            supportingText = stringResource(Res.string.settings_privacy_description),
+            onClick = onOpenPrivacy,
+        )
         SettingsRow(
             title = stringResource(Res.string.settings_libraries_title),
             supportingText = stringResource(Res.string.settings_libraries_description),
@@ -416,6 +426,7 @@ fun SettingsScreenPreview() = SettingsScreen(
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
+    onOpenPrivacy = {},
     onOpenLibraries = {},
     onLogoutConfirmed = {},
 )
@@ -434,6 +445,7 @@ fun SettingsScreenAccountErrorPreview() = SettingsScreen(
     onThemeModeSelected = {},
     onOpenNavigationSettings = {},
     onOpenAnalyticsSettings = {},
+    onOpenPrivacy = {},
     onOpenLibraries = {},
     onLogoutConfirmed = {},
 )

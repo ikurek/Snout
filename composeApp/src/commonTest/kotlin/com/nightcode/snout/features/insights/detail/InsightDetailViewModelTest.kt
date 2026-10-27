@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.insights.InsightRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.InsightSummary
@@ -12,6 +13,8 @@ import com.nightcode.snout.shared.domain.model.insights.TestInsightDetail
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.insights.GetInsightDetail
 import com.nightcode.snout.shared.domain.usecase.insights.SetInsightFavorite
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackInsightViewed
+import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
@@ -29,6 +32,8 @@ class InsightDetailViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<InsightRepository>()
         val insightId = TestInsightDetail.summary.id
@@ -41,6 +46,7 @@ class InsightDetailViewModelTest :
                 insightId = insightId,
                 getInsightDetail = GetInsightDetail(projectId, repository),
                 setInsightFavorite = SetInsightFavorite(projectId, repository),
+                trackInsightViewed = TrackInsightViewed(telemetryRepository),
             )
         }
 

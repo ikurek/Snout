@@ -5,20 +5,26 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
+import com.nightcode.snout.shared.domain.model.telemetry.ProjectSelectionSource
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryEvent
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackProjectSelected
 import com.nightcode.snout.testing.subscribed
+import dev.mokkery.MockMode
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -29,6 +35,8 @@ import kotlin.uuid.Uuid
 class ProjectSwitcherViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
+
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
 
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>()
@@ -45,6 +53,7 @@ class ProjectSwitcherViewModelTest :
                 refreshOrganizations = RefreshOrganizations(organizationRepository),
                 observeSelectedProject = ObserveSelectedProject(appStateRepository),
                 saveSelectedProject = SaveSelectedProject(appStateRepository),
+                trackProjectSelected = TrackProjectSelected(telemetryRepository),
             )
         }
 
@@ -78,9 +87,10 @@ class ProjectSwitcherViewModelTest :
             }
         }
 
-        should("save the selected project") {
+        should("save the selected project and report where it was picked") {
             val viewModel = subject()
-            viewModel.onProjectSelected(TestOrganization.id, projectId = 7).join()
+            viewModel.onProjectSelected(TestOrganization.id, projectId = 7, ProjectSelectionSource.Settings).join()
             verifySuspend { appStateRepository.saveSelectedProject(TestOrganization.id, 7) }
+            verify { telemetryRepository.track(TelemetryEvent.ProjectSelected(ProjectSelectionSource.Settings)) }
         }
     })

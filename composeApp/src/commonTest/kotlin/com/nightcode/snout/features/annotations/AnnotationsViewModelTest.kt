@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.annotations.AnnotationRepository
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.annotations.TestAnnotation
 import com.nightcode.snout.shared.domain.model.appstate.SelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
@@ -14,6 +15,8 @@ import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackAnnotationCreated
+import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
@@ -36,6 +39,8 @@ class AnnotationsViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<AnnotationRepository>()
         val selected = MutableStateFlow<SelectedProject?>(TestSelectedProject)
@@ -50,6 +55,7 @@ class AnnotationsViewModelTest :
             val projectId = GetSelectedProjectId(appStateRepository)
             return AnnotationsViewModel(
                 createAnnotation = CreateAnnotation(projectId, repository),
+                trackAnnotationCreated = TrackAnnotationCreated(telemetryRepository),
                 getAnnotations = GetAnnotations(projectId, repository),
                 observeAnnotationReloads = ObserveAnnotationReloads(
                     ObserveProjectReloads(appStateRepository),

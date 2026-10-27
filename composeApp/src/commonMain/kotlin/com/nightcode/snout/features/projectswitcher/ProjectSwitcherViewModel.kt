@@ -3,10 +3,12 @@ package com.nightcode.snout.features.projectswitcher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.organization.Organization
+import com.nightcode.snout.shared.domain.model.telemetry.ProjectSelectionSource
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackProjectSelected
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,6 +24,7 @@ internal class ProjectSwitcherViewModel(
     refreshOrganizations: RefreshOrganizations,
     private val observeSelectedProject: ObserveSelectedProject,
     private val saveSelectedProject: SaveSelectedProject,
+    private val trackProjectSelected: TrackProjectSelected,
 ) : ViewModel() {
 
     val uiState: StateFlow<ProjectSwitcherUiState> = combine(
@@ -54,9 +57,12 @@ internal class ProjectSwitcherViewModel(
         viewModelScope.launch { refreshOrganizations() }
     }
 
-    fun onProjectSelected(organizationId: Uuid, projectId: Long) = viewModelScope.launch {
-        saveSelectedProject(organizationId = organizationId, projectId = projectId)
-    }
+    /** [source] is the screen the switcher was opened on. */
+    fun onProjectSelected(organizationId: Uuid, projectId: Long, source: ProjectSelectionSource) =
+        viewModelScope.launch {
+            saveSelectedProject(organizationId = organizationId, projectId = projectId)
+            trackProjectSelected(source)
+        }
 }
 
 private fun List<Organization>.findProject(organizationId: Uuid, projectId: Long) =

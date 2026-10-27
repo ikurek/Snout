@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
@@ -13,6 +14,8 @@ import com.nightcode.snout.shared.domain.model.errortracking.TestErrorTrackingIs
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorTrackingIssue
 import com.nightcode.snout.shared.domain.usecase.errortracking.SetErrorTrackingIssueStatus
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackIssueStatusChanged
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
 import dev.mokkery.everySuspend
@@ -27,6 +30,8 @@ class ErrorTrackingIssueViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<ErrorTrackingRepository>()
 
@@ -36,6 +41,7 @@ class ErrorTrackingIssueViewModelTest :
                 issueId = TestErrorTrackingIssue.id,
                 getIssue = GetErrorTrackingIssue(projectId, repository),
                 setIssueStatus = SetErrorTrackingIssueStatus(projectId, repository),
+                trackIssueStatusChanged = TrackIssueStatusChanged(telemetryRepository),
             )
         }
 

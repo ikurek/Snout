@@ -2,11 +2,14 @@ package com.nightcode.snout.features.settings.navigation
 
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveNavigationPreferences
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackNavigationChanged
 import com.nightcode.snout.testing.subscribed
+import dev.mokkery.MockMode
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -20,12 +23,15 @@ class NavigationSettingsViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+
         val repository = mock<AppStateRepository>(autoUnit)
 
         fun subject(): NavigationSettingsViewModel {
             every { repository.observeNavigationPreferences() } returns flowOf(NavigationPreferences.Default)
             return NavigationSettingsViewModel(
                 saveNavigationPreferences = SaveNavigationPreferences(repository),
+                trackNavigationChanged = TrackNavigationChanged(telemetryRepository),
                 observeNavigationPreferences = ObserveNavigationPreferences(repository),
             )
         }

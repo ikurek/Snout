@@ -3,10 +3,13 @@ package com.nightcode.snout.features.onboarding.project
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.model.common.DataError
+import com.nightcode.snout.shared.domain.model.telemetry.ProjectSelectionSource
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.Logout
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackOnboarded
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackProjectSelected
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +28,8 @@ internal class ProjectSelectionViewModel(
     private val refreshOrganizations: RefreshOrganizations,
     private val saveSelectedProject: SaveSelectedProject,
     private val logout: Logout,
+    private val trackProjectSelected: TrackProjectSelected,
+    private val trackOnboarded: TrackOnboarded,
 ) : ViewModel() {
 
     private val _sideEffects = Channel<ProjectSelectionSideEffect>()
@@ -64,6 +69,8 @@ internal class ProjectSelectionViewModel(
 
     fun onProjectSelected(organizationId: Uuid, projectId: Long) = viewModelScope.launch {
         saveSelectedProject(organizationId = organizationId, projectId = projectId)
+        trackProjectSelected(ProjectSelectionSource.Onboarding)
+        trackOnboarded()
         _sideEffects.send(ProjectSelectionSideEffect.ProjectSelected)
     }
 }

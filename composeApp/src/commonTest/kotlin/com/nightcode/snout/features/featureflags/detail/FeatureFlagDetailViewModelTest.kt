@@ -5,16 +5,23 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.featureflags.FeatureFlagRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.featureflags.TestFeatureFlag
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryEvent
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlag
 import com.nightcode.snout.shared.domain.usecase.featureflags.SetFeatureFlagActive
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackFeatureFlagToggled
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.resetCalls
+import dev.mokkery.verify
+import dev.mokkery.verifyNoMoreCalls
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 
@@ -22,6 +29,9 @@ import io.kotest.matchers.shouldBe
 class FeatureFlagDetailViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
+
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+        beforeTest { resetCalls(telemetryRepository) }
 
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<FeatureFlagRepository>()
@@ -34,6 +44,7 @@ class FeatureFlagDetailViewModelTest :
                 flagId = TestFeatureFlag.id,
                 getFeatureFlag = GetFeatureFlag(projectId, repository),
                 setFeatureFlagActive = SetFeatureFlagActive(projectId, repository),
+                trackFeatureFlagToggled = TrackFeatureFlagToggled(telemetryRepository),
             )
         }
 
@@ -48,6 +59,7 @@ class FeatureFlagDetailViewModelTest :
             viewModel.onToggleConfirmed(false)
             viewModel.uiState.value.flag shouldBe disabled
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Idle
+            verify { telemetryRepository.track(TelemetryEvent.FeatureFlagToggled(active = false)) }
         }
 
         should("keep the flag and report forbidden when the key lacks write scope") {
@@ -62,6 +74,7 @@ class FeatureFlagDetailViewModelTest :
             viewModel.onToggleConfirmed(false)
             viewModel.uiState.value.flag shouldBe TestFeatureFlag
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Failed(DataError.Forbidden)
+            verifyNoMoreCalls(telemetryRepository)
             viewModel.onToggleErrorDismissed()
             viewModel.uiState.value.toggle shouldBe ToggleStatus.Idle
         }

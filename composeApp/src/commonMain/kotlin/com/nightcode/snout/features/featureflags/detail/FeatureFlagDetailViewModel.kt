@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.usecase.featureflags.GetFeatureFlag
 import com.nightcode.snout.shared.domain.usecase.featureflags.SetFeatureFlagActive
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackFeatureFlagToggled
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ internal class FeatureFlagDetailViewModel(
     @InjectedParam private val flagId: Long,
     private val getFeatureFlag: GetFeatureFlag,
     private val setFeatureFlagActive: SetFeatureFlagActive,
+    private val trackFeatureFlagToggled: TrackFeatureFlagToggled,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeatureFlagDetailUiState())
@@ -46,6 +48,7 @@ internal class FeatureFlagDetailViewModel(
                 _uiState.update {
                     it.copy(flag = updated, error = null, isRefreshing = false, toggle = ToggleStatus.Idle)
                 }
+                trackFeatureFlagToggled(active)
             },
         )
     }

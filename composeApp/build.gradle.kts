@@ -63,6 +63,7 @@ kotlin {
             implementation(projects.shared.domain.data.links)
             implementation(projects.shared.domain.data.logs)
             implementation(projects.shared.domain.data.organization)
+            implementation(projects.shared.domain.data.telemetry)
             implementation(projects.shared.domain.data.user)
         }
         named("androidHostTest").dependencies {

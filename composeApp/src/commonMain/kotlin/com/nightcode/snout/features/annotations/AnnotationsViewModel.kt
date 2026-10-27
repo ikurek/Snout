@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotation
 import com.nightcode.snout.shared.domain.usecase.annotations.CreateAnnotationError
 import com.nightcode.snout.shared.domain.usecase.annotations.GetAnnotations
 import com.nightcode.snout.shared.domain.usecase.annotations.ObserveAnnotationReloads
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackAnnotationCreated
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,7 @@ import kotlin.time.Instant
 internal class AnnotationsViewModel(
     private val getAnnotations: GetAnnotations,
     private val createAnnotation: CreateAnnotation,
+    private val trackAnnotationCreated: TrackAnnotationCreated,
     observeAnnotationReloads: ObserveAnnotationReloads,
 ) : ViewModel() {
 
@@ -67,6 +69,7 @@ internal class AnnotationsViewModel(
             },
             ifRight = {
                 _uiState.update { it.copy(create = CreateStatus.Idle) }
+                trackAnnotationCreated()
                 _sideEffects.send(AnnotationsSideEffect.Created)
             },
         )

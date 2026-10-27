@@ -33,6 +33,7 @@ import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.libraries.LibrariesRoute
 import com.nightcode.snout.features.settings.libraries.detail.LibraryDetailRoute
 import com.nightcode.snout.features.settings.navigation.NavigationSettingsRoute
+import com.nightcode.snout.features.settings.privacy.PrivacySettingsRoute
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.usecase.appstate.DetermineInitialLocation
@@ -42,6 +43,8 @@ import com.nightcode.snout.shared.domain.usecase.links.ClearPendingLink
 import com.nightcode.snout.shared.domain.usecase.links.ObservePendingLink
 import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import com.nightcode.snout.shared.domain.usecase.links.ResolvePostHogLink
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackLinkOpened
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackScreenViewed
 import kotlinx.coroutines.flow.filterNotNull
 import org.koin.compose.koinInject
 
@@ -59,6 +62,7 @@ internal fun MainNavGraph(initial: SnoutNavKey, initialNavigationPreferences: Na
     val backStack = rememberNavBackStack(DefaultSavedStateConfiguration, initial)
     ReturnToLoginOnSessionExpiry(backStack)
     HandleIncomingLinks(backStack)
+    ReportScreenViews(backStack)
 
     NavDisplay(
         backStack = backStack,
@@ -106,13 +110,16 @@ private fun HandleIncomingLinks(backStack: NavBackStack<NavKey>) {
     val clearPendingLink = koinInject<ClearPendingLink>()
     val resolvePostHogLink = koinInject<ResolvePostHogLink>()
     val openInBrowser = koinInject<OpenInBrowser>()
+    val trackLinkOpened = koinInject<TrackLinkOpened>()
     val hasHome = backStack.contains(HomeNavKey)
 
     LaunchedEffect(hasHome) {
         if (!hasHome) return@LaunchedEffect
         observePendingLink().filterNotNull().collect { url ->
             clearPendingLink()
-            when (val resolution = resolvePostHogLink(url)) {
+            val resolution = resolvePostHogLink(url)
+            trackLinkOpened(resolution)
+            when (resolution) {
                 is LinkResolution.InApp -> {
                     backStack.popUpTo(HomeNavKey)
                     resolution.destination.toNavKey()?.let(backStack::add)
@@ -121,6 +128,19 @@ private fun HandleIncomingLinks(backStack: NavBackStack<NavKey>) {
                 is LinkResolution.Browser -> openInBrowser(resolution.url)
             }
         }
+    }
+}
+
+/**
+ * Reports the destination on top of the back stack as viewed, each time another one comes on top (pushed, or
+ * uncovered by a pop). Home and onboarding report their own tabs and steps, which aren't destinations.
+ */
+@Composable
+private fun ReportScreenViews(backStack: NavBackStack<NavKey>) {
+    val trackScreenViewed = koinInject<TrackScreenViewed>()
+    val top = backStack.lastOrNull() as? SnoutNavKey
+    LaunchedEffect(top) {
+        top?.telemetryScreen?.let { trackScreenViewed(it) }
     }
 }
 
@@ -192,11 +212,13 @@ private fun EntryProviderScope<NavKey>.settingsEntries(backStack: NavBackStack<N
             onNavigateBack = back,
             onOpenNavigationSettings = { backStack.add(NavigationSettingsNavKey) },
             onOpenAnalyticsSettings = { backStack.add(AnalyticsSettingsNavKey) },
+            onOpenPrivacy = { backStack.add(PrivacySettingsNavKey) },
             onOpenLibraries = { backStack.add(LibrariesNavKey) },
         )
     }
     entry<NavigationSettingsNavKey> { NavigationSettingsRoute(onNavigateBack = back) }
     entry<AnalyticsSettingsNavKey> { AnalyticsSettingsRoute(onNavigateBack = back) }
+    entry<PrivacySettingsNavKey> { PrivacySettingsRoute(onNavigateBack = back) }
     entry<LibrariesNavKey> {
         LibrariesRoute(onNavigateBack = back, onOpenLibrary = { backStack.add(LibraryDetailNavKey(it)) })
     }

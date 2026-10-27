@@ -16,6 +16,10 @@ import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
+import com.nightcode.snout.shared.domain.model.telemetry.ProjectSelectionSource
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryScreen
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackScreenViewed
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -27,6 +31,7 @@ internal fun HomeRoute(
     navigation: SectionNavigation,
 ) {
     val viewModel = koinViewModel<HomeViewModel> { parametersOf(initialNavigationPreferences) }
+    val trackScreenViewed = koinInject<TrackScreenViewed>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val switcherViewModel = koinViewModel<ProjectSwitcherViewModel>()
     val switcherState by switcherViewModel.uiState.collectAsStateWithLifecycle()
@@ -48,12 +53,15 @@ internal fun HomeRoute(
         onOpenSection = onOpenSection,
         onOpenInPostHog = rememberPostHogOpener(),
         navigation = navigation,
+        onSectionShown = { section -> trackScreenViewed(section?.let(TelemetryScreen::of) ?: TelemetryScreen.More) },
     )
 
     ProjectSwitcherSheet(
         isVisible = showProjectSwitcher,
         state = switcherState,
-        onProjectSelected = switcherViewModel::onProjectSelected,
+        onProjectSelected = { organizationId, projectId ->
+            switcherViewModel.onProjectSelected(organizationId, projectId, ProjectSelectionSource.Home)
+        },
         onDismiss = { showProjectSwitcher = false },
     )
 

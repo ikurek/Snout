@@ -5,20 +5,27 @@ import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.insights.DashboardRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.insights.Dashboard
 import com.nightcode.snout.shared.domain.model.insights.DashboardTile
 import com.nightcode.snout.shared.domain.model.insights.TestDashboard
 import com.nightcode.snout.shared.domain.model.insights.TestInsightSummary
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryEvent
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboard
 import com.nightcode.snout.shared.domain.usecase.insights.GetDashboardTileResult
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackDashboardViewed
+import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.sequentially
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.resetCalls
+import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
@@ -30,6 +37,9 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 class DashboardDetailViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
+
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+        beforeTest { resetCalls(telemetryRepository) }
 
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<DashboardRepository>()
@@ -46,6 +56,7 @@ class DashboardDetailViewModelTest :
                 dashboardId = dashboard.id,
                 getDashboardTileResult = GetDashboardTileResult(projectId, repository),
                 getDashboard = GetDashboard(projectId, repository),
+                trackDashboardViewed = TrackDashboardViewed(telemetryRepository),
             )
         }
 
@@ -62,6 +73,16 @@ class DashboardDetailViewModelTest :
             verifySuspend { repository.getTileResult(TestSelectedProject.projectId, dashboard.id, 99) }
             viewModel.shownDashboard().pendingResult() shouldBe computed
             viewModel.uiState.value.tiles shouldBe emptyMap()
+        }
+
+        should("report the view once per visit, not on each refresh") {
+            everySuspend { repository.getDashboard(any(), any()) } returns Either.Right(dashboard)
+            everySuspend { repository.getTileResult(any(), any(), any()) } returns Either.Right(computed)
+            val viewModel = subject()
+            viewModel.refresh()
+            verify(VerifyMode.exactly(1)) {
+                telemetryRepository.track(TelemetryEvent.DashboardViewed(tileCount = dashboard.tiles.size))
+            }
         }
 
         should("keep a failed status for tiles that could not be computed") {

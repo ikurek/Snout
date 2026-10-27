@@ -1,6 +1,7 @@
 package com.nightcode.snout
 
 import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
+import com.nightcode.snout.shared.domain.usecase.telemetry.ApplyTelemetrySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,6 +26,12 @@ internal fun startSnoutKoin(platformSetup: KoinAppDeclaration) {
         modules(snoutModule())
     }
 }
+
+/**
+ * Starts reporting as the person last chose (see Settings > Privacy). The platforms run it right after the graph,
+ * blocking for the one local read it takes, so PostHog starts before the app's first open is captured.
+ */
+internal suspend fun applyTelemetrySettings() = KoinPlatform.getKoin().get<ApplyTelemetrySettings>().invoke()
 
 /** Main-thread work that outlives any screen; holding the link takes no time, so nothing ever waits on it. */
 private val HostScope by lazy { CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) }

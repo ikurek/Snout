@@ -7,11 +7,13 @@ import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.links.ExternalAppLauncher
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.data.user.UserRepository
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryEvent
 import com.nightcode.snout.shared.domain.model.user.TestUser
 import com.nightcode.snout.shared.domain.model.user.User
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveSelectedProject
@@ -24,15 +26,19 @@ import com.nightcode.snout.shared.domain.usecase.links.CanOpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackLoggedOut
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackThemeChanged
 import com.nightcode.snout.shared.domain.usecase.user.ObserveCurrentUser
 import com.nightcode.snout.shared.domain.usecase.user.RefreshCurrentUser
 import com.nightcode.snout.testing.subscribed
+import dev.mokkery.MockMode
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.mock
+import dev.mokkery.resetCalls
 import dev.mokkery.verify
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
@@ -44,6 +50,9 @@ import kotlinx.coroutines.flow.flowOf
 class SettingsViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
+
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+        beforeTest { resetCalls(telemetryRepository) }
 
         val storedUser = MutableStateFlow<User?>(null)
         val userRepository = mock<UserRepository>(autoUnit) {
@@ -75,6 +84,8 @@ class SettingsViewModelTest :
                 observeCurrentUser = ObserveCurrentUser(userRepository),
                 getInstanceUrl = GetInstanceUrl(authRepository),
                 saveThemeMode = SaveThemeMode(appStateRepository),
+                trackThemeChanged = TrackThemeChanged(telemetryRepository),
+                trackLoggedOut = TrackLoggedOut(telemetryRepository),
                 logout = Logout(
                     authRepository,
                     ClearLocalData(appStateRepository, organizationRepository, userRepository),
@@ -136,6 +147,7 @@ class SettingsViewModelTest :
         should("persist selected theme mode") {
             subject().onThemeModeSelected(ThemeMode.Light)
             verifySuspend { appStateRepository.saveThemeMode(ThemeMode.Light) }
+            verify { telemetryRepository.track(TelemetryEvent.ThemeChanged(ThemeMode.Light)) }
         }
 
         should("clear local data and credentials on logout") {
@@ -146,5 +158,6 @@ class SettingsViewModelTest :
                 userRepository.clear()
                 authRepository.clear()
             }
+            verify { telemetryRepository.track(TelemetryEvent.LoggedOut) }
         }
     })

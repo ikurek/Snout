@@ -27,8 +27,11 @@ import com.nightcode.snout.features.onboarding.project.ProjectSelectionSideEffec
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionUiState
 import com.nightcode.snout.features.onboarding.project.ProjectSelectionViewModel
 import com.nightcode.snout.navigation.OnboardingNavKey
+import com.nightcode.snout.shared.domain.model.telemetry.TelemetryScreen
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackScreenViewed
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.snackbar_generic_error_message
@@ -69,6 +72,12 @@ internal fun OnboardingRoute(navKey: OnboardingNavKey, onFinished: () -> Unit) {
         isBackEnabled = pagerState.targetPage != OnboardingStep.Intro.ordinal,
         onBackCompleted = ::navigateBack,
     )
+
+    // Steps aren't destinations, so the one the pager settles on is reported from here.
+    val trackScreenViewed = koinInject<TrackScreenViewed>()
+    LaunchedEffect(pagerState.settledPage) {
+        trackScreenViewed(OnboardingStep.entries[pagerState.settledPage].telemetryScreen)
+    }
 
     // Every arrival loads afresh: the key may have changed since the last visit.
     LaunchedEffect(pagerState.targetPage) {
@@ -185,3 +194,10 @@ private fun OnboardingPage(
         )
     }
 }
+
+private val OnboardingStep.telemetryScreen: TelemetryScreen
+    get() = when (this) {
+        OnboardingStep.Intro -> TelemetryScreen.Intro
+        OnboardingStep.Login -> TelemetryScreen.Login
+        OnboardingStep.ProjectSelection -> TelemetryScreen.ProjectSelection
+    }

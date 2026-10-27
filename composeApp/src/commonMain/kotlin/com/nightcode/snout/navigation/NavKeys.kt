@@ -37,6 +37,9 @@ internal data object NavigationSettingsNavKey : SnoutNavKey
 internal data object AnalyticsSettingsNavKey : SnoutNavKey
 
 @Serializable
+internal data object PrivacySettingsNavKey : SnoutNavKey
+
+@Serializable
 internal data object LibrariesNavKey : SnoutNavKey
 
 /** A bundled open-source library, by its Maven `group:artifact`. */

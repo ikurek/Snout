@@ -8,6 +8,7 @@ import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.analytics.SaveAnalyticsPreferences
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackAnalyticsSettingsChanged
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -17,6 +18,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 internal class AnalyticsSettingsViewModel(
     private val saveAnalyticsPreferences: SaveAnalyticsPreferences,
+    private val trackAnalyticsSettingsChanged: TrackAnalyticsSettingsChanged,
     observeAnalyticsPreferences: ObserveAnalyticsPreferences,
 ) : ViewModel() {
 
@@ -34,10 +36,15 @@ internal class AnalyticsSettingsViewModel(
 
     fun onBreakdownToggled(breakdown: WebBreakdown, enabled: Boolean) = update { it.withBreakdown(breakdown, enabled) }
 
-    fun reset() = viewModelScope.launch { saveAnalyticsPreferences(AnalyticsPreferences.Default) }
+    fun reset() = save(AnalyticsPreferences.Default)
 
     private fun update(transform: (AnalyticsPreferences) -> AnalyticsPreferences) {
         val current = uiState.value ?: return
-        viewModelScope.launch { saveAnalyticsPreferences(transform(current)) }
+        save(transform(current))
+    }
+
+    private fun save(preferences: AnalyticsPreferences) = viewModelScope.launch {
+        saveAnalyticsPreferences(preferences)
+        trackAnalyticsSettingsChanged(preferences)
     }
 }

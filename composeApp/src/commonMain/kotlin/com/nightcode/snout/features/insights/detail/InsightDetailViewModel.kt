@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nightcode.snout.shared.domain.usecase.insights.GetInsightDetail
 import com.nightcode.snout.shared.domain.usecase.insights.SetInsightFavorite
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackInsightViewed
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,7 @@ internal class InsightDetailViewModel(
     @InjectedParam private val insightId: Long,
     private val getInsightDetail: GetInsightDetail,
     private val setInsightFavorite: SetInsightFavorite,
+    private val trackInsightViewed: TrackInsightViewed,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InsightDetailUiState())
@@ -31,6 +33,7 @@ internal class InsightDetailViewModel(
 
     private var loadJob: Job? = null
     private var hasEntered = false
+    private var hasReportedView = false
 
     init {
         load()
@@ -69,6 +72,8 @@ internal class InsightDetailViewModel(
                     ifRight = { state.copy(insight = it, isRefreshing = false, error = null) },
                 )
             }
+            // Once per visit: refreshes aren't views.
+            result.onRight { if (!hasReportedView) trackInsightViewed(it.summary.kind).also { hasReportedView = true } }
         }
     }
 }

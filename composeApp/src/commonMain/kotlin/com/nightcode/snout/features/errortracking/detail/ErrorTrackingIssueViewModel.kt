@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.usecase.errortracking.GetErrorTrackingIssue
 import com.nightcode.snout.shared.domain.usecase.errortracking.SetErrorTrackingIssueStatus
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackIssueStatusChanged
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,7 @@ internal class ErrorTrackingIssueViewModel(
     @InjectedParam private val issueId: String,
     private val getIssue: GetErrorTrackingIssue,
     private val setIssueStatus: SetErrorTrackingIssueStatus,
+    private val trackIssueStatusChanged: TrackIssueStatusChanged,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ErrorTrackingIssueUiState())
@@ -67,6 +69,7 @@ internal class ErrorTrackingIssueViewModel(
                             updatingTo = null,
                         )
                     }
+                    trackIssueStatusChanged(status)
                     val undo = issue.status.toFilter()?.takeIf { it != target }
                     _sideEffects.send(ErrorTrackingIssueSideEffect.StatusChanged(target, undo))
                 },

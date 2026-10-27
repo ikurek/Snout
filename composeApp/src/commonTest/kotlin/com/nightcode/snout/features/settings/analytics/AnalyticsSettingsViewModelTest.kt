@@ -2,13 +2,16 @@ package com.nightcode.snout.features.settings.analytics
 
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
+import com.nightcode.snout.shared.domain.data.telemetry.TelemetryRepository
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.analytics.SaveAnalyticsPreferences
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackAnalyticsSettingsChanged
 import com.nightcode.snout.testing.subscribed
+import dev.mokkery.MockMode
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -22,12 +25,15 @@ class AnalyticsSettingsViewModelTest :
     ShouldSpec({
         extension(MainDispatcherExtension)
 
+        val telemetryRepository = mock<TelemetryRepository>(MockMode.autoUnit)
+
         val repository = mock<AppStateRepository>(autoUnit)
 
         fun subject(stored: AnalyticsPreferences = AnalyticsPreferences.Default): AnalyticsSettingsViewModel {
             every { repository.observeAnalyticsPreferences() } returns flowOf(stored)
             return AnalyticsSettingsViewModel(
                 saveAnalyticsPreferences = SaveAnalyticsPreferences(repository),
+                trackAnalyticsSettingsChanged = TrackAnalyticsSettingsChanged(telemetryRepository),
                 observeAnalyticsPreferences = ObserveAnalyticsPreferences(repository),
             )
         }

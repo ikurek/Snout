@@ -6,6 +6,7 @@ import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.NavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveNavigationPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveNavigationPreferences
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackNavigationChanged
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -15,6 +16,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 internal class NavigationSettingsViewModel(
     private val saveNavigationPreferences: SaveNavigationPreferences,
+    private val trackNavigationChanged: TrackNavigationChanged,
     observeNavigationPreferences: ObserveNavigationPreferences,
 ) : ViewModel() {
 
@@ -24,13 +26,18 @@ internal class NavigationSettingsViewModel(
     /** Puts [section] in [slot]; a section already in the bar swaps places with the one it replaces. */
     fun onSlotSelected(slot: Int, section: HomeSection) {
         val current = uiState.value ?: return
-        viewModelScope.launch { saveNavigationPreferences(current.withTab(slot, section)) }
+        save(current.withTab(slot, section))
     }
 
     fun onLandingSelected(section: HomeSection) {
         val current = uiState.value ?: return
-        viewModelScope.launch { saveNavigationPreferences(current.withLanding(section)) }
+        save(current.withLanding(section))
     }
 
-    fun reset() = viewModelScope.launch { saveNavigationPreferences(NavigationPreferences.Default) }
+    fun reset() = save(NavigationPreferences.Default)
+
+    private fun save(preferences: NavigationPreferences) = viewModelScope.launch {
+        saveNavigationPreferences(preferences)
+        trackNavigationChanged(preferences)
+    }
 }

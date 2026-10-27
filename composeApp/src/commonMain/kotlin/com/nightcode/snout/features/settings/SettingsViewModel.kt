@@ -13,6 +13,8 @@ import com.nightcode.snout.shared.domain.usecase.links.CanOpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.links.OpenInBrowser
 import com.nightcode.snout.shared.domain.usecase.links.OpenLinkSettings
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackLoggedOut
+import com.nightcode.snout.shared.domain.usecase.telemetry.TrackThemeChanged
 import com.nightcode.snout.shared.domain.usecase.user.ObserveCurrentUser
 import com.nightcode.snout.shared.domain.usecase.user.RefreshCurrentUser
 import kotlinx.coroutines.Job
@@ -30,6 +32,8 @@ internal class SettingsViewModel(
     private val getInstanceUrl: GetInstanceUrl,
     private val saveThemeMode: SaveThemeMode,
     private val logout: Logout,
+    private val trackThemeChanged: TrackThemeChanged,
+    private val trackLoggedOut: TrackLoggedOut,
     private val openInBrowser: OpenInBrowser,
     private val openLinkSettings: OpenLinkSettings,
     canOpenLinkSettings: CanOpenLinkSettings,
@@ -108,11 +112,15 @@ internal class SettingsViewModel(
 
     fun openLinkSettings() = openLinkSettings.invoke()
 
-    fun onThemeModeSelected(themeMode: ThemeMode) = viewModelScope.launch { saveThemeMode(themeMode) }
+    fun onThemeModeSelected(themeMode: ThemeMode) = viewModelScope.launch {
+        saveThemeMode(themeMode)
+        trackThemeChanged(themeMode)
+    }
 
     fun onLogoutConfirmed() = viewModelScope.launch {
         isLoggingOut.value = true
         accountLoad?.cancel()
+        trackLoggedOut()
         logout()
     }
 }

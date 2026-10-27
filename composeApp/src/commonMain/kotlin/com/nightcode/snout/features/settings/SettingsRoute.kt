@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nightcode.snout.common.compose.RefreshOnEnter
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherSheet
 import com.nightcode.snout.features.projectswitcher.ProjectSwitcherViewModel
+import com.nightcode.snout.shared.domain.model.telemetry.ProjectSelectionSource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -16,6 +17,7 @@ internal fun SettingsRoute(
     onNavigateBack: () -> Unit,
     onOpenNavigationSettings: () -> Unit,
     onOpenAnalyticsSettings: () -> Unit,
+    onOpenPrivacy: () -> Unit,
     onOpenLibraries: () -> Unit,
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
@@ -35,6 +37,7 @@ internal fun SettingsRoute(
         onThemeModeSelected = viewModel::onThemeModeSelected,
         onOpenNavigationSettings = onOpenNavigationSettings,
         onOpenAnalyticsSettings = onOpenAnalyticsSettings,
+        onOpenPrivacy = onOpenPrivacy,
         onOpenLibraries = onOpenLibraries,
         onLogoutConfirmed = viewModel::onLogoutConfirmed,
     )
@@ -42,7 +45,9 @@ internal fun SettingsRoute(
     ProjectSwitcherSheet(
         isVisible = showProjectSwitcher,
         state = switcherState,
-        onProjectSelected = switcherViewModel::onProjectSelected,
+        onProjectSelected = { organizationId, projectId ->
+            switcherViewModel.onProjectSelected(organizationId, projectId, ProjectSelectionSource.Settings)
+        },
         onDismiss = { showProjectSwitcher = false },
     )
 }
