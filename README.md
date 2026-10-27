@@ -25,8 +25,9 @@ Your analytics, dashboards, feature flags, errors and logs, in a native Android 
 
 Snout is an open-source, unofficial PostHog client built with Kotlin Multiplatform and Compose Multiplatform. It
 connects straight to your PostHog instance (US or EU cloud, or self-hosted) with a personal API key. It has no
-backend of its own and no analytics or crash reporting: nothing leaves your device except calls to the instance
-you configure.
+backend of its own: your PostHog data travels only between your device and the instance you configure. The release
+builds the project publishes send anonymous usage and error reports to Snout's own PostHog project, which never include your PostHog data and can
+be switched off in Settings → Privacy (see the [privacy policy](PRIVACY.md)).
 
 > [!NOTE]
 > Snout is a community project. It is not affiliated with or endorsed by PostHog Inc.
@@ -54,8 +55,9 @@ you configure.
   sections sit in the bottom bar (the rest live under More) and which opens first, and what the Analytics
   tab shows: default range, stat cards, visitors chart and breakdown tables. An open-source libraries screen lists
   every bundled library with its version, author and license, and opens each for its full license text and website.
-- Every screen has loading, empty, error, permission-denied and rate-limited states, pull to refresh and an
-  "open in PostHog" action.
+  A Privacy screen switches usage and error reports off and links the privacy policy.
+- Every screen that loads from PostHog has loading, empty, error, permission-denied and rate-limited states, pull to
+  refresh and an "open in PostHog" action.
 
 ## Getting started
 
@@ -72,7 +74,8 @@ Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `featu
 `annotation`, `activity_log`. Add `error_tracking:read` for Errors and `logs:read` for Logs. Add `feature_flag:write` to toggle flags,
 `annotation:write` to add annotations, `error_tracking:write` to resolve or suppress errors and `insight:write`
 to favorite insights. The login screen lists which scope each feature needs.
-PostHog rate-limits personal keys (240 requests/min); the app surfaces this instead of failing silently.
+PostHog rate-limits personal keys (for example 240 requests a minute and 1,200 an hour on analytics endpoints); the
+app surfaces this instead of failing silently.
 
 ## Building
 

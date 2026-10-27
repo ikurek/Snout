@@ -73,6 +73,8 @@ workflows:
       groups:
         - google-play
         - github
+        # POSTHOG_PROJECT_TOKEN (phc_…) and POSTHOG_HOST of Snout's own PostHog project: only store builds report.
+        - posthog
       android_signing:
         - snout-keystore
       ios_signing:

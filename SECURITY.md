@@ -18,7 +18,8 @@ Fixes go into the latest release only.
 ## Scope
 
 In scope: how the app stores and sends the API key and account (`shared/storage/securestore`), the network layer,
-incoming links and the iOS share extension, and anything that sends data somewhere other than the configured
-PostHog instance.
+incoming links and the iOS share extension, the usage and error reports (`shared/telemetry`), in particular anything
+in them that could identify the person or carry their PostHog data, and anything else that sends data somewhere
+other than the configured PostHog instance.
 
 Out of scope: vulnerabilities in PostHog itself; report those to [PostHog](https://github.com/PostHog/posthog/security).

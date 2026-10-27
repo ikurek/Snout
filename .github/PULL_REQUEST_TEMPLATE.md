@@ -8,5 +8,6 @@
 - [ ] `./gradlew :androidApp:validateDebugScreenshotTest` passes, or references are updated and committed for an intended UI change
 - [ ] Tests added or updated for changed logic
 - [ ] New API key scopes added to `KeyScopes.kt` and the README (if any)
+- [ ] New or changed usage or error reports described in `PRIVACY.md` (if any)
 - [ ] No API keys or other secrets in code, fixtures or screenshots
 - [ ] Added myself to `AUTHORS` (first contribution)

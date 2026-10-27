@@ -18,8 +18,11 @@ follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 - Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). New code should follow the conventions there: layers and DI,
   one `uiState` per view model, the `XUiState.kt` layout, handler naming, design-system components and `Spacing`
   tokens instead of raw values.
-- Snout talks only to the PostHog instance the user configures. Don't add analytics, crash reporting or any other
-  service that sends data elsewhere.
+- The person's PostHog data travels only between the device and the instance they configure. The one other place
+  the app sends anything is Snout's own PostHog project, through `shared/telemetry` (see
+  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#telemetry)): never add another service, and never put the person's data
+  (names, keys, URLs, ids, content) in an event or error report. A new event or a change to what is sent needs the
+  [privacy policy](PRIVACY.md) updated in the same pull request.
 - Never commit API keys or other secrets, including in test fixtures and screenshots.
 
 ## Building and checks
@@ -41,7 +44,7 @@ so review the diff after it) and then `detekt` reports what is left.
 
 Architecture rules: `konsist/` holds [Konsist](https://docs.konsist.lemonappdev.com) tests that read every module's
 sources and check the layering and conventions in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): which layer may
-import which, DTO, repository, use case and view model shapes, and previews. A failure names the rule and the
+import which, DTO, repository, use case and view model shapes, previews, and what telemetry may carry and import. A failure names the rule and the
 offending files. When a convention changes on purpose, change its rule in the same pull request.
 
 Screenshot tests: every public `*Preview()` composable in `composeApp` is rendered by generated wrappers in
@@ -86,6 +89,11 @@ signing.keyAlias=upload
 signing.keyPassword=…
 ```
 
+Only release builds with Snout's PostHog project token report usage and errors. Codemagic provides it from its
+`posthog` group (`POSTHOG_PROJECT_TOKEN`, `POSTHOG_HOST`); to try reporting from a local release build, put
+`posthog.project.token` and `posthog.host` in `local.properties`. Without them, and in every debug build, PostHog is
+never started.
+
 ## Pull requests
 
 - Keep each pull request to one change, with focused commits whose subject says what changed in the imperative
@@ -95,7 +103,7 @@ signing.keyPassword=…
 - UI changes: update the screenshot references as described above and commit them, so reviewers see the visual
   change in the diff.
 - Add or update tests for logic you change: mappers and repositories in `shared/data`, use cases in
-  `shared/domain/usecase`, view models in `composeApp/src/commonTest`.
+  `shared/domain/usecase` (one test file per use case, named after it), view models in `composeApp/src/commonTest`.
 - A feature that calls a new PostHog endpoint needs its API key scope added to the login screen's scope list
   (`KeyScopes.kt`) and to the README.
 - Add yourself to [AUTHORS](AUTHORS) in your first pull request.
