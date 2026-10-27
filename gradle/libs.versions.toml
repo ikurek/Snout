@@ -10,6 +10,7 @@ compose-multiplatform-material3 = "1.12.0-alpha03"
 compose-multiplatform-navigation3 = "1.1.2"
 compose-multiplatform-navigationevent = "1.1.0"
 aboutlibraries = "15.3.0"
+buildkonfig = "0.23.0"
 arrow = "2.2.3"
 coil = "3.6.3"
 coroutines = "1.11.0"
@@ -26,6 +27,7 @@ sqldelight = "2.4.0"
 kotest = "6.2.5"
 konsist = "0.18.1"
 mokkery = "3.5.1"
+posthog-kmp = "0.9.0"
 compose-screenshot = "0.0.1-alpha16"
 
 [libraries]
@@ -50,6 +52,9 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 # DataStore
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# Telemetry
+posthog-kmp = { module = "com.posthog:posthog-kmp", version.ref = "posthog-kmp" }
 
 # Secure storage
 ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
@@ -117,6 +122,7 @@ ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", 
 [plugins]
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
+buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

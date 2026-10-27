@@ -124,6 +124,18 @@ class ConventionTest :
             }
         }
 
+        context("telemetry") {
+            // Reports go to Snout's own PostHog, so the person's data (names, keys, URLs, ids) must not fit in them.
+            should("keep events to kinds, counts and switches, with nothing that could hold the person's data") {
+                classes
+                    .withPackage("com.nightcode.snout.shared.domain.model.telemetry")
+                    .filter { it.hasParentWithName("TelemetryEvent") }
+                    .assertTrue(testName = rule) { event ->
+                        event.primaryConstructor?.parameters.orEmpty().none { it.type.name in IdentifyingTypes }
+                    }
+            }
+        }
+
         context("previews") {
             val previews = scope.functions().withAnnotationNamed("PreviewLightDark")
 
@@ -143,6 +155,9 @@ class ConventionTest :
             }
         }
     })
+
+/** Types that names, keys, URLs and ids come as. */
+private val IdentifyingTypes = setOf("String", "Long", "Uuid")
 
 private val KoClassDeclaration.uiStateType: String?
     get() = properties().singleOrNull { it.name == "uiState" }?.type?.text

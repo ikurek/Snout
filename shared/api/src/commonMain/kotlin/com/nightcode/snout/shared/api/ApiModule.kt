@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.api
 
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import com.nightcode.snout.shared.storage.datastore.DataStoreModule
+import com.nightcode.snout.shared.telemetry.TrackNonFatal
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
@@ -34,8 +35,14 @@ class ApiModule {
     fun provideJson(): Json = ApiJson
 
     @Single
-    fun providePostHogHttpClient(json: Json, dataStore: AuthDataStore, appBuild: AppBuild): HttpClient =
-        platformHttpClient {
+    fun providePostHogHttpClient(
+        json: Json,
+        dataStore: AuthDataStore,
+        appBuild: AppBuild,
+        trackNonFatal: TrackNonFatal,
+    ): HttpClient {
+        FailureReport.trackNonFatal = trackNonFatal
+        return platformHttpClient {
             if (appBuild == AppBuild.Debug) installDebugLogging()
             expectSuccess = true
             install(ContentNegotiation) {
@@ -66,4 +73,5 @@ class ApiModule {
                 }
             }
         }
+    }
 }

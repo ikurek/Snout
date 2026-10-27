@@ -14,6 +14,9 @@ private const val Storage = "$Shared.storage"
 private const val Models = "$Shared.domain.model"
 private const val Repositories = "$Shared.domain.data"
 private const val UseCases = "$Shared.domain.usecase"
+private const val Telemetry = "$Shared.telemetry"
+private const val TelemetrySdk = "$Telemetry.sdk"
+private const val PostHogSdk = "com.posthog"
 
 /** Dependencies point inwards: the layers in docs/ARCHITECTURE.md, checked through each file's imports. */
 class LayerDependencyTest :
@@ -48,9 +51,15 @@ class LayerDependencyTest :
             }
         }
 
-        should("let the UI see models and use cases only, never repositories, data, API or storage") {
+        should("let the UI see models and use cases only, never repositories, data, API, storage or telemetry") {
             files.filter { it.packagee?.name?.startsWith(Shared) == false }
-                .assertNoImportsFrom(rule, Api, Data, Storage, Repositories)
+                .assertNoImportsFrom(rule, Api, Data, Storage, Repositories, Telemetry)
+        }
+
+        // Swapping or upgrading the SDK stays inside one module, and nothing else can report around the switches.
+        should("keep PostHog's SDK inside telemetry/sdk") {
+            files.filterNot { it.packagee?.name?.let { name -> name == TelemetrySdk } == true }
+                .assertNoImportsFrom(rule, PostHogSdk)
         }
     })
 

@@ -23,6 +23,7 @@ kotlin {
         api(projects.shared.domain.model.logs)
         api(projects.shared.domain.model.user)
         api(projects.shared.domain.model.organization)
+        api(projects.shared.domain.model.telemetry)
         api(projects.shared.domain.usecase.analytics)
         api(projects.shared.domain.usecase.experiments)
         api(projects.shared.domain.usecase.errortracking)
@@ -36,6 +37,7 @@ kotlin {
         api(projects.shared.domain.usecase.user)
         api(projects.shared.domain.usecase.organization)
         api(projects.shared.domain.usecase.appstate)
+        api(projects.shared.domain.usecase.telemetry)
         implementation(projects.shared.data.activitylog)
         implementation(projects.shared.data.analytics)
         implementation(projects.shared.data.annotations)
@@ -49,7 +51,10 @@ kotlin {
         implementation(projects.shared.data.links)
         implementation(projects.shared.data.logs)
         implementation(projects.shared.data.organization)
+        implementation(projects.shared.data.telemetry)
         implementation(projects.shared.data.user)
+        // PostHog behind the telemetry interfaces, bound here so the layers that report never see the SDK.
+        implementation(projects.shared.telemetry.sdk)
         // Not used directly: their Koin definitions must be visible here for the compile-time graph check
         // (SharedGraph), which only sees modules on this compilation's classpath.
         implementation(projects.shared.api.activitylog)

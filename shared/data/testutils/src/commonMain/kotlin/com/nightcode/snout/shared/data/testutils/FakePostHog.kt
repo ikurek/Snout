@@ -75,7 +75,7 @@ suspend fun HttpRequestData.jsonBody(): JsonObject =
 /** Parses a JSON literal, so expected request bodies compare structurally with [jsonBody] (key order aside). */
 fun parseJson(literal: String): JsonElement = TestJson.parseToJsonElement(literal)
 
-private class InMemoryDataStore(initial: Preferences) : DataStore<Preferences> {
+internal class InMemoryDataStore(initial: Preferences) : DataStore<Preferences> {
     private val state = MutableStateFlow(initial)
 
     override val data: Flow<Preferences> = state

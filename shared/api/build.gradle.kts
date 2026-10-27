@@ -21,6 +21,7 @@ kotlin {
             implementation(libs.ktor.serialization.json)
             api(projects.shared.domain.model.common)
             implementation(projects.shared.storage.datastore)
+            implementation(projects.shared.telemetry)
         }
         commonTest.dependencies {
             implementation(libs.ktor.client.mock)

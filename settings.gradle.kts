@@ -63,6 +63,7 @@ include(":shared:data:links")
 include(":shared:data:logs")
 include(":shared:data:organization")
 include(":shared:data:testutils")
+include(":shared:data:telemetry")
 include(":shared:data:user")
 
 // Domain models
@@ -79,6 +80,7 @@ include(":shared:domain:model:insights")
 include(":shared:domain:model:links")
 include(":shared:domain:model:logs")
 include(":shared:domain:model:organization")
+include(":shared:domain:model:telemetry")
 include(":shared:domain:model:user")
 
 // Domain repository interfaces
@@ -94,6 +96,7 @@ include(":shared:domain:data:insights")
 include(":shared:domain:data:links")
 include(":shared:domain:data:logs")
 include(":shared:domain:data:organization")
+include(":shared:domain:data:telemetry")
 include(":shared:domain:data:user")
 
 // Domain use cases
@@ -109,6 +112,7 @@ include(":shared:domain:usecase:insights")
 include(":shared:domain:usecase:links")
 include(":shared:domain:usecase:logs")
 include(":shared:domain:usecase:organization")
+include(":shared:domain:usecase:telemetry")
 include(":shared:domain:usecase:user")
 
 // Common
@@ -119,3 +123,5 @@ include(":shared:common:testutils")
 include(":shared:storage:database")
 include(":shared:storage:datastore")
 include(":shared:storage:securestore")
+include(":shared:telemetry")
+include(":shared:telemetry:sdk")
