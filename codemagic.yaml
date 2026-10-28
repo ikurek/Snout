@@ -112,9 +112,15 @@ workflows:
           script: |
             #!/usr/bin/env sh
             set -e # exit on first failed command
-            # Post-publish scripts run even after a failed build; a failed release shouldn't show up on GitHub.
-            if [ "$CM_BUILD_STEP_STATUS" != "success" ]; then exit 0; fi
+            # Post-publish scripts run even after a failed build, and CM_BUILD_STEP_STATUS isn't set for
+            # codemagic.yaml builds. The build steps stop at the first failure and the IPA comes last, so both
+            # files existing means every step succeeded; a failed release shouldn't show up on GitHub.
+            BUILT_APK=androidApp/build/outputs/apk/release/androidApp-release.apk
+            if [ ! -f "$BUILT_APK" ] || ! ls build/ios/ipa/*.ipa >/dev/null 2>&1; then
+              echo "No APK or IPA: the build failed, so no GitHub release."
+              exit 0
+            fi
             APK="snout-$CM_TAG.apk"
-            cp androidApp/build/outputs/apk/release/androidApp-release.apk "$APK"
+            cp "$BUILT_APK" "$APK"
             gh release create "$CM_TAG" "$APK" --title "$CM_TAG" --notes-file release_notes.txt
     cache: *cache
