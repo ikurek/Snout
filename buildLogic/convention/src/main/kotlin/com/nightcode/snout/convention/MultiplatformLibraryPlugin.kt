@@ -29,7 +29,11 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                 iosSimulatorArm64()
 
                 extensions.configure<KotlinMultiplatformAndroidLibraryTarget> {
-                    compileSdk = libs.findVersion("android.targetSdk").get().toString().toInt()
+                    compileSdk {
+                        version = release(libs.findVersion("android.targetSdk").get().toString().toInt()) {
+                            minorApiLevel = libs.findVersion("android.compileSdkMinor").get().toString().toInt()
+                        }
+                    }
                     minSdk = libs.findVersion("android.minSdk").get().toString().toInt()
                     compilerOptions {
                         jvmTarget.set(JvmTarget.JVM_11)
