@@ -8,7 +8,11 @@ plugins {
 
 android {
     namespace = "com.nightcode.snout"
-    compileSdk = libs.versions.android.targetSdk.get().toInt()
+    compileSdk {
+        version = release(libs.versions.android.targetSdk.get().toInt()) {
+            minorApiLevel = libs.versions.android.compileSdkMinor.get().toInt()
+        }
+    }
 
     defaultConfig {
         applicationId = "com.nightcode.snout"
