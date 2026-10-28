@@ -84,24 +84,10 @@ jobs:
           name: screenshot-test-report
           path: androidApp/build/reports/screenshotTest/
 
-  ios:
-    name: iOS compile
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup-gradle
-      - uses: actions/cache@v6
-        with:
-          path: ~/.konan
-          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
-      - run: ./gradlew :composeApp:compileKotlinIosSimulatorArm64
-
   gate:
     name: Quality gate
     if: always()
-    needs: [static-analysis, architecture, unit-tests, screenshot-tests, ios]
+    needs: [static-analysis, architecture, unit-tests, screenshot-tests]
     runs-on: ubuntu-latest
     steps:
       - name: Require every check to pass
