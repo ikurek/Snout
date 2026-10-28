@@ -9,7 +9,11 @@ kotlin {
 
     android {
         namespace = "com.nightcode.snout.shared.common.testutils"
-        compileSdk = libs.versions.android.targetSdk.get().toInt()
+        compileSdk {
+            version = release(libs.versions.android.targetSdk.get().toInt()) {
+                minorApiLevel = libs.versions.android.compileSdkMinor.get().toInt()
+            }
+        }
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 

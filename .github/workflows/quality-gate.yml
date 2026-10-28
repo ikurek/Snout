@@ -21,14 +21,14 @@ jobs:
     name: Static analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew detekt lint --continue
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: static-analysis-reports
           path: |
@@ -39,14 +39,14 @@ jobs:
     name: Architecture (Konsist)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew :konsist:test
       - name: Upload report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: architecture-report
           path: konsist/build/reports/tests/
@@ -55,14 +55,14 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew testAndroidHostTest --continue
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-test-reports
           path: '**/build/reports/tests/'
@@ -72,14 +72,14 @@ jobs:
     # The references are recorded on macOS; rendering on Linux can differ by a few pixels.
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-gradle
       - run: ./gradlew :androidApp:validateDebugScreenshotTest
       - name: Upload diffs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshot-test-report
           path: androidApp/build/reports/screenshotTest/
@@ -88,11 +88,11 @@ jobs:
     name: iOS compile
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-gradle
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.konan
           key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}

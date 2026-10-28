@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -89,16 +89,17 @@ private fun <T> FilterMenuOptions(options: List<MenuOption<T>>, selected: T, onS
         selectedContainerColor = SnoutTheme.colors.secondaryContainer,
         selectedTextColor = SnoutTheme.colors.onSecondaryContainer,
         selectedLeadingIconColor = SnoutTheme.colors.onSecondaryContainer,
-        selectedTrailingIconColor = SnoutTheme.colors.onSecondaryContainer,
+        selectedTrailingContentColor = SnoutTheme.colors.onSecondaryContainer,
     )
     DropdownMenuGroup(shapes = MenuDefaults.groupShape(index = 0, count = 1)) {
         options.forEachIndexed { index, option ->
-            DropdownMenuItem(
-                checked = option.value == selected,
-                onCheckedChange = { onSelect(option.value) },
+            // One option of several is picked, like a radio group, so a selectable item rather than a checkable one.
+            SelectableDropdownMenuItem(
+                selected = option.value == selected,
+                onClick = { onSelect(option.value) },
                 text = { Text(option.label) },
                 shapes = MenuDefaults.itemShape(index, options.size),
-                checkedLeadingIcon = {
+                selectedLeadingIcon = {
                     Icon(
                         painter = painterResource(Res.drawable.ic_check_24dp),
                         contentDescription = null,

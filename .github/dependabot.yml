@@ -1,15 +1,21 @@
-# Weekly pull requests for outdated dependencies; the Quality gate checks each before it's merged.
+# Weekly, and grouped: at most three pull requests a week (actions, the Kotlin toolchain, everything else in
+# Gradle). The Quality gate checks each before it's merged.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directories: ["/", "/.github/actions/*"]
     schedule:
       interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
   - package-ecosystem: gradle
     directory: /
     schedule:
       interval: weekly
     groups:
-      # One pull request for the toolchain that has to move together.
+      # The toolchain has to move together: Kotlin, its compiler plugins and Compose Multiplatform.
       kotlin:
-        patterns: ["org.jetbrains.kotlin*", "org.jetbrains.compose*"]
+        patterns: ["org.jetbrains.kotlin*", "org.jetbrains.compose*", "org.jetbrains.androidx*"]
+      dependencies:
+        patterns: ["*"]
