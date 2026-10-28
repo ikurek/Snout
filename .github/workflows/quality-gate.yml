@@ -28,7 +28,7 @@ jobs:
       - run: ./gradlew detekt lint --continue
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: static-analysis-reports
           path: |
@@ -46,7 +46,7 @@ jobs:
       - run: ./gradlew :konsist:test
       - name: Upload report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: architecture-report
           path: konsist/build/reports/tests/
@@ -62,7 +62,7 @@ jobs:
       - run: ./gradlew testAndroidHostTest --continue
       - name: Upload reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-test-reports
           path: '**/build/reports/tests/'
@@ -79,7 +79,7 @@ jobs:
       - run: ./gradlew :androidApp:validateDebugScreenshotTest
       - name: Upload diffs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshot-test-report
           path: androidApp/build/reports/screenshotTest/
