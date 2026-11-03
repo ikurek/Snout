@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.data.appstate.AppStateRepository
 import com.nightcode.snout.shared.domain.data.auth.AuthRepository
+import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingRepository
 import com.nightcode.snout.shared.domain.data.insights.InsightRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
@@ -17,6 +18,7 @@ import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
+import com.nightcode.snout.shared.domain.usecase.errortracking.FindIssueIdByFingerprint
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
@@ -44,6 +46,7 @@ class ResolvePostHogLinkTest :
         val appStateRepository = mock<AppStateRepository>(autoUnit)
         val organizationRepository = mock<OrganizationRepository>()
         val insightRepository = mock<InsightRepository>()
+        val errorTrackingRepository = mock<ErrorTrackingRepository>()
 
         val subject = ResolvePostHogLink(
             getInstanceUrl = GetInstanceUrl(authRepository),
@@ -54,6 +57,10 @@ class ResolvePostHogLinkTest :
             findInsightIdByShortId = FindInsightIdByShortId(
                 GetSelectedProjectId(appStateRepository),
                 insightRepository,
+            ),
+            findIssueIdByFingerprint = FindIssueIdByFingerprint(
+                GetSelectedProjectId(appStateRepository),
+                errorTrackingRepository,
             ),
         )
 
@@ -69,6 +76,27 @@ class ResolvePostHogLinkTest :
                 LinkResolution.InApp(DeepLinkDestination.Dashboard(5))
             subject("$Instance/project/1/error_tracking/$IssueId?fingerprint=x") shouldBe
                 LinkResolution.InApp(DeepLinkDestination.ErrorTrackingIssue(IssueId))
+        }
+
+        should("open the hyphenated error tracking pages of current PostHog") {
+            subject("$Instance/project/1/error-tracking/$IssueId") shouldBe
+                LinkResolution.InApp(DeepLinkDestination.ErrorTrackingIssue(IssueId))
+            subject("$Instance/project/1/error-tracking") shouldBe
+                LinkResolution.InApp(DeepLinkDestination.Section(HomeSection.ErrorTracking))
+        }
+
+        should("look an error tracking issue up by the fingerprint in an email link") {
+            everySuspend { errorTrackingRepository.findIssueIdByFingerprint(1L, "ae24%2F7") } returns
+                Either.Right(IssueId)
+            val link = "$Instance/project/1/error-tracking/fingerprint/ae24%2F7?utm_source=error_tracking_weekly_digest"
+            subject(link) shouldBe
+                LinkResolution.InApp(DeepLinkDestination.ErrorTrackingIssue(IssueId))
+        }
+
+        should("send a fingerprint the API can't find to the browser") {
+            everySuspend { errorTrackingRepository.findIssueIdByFingerprint(1L, "gone") } returns Either.Right(null)
+            subject("$Instance/project/1/error-tracking/fingerprint/gone") shouldBe
+                LinkResolution.Browser("$Instance/project/1/error-tracking/fingerprint/gone")
         }
 
         should("open a list page as its section and the project root as Home") {

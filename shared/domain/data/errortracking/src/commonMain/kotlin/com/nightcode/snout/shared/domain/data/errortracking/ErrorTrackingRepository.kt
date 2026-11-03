@@ -23,6 +23,9 @@ interface ErrorTrackingRepository {
     ): Either<DataError, List<ErrorTrackingIssue>>
     suspend fun getIssue(projectId: Long, issueId: String): Either<DataError, ErrorTrackingIssue>
 
+    /** [fingerprint] is percent-encoded, as in a link's path. Null when the project has no such fingerprint. */
+    suspend fun findIssueIdByFingerprint(projectId: Long, fingerprint: String): Either<DataError, String?>
+
     /** Changes the issue's status, which moves it to another status filter's list. */
     suspend fun setStatus(projectId: Long, issueId: String, status: IssueStatusFilter): Either<DataError, IssueStatus>
     suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>>

@@ -37,6 +37,7 @@ class ParsePostHogLinkTest :
                 PostHogResource.FeatureFlag(7),
                 PostHogResource.ErrorTracking,
                 PostHogResource.ErrorTrackingIssue(IssueId),
+                PostHogResource.ErrorTrackingFingerprint("ae2475c87c1d"),
                 PostHogResource.Logs,
                 PostHogResource.Experiments,
                 PostHogResource.Experiment(3),

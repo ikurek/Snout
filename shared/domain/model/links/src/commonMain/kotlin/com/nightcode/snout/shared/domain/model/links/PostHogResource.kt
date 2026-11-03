@@ -12,6 +12,12 @@ sealed interface PostHogResource {
     data class FeatureFlag(val id: Long) : PostHogResource
     data object ErrorTracking : PostHogResource
     data class ErrorTrackingIssue(val id: String) : PostHogResource
+
+    /**
+     * The issue an exception fingerprint belongs to; PostHog's emails link issues this way. [fingerprint] stays
+     * percent-encoded as in the link's path.
+     */
+    data class ErrorTrackingFingerprint(val fingerprint: String) : PostHogResource
     data object Logs : PostHogResource
     data object Experiments : PostHogResource
     data class Experiment(val id: Long) : PostHogResource

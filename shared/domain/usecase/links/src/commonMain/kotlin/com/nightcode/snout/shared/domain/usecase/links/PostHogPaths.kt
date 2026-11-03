@@ -5,7 +5,8 @@ import kotlin.uuid.Uuid
 
 /*
  * The web app's page paths below `/project/{id}/`, in both directions. Kept side by side so a link Snout
- * builds always parses back to the same resource.
+ * builds always parses back to the same resource. Fingerprint pages are newer than PostHog's switch from
+ * `error_tracking` to `error-tracking`, so only they use the new spelling.
  */
 
 // One flat branch per resource; splitting it would only hide the URL table.
@@ -21,6 +22,7 @@ internal fun PostHogResource.path(): String = when (this) {
     is PostHogResource.FeatureFlag -> "feature_flags/$id"
     PostHogResource.ErrorTracking -> "error_tracking"
     is PostHogResource.ErrorTrackingIssue -> "error_tracking/$id"
+    is PostHogResource.ErrorTrackingFingerprint -> "error-tracking/fingerprint/$fingerprint"
     PostHogResource.Logs -> "logs"
     PostHogResource.Experiments -> "experiments"
     is PostHogResource.Experiment -> "experiments/$id"
@@ -53,9 +55,8 @@ internal fun parsePath(segments: List<String>): PostHogResource? {
             id?.toLongOrNull()?.let(PostHogResource::FeatureFlag)
         }
 
-        "error_tracking" -> parseListOrItem(segments, PostHogResource.ErrorTracking) {
-            id?.takeIf { Uuid.parseOrNull(it) != null }?.let(PostHogResource::ErrorTrackingIssue)
-        }
+        // The web app moved to `error-tracking`; older instances and links still use `error_tracking`.
+        "error_tracking", "error-tracking" -> parseErrorTracking(segments)
 
         "logs" -> PostHogResource.Logs.takeIf { segments.size == 1 }
 
@@ -68,6 +69,18 @@ internal fun parsePath(segments: List<String>): PostHogResource? {
         "activity" -> PostHogResource.ActivityLog.takeIf { segments == listOf("activity", "explore") }
 
         else -> null
+    }
+}
+
+/** An issue by its id, or by an exception fingerprint as in PostHog's emails: `fingerprint/{percent-encoded}`. */
+private fun parseErrorTracking(segments: List<String>): PostHogResource? {
+    val fingerprint = segments.takeIf { it.size == 3 && it[1] == "fingerprint" }?.get(2)
+    return if (fingerprint != null) {
+        PostHogResource.ErrorTrackingFingerprint(fingerprint)
+    } else {
+        parseListOrItem(segments, PostHogResource.ErrorTracking) {
+            segments.getOrNull(1)?.takeIf { Uuid.parseOrNull(it) != null }?.let(PostHogResource::ErrorTrackingIssue)
+        }
     }
 }
 

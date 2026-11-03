@@ -3,6 +3,7 @@ package com.nightcode.snout.shared.api.errortracking
 import com.nightcode.snout.shared.api.DateRangeDto
 import com.nightcode.snout.shared.api.PropertyFilterDto
 import com.nightcode.snout.shared.api.QueryRequestDto
+import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingFingerprintDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesRequestDto
@@ -17,6 +18,9 @@ import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.http.decodeURLPart
 import org.koin.core.annotation.Single
 
 /** PostHog caps a page of issues at 100. */
@@ -85,6 +89,18 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
             ),
         ).body()
     }
+
+    /**
+     * The fingerprint record naming the issue an exception fingerprint belongs to now, so it survives issue merges.
+     * [encodedFingerprint] comes percent-encoded from a link's path. PostHog answers 404 for a fingerprint it
+     * doesn't know.
+     */
+    suspend fun resolveFingerprint(projectId: Long, encodedFingerprint: String) =
+        networkCall<ErrorTrackingFingerprintDto> {
+            client.get(authDataStore.projectUrl(projectId, "error_tracking/fingerprints/resolve/")) {
+                parameter("fingerprint", encodedFingerprint.decodeURLPart())
+            }.body()
+        }
 
     /**
      * Sets an issue's status to active, resolved or suppressed. Requires the `error_tracking:write` scope; PostHog

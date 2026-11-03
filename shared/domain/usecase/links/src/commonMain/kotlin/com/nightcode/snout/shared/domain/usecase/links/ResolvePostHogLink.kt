@@ -10,6 +10,7 @@ import com.nightcode.snout.shared.domain.model.organization.Organization
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
 import com.nightcode.snout.shared.domain.usecase.auth.GetInstanceUrl
+import com.nightcode.snout.shared.domain.usecase.errortracking.FindIssueIdByFingerprint
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
@@ -29,6 +30,7 @@ class ResolvePostHogLink(
     private val refreshOrganizations: RefreshOrganizations,
     private val saveSelectedProject: SaveSelectedProject,
     private val findInsightIdByShortId: FindInsightIdByShortId,
+    private val findIssueIdByFingerprint: FindIssueIdByFingerprint,
 ) {
     suspend operator fun invoke(url: String): LinkResolution {
         val link = parsePostHogLink(url)
@@ -55,7 +57,7 @@ class ResolvePostHogLink(
     private suspend fun findOrganization(projectId: Long): Organization? =
         observeOrganizations().first().firstOrNull { organization -> organization.projects.any { it.id == projectId } }
 
-    /** Null when the resource can't be shown after all (an insight short id the API doesn't know). */
+    /** Null when the resource can't be shown after all (an insight short id or fingerprint the API doesn't know). */
     private suspend fun PostHogResource.toDestination(): DeepLinkDestination? = when (this) {
         PostHogResource.Project -> DeepLinkDestination.Home
 
@@ -64,6 +66,9 @@ class ResolvePostHogLink(
         is PostHogResource.FeatureFlag -> DeepLinkDestination.FeatureFlag(id)
 
         is PostHogResource.ErrorTrackingIssue -> DeepLinkDestination.ErrorTrackingIssue(id)
+
+        is PostHogResource.ErrorTrackingFingerprint ->
+            findIssueIdByFingerprint(fingerprint).getOrNull()?.let(DeepLinkDestination::ErrorTrackingIssue)
 
         is PostHogResource.Experiment -> DeepLinkDestination.Experiment(id)
 

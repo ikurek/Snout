@@ -1,6 +1,8 @@
 package com.nightcode.snout.shared.data.errortracking
 
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import com.nightcode.snout.shared.api.errortracking.ErrorTrackingApi
 import com.nightcode.snout.shared.data.common.ChangeSignal
 import com.nightcode.snout.shared.data.errortracking.mapper.apiValue
@@ -39,6 +41,12 @@ internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi) : 
 
     override suspend fun getIssue(projectId: Long, issueId: String): Either<DataError, ErrorTrackingIssue> =
         api.getIssue(projectId, issueId).map { it.toIssue() }
+
+    override suspend fun findIssueIdByFingerprint(projectId: Long, fingerprint: String): Either<DataError, String?> =
+        api.resolveFingerprint(projectId, fingerprint).fold(
+            ifLeft = { error -> if (error == DataError.NotFound) null.right() else error.left() },
+            ifRight = { it.issueId.right() },
+        )
 
     override suspend fun setStatus(
         projectId: Long,

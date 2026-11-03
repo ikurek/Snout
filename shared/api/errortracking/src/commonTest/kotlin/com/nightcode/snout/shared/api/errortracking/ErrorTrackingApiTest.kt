@@ -106,6 +106,15 @@ class ErrorTrackingApiTest :
             shouldHaveSent(HttpMethod.Patch, "error_tracking/issues/issue-1/", """{"status":"suppressed"}""")
         }
 
+        should("decode a fingerprint from a link once before sending it") {
+            api.resolveFingerprint(ProjectId, encodedFingerprint = "a%2Fb%20c")
+
+            val request = postHog.requests.single()
+            request.method shouldBe HttpMethod.Get
+            request.url.toString() shouldBe
+                "$TestInstanceUrl/api/projects/$ProjectId/error_tracking/fingerprints/resolve/?fingerprint=a%2Fb+c"
+        }
+
         should("query app versions with HogQL") {
             api.getAppVersions(ProjectId)
 
