@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.Dp
@@ -33,25 +35,35 @@ private const val MetaWidth = 0.35f
 private const val DefaultRowCount = 5
 private const val ThirdLineWidth = 0.8f
 
-/** Slow alpha pulse shared by every skeleton block on screen so they breathe together. */
+/** The pulse of the skeleton group around a block, so the blocks of one placeholder breathe together. */
+private val LocalShimmerAlpha = staticCompositionLocalOf<State<Float>?> { null }
+
+/** Slow alpha pulse; read it only in the draw phase, so the pulse redraws the blocks without recomposing them. */
 @Composable
-private fun shimmerAlpha(): Float {
-    val transition = rememberInfiniteTransition(label = "skeleton")
-    val alpha by transition.animateFloat(
-        initialValue = ShimmerMinAlpha,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(ShimmerDurationMillis), RepeatMode.Reverse),
-        label = "skeletonAlpha",
-    )
-    return alpha
+private fun rememberShimmerAlpha(): State<Float> = rememberInfiniteTransition(label = "skeleton").animateFloat(
+    initialValue = ShimmerMinAlpha,
+    targetValue = 1f,
+    animationSpec = infiniteRepeatable(tween(ShimmerDurationMillis), RepeatMode.Reverse),
+    label = "skeletonAlpha",
+)
+
+/** Runs one pulse for every [SkeletonBlock] in [content] instead of one per block; nested groups share the outer. */
+@Composable
+internal fun SkeletonGroup(content: @Composable () -> Unit) {
+    if (LocalShimmerAlpha.current != null) {
+        content()
+    } else {
+        CompositionLocalProvider(LocalShimmerAlpha provides rememberShimmerAlpha(), content = content)
+    }
 }
 
 /** One placeholder block; size it with [modifier]. */
 @Composable
 internal fun SkeletonBlock(modifier: Modifier = Modifier) {
+    val shimmerAlpha = LocalShimmerAlpha.current ?: rememberShimmerAlpha()
     Box(
         modifier = modifier
-            .alpha(shimmerAlpha())
+            .graphicsLayer { alpha = shimmerAlpha.value }
             .clip(SnoutTheme.shapes.extraSmall)
             .background(SnoutTheme.colors.surfaceContainerHigh),
     )
@@ -78,18 +90,22 @@ internal fun SkeletonRow(modifier: Modifier = Modifier, divider: Boolean = true)
 /** Loading state for list and detail screens; never a centred spinner. */
 @Composable
 internal fun SkeletonRows(modifier: Modifier = Modifier, count: Int = DefaultRowCount) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        repeat(count) { index -> SkeletonRow(divider = index < count - 1) }
+    SkeletonGroup {
+        Column(modifier = modifier.fillMaxWidth()) {
+            repeat(count) { index -> SkeletonRow(divider = index < count - 1) }
+        }
     }
 }
 
 /** Three text-like lines, used inside cards whose content is still computing. */
 @Composable
 internal fun SkeletonLines(modifier: Modifier = Modifier, lineHeight: Dp = 12.dp) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
-        SkeletonBlock(Modifier.fillMaxWidth(LineWidth).height(lineHeight))
-        SkeletonBlock(Modifier.fillMaxWidth(TitleWidth).height(lineHeight))
-        SkeletonBlock(Modifier.fillMaxWidth(ThirdLineWidth).height(lineHeight))
+    SkeletonGroup {
+        Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+            SkeletonBlock(Modifier.fillMaxWidth(LineWidth).height(lineHeight))
+            SkeletonBlock(Modifier.fillMaxWidth(TitleWidth).height(lineHeight))
+            SkeletonBlock(Modifier.fillMaxWidth(ThirdLineWidth).height(lineHeight))
+        }
     }
 }
 

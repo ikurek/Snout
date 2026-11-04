@@ -30,6 +30,7 @@ import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDurationSeconds
 import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.atoms.SkeletonBlock
+import com.nightcode.snout.designsystem.atoms.SkeletonGroup
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.VerticalSpacer
 import com.nightcode.snout.designsystem.atoms.chips.ChoiceChip
@@ -147,7 +148,7 @@ private fun OverviewGrid(metrics: List<OverviewMetric>) {
 
 /** Skeleton shaped like the stat grid and the chart card so the layout does not jump when data arrives. */
 @Composable
-private fun SnapshotSkeleton() {
+private fun SnapshotSkeleton() = SkeletonGroup {
     Column(
         modifier = Modifier.padding(horizontal = Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
