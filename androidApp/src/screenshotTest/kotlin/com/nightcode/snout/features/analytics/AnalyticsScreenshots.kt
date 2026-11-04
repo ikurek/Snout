@@ -28,6 +28,12 @@ fun AnalyticsScreenLoadingPreviewShot() = ScreenshotEnvironment { AnalyticsScree
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun AnalyticsScreenPartlyLoadedPreviewShot() = ScreenshotEnvironment { AnalyticsScreenPartlyLoadedPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun AnalyticsScreenPreviewShot() = ScreenshotEnvironment { AnalyticsScreenPreview() }
 
 @PreviewTest

@@ -11,16 +11,16 @@ import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
-import com.nightcode.snout.shared.domain.usecase.analytics.GetAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.LoadAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import dev.mokkery.answering.returns
-import dev.mokkery.answering.sequentially
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -34,7 +34,8 @@ class AnalyticsViewModelTest :
 
         val appStateRepository = mock<AppStateRepository>()
         val repository = mock<AnalyticsRepository>()
-        val loaded = Either.Right(TestAnalyticsSnapshot)
+        val activeUserKeys = setOf(OverviewMetricKey.WeeklyActiveUsers, OverviewMetricKey.MonthlyActiveUsers)
+        val overview = Either.Right(TestAnalyticsSnapshot.overview.filter { it.key !in activeUserKeys })
         val preferences = MutableStateFlow(AnalyticsPreferences.Default)
         val selectedProject = MutableStateFlow(TestSelectedProject)
 
@@ -44,43 +45,36 @@ class AnalyticsViewModelTest :
             everySuspend { appStateRepository.getSelectedProject() } returns TestSelectedProject
             every { appStateRepository.observeSelectedProject() } returns selectedProject
             every { appStateRepository.observeAnalyticsPreferences() } returns preferences
+            everySuspend { repository.getOverview(any(), any()) } returns overview
+            everySuspend { repository.getActiveUsers(any(), any()) } returns
+                Either.Right(TestAnalyticsSnapshot.overview.filter { it.key in activeUserKeys })
+            everySuspend { repository.getTrends(any(), any()) } returns Either.Right(TestAnalyticsSnapshot.trends)
+            everySuspend { repository.getBreakdown(any(), any(), any()) } returns Either.Left(DataError.NotFound)
+            TestAnalyticsSnapshot.breakdowns.forEach { table ->
+                everySuspend { repository.getBreakdown(any(), any(), table.breakdown) } returns Either.Right(table)
+            }
             return AnalyticsViewModel(
-                getAnalytics = GetAnalytics(GetSelectedProjectId(appStateRepository), repository),
+                loadAnalytics = LoadAnalytics(GetSelectedProjectId(appStateRepository), repository),
                 observeProjectReloads = ObserveProjectReloads(appStateRepository),
                 observeAnalyticsPreferences = ObserveAnalyticsPreferences(appStateRepository),
             )
         }
 
         should("load the default range on start") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             viewModel.uiState.value.range shouldBe AnalyticsRange.Last7Days
             viewModel.uiState.value.snapshot shouldBe TestAnalyticsSnapshot
-            verifySuspend {
-                repository.getSnapshot(
-                    TestSelectedProject.projectId,
-                    AnalyticsRange.Last7Days,
-                    any(),
-                )
-            }
+            verifySuspend { repository.getOverview(TestSelectedProject.projectId, AnalyticsRange.Last7Days) }
         }
 
         should("load again when the range changes") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             viewModel.onRangeSelected(AnalyticsRange.Last30Days)
             viewModel.uiState.value.range shouldBe AnalyticsRange.Last30Days
-            verifySuspend {
-                repository.getSnapshot(
-                    TestSelectedProject.projectId,
-                    AnalyticsRange.Last30Days,
-                    any(),
-                )
-            }
+            verifySuspend { repository.getOverview(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
         }
 
         should("open on the preferred range and hide deselected cards and tables") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             preferences.value = AnalyticsPreferences.Default
                 .copy(defaultRange = AnalyticsRange.Last30Days, showTrendChart = false)
@@ -96,41 +90,41 @@ class AnalyticsViewModelTest :
                 OverviewMetricKey.MonthlyActiveUsers,
             )
             data.trends shouldBe emptyList()
-            verifySuspend {
-                repository.getSnapshot(
-                    TestSelectedProject.projectId,
-                    AnalyticsRange.Last30Days,
-                    any(),
-                )
-            }
+            verifySuspend { repository.getOverview(TestSelectedProject.projectId, AnalyticsRange.Last30Days) }
         }
 
         should("load again when the selected project changes") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             val otherProject = TestSelectedProject.copy(projectId = 42L)
             everySuspend { appStateRepository.getSelectedProject() } returns otherProject
             selectedProject.value = otherProject
-            verifySuspend { repository.getSnapshot(42L, AnalyticsRange.Last7Days, any()) }
+            verifySuspend { repository.getOverview(42L, AnalyticsRange.Last7Days) }
         }
 
         should("keep the snapshot and report a failed pull to refresh") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } sequentially {
-                returns(loaded)
-                returns(Either.Left(DataError.ConnectionError))
-            }
             val viewModel = subject()
+            everySuspend { repository.getOverview(any(), any()) } returns Either.Left(DataError.ConnectionError)
             viewModel.refresh()
             viewModel.uiState.value.snapshot shouldBe TestAnalyticsSnapshot
             viewModel.uiState.value.error shouldBe DataError.ConnectionError
         }
 
         should("load again, keeping the snapshot, when the preferences ask for more") {
-            everySuspend { repository.getSnapshot(any(), any(), any()) } returns loaded
             val viewModel = subject()
             val wider = AnalyticsPreferences.Default.copy(showTrendChart = false)
             preferences.value = wider
-            verifySuspend { repository.getSnapshot(TestSelectedProject.projectId, AnalyticsRange.Last7Days, wider) }
+            verifySuspend(VerifyMode.exactly(2)) {
+                repository.getOverview(TestSelectedProject.projectId, AnalyticsRange.Last7Days)
+            }
             viewModel.uiState.value.snapshot.shouldNotBeNull()
+        }
+
+        should("show the error placeholder when a first load's overview fails") {
+            val viewModel = subject()
+            everySuspend { repository.getOverview(any(), any()) } returns Either.Left(DataError.Forbidden)
+            // Another range starts from nothing loaded.
+            viewModel.onRangeSelected(AnalyticsRange.Last30Days)
+            viewModel.uiState.value.snapshot shouldBe null
+            viewModel.uiState.value.error shouldBe DataError.Forbidden
         }
     })

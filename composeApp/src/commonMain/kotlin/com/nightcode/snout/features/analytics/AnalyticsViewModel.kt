@@ -6,7 +6,7 @@ import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPreferences
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.applying
-import com.nightcode.snout.shared.domain.usecase.analytics.GetAnalytics
+import com.nightcode.snout.shared.domain.usecase.analytics.LoadAnalytics
 import com.nightcode.snout.shared.domain.usecase.analytics.ObserveAnalyticsPreferences
 import com.nightcode.snout.shared.domain.usecase.appstate.ObserveProjectReloads
 import kotlinx.coroutines.Job
@@ -22,7 +22,7 @@ import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 internal class AnalyticsViewModel(
-    private val getAnalytics: GetAnalytics,
+    private val loadAnalytics: LoadAnalytics,
     observeProjectReloads: ObserveProjectReloads,
     observeAnalyticsPreferences: ObserveAnalyticsPreferences,
 ) : ViewModel() {
@@ -39,7 +39,7 @@ internal class AnalyticsViewModel(
     /** Set when another project is selected, until the collector below drops the previous project's snapshot. */
     private var projectChanged = false
 
-    /** The snapshot as fetched; the screen shows it with the current preferences applied. */
+    /** The latest snapshot as fetched; the screen shows it with the current preferences applied. */
     private var fetched: AnalyticsSnapshot? = null
     private var currentPreferences: AnalyticsPreferences? = null
     private var loadJob: Job? = null
@@ -83,13 +83,25 @@ internal class AnalyticsViewModel(
         val preferences = currentPreferences ?: return
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = it.snapshot != null, error = null) }
-            val result = getAnalytics(range, preferences)
-            result.onRight { fetched = it }
-            _uiState.update { state ->
+            val isRefresh = _uiState.value.snapshot != null
+            _uiState.update { it.copy(isRefreshing = isRefresh, error = null) }
+            loadAnalytics(range, preferences).collect { result ->
                 result.fold(
-                    ifLeft = { state.copy(isRefreshing = false, error = it) },
-                    ifRight = { state.copy(snapshot = it.applying(preferences), isRefreshing = false, error = null) },
+                    ifLeft = { error ->
+                        // A first load that failed drops the parts it had shown, for the error placeholder.
+                        if (!isRefresh) fetched = null
+                        _uiState.update {
+                            it.copy(snapshot = fetched?.applying(preferences), isRefreshing = false, error = error)
+                        }
+                    },
+                    ifRight = { snapshot ->
+                        // A first load shows each part as it arrives. A refresh keeps what is on screen until every
+                        // part is in, rather than putting skeletons back over it.
+                        if (!isRefresh || snapshot.isComplete) {
+                            fetched = snapshot
+                            _uiState.update { it.copy(snapshot = snapshot.applying(preferences), isRefreshing = false) }
+                        }
+                    },
                 )
             }
         }

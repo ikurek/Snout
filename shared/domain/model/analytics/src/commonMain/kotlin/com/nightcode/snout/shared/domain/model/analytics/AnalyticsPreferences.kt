@@ -35,4 +35,5 @@ fun AnalyticsSnapshot.applying(preferences: AnalyticsPreferences): AnalyticsSnap
     overview = overview.filter { it.key == OverviewMetricKey.Other || it.key in preferences.metrics },
     trends = if (preferences.showTrendChart) trends else emptyList(),
     breakdowns = breakdowns.filter { it.breakdown in preferences.breakdowns },
+    pending = pending.intersect(AnalyticsPart.shownBy(preferences).toSet()),
 )

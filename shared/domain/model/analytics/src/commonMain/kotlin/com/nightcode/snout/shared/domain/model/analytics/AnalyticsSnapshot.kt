@@ -2,13 +2,27 @@ package com.nightcode.snout.shared.domain.model.analytics
 
 import com.nightcode.snout.shared.common.testdata.TestData
 
+/**
+ * The Analytics tab's figures for [range]. Parts arrive one by one: [pending] lists those still being fetched, which
+ * the tab shows as skeletons in their place. A part that failed is simply left out, except the overview (see
+ * [AnalyticsPart.Overview]).
+ */
 data class AnalyticsSnapshot(
     val range: AnalyticsRange,
     val overview: List<OverviewMetric>,
     val trends: List<MetricTrend>,
     val breakdowns: List<BreakdownTable>,
+    val pending: Set<AnalyticsPart> = emptySet(),
 ) {
+    val isComplete: Boolean get() = pending.isEmpty()
+
     fun trend(metric: TrendMetric): MetricTrend? = trends.firstOrNull { it.metric == metric }
+
+    companion object {
+        /** Nothing fetched yet: every part [parts] names is pending. */
+        fun empty(range: AnalyticsRange, parts: Collection<AnalyticsPart>) =
+            AnalyticsSnapshot(range, emptyList(), emptyList(), emptyList(), pending = parts.toSet())
+    }
 }
 
 private val TestDays = listOf(

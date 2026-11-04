@@ -1,5 +1,6 @@
 package com.nightcode.snout.features.analytics
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -49,14 +50,17 @@ import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.analytics.components.label
 import com.nightcode.snout.features.analytics.components.labelIsCode
 import com.nightcode.snout.shared.common.testdata.TestData
+import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPart
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
 import com.nightcode.snout.shared.domain.model.analytics.MetricTrend
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetric
+import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKind
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.TrendMetric
+import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
 import com.nightcode.snout.shared.domain.model.common.DataError
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -72,6 +76,12 @@ private const val SkeletonStatRows = 2
 private const val SkeletonLabelWidth = 0.5f
 private const val SkeletonValueWidth = 0.6f
 private const val SkeletonChipWidth = 0.7f
+
+/** Skeleton stat cards while the overview is on its way: about as many as it brings, in two full rows. */
+private const val OverviewSkeletonCards = 4
+
+/** Skeleton stat cards for weekly and monthly active users. */
+private const val ActiveUsersSkeletonCards = 2
 
 @Composable
 internal fun AnalyticsScreen(
@@ -109,36 +119,61 @@ private fun SnapshotContent(snapshot: AnalyticsSnapshot, contentPadding: Padding
             .padding(horizontal = Spacing.large),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
-        OverviewGrid(snapshot.overview)
-        if (snapshot.trends.isNotEmpty()) TrendCard(snapshot.trends)
-        // Web projects have no screens and mobile projects have no pages; only show what has data.
-        snapshot.breakdowns.filter { it.rows.isNotEmpty() }.forEach { BreakdownCard(it) }
+        // Parts still loading hold their place with a skeleton, which crossfades to the part once it arrives.
+        val pendingStatCards = (if (AnalyticsPart.Overview in snapshot.pending) OverviewSkeletonCards else 0) +
+            (if (AnalyticsPart.ActiveUsers in snapshot.pending) ActiveUsersSkeletonCards else 0)
+        OverviewGrid(metrics = snapshot.overview, pendingCards = pendingStatCards)
+        Crossfade(targetState = AnalyticsPart.Trends in snapshot.pending, label = "Trends") { pending ->
+            when {
+                pending -> SkeletonCard()
+                snapshot.trends.isNotEmpty() -> TrendCard(snapshot.trends)
+            }
+        }
+        WebBreakdown.entries.forEach { breakdown ->
+            val pending = AnalyticsPart.Breakdown(breakdown) in snapshot.pending
+            val table = snapshot.breakdowns.firstOrNull { it.breakdown == breakdown }
+            // Web projects have no screens and mobile projects have no pages; only show what has data.
+            if (pending || (table != null && table.rows.isNotEmpty())) {
+                Crossfade(targetState = table.takeUnless { pending }, label = "Breakdown") {
+                    if (it == null) SkeletonCard() else BreakdownCard(it)
+                }
+            }
+        }
         VerticalSpacer(Spacing.small)
     }
 }
 
 /**
  * Two columns of stat cards with 8dp gaps; an odd last card keeps one column. Cards in a row share the taller
- * one's height, so a metric without a comparison (bounce rate with no sessions) doesn't end up shorter.
+ * one's height, so a metric without a comparison (bounce rate with no sessions) doesn't end up shorter. The
+ * [pendingCards] skeletons follow the cards already in.
  */
 @Composable
-private fun OverviewGrid(metrics: List<OverviewMetric>) {
+private fun OverviewGrid(metrics: List<OverviewMetric>, pendingCards: Int) {
     val previousLabel = stringResource(Res.string.analytics_metric_previous)
+    val cells: List<OverviewMetric?> = metrics + List(pendingCards) { null }
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
-        metrics.chunked(2).forEach { pair ->
+        cells.chunked(2).forEach { pair ->
             Row(
                 modifier = Modifier.height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.small),
             ) {
-                pair.forEach { metric ->
-                    StatCard(
-                        label = metric.label(),
-                        value = metric.value?.let { metric.kind.format(it) } ?: "–",
-                        changePercent = metric.changePercent,
-                        lowerIsBetter = metric.isIncreaseBad,
-                        comparison = metric.previous?.let { "$previousLabel ${metric.kind.format(it)}" },
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
-                    )
+                pair.forEach { cell ->
+                    Crossfade(targetState = cell, modifier = Modifier.weight(1f).fillMaxHeight(), label = "Stat") {
+                        val metric = it
+                        if (metric == null) {
+                            SkeletonStatCard(modifier = Modifier.fillMaxSize())
+                        } else {
+                            StatCard(
+                                label = metric.label(),
+                                value = metric.value?.let { value -> metric.kind.format(value) } ?: "–",
+                                changePercent = metric.changePercent,
+                                lowerIsBetter = metric.isIncreaseBad,
+                                comparison = metric.previous?.let { "$previousLabel ${metric.kind.format(it)}" },
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
                 }
                 if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
             }
@@ -160,20 +195,26 @@ private fun SnapshotSkeleton() = SkeletonGroup {
             }
         }
         VerticalSpacer(Spacing.xxSmall)
-        Surface(shape = SnoutTheme.shapes.large, color = SnoutTheme.colors.surfaceContainerLow) {
-            Column(
-                modifier = Modifier.padding(Spacing.large),
-                verticalArrangement = Arrangement.spacedBy(Spacing.large),
-            ) {
-                SkeletonBlock(Modifier.fillMaxWidth(SkeletonLabelWidth).height(16.dp))
-                SkeletonLines()
-            }
+        SkeletonCard()
+    }
+}
+
+/** A chart or table card on its way: title and lines on the card's own surface. */
+@Composable
+private fun SkeletonCard() = SkeletonGroup {
+    Surface(shape = SnoutTheme.shapes.large, color = SnoutTheme.colors.surfaceContainerLow) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(Spacing.large),
+            verticalArrangement = Arrangement.spacedBy(Spacing.large),
+        ) {
+            SkeletonBlock(Modifier.fillMaxWidth(SkeletonLabelWidth).height(16.dp))
+            SkeletonLines()
         }
     }
 }
 
 @Composable
-private fun SkeletonStatCard(modifier: Modifier = Modifier) {
+private fun SkeletonStatCard(modifier: Modifier = Modifier) = SkeletonGroup {
     Surface(modifier = modifier, shape = SnoutTheme.shapes.medium, color = SnoutTheme.colors.surfaceContainerLow) {
         Column(modifier = Modifier.padding(Spacing.medium), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             SkeletonBlock(Modifier.fillMaxWidth(SkeletonLabelWidth).height(12.dp))
@@ -285,6 +326,30 @@ fun AnalyticsScreenErrorPreview() = AnalyticsScreen(
 @Composable
 fun AnalyticsScreenRefreshErrorPreview() = AnalyticsScreen(
     state = AnalyticsUiState(snapshot = TestAnalyticsSnapshot, error = DataError.ConnectionError),
+    onRangeSelected = {},
+    onRefresh = {},
+)
+
+/** Halfway through a first load: the overview and the page table are in, the rest still on its way. */
+@OptIn(TestData::class)
+@PreviewLightDark
+@PreviewWrapper(ThemePreviewWrapper::class)
+@Composable
+fun AnalyticsScreenPartlyLoadedPreview() = AnalyticsScreen(
+    state = AnalyticsUiState(
+        snapshot = TestAnalyticsSnapshot.copy(
+            overview = TestAnalyticsSnapshot.overview.filter {
+                it.key != OverviewMetricKey.WeeklyActiveUsers && it.key != OverviewMetricKey.MonthlyActiveUsers
+            },
+            trends = emptyList(),
+            breakdowns = TestAnalyticsSnapshot.breakdowns.filter { it.breakdown == WebBreakdown.Page },
+            pending = setOf(
+                AnalyticsPart.ActiveUsers,
+                AnalyticsPart.Trends,
+                AnalyticsPart.Breakdown(WebBreakdown.Channel),
+            ),
+        ),
+    ),
     onRangeSelected = {},
     onRefresh = {},
 )
