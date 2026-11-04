@@ -1,14 +1,15 @@
 package com.nightcode.snout.designsystem.charts
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -49,17 +50,18 @@ internal fun BarChart(
     val gridColor = SnoutTheme.colors.outlineVariant
     val highlightColor = SnoutTheme.colors.onSurface.copy(alpha = HighlightAlpha)
     val periods = series.maxOfOrNull { it.values.size } ?: 0
-    val range = if (stacked) {
-        axisRange((0 until periods).map { index -> series.sumOf { it.values.getOrElse(index) { 0.0 } } })
-    } else {
-        axisRange(series.flatMap { it.values })
+    val range = remember(series, stacked) {
+        if (stacked) {
+            axisRange((0 until periods).map { index -> series.sumOf { it.values.getOrElse(index) { 0.0 } } })
+        } else {
+            axisRange(series.flatMap { it.values })
+        }
     }
     val selection = remember(series, xLabels) { mutableStateOf(selectedIndex) }
-    val selected = selection.value?.takeIf { it < periods }
 
     Column(modifier = modifier) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            Canvas(
+            Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(height)
@@ -70,28 +72,37 @@ internal fun BarChart(
                             plotRect(size, textMeasurer, labelStyle, range, valueFormatter)
                                 .barIndexAt(x, periods)
                         }
+                    }
+                    // Labels are measured once per size and data; picking a period only redraws.
+                    .drawWithCache {
+                        val axes = measureAxes(size, textMeasurer, labelStyle, range, xLabels, valueFormatter)
+                        val plot = axes.plot
+                        onDrawBehind {
+                            drawAxes(axes, gridColor)
+                            if (periods == 0) return@onDrawBehind
+                            val groupWidth = plot.width / periods
+                            selection.value?.takeIf { it < periods }?.let {
+                                drawRect(
+                                    color = highlightColor,
+                                    topLeft = Offset(plot.left + it * groupWidth, plot.top),
+                                    size = Size(groupWidth, plot.height),
+                                )
+                            }
+                            if (stacked) {
+                                drawStackedBars(series, periods, plot, range, groupWidth)
+                            } else {
+                                drawGroupedBars(series, plot, range, groupWidth)
+                            }
+                        }
                     },
-            ) {
-                val plot = drawAxes(textMeasurer, labelStyle, gridColor, range, xLabels, valueFormatter)
-                if (periods == 0) return@Canvas
-                val groupWidth = plot.width / periods
-                selected?.let {
-                    drawRect(
-                        color = highlightColor,
-                        topLeft = Offset(plot.left + it * groupWidth, plot.top),
-                        size = Size(groupWidth, plot.height),
-                    )
-                }
-                if (stacked) {
-                    drawStackedBars(series, periods, plot, range, groupWidth)
-                } else {
-                    drawGroupedBars(series, plot, range, groupWidth)
-                }
-            }
-            selected?.let { PeriodReadout(series, xLabels, it, periods, valueFormatter) }
+            )
+            SelectedPeriodReadout(selection, series, xLabels, periods, valueFormatter)
         }
         if (showLegend) {
-            ChartLegend(entries = series.map { it.name to it.color }, modifier = Modifier.fillMaxWidth())
+            ChartLegend(
+                entries = remember(series) { series.map { it.name to it.color } },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
