@@ -1,9 +1,9 @@
 package com.nightcode.snout.designsystem.organisms
 
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
+import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,6 +23,9 @@ import snout.composeapp.generated.resources.ic_more_horiz_24dp
 /**
  * Five destinations on `surfaceContainer` with a tonal `secondaryContainer` indicator pill. The active icon is
  * `onSecondaryContainer`, never `primary`; labels are always visible.
+ *
+ * The short bar is 64dp over the bottom inset, close to a native iOS tab bar; the 80dp `NavigationBar` left about 50pt
+ * of empty space under the labels above the iOS home indicator.
  */
 @Composable
 internal fun BottomNavigation(
@@ -31,17 +34,17 @@ internal fun BottomNavigation(
     onSelect: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationBar(modifier = modifier, containerColor = SnoutTheme.colors.surfaceContainer) {
+    ShortNavigationBar(modifier = modifier, containerColor = SnoutTheme.colors.surfaceContainer) {
         items.forEachIndexed { index, item ->
-            NavigationBarItem(
+            ShortNavigationBarItem(
                 selected = index == selectedIndex,
                 onClick = { onSelect(index) },
                 icon = { Icon(painter = item.icon, contentDescription = item.label) },
                 label = { Text(item.label, style = SnoutTheme.typography.labelMedium) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = SnoutTheme.colors.secondaryContainer,
+                colors = ShortNavigationBarItemDefaults.colors(
+                    selectedIndicatorColor = SnoutTheme.colors.secondaryContainer,
                     selectedIconColor = SnoutTheme.colors.onSecondaryContainer,
-                    selectedTextColor = SnoutTheme.colors.onSurface,
+                    selectedTextColorTopIconPosition = SnoutTheme.colors.onSurface,
                     unselectedIconColor = SnoutTheme.colors.onSurfaceVariant,
                     unselectedTextColor = SnoutTheme.colors.onSurfaceVariant,
                 ),
