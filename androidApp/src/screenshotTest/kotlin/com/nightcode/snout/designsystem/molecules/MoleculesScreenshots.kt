@@ -57,6 +57,11 @@ fun KeyValueRowPreviewShot() = ScreenshotEnvironment { KeyValueRowPreview() }
 @PreviewTest
 @Preview(name = "light", showBackground = true)
 @Composable
+fun MarkdownTextPreviewShot() = ScreenshotEnvironment { MarkdownTextPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true)
+@Composable
 fun PlaceholderPreviewShot() = ScreenshotEnvironment { PlaceholderPreview() }
 
 @PreviewTest

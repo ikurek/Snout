@@ -25,6 +25,7 @@ kotlin = "2.4.21"
 kotlin-serialization = "1.12.0"
 kotlin-datetime = "0.8.0"
 ktor = "3.6.0"
+markdown-renderer = "0.46.0"
 sqldelight = "2.4.1"
 kotest = "6.2.6"
 konsist = "0.18.1"
@@ -92,6 +93,9 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 # Coil
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+
+# Markdown
+markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdown-renderer" }
 
 # SQLDelight
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }

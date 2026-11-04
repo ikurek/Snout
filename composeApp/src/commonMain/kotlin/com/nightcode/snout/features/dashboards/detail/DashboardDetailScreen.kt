@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -21,6 +20,7 @@ import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
+import com.nightcode.snout.designsystem.molecules.MarkdownText
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NothingFoundPlaceholder
@@ -71,6 +71,7 @@ internal fun DashboardDetailScreen(
                 } else {
                     TileList(
                         state = state,
+                        description = dashboard.description,
                         tiles = dashboard.tiles,
                         onRetryTile = onRetryTile,
                         onOpenInsight = onOpenInsight,
@@ -85,6 +86,7 @@ internal fun DashboardDetailScreen(
 @Composable
 private fun TileList(
     state: DashboardDetailUiState,
+    description: String?,
     tiles: List<DashboardTile>,
     onRetryTile: (insightId: Long) -> Unit,
     onOpenInsight: (insightId: Long) -> Unit,
@@ -94,6 +96,15 @@ private fun TileList(
         contentPadding = PaddingValues(horizontal = Spacing.large, vertical = Spacing.small) + contentPadding,
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
+        if (!description.isNullOrBlank()) {
+            item(key = "description", contentType = "description") {
+                MarkdownText(
+                    markdown = description,
+                    color = SnoutTheme.colors.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
         // Text tiles and each chart kind reuse only their own kind's slots as tiles scroll in.
         items(tiles, key = { it.id }, contentType = { it.contentType }) { tile ->
             when (tile) {
@@ -103,10 +114,9 @@ private fun TileList(
                     color = SnoutTheme.colors.secondaryContainer,
                     contentColor = SnoutTheme.colors.onSecondaryContainer,
                 ) {
-                    Text(
-                        text = tile.body,
+                    MarkdownText(
+                        markdown = tile.body,
                         modifier = Modifier.padding(horizontal = Spacing.medium, vertical = 10.dp),
-                        style = SnoutTheme.typography.bodyMedium,
                     )
                 }
 

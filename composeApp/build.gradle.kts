@@ -45,6 +45,7 @@ kotlin {
             // Coil
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+            implementation(libs.markdown.renderer.m3)
             // Koin
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)

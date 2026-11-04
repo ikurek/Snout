@@ -21,6 +21,7 @@ import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
+import com.nightcode.snout.designsystem.molecules.MarkdownText
 import com.nightcode.snout.designsystem.molecules.SectionCard
 import com.nightcode.snout.designsystem.molecules.TagList
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
@@ -106,11 +107,14 @@ private fun DetailContent(detail: InsightDetail, modifier: Modifier, contentPadd
             .padding(contentPadding)
             .padding(top = Spacing.small, bottom = Spacing.xxLarge),
     ) {
-        SectionCard(
-            title = detail.summary.name,
-            subtitle = detail.summary.description,
-            modifier = Modifier.padding(horizontal = Spacing.large),
-        ) {
+        SectionCard(title = detail.summary.name, modifier = Modifier.padding(horizontal = Spacing.large)) {
+            detail.summary.description?.takeIf { it.isNotBlank() }?.let {
+                MarkdownText(
+                    markdown = it,
+                    style = SnoutTheme.typography.bodySmall,
+                    color = SnoutTheme.colors.onSurfaceVariant,
+                )
+            }
             detail.summary.period?.let {
                 Text(
                     text = it.label(),

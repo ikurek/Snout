@@ -19,6 +19,7 @@ import com.nightcode.snout.designsystem.atoms.SectionLabel
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
+import com.nightcode.snout.designsystem.molecules.MarkdownText
 import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
@@ -96,10 +97,9 @@ private fun ExperimentContent(
             .padding(contentPadding)
             .padding(bottom = Spacing.xxLarge),
     ) {
-        experiment.description?.let {
-            Text(
-                text = it,
-                style = SnoutTheme.typography.bodyMedium,
+        experiment.description?.takeIf { it.isNotBlank() }?.let {
+            MarkdownText(
+                markdown = it,
                 color = SnoutTheme.colors.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
             )
