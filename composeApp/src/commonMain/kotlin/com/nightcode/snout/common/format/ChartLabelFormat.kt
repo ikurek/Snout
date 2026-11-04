@@ -13,10 +13,11 @@ private const val TwoDigits = 2
  * hourly points become "14:00"; anything else is shown as received.
  */
 internal fun String.formatChartLabel(): String {
-    val date = runCatching { LocalDate.parse(take(DateLength)) }.getOrNull()
-    val dateTime = runCatching { LocalDateTime.parse(replace(' ', 'T').take(MinuteEnd)) }.getOrNull()
+    // parseOrNull, not parse in runCatching: a chart has a label per point, and exceptions are slow on iOS.
+    val date = if (length <= DateLength) LocalDate.Formats.ISO.parseOrNull(this) else null
+    val dateTime = if (date == null) LocalDateTime.Formats.ISO.parseOrNull(replace(' ', 'T').take(MinuteEnd)) else null
     return when {
-        date != null && length <= DateLength -> "${date.day} ${date.month.name.take(MonthAbbreviation).titleCase()}"
+        date != null -> "${date.day} ${date.month.name.take(MonthAbbreviation).titleCase()}"
         dateTime != null -> "${dateTime.hour.twoDigits()}:${dateTime.minute.twoDigits()}"
         else -> this
     }
