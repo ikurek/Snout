@@ -9,17 +9,22 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.HttpRequest
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 
 /**
  * Runs [call] and turns its failures into a [DataError]. Failures the app has no wording for (an unexpected status,
  * a server error or any other exception) all become [DataError.UnexpectedError]: debug builds log what they were, and
  * they are reported as errors, since each is a bug or a PostHog change the app doesn't handle yet.
+ *
+ * [call] runs on [Dispatchers.Default]: Ktor decodes the response body in the calling coroutine, and decoding a large
+ * JSON answer on the main thread (view models call from `viewModelScope`) drops frames, most of all on iOS.
  */
 @Suppress("SwallowedException", "TooGenericExceptionCaught")
 suspend fun <T> networkCall(call: suspend () -> T): Either<DataError, T> = either {
     try {
-        call()
+        withContext(Dispatchers.Default) { call() }
     } catch (e: ClientRequestException) {
         raise(
             when (e.response.status) {

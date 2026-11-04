@@ -61,6 +61,8 @@ Layers, with dependencies pointing inwards:
   and the selected project (`Logout`, through `ClearLocalData`); a 401 removes the key, and `ClearLocalData` the rest.
 - HTTP responses are not cached by the platform: on iOS the Darwin engine's URLSession has no `URLCache`, and
   `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
+- PostHog's answers are decoded off the main thread: `networkCall` runs the call on `Dispatchers.Default`, since Ktor
+  decodes the body in the calling coroutine and view models call from `viewModelScope`, on the main thread.
 - Debug builds log HTTP traffic (Ktor `Logging`, to logcat and the iOS unified log; `shared/api/DebugLogging.kt`):
   request lines, statuses and headers, with `Authorization` masked and bodies left out, plus the cause of each failure
   `networkCall` reports as `UnexpectedError` (an exception, or a status and request line). Release builds log nothing;
