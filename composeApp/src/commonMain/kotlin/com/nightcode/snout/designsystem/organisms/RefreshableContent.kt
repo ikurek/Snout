@@ -1,5 +1,12 @@
 package com.nightcode.snout.designsystem.organisms
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -12,7 +19,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.refreshFailedMessage
@@ -42,13 +55,18 @@ internal fun LoadingOrErrorContent(
     loadingContent: @Composable () -> Unit = { SkeletonRows() },
     notFoundContent: (@Composable () -> Unit)? = null,
 ) {
-    when {
-        error == null -> Box(modifier = modifier.fillMaxSize()) { loadingContent() }
+    FadeInOnAppear(modifier = modifier.fillMaxSize()) {
+        // A failed load crossfades from the skeleton to its error, and back on retry.
+        Crossfade(targetState = error, label = "LoadingOrError") { shown ->
+            when {
+                shown == null -> Box(modifier = Modifier.fillMaxSize()) { loadingContent() }
 
-        error == DataError.NotFound && notFoundContent != null ->
-            Box(modifier = modifier.fillMaxSize()) { notFoundContent() }
+                shown == DataError.NotFound && notFoundContent != null ->
+                    Box(modifier = Modifier.fillMaxSize()) { notFoundContent() }
 
-        else -> ErrorPlaceholder(error = error, onRetry = onRetry, modifier = modifier.fillMaxSize())
+                else -> ErrorPlaceholder(error = shown, onRetry = onRetry, modifier = Modifier.fillMaxSize())
+            }
+        }
     }
 }
 
@@ -67,20 +85,31 @@ internal fun RefreshableContent(
     isPullToRefreshEnabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
-        modifier = modifier.fillMaxSize(),
-        enabled = isPullToRefreshEnabled,
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            refreshError?.let { error ->
-                InlineErrorBanner(
-                    text = stringResource(error.refreshFailedMessage()),
-                    modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
-                )
+    FadeInOnAppear(modifier = modifier.fillMaxSize()) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.fillMaxSize(),
+            enabled = isPullToRefreshEnabled,
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // The last error stays in the banner while it slides away, so its text doesn't vanish first.
+                var lastError by remember { mutableStateOf(refreshError) }
+                SideEffect { if (refreshError != null) lastError = refreshError }
+                AnimatedVisibility(
+                    visible = refreshError != null,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    (refreshError ?: lastError)?.let { error ->
+                        InlineErrorBanner(
+                            text = stringResource(error.refreshFailedMessage()),
+                            modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
+                        )
+                    }
+                }
+                content()
             }
-            content()
         }
     }
 }
@@ -99,13 +128,26 @@ internal fun RefreshableEmptyContent(
         )
     },
 ) {
-    PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = onRefresh, modifier = modifier.fillMaxSize()) {
-        // A scrollable child is needed for the pull gesture; size it to the viewport so content stays centered.
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val viewportHeight = maxHeight
-            Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Box(modifier = Modifier.fillMaxWidth().height(viewportHeight)) { content() }
+    FadeInOnAppear(modifier = modifier.fillMaxSize()) {
+        PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) {
+            // A scrollable child is needed for the pull gesture; size it to the viewport so content stays centered.
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val viewportHeight = maxHeight
+                Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Box(modifier = Modifier.fillMaxWidth().height(viewportHeight)) { content() }
+                }
             }
         }
     }
+}
+
+/**
+ * Fades [content] in when it first appears, so a state that replaces another (loaded data over its skeleton, the
+ * skeleton again for another project) doesn't cut in. Previews show it at once.
+ */
+@Composable
+private fun FadeInOnAppear(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val inspecting = LocalInspectionMode.current
+    val visible = remember { MutableTransitionState(inspecting).apply { targetState = true } }
+    AnimatedVisibility(visibleState = visible, modifier = modifier, enter = fadeIn(), exit = fadeOut()) { content() }
 }
