@@ -125,17 +125,39 @@ internal fun LogServiceScreen(
                     refreshError = state.error,
                     onRefresh = onRefresh,
                 ) {
-                    LazyColumn(contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly()) {
-                        state.volume?.let { volume ->
-                            item(key = "volume") { VolumeChart(volume, includeDate = range != LogsRange.LastHour) }
-                        }
-                        itemsIndexed(logs, key = { _, entry -> entry.id }) { index, entry ->
-                            LogRow(entry = entry, divider = index < logs.lastIndex, onClick = { onOpenEntry(entry) })
-                        }
-                        item(key = "load-more") { LoadMoreFooter(status = state.loadMore, onLoadMore = onLoadMore) }
-                    }
+                    LogList(
+                        state = state,
+                        logs = logs,
+                        includeDate = range != LogsRange.LastHour,
+                        contentPadding = PaddingValues(bottom = Spacing.large) + innerPadding.bottomOnly(),
+                        onLoadMore = onLoadMore,
+                        onOpenEntry = onOpenEntry,
+                    )
                 }
             }
+        }
+    }
+}
+
+/** The volume chart, the lines, and the footer that loads the next page; each kind reuses only its own slots. */
+@Composable
+private fun LogList(
+    state: LogServiceUiState,
+    logs: List<LogEntry>,
+    includeDate: Boolean,
+    contentPadding: PaddingValues,
+    onLoadMore: () -> Unit,
+    onOpenEntry: (LogEntry) -> Unit,
+) {
+    LazyColumn(contentPadding = contentPadding) {
+        state.volume?.let { volume ->
+            item(key = "volume", contentType = "volume") { VolumeChart(volume, includeDate) }
+        }
+        itemsIndexed(logs, key = { _, entry -> entry.id }, contentType = { _, _ -> "log" }) { index, entry ->
+            LogRow(entry = entry, divider = index < logs.lastIndex, onClick = { onOpenEntry(entry) })
+        }
+        item(key = "load-more", contentType = "load-more") {
+            LoadMoreFooter(status = state.loadMore, onLoadMore = onLoadMore)
         }
     }
 }

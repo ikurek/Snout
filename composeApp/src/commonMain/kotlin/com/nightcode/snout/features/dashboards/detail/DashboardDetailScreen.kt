@@ -94,7 +94,8 @@ private fun TileList(
         contentPadding = PaddingValues(horizontal = Spacing.large, vertical = Spacing.small) + contentPadding,
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
-        items(tiles, key = { it.id }) { tile ->
+        // Text tiles and each chart kind reuse only their own kind's slots as tiles scroll in.
+        items(tiles, key = { it.id }, contentType = { it.contentType }) { tile ->
             when (tile) {
                 is DashboardTile.TextTile -> Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -195,3 +196,9 @@ fun DashboardDetailScreenErrorPreview() = DashboardDetailScreen(
     onOpenInsight = {},
     onOpenInPostHog = {},
 )
+
+private val DashboardTile.contentType: Any
+    get() = when (this) {
+        is DashboardTile.TextTile -> "text"
+        is DashboardTile.InsightTile -> insight.display
+    }

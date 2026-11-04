@@ -47,7 +47,11 @@ internal fun LazyListScope.projectEntries(
     selectedProject: SelectedProject?,
     onProjectSelected: (organizationId: Uuid, projectId: Long) -> Unit,
 ) {
-    itemsIndexed(entries, key = { _, entry -> entry.key }) { index, entry ->
+    itemsIndexed(
+        items = entries,
+        key = { _, entry -> entry.key },
+        contentType = { _, entry -> entry::class },
+    ) { index, entry ->
         val divider = index < entries.lastIndex
         when (entry) {
             is ProjectListEntry.OrganizationHeader -> OrganizationRow(
