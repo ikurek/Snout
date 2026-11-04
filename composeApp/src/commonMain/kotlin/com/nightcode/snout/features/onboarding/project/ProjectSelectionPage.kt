@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -100,9 +101,10 @@ private fun LoadedContent(
     if (organizations.all { it.projects.isEmpty() }) {
         NothingFoundPlaceholder(onRetry = onRetry, modifier = Modifier.fillMaxSize())
     } else {
+        val entries = remember(organizations) { organizations.toProjectListEntries() }
         LazyColumn(contentPadding = contentPadding) {
             projectEntries(
-                entries = organizations.toProjectListEntries(),
+                entries = entries,
                 selectedProject = null,
                 onProjectSelected = onProjectSelected,
             )
