@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -110,12 +111,14 @@ private fun ActivitySentence(actor: String, entry: ActivityEntry) {
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = buildAnnotatedString {
-                withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(actor) }
-                append(' ')
-                append(entry.activity.replace('_', ' '))
-                append(' ')
-                append(entry.scope.humanizeScope())
+            text = remember(actor, entry.activity, entry.scope) {
+                buildAnnotatedString {
+                    withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(actor) }
+                    append(' ')
+                    append(entry.activity.replace('_', ' '))
+                    append(' ')
+                    append(entry.scope.humanizeScope())
+                }
             },
             style = SnoutTheme.typography.bodyMedium,
         )
@@ -139,8 +142,11 @@ private fun ChangeLine(change: ActivityChange, modifier: Modifier = Modifier) {
     }
 }
 
+/** Between a lowercase and an uppercase letter; compiled once, as compiling it per row is slow on iOS. */
+private val ScopeWordBoundary = Regex("(?<=[a-z])(?=[A-Z])")
+
 /** "FeatureFlag" -> "feature flag" */
-private fun String.humanizeScope(): String = replace(Regex("(?<=[a-z])(?=[A-Z])"), " ").lowercase()
+private fun String.humanizeScope(): String = replace(ScopeWordBoundary, " ").lowercase()
 
 @OptIn(TestData::class)
 @PreviewLightDark
