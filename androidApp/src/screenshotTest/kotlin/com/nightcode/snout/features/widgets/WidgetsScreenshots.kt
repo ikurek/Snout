@@ -22,6 +22,12 @@ fun AnalyticsWidgetSettingsScreenPreviewShot() = ScreenshotEnvironment { Analyti
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun HighlightsWidgetSettingsScreenPreviewShot() = ScreenshotEnvironment { HighlightsWidgetSettingsScreenPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun InsightWidgetPickerScreenNotConnectedPreviewShot() =
     ScreenshotEnvironment { InsightWidgetPickerScreenNotConnectedPreview() }
 
