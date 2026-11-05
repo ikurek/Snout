@@ -12,8 +12,9 @@ import org.koin.core.annotation.Single
 @Single
 class ValidateAndSaveUserAuth(private val authRepository: AuthRepository, private val userRepository: UserRepository) {
     suspend operator fun invoke(token: String, instanceUrl: String): Either<DataError, Unit> = either {
-        authRepository.savePersonalApiKey(PersonalApiKey(token))
+        // The instance first: a key stored without one is dropped as left over from an earlier install.
         authRepository.saveInstanceUrl(instanceUrl)
+        authRepository.savePersonalApiKey(PersonalApiKey(token))
         userRepository.refreshCurrentUser().onLeft { authRepository.clear() }.bind()
     }
 }

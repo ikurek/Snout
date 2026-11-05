@@ -26,8 +26,8 @@ class ValidateAndSaveUserAuthTest :
             everySuspend { userRepository.refreshCurrentUser() } returns Either.Right(Unit)
             subject("phx_token", "https://app.posthog.com").shouldBeRight()
             verifySuspend(exhaustiveOrder) {
-                authRepository.savePersonalApiKey(PersonalApiKey("phx_token"))
                 authRepository.saveInstanceUrl("https://app.posthog.com")
+                authRepository.savePersonalApiKey(PersonalApiKey("phx_token"))
                 userRepository.refreshCurrentUser()
             }
         }

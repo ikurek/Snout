@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <!-- The preferences file lives in the App Group, so the widget extension can read it. -->
+        <key>com.apple.security.application-groups</key>
+        <array>
+            <string>group.com.nightcode.snout</string>
+        </array>
+        <!--
+            The app's own group stays first, so it remains the default for KSafe's Keychain key; the second holds the
+            API key, which the app and its widgets both use (KeychainPersonalApiKeyStores.kt).
+        -->
+        <key>keychain-access-groups</key>
+        <array>
+            <string>$(AppIdentifierPrefix)com.nightcode.snout</string>
+            <string>$(AppIdentifierPrefix)com.nightcode.snout.shared</string>
+        </array>
+    </dict>
+</plist>

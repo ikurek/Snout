@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nightcode.snout.shared.common.testdata.TestData
-import com.nightcode.snout.shared.storage.securestore.InMemorySecureStore
+import com.nightcode.snout.shared.storage.securestore.InMemoryPersonalApiKeyStore
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -24,45 +24,69 @@ class AuthDataStoreTest :
         should("read nothing when signed out") {
             AuthDataStore(
                 InMemoryDataStore(emptyPreferences()),
-                InMemorySecureStore(),
+                InMemoryPersonalApiKeyStore(),
             ).getPersonalApiKey() shouldBe null
         }
 
-        should("save the key only to the secure store") {
+        should("save the key only to its own store") {
             val preferences = InMemoryDataStore(emptyPreferences())
-            val secureStore = InMemorySecureStore()
-            val subject = AuthDataStore(preferences, secureStore)
+            val keyStore = InMemoryPersonalApiKeyStore()
+            val subject = AuthDataStore(preferences, keyStore)
 
             subject.savePersonalApiKey(Key)
 
             subject.getPersonalApiKey() shouldBe Key
             subject.observePersonalApiKey().first() shouldBe Key
-            secureStore.snapshot shouldBe mapOf(PersonalApiKeySecureKey to Key)
+            keyStore.key shouldBe Key
             preferences.current.asMap().shouldBeEmpty()
+        }
+
+        should("pick up a key another process changed in the shared store, once asked to reload it") {
+            val keyStore = InMemoryPersonalApiKeyStore(Key)
+            val subject = AuthDataStore(InMemoryDataStore(preferencesOf(InstanceUrlKey to Instance)), keyStore)
+            subject.getPersonalApiKey() shouldBe Key
+
+            // The app signs out while the widget extension still holds the key it loaded.
+            keyStore.clear()
+            subject.getPersonalApiKey() shouldBe Key
+            subject.reloadPersonalApiKey()
+            subject.getPersonalApiKey() shouldBe null
+
+            keyStore.set("phx_other")
+            subject.reloadPersonalApiKey()
+            subject.observePersonalApiKey().first() shouldBe "phx_other"
+        }
+
+        should("drop a key left without its instance, as a reinstalled iOS app finds it") {
+            val keyStore = InMemoryPersonalApiKeyStore(Key)
+            val subject = AuthDataStore(InMemoryDataStore(emptyPreferences()), keyStore)
+
+            subject.getPersonalApiKey() shouldBe null
+            keyStore.key shouldBe null
         }
 
         should("forget only the key after it is rejected, keeping the instance") {
             val preferences = InMemoryDataStore(preferencesOf(InstanceUrlKey to Instance))
-            val secureStore = InMemorySecureStore(mapOf(PersonalApiKeySecureKey to Key))
-            val subject = AuthDataStore(preferences, secureStore)
+            val keyStore = InMemoryPersonalApiKeyStore(Key)
+            val subject = AuthDataStore(preferences, keyStore)
 
             subject.clearPersonalApiKey()
 
             subject.observePersonalApiKey().first() shouldBe null
-            secureStore.snapshot.shouldBeEmpty()
+            keyStore.key shouldBe null
             subject.getInstanceUrl() shouldBe Instance
         }
 
         should("forget the key and the instance on clear") {
             val preferences = InMemoryDataStore(preferencesOf(InstanceUrlKey to Instance))
-            val secureStore = InMemorySecureStore(mapOf(PersonalApiKeySecureKey to Key))
-            val subject = AuthDataStore(preferences, secureStore)
+            val keyStore = InMemoryPersonalApiKeyStore(Key)
+            val subject = AuthDataStore(preferences, keyStore)
 
             subject.clear()
 
             subject.getPersonalApiKey() shouldBe null
             subject.getInstanceUrl() shouldBe null
-            secureStore.snapshot.shouldBeEmpty()
+            keyStore.key shouldBe null
         }
     })
 

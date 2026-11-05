@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
-import com.nightcode.snout.shared.storage.securestore.InMemorySecureStore
+import com.nightcode.snout.shared.storage.securestore.InMemoryPersonalApiKeyStore
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -52,7 +52,7 @@ class FakePostHog {
     @OptIn(TestData::class)
     val authDataStore = AuthDataStore(
         InMemoryDataStore(preferencesOf(stringPreferencesKey("instance_url") to TestInstanceUrl)),
-        InMemorySecureStore(),
+        InMemoryPersonalApiKeyStore(),
     )
 
     /** Requests sent so far, oldest first. */

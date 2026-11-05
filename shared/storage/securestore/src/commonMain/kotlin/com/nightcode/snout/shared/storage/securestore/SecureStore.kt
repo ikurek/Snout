@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.update
 /**
  * Strings kept encrypted under a key the platform holds: KSafe, with its key in the Keychain on iOS (this device
  * only, so never in a backup) and in the Android Keystore on Android. For secrets and personal data, not for
- * preferences.
+ * preferences. The personal API key has its own store ([PersonalApiKeyStore]), which the iOS widget extension shares.
  *
  * A value that can no longer be decrypted (a lost or invalidated key) reads as missing.
  */

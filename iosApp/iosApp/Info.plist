@@ -6,6 +6,9 @@
         <true/>
         <key>CFBundleDisplayName</key>
         <string>Snout</string>
+        <!-- The Keychain group the app shares the connection with its widgets in, with the team prefix signing resolves. -->
+        <key>SnoutKeychainAccessGroup</key>
+        <string>$(AppIdentifierPrefix)com.nightcode.snout.shared</string>
         <key>ITSAppUsesNonExemptEncryption</key>
         <false/>
         <key>CFBundleURLTypes</key>
