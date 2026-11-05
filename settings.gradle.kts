@@ -126,3 +126,6 @@ include(":shared:storage:datastore")
 include(":shared:storage:securestore")
 include(":shared:telemetry")
 include(":shared:telemetry:sdk")
+
+// Composition roots below :shared (the app's): everything but the telemetry SDK, and the widget extension's
+include(":shared:core")

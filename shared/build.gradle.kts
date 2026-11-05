@@ -38,34 +38,9 @@ kotlin {
         api(projects.shared.domain.usecase.organization)
         api(projects.shared.domain.usecase.appstate)
         api(projects.shared.domain.usecase.telemetry)
-        implementation(projects.shared.data.activitylog)
-        implementation(projects.shared.data.analytics)
-        implementation(projects.shared.data.annotations)
-        implementation(projects.shared.data.appstate)
-        implementation(projects.shared.data.auth)
-        implementation(projects.shared.data.common)
-        implementation(projects.shared.data.errortracking)
-        implementation(projects.shared.data.experiments)
-        implementation(projects.shared.data.featureflags)
-        implementation(projects.shared.data.insights)
-        implementation(projects.shared.data.links)
-        implementation(projects.shared.data.logs)
-        implementation(projects.shared.data.organization)
-        implementation(projects.shared.data.telemetry)
-        implementation(projects.shared.data.user)
+        // Every data and use case module, through CoreModule; implementation, so the UI never sees the data layer.
+        implementation(projects.shared.core)
         // PostHog behind the telemetry interfaces, bound here so the layers that report never see the SDK.
         implementation(projects.shared.telemetry.sdk)
-        // Not used directly: their Koin definitions must be visible here for the compile-time graph check
-        // (SharedGraph), which only sees modules on this compilation's classpath.
-        implementation(projects.shared.api.activitylog)
-        implementation(projects.shared.api.analytics)
-        implementation(projects.shared.api.annotations)
-        implementation(projects.shared.api.errortracking)
-        implementation(projects.shared.api.experiments)
-        implementation(projects.shared.api.featureflags)
-        implementation(projects.shared.api.insights)
-        implementation(projects.shared.api.logs)
-        implementation(projects.shared.api.organizations)
-        implementation(projects.shared.api.users)
     }
 }
