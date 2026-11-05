@@ -13,16 +13,16 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 
-/** The projects an Android analytics widget's settings offer; the stat and range are the screen's own state. */
+/** The projects the settings of an Android analytics or highlights widget offer; the rest is the screen's own state. */
 @KoinViewModel
-internal class AnalyticsWidgetSettingsViewModel(
+internal class WidgetSettingsViewModel(
     @InjectedParam private val widget: WidgetProject,
     private val isSignedIn: IsSignedIn,
     private val widgetProjects: WidgetProjects,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AnalyticsWidgetSettingsUiState())
-    val uiState: StateFlow<AnalyticsWidgetSettingsUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(WidgetSettingsUiState())
+    val uiState: StateFlow<WidgetSettingsUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

@@ -61,7 +61,7 @@ fun AnalyticsWidgetSettings(
     onSave: (AnalyticsWidgetConfig) -> Unit,
     onClose: () -> Unit,
 ) {
-    val viewModel = koinViewModel<AnalyticsWidgetSettingsViewModel> { parametersOf(WidgetProject(initial?.projectId)) }
+    val viewModel = koinViewModel<WidgetSettingsViewModel> { parametersOf(WidgetProject(initial?.projectId)) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var metric by rememberSaveable { mutableStateOf(initial?.metric ?: AnalyticsWidgetConfig.DefaultMetric) }
     var range by rememberSaveable { mutableStateOf(initial?.range ?: AnalyticsWidgetConfig.DefaultRange) }
@@ -88,7 +88,7 @@ fun AnalyticsWidgetSettings(
 
 @Composable
 internal fun AnalyticsWidgetSettingsScreen(
-    state: AnalyticsWidgetSettingsUiState,
+    state: WidgetSettingsUiState,
     metric: OverviewMetricKey,
     range: AnalyticsRange,
     isNew: Boolean,
@@ -167,7 +167,7 @@ internal fun AnalyticsWidgetSettingsScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun AnalyticsWidgetSettingsScreenPreview() = AnalyticsWidgetSettingsScreen(
-    state = AnalyticsWidgetSettingsUiState(isConnected = true, projects = TestProjectChoices, projectId = 1L),
+    state = WidgetSettingsUiState(isConnected = true, projects = TestProjectChoices, projectId = 1L),
     metric = AnalyticsWidgetConfig.DefaultMetric,
     range = AnalyticsWidgetConfig.DefaultRange,
     isNew = true,
