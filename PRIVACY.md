@@ -1,6 +1,6 @@
 # Privacy policy
 
-Effective October 27, 2026
+Effective November 1, 2026
 
 Snout is a mobile client for PostHog, developed by Igor Kurek (NightCode) and published as open source at
 [github.com/ikurek/snout](https://github.com/ikurek/snout). This policy covers the Snout apps for Android and iOS.
@@ -25,6 +25,12 @@ websites.
 - **Changes you make.** When you toggle a feature flag, resolve or suppress an error, add an annotation or favorite an
   insight, the app sends that change to your instance.
 - **Your preferences.** The selected project, theme, layout and privacy settings are stored on your device.
+- **Widgets.** Widgets you add to your home screen (or, on iOS, your Lock Screen) request the numbers they show from
+  your instance each time they refresh and show them on that screen; nothing they load is kept. On Android they run in
+  the app itself. On iOS the widget extension uses the app's own API key, which the app keeps in the iOS Keychain
+  where only the app and its widgets can read it, and reads the instance URL from storage shared only with the app.
+  The project each widget shows is part of that widget's own settings. iOS hides the numbers on a locked iPhone
+  unless your settings allow widgets while locked.
 
 All of this stays on your device or travels directly between your device and your PostHog instance over HTTPS. The
 developer of Snout never receives any of it. How your instance handles the data it holds is governed by your
@@ -67,7 +73,9 @@ share them with anyone else or use them for advertising, and we keep them only a
 ## Removing your data
 
 Logging out in Settings deletes the API key, your account and your projects from the device. Uninstalling the app
-removes everything it stored, including the random report identifier. To revoke the app's access to your PostHog,
+removes everything it stored, including the random report identifier, with one exception on iOS: iOS keeps Keychain
+items after an app is deleted, so the API key stays in the Keychain until you install Snout again, which deletes it
+when it first opens. To remove it at once, log out before deleting the app. To revoke the app's access to your PostHog,
 delete the personal API key in your PostHog settings. To ask about the reports from your installation, open an
 issue (see Contact); since they aren't linked to you, we can only find them with the identifier, which uninstalling
 removes.
