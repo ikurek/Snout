@@ -48,6 +48,25 @@ class AnalyticsMapperTest :
             trends[1].previous shouldBe null
         }
 
+        should("find each series by the name PostHog now puts on the result itself") {
+            val response = TestJson.decodeFromString<QueryResponseDto>(
+                """{"results":[
+                  {"label":"${'$'}pageview","custom_name":"sessions","compare_label":"current","order":4,
+                   "data":[4.0,6.0],"days":["2026-10-01","2026-10-02"]},
+                  {"label":"${'$'}screen","custom_name":"sessions","compare_label":"current","order":5,
+                   "data":[0.0,1.0],"days":["2026-10-01","2026-10-02"]},
+                  {"label":"${'$'}pageview","custom_name":"sessions","compare_label":"previous","order":4,
+                   "data":[2.0,3.0],"days":["2026-09-29","2026-09-30"]},
+                  {"custom_name":"wau","compare_label":"current","data":[80.0,100.0]}
+                ]}""",
+            )
+            val trends = response.toMetricTrends(TestJson)
+            trends.map { it.metric } shouldBe listOf(TrendMetric.Sessions)
+            trends[0].current.points.map { it.value } shouldBe listOf(4.0, 7.0)
+            trends[0].previous?.points?.map { it.value } shouldBe listOf(2.0, 3.0)
+            response.toActiveUserMetrics(TestJson).map { it.value } shouldBe listOf(100.0)
+        }
+
         should("take active users as of the last day and compare with the previous period") {
             val response = TestJson.decodeFromString<QueryResponseDto>(
                 """{"results":[

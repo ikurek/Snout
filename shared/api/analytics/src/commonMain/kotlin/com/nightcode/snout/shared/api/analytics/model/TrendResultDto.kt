@@ -12,10 +12,14 @@ data class TrendActionDto(
     @SerialName("event") val event: String? = null,
 )
 
-/** One series of a TrendsQuery result. */
+/**
+ * One series of a TrendsQuery result. PostHog echoes the series' name as [customName]; older versions nest it in
+ * [action] instead.
+ */
 @Serializable
 data class TrendResultDto(
     @SerialName("label") val label: String? = null,
+    @SerialName("custom_name") val customName: String? = null,
     @SerialName("data") val data: List<Double>? = null,
     @SerialName("labels") val labels: List<String>? = null,
     @SerialName("days") val days: List<String>? = null,

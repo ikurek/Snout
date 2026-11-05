@@ -103,7 +103,8 @@ internal fun List<TrendResultDto>.sumSeries(): TimeSeries? {
     return TimeSeries(points)
 }
 
-private fun List<TrendResultDto>.named(name: String) = filter { it.action?.customName == name }
+/** The results of the series named [name]: PostHog puts the name on each result, older versions in its `action`. */
+private fun List<TrendResultDto>.named(name: String) = filter { (it.customName ?: it.action?.customName) == name }
 
 private fun List<TrendResultDto>.current() = filterNot { it.compareLabel == PreviousCompareLabel }
 
