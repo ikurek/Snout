@@ -7,11 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A1D6E700000000000000002 /* SnoutWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A1D6E700000000000000001 /* SnoutWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1B2C3D4E5F6071829304A02 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304A01 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A7E1C0DE00000000000000B1 /* KotlinMultiplatformLinkedPackage in Frameworks */ = {isa = PBXBuildFile; productRef = A7E1C0DE00000000000000B2 /* KotlinMultiplatformLinkedPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5A1D6E70000000000000000A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3CA0705AA5060D5F178A8419 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A1D6E700000000000000005;
+			remoteInfo = SnoutWidgets;
+		};
 		A1B2C3D4E5F6071829304A0A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3CA0705AA5060D5F178A8419 /* Project object */;
@@ -29,6 +37,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				A1B2C3D4E5F6071829304A02 /* ShareExtension.appex in Embed Foundation Extensions */,
+				5A1D6E700000000000000002 /* SnoutWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -36,6 +45,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5A1D6E700000000000000001 /* SnoutWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SnoutWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D4E5F6071829304A01 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C236872B455A92BD90E3CAC /* snout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = snout.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -54,6 +64,13 @@
 				Info.plist,
 			);
 			target = A1B2C3D4E5F6071829304A05 /* ShareExtension */;
+		};
+		5A1D6E700000000000000003 /* Exceptions for "SnoutWidgets" folder in "SnoutWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5A1D6E700000000000000005 /* SnoutWidgets */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -84,6 +101,14 @@
 			path = SnoutLink;
 			sourceTree = "<group>";
 		};
+		5A1D6E700000000000000004 /* SnoutWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5A1D6E700000000000000003 /* Exceptions for "SnoutWidgets" folder in "SnoutWidgets" target */,
+			);
+			path = SnoutWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +127,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A1D6E700000000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -111,6 +143,7 @@
 				891FC652B5AFE9494B36EE8F /* Configuration */,
 				C8242837FA762241B5DD7E8E /* iosApp */,
 				A1B2C3D4E5F6071829304A04 /* ShareExtension */,
+				5A1D6E700000000000000004 /* SnoutWidgets */,
 				A1B2C3D4E5F6071829304A10 /* SnoutLink */,
 				0C4F66FDD3FEF25A1720E3D4 /* Products */,
 			);
@@ -121,6 +154,7 @@
 			children = (
 				1C236872B455A92BD90E3CAC /* snout.app */,
 				A1B2C3D4E5F6071829304A01 /* ShareExtension.appex */,
+				5A1D6E700000000000000001 /* SnoutWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,6 +176,7 @@
 			);
 			dependencies = (
 				A1B2C3D4E5F6071829304A0B /* PBXTargetDependency */,
+				5A1D6E70000000000000000B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C8242837FA762241B5DD7E8E /* iosApp */,
@@ -178,6 +213,30 @@
 			productReference = A1B2C3D4E5F6071829304A01 /* ShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		5A1D6E700000000000000005 /* SnoutWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A1D6E70000000000000000E /* Build configuration list for PBXNativeTarget "SnoutWidgets" */;
+			buildPhases = (
+				5A1D6E700000000000000009 /* Compile Kotlin Framework */,
+				5A1D6E700000000000000006 /* Sources */,
+				5A1D6E700000000000000007 /* Frameworks */,
+				5A1D6E700000000000000008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5A1D6E700000000000000004 /* SnoutWidgets */,
+				A1B2C3D4E5F6071829304A10 /* SnoutLink */,
+			);
+			name = SnoutWidgets;
+			packageProductDependencies = (
+			);
+			productName = SnoutWidgets;
+			productReference = 5A1D6E700000000000000001 /* SnoutWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -192,6 +251,9 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					A1B2C3D4E5F6071829304A05 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					5A1D6E700000000000000005 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -215,6 +277,7 @@
 			targets = (
 				83FB984121317B60C2060DFE /* iosApp */,
 				A1B2C3D4E5F6071829304A05 /* ShareExtension */,
+				5A1D6E700000000000000005 /* SnoutWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -228,6 +291,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A1B2C3D4E5F6071829304A08 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A1D6E700000000000000008 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,6 +326,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
 		};
+		5A1D6E700000000000000009 /* Compile Kotlin Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Compile Kotlin Framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :widgets:embedAndSignAppleFrameworkForXcode\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -273,6 +362,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A1D6E700000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -280,6 +376,11 @@
 			isa = PBXTargetDependency;
 			target = A1B2C3D4E5F6071829304A05 /* ShareExtension */;
 			targetProxy = A1B2C3D4E5F6071829304A0A /* PBXContainerItemProxy */;
+		};
+		5A1D6E70000000000000000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A1D6E700000000000000005 /* SnoutWidgets */;
+			targetProxy = 5A1D6E70000000000000000A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -513,6 +614,56 @@
 			};
 			name = Release;
 		};
+		5A1D6E70000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = SnoutWidgets/SnoutWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnoutWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Snout;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nightcode.snout.widgets;
+				PRODUCT_NAME = SnoutWidgets;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5A1D6E70000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = SnoutWidgets/SnoutWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnoutWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Snout;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.nightcode.snout.widgets;
+				PRODUCT_NAME = SnoutWidgets;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -539,6 +690,15 @@
 			buildConfigurations = (
 				A1B2C3D4E5F6071829304A0C /* Debug */,
 				A1B2C3D4E5F6071829304A0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A1D6E70000000000000000E /* Build configuration list for PBXNativeTarget "SnoutWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A1D6E70000000000000000C /* Debug */,
+				5A1D6E70000000000000000D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

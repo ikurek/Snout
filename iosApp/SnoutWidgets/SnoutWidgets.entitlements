@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <!-- The app's preferences (instance URL, selected project, analytics range), read only. -->
+        <key>com.apple.security.application-groups</key>
+        <array>
+            <string>group.com.nightcode.snout</string>
+        </array>
+        <!-- The app's API key, which the widgets read and never write. -->
+        <key>keychain-access-groups</key>
+        <array>
+            <string>$(AppIdentifierPrefix)com.nightcode.snout.shared</string>
+        </array>
+    </dict>
+</plist>
