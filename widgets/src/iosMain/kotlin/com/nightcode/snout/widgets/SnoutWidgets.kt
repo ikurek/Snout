@@ -1,6 +1,7 @@
 package com.nightcode.snout.widgets
 
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.HighlightMetric
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.shared.widgets.WidgetSession
 import com.nightcode.snout.shared.widgets.WidgetSharedModule
@@ -30,6 +31,13 @@ object SnoutWidgets {
         range: AnalyticsRange,
     ): WidgetState<AnalyticsWidgetContent> =
         fresh<AnalyticsWidgetLoader>().load(AnalyticsWidgetConfig(projectId, metric, range))
+
+    suspend fun highlights(
+        projectId: Long,
+        range: AnalyticsRange,
+        metrics: List<HighlightMetric>,
+    ): WidgetState<HighlightsWidgetContent> =
+        fresh<HighlightsWidgetLoader>().load(HighlightsWidgetConfig(projectId, range, metrics))
 
     suspend fun insight(projectId: Long, insightId: Long): WidgetState<InsightWidgetContent> =
         fresh<InsightWidgetLoader>().load(projectId, insightId)
