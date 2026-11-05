@@ -1,10 +1,13 @@
 package com.nightcode.snout
 
+import com.nightcode.snout.shared.domain.usecase.appstate.ObserveWidgetChanges
 import com.nightcode.snout.shared.domain.usecase.links.SubmitIncomingLink
 import com.nightcode.snout.shared.domain.usecase.telemetry.ApplyTelemetrySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -13,7 +16,7 @@ import org.koin.mp.KoinPlatform
 
 /*
  * The entry points the platform hosts call: start the app's graph once per process, before any UI, then hand over
- * the links the system asks the app to open.
+ * the links the system asks the app to open, and redraw home-screen widgets when what they show changes.
  */
 
 /** Every definition of the app, the one module list both platforms start and AppModuleTest verifies. */
@@ -44,4 +47,22 @@ private val HostScope by lazy { CoroutineScope(SupervisorJob() + Dispatchers.Mai
 fun submitIncomingLink(text: String) {
     val submitIncomingLink = KoinPlatform.getKoin().get<SubmitIncomingLink>()
     HostScope.launch { submitIncomingLink(text) }
+}
+
+/**
+ * Calls [onChange] on the main thread each time the person signs in or out, the one change every home-screen widget
+ * shows (each names its own project and range, whatever the app shows). The platform reloads its widgets there
+ * (`startWidgets`, WidgetKit's `reloadAllTimelines`), so a widget never shows the previous account until its next
+ * refresh. Call once, after the platform started the graph.
+ */
+fun observeWidgetChanges(onChange: () -> Unit) {
+    val observeWidgetChanges = KoinPlatform.getKoin().get<ObserveWidgetChanges>()
+    // Reading the key off the main thread: iOS blocks it for the startup read, which waits on the same key.
+    HostScope.launch {
+        observeWidgetChanges().flowOn(Dispatchers.Default)
+            // A key the secure store can't read (the Keystore failing) only stops these redraws: the widgets still
+            // refresh on their own and show the failure there, instead of the app crashing at start.
+            .catch { }
+            .collect { onChange() }
+    }
 }
