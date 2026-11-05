@@ -15,6 +15,7 @@ internal fun startWidgets(context: Context) {
         WidgetScope.launch {
             AnalyticsResults.reloadAll(context)
             InsightResults.reloadAll(context)
+            HighlightsResults.reloadAll(context)
         }
     }
 }

@@ -10,9 +10,13 @@ import com.nightcode.snout.R
 import com.nightcode.snout.shared.common.format.ChangeTone
 import com.nightcode.snout.shared.common.format.TrendChange
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
+import com.nightcode.snout.shared.domain.model.analytics.HighlightMetric
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
 import com.nightcode.snout.widgets.AnalyticsWidgetConfig
 import com.nightcode.snout.widgets.AnalyticsWidgetContent
+import com.nightcode.snout.widgets.HighlightTile
+import com.nightcode.snout.widgets.HighlightsWidgetConfig
+import com.nightcode.snout.widgets.HighlightsWidgetContent
 import com.nightcode.snout.widgets.InsightWidgetBody
 import com.nightcode.snout.widgets.InsightWidgetContent
 import com.nightcode.snout.widgets.WidgetStat
@@ -49,6 +53,30 @@ internal fun analyticsPreview(
     loadedAt = System.currentTimeMillis(),
 )
 
+/** Sample numbers for the highlights widget's preview, drawn by the widget itself. */
+internal fun highlightsPreview(
+    context: Context,
+): WidgetLoad<HighlightsWidgetConfig?, WidgetState<HighlightsWidgetContent>?> {
+    val tiles = listOf(
+        HighlightTile(HighlightMetric.DailyActiveUsers, "2,480", PreviewUp),
+        HighlightTile(HighlightMetric.MonthlyActiveUsers, "41.2k", TrendChange("↑ 3.4%", ChangeTone.Good)),
+        HighlightTile(HighlightMetric.SessionDuration, "2m 23s", TrendChange("↓ 1.2%", ChangeTone.Bad)),
+        HighlightTile(HighlightMetric.Exceptions, "206", TrendChange("↓ 10%", ChangeTone.Good)),
+        HighlightTile(HighlightMetric.Mrr, "$12.4k", TrendChange("→ 0%", ChangeTone.Neutral)),
+        HighlightTile(HighlightMetric.LatestAppVersion, "3.3.0", null),
+    )
+    return WidgetLoad(
+        config = HighlightsWidgetConfig(
+            projectId = 0,
+            range = AnalyticsRange.Last7Days,
+            metrics = tiles.map { it.metric },
+            projectName = context.getString(R.string.widget_preview_project),
+        ),
+        result = WidgetState.Loaded(HighlightsWidgetContent(AnalyticsRange.Last7Days, tiles, link = null)),
+        loadedAt = System.currentTimeMillis(),
+    )
+}
+
 /** Sample numbers for the insight widget's preview, drawn by the widget itself. */
 internal fun insightPreview(context: Context): WidgetLoad<InsightPick?, InsightLoad> {
     val name = context.getString(R.string.widget_insight_preview_name)
@@ -77,4 +105,5 @@ internal suspend fun publishWidgetPreviews(context: Context) {
     val manager = GlanceAppWidgetManager(context)
     manager.setWidgetPreviews(AnalyticsWidgetReceiver::class)
     manager.setWidgetPreviews(InsightWidgetReceiver::class)
+    manager.setWidgetPreviews(HighlightsWidgetReceiver::class)
 }
