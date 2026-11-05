@@ -26,8 +26,9 @@ private typealias PartUpdate = (AnalyticsSnapshot) -> AnalyticsSnapshot
  * time one of its parts arrives: first with every part pending, last with none. The parts are fetched in parallel,
  * so the tab fills in as they come rather than after the slowest.
  *
- * An optional part that fails is left out. The overview is required: when it fails the flow emits that error and
- * ends, dropping the requests still running.
+ * The figures are [projectId]'s when given (a home-screen widget names its own project), the selected project's
+ * otherwise. An optional part that fails is left out. The overview is required: when it fails the flow emits that error
+ * and ends, dropping the requests still running.
  */
 @Single
 class LoadAnalytics(
@@ -37,8 +38,9 @@ class LoadAnalytics(
     operator fun invoke(
         range: AnalyticsRange,
         preferences: AnalyticsPreferences,
+        projectId: Long? = null,
     ): Flow<Either<DataError, AnalyticsSnapshot>> = channelFlow {
-        val projectId = getSelectedProjectId()
+        val project = projectId ?: getSelectedProjectId()
         val parts = AnalyticsPart.shownBy(preferences)
         var snapshot = AnalyticsSnapshot.empty(range, parts)
         val lock = Mutex()
@@ -48,7 +50,7 @@ class LoadAnalytics(
             coroutineScope {
                 parts.forEach { part ->
                     launch {
-                        val update = fetch(part, projectId, range)
+                        val update = fetch(part, project, range)
                         lock.withLock {
                             snapshot = update(snapshot).copy(pending = snapshot.pending - part)
                             send(Either.Right(snapshot))

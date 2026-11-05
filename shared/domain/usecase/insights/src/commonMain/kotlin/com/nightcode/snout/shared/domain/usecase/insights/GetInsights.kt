@@ -9,6 +9,7 @@ import org.koin.core.annotation.Single
 
 @Single
 class GetInsights(private val getSelectedProjectId: GetSelectedProjectId, private val repository: InsightRepository) {
-    suspend operator fun invoke(): Either<DataError, List<InsightSummary>> =
-        repository.getInsights(getSelectedProjectId())
+    /** [projectId]'s insights when given (a home-screen widget's picker names its own), else the selected project's. */
+    suspend operator fun invoke(projectId: Long? = null): Either<DataError, List<InsightSummary>> =
+        repository.getInsights(projectId ?: getSelectedProjectId())
 }

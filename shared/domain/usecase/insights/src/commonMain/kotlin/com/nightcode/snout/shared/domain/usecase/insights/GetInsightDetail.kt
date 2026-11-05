@@ -12,6 +12,7 @@ class GetInsightDetail(
     private val getSelectedProjectId: GetSelectedProjectId,
     private val repository: InsightRepository,
 ) {
-    suspend operator fun invoke(insightId: Long): Either<DataError, InsightDetail> =
-        repository.getInsight(getSelectedProjectId(), insightId)
+    /** Insight [insightId] of [projectId] when given (a home-screen widget names its own), else of the selected one. */
+    suspend operator fun invoke(insightId: Long, projectId: Long? = null): Either<DataError, InsightDetail> =
+        repository.getInsight(projectId ?: getSelectedProjectId(), insightId)
 }

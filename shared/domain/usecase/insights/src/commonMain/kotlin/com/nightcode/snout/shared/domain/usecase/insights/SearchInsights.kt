@@ -12,6 +12,7 @@ class SearchInsights(
     private val getSelectedProjectId: GetSelectedProjectId,
     private val repository: InsightRepository,
 ) {
-    suspend operator fun invoke(query: String): Either<DataError, List<InsightSummary>> =
-        repository.searchInsights(getSelectedProjectId(), query)
+    /** [projectId]'s insights when given (a home-screen widget's picker names its own), else the selected project's. */
+    suspend operator fun invoke(query: String, projectId: Long? = null): Either<DataError, List<InsightSummary>> =
+        repository.searchInsights(projectId ?: getSelectedProjectId(), query)
 }
