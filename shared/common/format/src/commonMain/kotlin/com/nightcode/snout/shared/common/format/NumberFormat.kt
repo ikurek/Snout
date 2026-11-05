@@ -1,4 +1,4 @@
-package com.nightcode.snout.common.format
+package com.nightcode.snout.shared.common.format
 
 import kotlin.math.abs
 import kotlin.math.roundToLong
@@ -10,7 +10,7 @@ private const val Hundred = 100.0
 private const val Ten = 10.0
 
 /** 1234 -> "1.2k", 12 -> "12", 0.42 -> "0.42". Locale independent on purpose: dashboards read the same everywhere. */
-internal fun Double.formatCompact(): String {
+fun Double.formatCompact(): String {
     val magnitude = abs(this)
     return when {
         magnitude >= Billion -> "${(this / Billion).formatDecimals(1)}B"
@@ -22,7 +22,7 @@ internal fun Double.formatCompact(): String {
     }
 }
 
-internal fun Double.formatDecimals(digits: Int): String {
+fun Double.formatDecimals(digits: Int): String {
     var factor = 1.0
     repeat(digits) { factor *= Ten }
     val rounded = (this * factor).roundToLong()
@@ -35,13 +35,13 @@ internal fun Double.formatDecimals(digits: Int): String {
 }
 
 /** 0.1234 -> "12.3%" when [isFraction], 12.34 -> "12.3%" otherwise. */
-internal fun Double.formatPercent(isFraction: Boolean = false): String {
+fun Double.formatPercent(isFraction: Boolean = false): String {
     val percent = if (isFraction) this * 100 else this
     return "${percent.formatDecimals(1)}%"
 }
 
 /** 83 -> "1m 23s", 3725 -> "1h 2m". */
-internal fun Double.formatDurationSeconds(): String {
+fun Double.formatDurationSeconds(): String {
     val total = roundToLong()
     val hours = total / 3600
     val minutes = total % 3600 / 60
@@ -53,4 +53,4 @@ internal fun Double.formatDurationSeconds(): String {
     }
 }
 
-internal fun Double.formatSigned(): String = if (this > 0) "+${formatDecimals(1)}" else formatDecimals(1)
+fun Double.formatSigned(): String = if (this > 0) "+${formatDecimals(1)}" else formatDecimals(1)

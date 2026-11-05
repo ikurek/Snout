@@ -21,9 +21,9 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.shared.common.format.formatCompact
 
 private const val BarAlpha = 0.14f
 

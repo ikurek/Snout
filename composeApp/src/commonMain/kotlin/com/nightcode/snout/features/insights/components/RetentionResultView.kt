@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import com.nightcode.snout.common.format.formatChartLabel
-import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.charts.ChartSeries
 import com.nightcode.snout.designsystem.charts.LineChart
 import com.nightcode.snout.designsystem.charts.RetentionTable
 import com.nightcode.snout.designsystem.charts.RetentionTableRow
 import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.shared.common.format.formatPercent
 import com.nightcode.snout.shared.domain.model.insights.InsightResult
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res

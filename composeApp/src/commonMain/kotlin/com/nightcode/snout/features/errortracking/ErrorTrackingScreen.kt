@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.charts.Sparkline
@@ -37,6 +36,7 @@ import com.nightcode.snout.designsystem.organisms.UnavailablePlaceholder
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.label
+import com.nightcode.snout.shared.common.format.formatCompact
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion

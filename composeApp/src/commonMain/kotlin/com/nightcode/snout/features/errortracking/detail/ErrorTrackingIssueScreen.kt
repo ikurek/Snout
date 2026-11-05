@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.common.format.formatDateTime
 import com.nightcode.snout.common.format.formatRelative
 import com.nightcode.snout.common.format.lastDaysLabels
@@ -41,6 +40,7 @@ import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.IssueStatusPill
+import com.nightcode.snout.shared.common.format.formatCompact
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue

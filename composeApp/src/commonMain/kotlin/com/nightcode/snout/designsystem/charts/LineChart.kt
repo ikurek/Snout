@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.shared.common.format.formatCompact
 
 private const val FillAlpha = 0.14f
 private const val DashLength = 8f

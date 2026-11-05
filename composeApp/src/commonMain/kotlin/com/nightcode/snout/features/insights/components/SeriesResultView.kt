@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import com.nightcode.snout.common.format.formatChartLabel
-import com.nightcode.snout.common.format.formatSigned
 import com.nightcode.snout.designsystem.atoms.TrendChip
 import com.nightcode.snout.designsystem.charts.BarChart
 import com.nightcode.snout.designsystem.charts.ChartSeries
@@ -19,6 +18,8 @@ import com.nightcode.snout.designsystem.charts.RankedBarRow
 import com.nightcode.snout.designsystem.charts.chartColor
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.shared.common.format.formatSigned
+import com.nightcode.snout.shared.common.format.formatValue
 import com.nightcode.snout.shared.domain.model.insights.InsightDisplay
 import com.nightcode.snout.shared.domain.model.insights.TrendSeries
 import com.nightcode.snout.shared.domain.model.insights.ValueFormat

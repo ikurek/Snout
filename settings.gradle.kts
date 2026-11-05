@@ -116,6 +116,7 @@ include(":shared:domain:usecase:telemetry")
 include(":shared:domain:usecase:user")
 
 // Common
+include(":shared:common:format")
 include(":shared:common:testdata")
 include(":shared:common:testutils")
 

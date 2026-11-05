@@ -12,8 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
-import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.atoms.StatusTone
 import com.nightcode.snout.designsystem.atoms.Tag
 import com.nightcode.snout.designsystem.charts.BarSegment
@@ -32,6 +30,8 @@ import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.logs.components.LogsUnavailablePlaceholder
 import com.nightcode.snout.features.logs.components.label
 import com.nightcode.snout.features.logs.components.volumeColor
+import com.nightcode.snout.shared.common.format.formatCompact
+import com.nightcode.snout.shared.common.format.formatPercent
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.logs.LogLevelCounts

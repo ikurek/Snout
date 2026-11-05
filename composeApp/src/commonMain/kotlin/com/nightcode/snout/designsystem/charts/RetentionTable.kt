@@ -21,11 +21,11 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
-import com.nightcode.snout.common.format.formatDecimals
 import com.nightcode.snout.designsystem.atoms.Hairline
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.shared.common.format.formatCompact
+import com.nightcode.snout.shared.common.format.formatDecimals
 
 private val LabelWidth = 52.dp
 private val SizeWidth = 44.dp

@@ -20,10 +20,10 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
-import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
+import com.nightcode.snout.shared.common.format.formatCompact
+import com.nightcode.snout.shared.common.format.formatPercent
 
 /** Series indices used for the first three steps: orange, blue, violet; later steps continue down the palette. */
 private val StepColorIndices = listOf(0, 1, 3)

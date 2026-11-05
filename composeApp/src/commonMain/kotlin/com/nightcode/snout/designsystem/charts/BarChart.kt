@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatCompact
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
+import com.nightcode.snout.shared.common.format.formatCompact
 import kotlin.math.abs
 import kotlin.math.min
 

@@ -9,37 +9,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
-import com.nightcode.snout.common.format.formatDecimals
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
-import kotlin.math.abs
-
-private const val FlatThresholdPercent = 0.05
-private const val Up = "↑"
-private const val Down = "↓"
-private const val Flat = "→"
+import com.nightcode.snout.shared.common.format.ChangeTone
+import com.nightcode.snout.shared.common.format.trendChange
 
 /**
- * Signed period-over-period change. The arrow is always drawn so colour is never the only signal;
- * [lowerIsBetter] flips which direction counts as good (bounce rate, errors).
+ * Signed period-over-period change, written as [trendChange] writes it for the widgets too. [lowerIsBetter] flips
+ * which direction counts as good (bounce rate, errors).
  */
 @Composable
 internal fun TrendChip(changePercent: Double, modifier: Modifier = Modifier, lowerIsBetter: Boolean = false) {
-    val flat = abs(changePercent) < FlatThresholdPercent
-    val improved = if (lowerIsBetter) changePercent < 0 else changePercent > 0
-    val (container, content) = when {
-        flat -> SnoutTheme.colors.surfaceContainerHigh to SnoutTheme.colors.onSurfaceVariant
-        improved -> SnoutTheme.extendedColors.successContainer to SnoutTheme.extendedColors.onSuccessContainer
-        else -> SnoutTheme.colors.errorContainer to SnoutTheme.colors.onErrorContainer
-    }
-    val arrow = when {
-        flat -> Flat
-        changePercent > 0 -> Up
-        else -> Down
+    val change = trendChange(changePercent, lowerIsBetter)
+    val (container, content) = when (change.tone) {
+        ChangeTone.Neutral -> SnoutTheme.colors.surfaceContainerHigh to SnoutTheme.colors.onSurfaceVariant
+        ChangeTone.Good -> SnoutTheme.extendedColors.successContainer to SnoutTheme.extendedColors.onSuccessContainer
+        ChangeTone.Bad -> SnoutTheme.colors.errorContainer to SnoutTheme.colors.onErrorContainer
     }
     Surface(modifier = modifier, shape = SnoutTheme.shapes.extraSmall, color = container, contentColor = content) {
         Text(
-            text = "$arrow ${abs(changePercent).formatDecimals(1)}%",
+            text = change.text,
             style = SnoutTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,

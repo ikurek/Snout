@@ -27,9 +27,6 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.format.formatChartLabel
-import com.nightcode.snout.common.format.formatCompact
-import com.nightcode.snout.common.format.formatDurationSeconds
-import com.nightcode.snout.common.format.formatPercent
 import com.nightcode.snout.designsystem.atoms.SkeletonBlock
 import com.nightcode.snout.designsystem.atoms.SkeletonGroup
 import com.nightcode.snout.designsystem.atoms.SkeletonLines
@@ -49,6 +46,8 @@ import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.analytics.components.label
 import com.nightcode.snout.features.analytics.components.labelIsCode
+import com.nightcode.snout.shared.common.format.format
+import com.nightcode.snout.shared.common.format.formatCompact
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsPart
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
@@ -57,7 +56,6 @@ import com.nightcode.snout.shared.domain.model.analytics.BreakdownTable
 import com.nightcode.snout.shared.domain.model.analytics.MetricTrend
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetric
 import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKey
-import com.nightcode.snout.shared.domain.model.analytics.OverviewMetricKind
 import com.nightcode.snout.shared.domain.model.analytics.TestAnalyticsSnapshot
 import com.nightcode.snout.shared.domain.model.analytics.TrendMetric
 import com.nightcode.snout.shared.domain.model.analytics.WebBreakdown
@@ -293,12 +291,6 @@ private fun EmptyNote() {
         style = SnoutTheme.typography.bodyMedium,
         color = SnoutTheme.colors.onSurfaceVariant,
     )
-}
-
-private fun OverviewMetricKind.format(value: Double): String = when (this) {
-    OverviewMetricKind.Count -> value.formatCompact()
-    OverviewMetricKind.DurationSeconds -> value.formatDurationSeconds()
-    OverviewMetricKind.Percentage -> value.formatPercent(isFraction = value <= 1.0)
 }
 
 @OptIn(TestData::class)
