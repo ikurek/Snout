@@ -29,7 +29,7 @@ private const val BreakdownColumn = "context.columns.breakdown_value"
 private const val VisitorsColumn = "context.columns.visitors"
 private const val ViewsColumn = "context.columns.views"
 private const val PreviousCompareLabel = "previous"
-private const val PercentFactor = 100.0
+internal const val PercentFactor = 100.0
 
 /** Values PostHog uses for "no value" and "everything else" buckets in breakdowns; neither belongs in a top list. */
 private val BreakdownSentinels = setOf("\$\$_posthog_breakdown_null_\$\$", "\$\$_posthog_breakdown_other_\$\$")
@@ -104,11 +104,11 @@ internal fun List<TrendResultDto>.sumSeries(): TimeSeries? {
 }
 
 /** The results of the series named [name]: PostHog puts the name on each result, older versions in its `action`. */
-private fun List<TrendResultDto>.named(name: String) = filter { (it.customName ?: it.action?.customName) == name }
+internal fun List<TrendResultDto>.named(name: String) = filter { (it.customName ?: it.action?.customName) == name }
 
-private fun List<TrendResultDto>.current() = filterNot { it.compareLabel == PreviousCompareLabel }
+internal fun List<TrendResultDto>.current() = filterNot { it.compareLabel == PreviousCompareLabel }
 
-private fun List<TrendResultDto>.previous() = filter { it.compareLabel == PreviousCompareLabel }
+internal fun List<TrendResultDto>.previous() = filter { it.compareLabel == PreviousCompareLabel }
 
 internal fun QueryResponseDto.toBreakdownTable(breakdown: WebBreakdown): BreakdownTable {
     val columns = columns.orEmpty()

@@ -1,6 +1,7 @@
 package com.nightcode.snout.shared.api.analytics
 
 import com.nightcode.snout.shared.api.QueryRequestDto
+import com.nightcode.snout.shared.api.analytics.model.ProjectSettingsDto
 import com.nightcode.snout.shared.api.analytics.model.QueryResponseDto
 import com.nightcode.snout.shared.api.networkCall
 import com.nightcode.snout.shared.api.postJson
@@ -8,6 +9,7 @@ import com.nightcode.snout.shared.api.projectUrl
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import org.koin.core.annotation.Single
 
 /** Series names used in trends requests and matched again in results. */
@@ -15,6 +17,7 @@ object TrendSeriesNames {
     const val Visitors = "visitors"
     const val Views = "views"
     const val Sessions = "sessions"
+    const val DailyActiveUsers = "dau"
     const val WeeklyActiveUsers = "wau"
     const val MonthlyActiveUsers = "mau"
 }
@@ -29,6 +32,8 @@ private val ActiveUserSeries = listOf(
     TrendSeriesSpec(TrendSeriesNames.WeeklyActiveUsers, "weekly_active"),
     TrendSeriesSpec(TrendSeriesNames.MonthlyActiveUsers, "monthly_active"),
 )
+
+private val DailyActiveUserSeries = TrendSeriesSpec(TrendSeriesNames.DailyActiveUsers, "dau")
 
 private val BreakdownSeries = listOf(TrendSeriesSpec(TrendSeriesNames.Visitors, "dau"))
 
@@ -47,6 +52,27 @@ class AnalyticsApi(private val client: HttpClient, private val authDataStore: Au
     /** Rolling weekly and monthly active users per day; the last point is the value "as of" the range end. */
     suspend fun getActiveUsers(projectId: Long, dateFrom: String) =
         runQuery(projectId, trendsQuery(dateFrom, interval = "day", series = ActiveUserSeries, compare = true))
+
+    /** Daily, weekly and monthly active users per day over the last week, with the week before. */
+    suspend fun getActiveUserCounts(projectId: Long) = runQuery(
+        projectId,
+        trendsQuery("-7d", interval = "day", series = listOf(DailyActiveUserSeries) + ActiveUserSeries, compare = true),
+    )
+
+    /** Every revenue source's MRR and revenue to date (see [RevenueTotalsQuery]). */
+    suspend fun getRevenueTotals(projectId: Long) = runQuery(projectId, RevenueTotalsQuery)
+
+    /** The app versions events carried over the last week, most used first. */
+    suspend fun getAppVersions(projectId: Long) = runQuery(projectId, AppVersionsQuery)
+
+    /** Exceptions over the range [dateFrom] names, and over the span before it. */
+    suspend fun getExceptionCounts(projectId: Long, dateFrom: String) =
+        runQuery(projectId, exceptionCountsQuery(dateFrom))
+
+    /** The project's settings; the currency its revenue is reported in. */
+    suspend fun getProjectSettings(projectId: Long) = networkCall<ProjectSettingsDto> {
+        client.get(authDataStore.projectUrl(projectId, "")).body()
+    }
 
     /** Unique visitors per value of an event property over the whole range. */
     suspend fun getPropertyBreakdown(projectId: Long, dateFrom: String, property: String, limit: Int) = runQuery(
