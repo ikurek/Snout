@@ -12,6 +12,17 @@
         }
       }
     },
+    "In ${project}, show ${metrics} for ${range}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In ${project}, show ${metrics} for ${range}"
+          }
+        }
+      }
+    },
     "In ${project}, show ${stat} for ${range}": {
       "extractionState": "manual",
       "localizations": {
@@ -129,6 +140,61 @@
           "stringUnit": {
             "state": "translated",
             "value": "Couldn't load from PostHog."
+          }
+        }
+      }
+    },
+    "widget_highlight_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't load"
+          }
+        }
+      }
+    },
+    "widget_highlight_not_set_up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not set up"
+          }
+        }
+      }
+    },
+    "widget_highlights_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A project's key numbers at a glance: web stats, active users, revenue and app health."
+          }
+        }
+      }
+    },
+    "widget_highlights_intent_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a project, a range and the metrics to show."
+          }
+        }
+      }
+    },
+    "widget_highlights_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project highlights"
           }
         }
       }
@@ -254,6 +320,17 @@
         }
       }
     },
+    "widget_metric_app_version": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest app version"
+          }
+        }
+      }
+    },
     "widget_metric_bounce_rate": {
       "extractionState": "manual",
       "localizations": {
@@ -261,6 +338,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bounce rate"
+          }
+        }
+      }
+    },
+    "widget_metric_dau": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily active users"
+          }
+        }
+      }
+    },
+    "widget_metric_exceptions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exceptions"
           }
         }
       }
@@ -276,6 +375,17 @@
         }
       }
     },
+    "widget_metric_mrr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MRR"
+          }
+        }
+      }
+    },
     "widget_metric_other": {
       "extractionState": "manual",
       "localizations": {
@@ -283,6 +393,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Other"
+          }
+        }
+      }
+    },
+    "widget_metric_revenue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revenue to date"
           }
         }
       }
@@ -349,6 +470,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choose the project to show."
+          }
+        }
+      }
+    },
+    "widget_parameter_metric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metric"
+          }
+        }
+      }
+    },
+    "widget_parameter_metrics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metrics"
           }
         }
       }
@@ -514,6 +657,138 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Snout to connect your PostHog."
+          }
+        }
+      }
+    },
+    "widget_tile_bounce_rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bounce rate"
+          }
+        }
+      }
+    },
+    "widget_tile_dau": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAU"
+          }
+        }
+      }
+    },
+    "widget_tile_duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duration"
+          }
+        }
+      }
+    },
+    "widget_tile_exceptions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exceptions"
+          }
+        }
+      }
+    },
+    "widget_tile_mau": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAU"
+          }
+        }
+      }
+    },
+    "widget_tile_mrr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MRR"
+          }
+        }
+      }
+    },
+    "widget_tile_revenue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revenue"
+          }
+        }
+      }
+    },
+    "widget_tile_sessions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessions"
+          }
+        }
+      }
+    },
+    "widget_tile_version": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        }
+      }
+    },
+    "widget_tile_views": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Views"
+          }
+        }
+      }
+    },
+    "widget_tile_visitors": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visitors"
+          }
+        }
+      }
+    },
+    "widget_tile_wau": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WAU"
           }
         }
       }

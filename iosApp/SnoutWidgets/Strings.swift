@@ -6,6 +6,10 @@ enum Strings {
     static var analyticsName: String { String(localized: "widget_analytics_name") }
     static var analyticsDescription: String { String(localized: "widget_analytics_description") }
     static var insightName: String { String(localized: "widget_insight_name") }
+    static var highlightsName: String { String(localized: "widget_highlights_name") }
+    static var highlightsDescription: String { String(localized: "widget_highlights_description") }
+    static var highlightNotSetUp: String { String(localized: "widget_highlight_not_set_up") }
+    static var highlightFailed: String { String(localized: "widget_highlight_failed") }
     static var insightDescription: String { String(localized: "widget_insight_description") }
 
     static var signedOut: String { String(localized: "widget_signed_out") }
@@ -50,6 +54,20 @@ enum Strings {
     static var metricWau: String { String(localized: "widget_metric_wau") }
     static var metricMau: String { String(localized: "widget_metric_mau") }
     static var metricOther: String { String(localized: "widget_metric_other") }
+
+    // A tile's name, short enough for a third of a medium widget.
+    static var tileVisitors: String { String(localized: "widget_tile_visitors") }
+    static var tileViews: String { String(localized: "widget_tile_views") }
+    static var tileSessions: String { String(localized: "widget_tile_sessions") }
+    static var tileSessionDuration: String { String(localized: "widget_tile_duration") }
+    static var tileBounceRate: String { String(localized: "widget_tile_bounce_rate") }
+    static var tileDailyActiveUsers: String { String(localized: "widget_tile_dau") }
+    static var tileWeeklyActiveUsers: String { String(localized: "widget_tile_wau") }
+    static var tileMonthlyActiveUsers: String { String(localized: "widget_tile_mau") }
+    static var tileMrr: String { String(localized: "widget_tile_mrr") }
+    static var tileRevenue: String { String(localized: "widget_tile_revenue") }
+    static var tileLatestAppVersion: String { String(localized: "widget_tile_version") }
+    static var tileExceptions: String { String(localized: "widget_tile_exceptions") }
 
     /// The sample widgets' names, for the widget gallery and previews.
     static var previewProject: String { String(localized: "widget_preview_project") }

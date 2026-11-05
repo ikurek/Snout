@@ -70,6 +70,34 @@ struct InsightDisplay {
     ) }
 }
 
+struct HighlightsDisplay {
+    let range: String
+    /// One per metric of the widget, in its order.
+    let tiles: [TileDisplay]
+    let link: URL?
+
+    static var placeholder: HighlightsDisplay { HighlightsDisplay(
+        range: Strings.range7d,
+        tiles: [
+            TileDisplay(label: Strings.tileDailyActiveUsers, value: "2,480", change: ChangeDisplay(text: "↑ 12.8%", tone: .good)),
+            TileDisplay(label: Strings.tileMonthlyActiveUsers, value: "41.2k", change: ChangeDisplay(text: "↑ 3.4%", tone: .good)),
+            TileDisplay(label: Strings.tileSessionDuration, value: "2m 23s", change: ChangeDisplay(text: "↓ 1.2%", tone: .bad)),
+            TileDisplay(label: Strings.tileExceptions, value: "206", change: ChangeDisplay(text: "↓ 10%", tone: .good)),
+            TileDisplay(label: Strings.tileMrr, value: "$12.4k", change: nil),
+            TileDisplay(label: Strings.tileLatestAppVersion, value: "3.3.0", change: nil),
+        ],
+        link: nil
+    ) }
+}
+
+/// A metric of a highlights widget: its value, or nothing and a [note] saying why.
+struct TileDisplay {
+    let label: String
+    let value: String?
+    let change: ChangeDisplay?
+    var note: String?
+}
+
 struct StatDisplay {
     let label: String
     let value: String
@@ -114,6 +142,23 @@ extension AnalyticsDisplay {
                 StatDisplay(label: stat.key.label, value: stat.value, change: stat.change.map(ChangeDisplay.init))
             },
             series: content.series.map(\.doubleValue),
+            link: content.link.flatMap { SnoutLink.url(carrying: $0) }
+        )
+    }
+}
+
+extension HighlightsDisplay {
+    init(_ content: HighlightsWidgetContent) {
+        self.init(
+            range: content.range.label,
+            tiles: content.tiles.map { tile in
+                TileDisplay(
+                    label: tile.metric.tileLabel,
+                    value: tile.value,
+                    change: tile.change.map(ChangeDisplay.init),
+                    note: tile.missing.map { $0 == .notsetup ? Strings.highlightNotSetUp : Strings.highlightFailed }
+                )
+            },
             link: content.link.flatMap { SnoutLink.url(carrying: $0) }
         )
     }
@@ -172,6 +217,26 @@ extension OverviewMetricKey {
         case .weeklyactiveusers: Strings.metricWau
         case .monthlyactiveusers: Strings.metricMau
         default: Strings.metricOther
+        }
+    }
+}
+
+extension HighlightMetric {
+    /// Its name on a tile: short ("DAU"), where the settings spell it out.
+    var tileLabel: String {
+        switch self {
+        case .visitors: Strings.tileVisitors
+        case .views: Strings.tileViews
+        case .sessions: Strings.tileSessions
+        case .sessionduration: Strings.tileSessionDuration
+        case .bouncerate: Strings.tileBounceRate
+        case .dailyactiveusers: Strings.tileDailyActiveUsers
+        case .weeklyactiveusers: Strings.tileWeeklyActiveUsers
+        case .monthlyactiveusers: Strings.tileMonthlyActiveUsers
+        case .mrr: Strings.tileMrr
+        case .revenue: Strings.tileRevenue
+        case .latestappversion: Strings.tileLatestAppVersion
+        default: Strings.tileExceptions
         }
     }
 }

@@ -13,5 +13,6 @@ struct SnoutWidgetsBundle: WidgetBundle {
     var body: some Widget {
         AnalyticsWidget()
         InsightWidget()
+        HighlightsWidget()
     }
 }
