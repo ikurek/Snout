@@ -6,10 +6,14 @@ for how to build, check and send a change.
 ## Project layout
 
 ```
-androidApp/   Android entry point (SnoutApplication, MainActivity, launcher icons) and screenshot tests
-iosApp/       iOS entry point (SwiftUI host), ShareExtension, SnoutLink (URL contract shared by both),
-              KotlinMultiplatformLinkedPackage (posthog-ios for the telemetry SDK, generated; see Telemetry)
+androidApp/   Android entry point (SnoutApplication, MainActivity, launcher icons), the Glance widgets
+              (appwidget/) and screenshot tests
+iosApp/       iOS entry point (SwiftUI host), ShareExtension, SnoutWidgets (WidgetKit extension), SnoutLink (URL
+              contract shared by all three), KotlinMultiplatformLinkedPackage (posthog-ios for the telemetry SDK,
+              generated; see Telemetry)
 composeApp/   Shared Compose UI: design system, features (route / screen / view model), navigation
+widgets/      What the home-screen widgets show (loaders and their states), without Compose; on iOS the
+              SnoutWidgetKit framework the widget extension links (see Widgets)
 shared/       Kotlin business logic, one module per layer and feature:
   api/<feature>            Ktor API + DTOs
   domain/model/<feature>   domain types
@@ -17,11 +21,15 @@ shared/       Kotlin business logic, one module per layer and feature:
   data/<feature>           repository implementations, mappers
   domain/usecase/<feature> use cases exposed to the UI
   storage/                 DataStore preferences, SQLDelight (organizations and projects) and the
-                           secure store (KSafe) for the API key and account
-  common/                  `@TestData` opt-in, test utilities
+                           secure store (KSafe) for the account, and the API key's store
+  common/                  `@TestData` opt-in, test utilities, number formatting (`format`) the screens and
+                           widgets share
   telemetry/               Snout's own usage and error reports: ErrorTracker, EventSink, TelemetrySwitch,
                            TrackNonFatal and fakes; free of SDKs, so any layer can report
   telemetry/sdk            PostHog (posthog-kmp) behind them; only `shared` sees it
+  core/                    CoreModule: every data and use case module, without the telemetry SDK
+  widgets/                 WidgetSharedModule: the iOS widget extension's composition root (CoreModule, no
+                           reporting)
 buildLogic/   Gradle convention plugins
 konsist/      Konsist architecture tests (JVM; reads the other modules' sources)
 scripts/      generate_screenshot_tests.py
@@ -36,8 +44,9 @@ Layers, with dependencies pointing inwards:
   mutations return the updated item where PostHog sends it back.
 - API responses are not stored anywhere: a screen fetches what it shows when it needs it and holds it only in its
   view model's state. Only user data is persisted: organizations and projects in SQLDelight
-  (`OrganizationRepository`), the API key and account in the secure store, and the instance URL, selected
-  project and preferences in DataStore.
+  (`OrganizationRepository`), the API key and account in secure storage, and the instance URL, selected
+  project and preferences in DataStore. Widgets follow the same rule: each refresh loads what the widget shows
+  again, and a refresh that fails shows its error rather than anything loaded before (see Widgets).
 - Repositories with mutations expose `changes: Flow<Unit>` (a `ChangeSignal` in `data/common`), which emits after
   each successful mutation and carries no data. Lists reload through `ObserveProjectReloads`, or for a feature with
   mutations its `Observe<Feature>Reloads` (`observeProjectReloads(repository.changes)`): they emit a `ProjectReload`
@@ -55,9 +64,25 @@ Layers, with dependencies pointing inwards:
   transfers) and in the Android Keystore on Android, with no decrypted copy cached in memory
   (`KSafeMemoryPolicy.ENCRYPTED`); a value that no longer decrypts reads as missing. The library is wrapped behind
   `SecureStore` so the rest of the app depends on a three-method interface it can fake (`InMemorySecureStore`),
-  and swapping or upgrading the library stays inside this module. It holds the personal API key (`AuthDataStore`)
-  and the signed-in account (`UserRepositoryImpl`, so Settings shows it at once). The instance URL, selected
-  project and preferences stay in DataStore. Logging out removes the key, the account, the organizations and projects
+  and swapping or upgrading the library stays inside this module. It holds the signed-in account
+  (`UserRepositoryImpl`, so Settings shows it at once). The instance URL, selected project and preferences stay in
+  DataStore.
+- The personal API key has its own store, `PersonalApiKeyStore` (faked by `InMemoryPersonalApiKeyStore`), which
+  `AuthDataStore` uses. It is separate because the iOS widget extension needs the key too, and KSafe can't be
+  shared between processes: it reads its file once and serves it from memory, and writes the file when it starts,
+  so a second process would see stale values and could overwrite the app's. Each platform keeps the key where its
+  widgets can reach it:
+  - Android: in KSafe with everything else (`SecureStorePersonalApiKeyStore`). Glance widgets run in the app's
+    process and graph, so nothing has to be shared. Moving the key to hand-written Keystore code would add our own
+    encryption and a migration for every user, for no gain.
+  - iOS: one Keychain item in an access group the app and the widget extension share (`SharedKeychain`), so both
+    use the same key, and signing out or in reaches widgets on their next load. The app's
+    `KeychainPersonalApiKeyStore` reads and writes it; the extension's `WidgetPersonalApiKeyStore` reads it fresh
+    each time and never writes it. Versions before widgets kept the key in KSafe: the first read moves it to the
+    Keychain. iOS keeps Keychain items after the app is deleted, but deletes the preferences with the instance URL:
+    `AuthDataStore` drops a key it finds without its instance, so a reinstall starts signed out (`PRIVACY.md` says
+    so); signing in saves the instance first. Both targets must have the access group (`SharedWithWidgets`).
+- Logging out removes the key, the account, the organizations and projects
   and the selected project (`Logout`, through `ClearLocalData`); a 401 removes the key, and `ClearLocalData` the rest.
 - HTTP responses are not cached by the platform: on iOS the Darwin engine's URLSession has no `URLCache`, and
   `startSnout()` empties the shared one; OkHttp on Android has no cache configured.
@@ -80,8 +105,10 @@ DI (Koin annotations with the Koin compiler plugin):
 - Definitions are annotated on the classes themselves (`@Single`, `@Single(binds = [...])` for repository
   implementations, `@KoinViewModel`). Each module is a `@Module @ComponentScan` class, e.g.
   `FeatureFlagsDataModule`.
-- `shared/src/commonMain/.../di/SharedModule.kt` is the shared composition root: it includes every data and use
-  case module. `composeApp`'s `AppModule` includes it and scans the view models.
+- `shared/src/commonMain/.../di/SharedModule.kt` is the shared composition root: `CoreModule` (`shared/core`, every
+  data and use case module) plus the telemetry SDK. `composeApp`'s `AppModule` includes it and the widget loaders
+  (`WidgetsModule`), and scans the view models. The iOS widget extension builds its own graph on `CoreModule` (see
+  Widgets).
 - `composeApp/.../Snout.kt` starts Koin once, before any UI, and then applies the telemetry settings (see
   Telemetry): `SnoutApplication` on Android, `startSnout()` from `iOSApp.init` on iOS.
 - Before any UI the platform also reads `Startup` with `loadStartup()` (`composeApp/.../Startup.kt`): the first
@@ -172,6 +199,79 @@ On iOS, `posthog-kmp` brings `posthog-ios` through Kotlin's SwiftPM import: the 
 version, regenerate it with `XCODEPROJ_PATH=iosApp/iosApp.xcodeproj ./gradlew :composeApp:integrateLinkagePackage`,
 move the package from `composeApp/iosApp/` to `iosApp/`, and restore the project file: the task rewrites it, while the
 four entries the package needs are already there.
+
+## Widgets
+
+Home-screen widgets show one analytics stat over a range (wide widgets add the other stats) and one saved insight
+(its latest number and line, its top breakdowns, or its funnel conversion). The analytics widget is called
+"Analytics", like the tab, not "Web analytics": PostHog's web analytics queries count `$screen` as well as `$pageview`
+(`shared/api/analytics/Queries.kt`), so it works for mobile apps too.
+
+Each widget has its own project, picked in its settings and independent of the app's selected project. A new widget
+starts on none, so the person picks it rather than inheriting whatever the app shows. Both platforms ask the same
+things in the same order (analytics: project, stat, range; insight: project, then insight) with the same defaults
+(Visitors, last 7 days). Every widget heads itself with its project's name, kept with its settings as it was when
+picked (Android's Glance state, iOS's `ProjectEntity`), so widgets of different projects can be told apart. Both
+lay a stat or insight out the same way: the header (title, caption and a refresh button; on iOS `RefreshWidgetIntent`,
+which WidgetKit answers by reloading that widget), the number and its change (on wide widgets with the next stats
+beside it), and its line as a chart filling the rest of the widget edge to edge (ending on a dot at the right edge), with
+when it last loaded on the
+chart's faded fill (`WidgetChart` and `sparkline` on Android, `WidgetChartLayout` and `Sparkline` on iOS, which turns
+the system's content margins off for it). Without a line, the other stats and the footer take its place, as the
+height allows.
+
+Compose Multiplatform can't draw widgets on either platform, so the UI is native and everything below it is shared:
+
+- `widgets/` holds the loaders (`AnalyticsWidgetLoader`, `InsightWidgetLoader`, and `WidgetProjects` for the
+  settings' project list): they call the use cases, as a view model would, naming the widget's project (the
+  project-scoped use cases take an optional `projectId`, the selected project's otherwise), and return a
+  `WidgetState` (signed out per `IsSignedIn`, failed with a `DataError`, or loaded) with the values already formatted (`shared/common/format`, the same
+  functions the screens use). Tapping a loaded widget opens its PostHog link (`GetPostHogUrl`), which the app
+  resolves to its own screen, switching to the widget's project. The insight picker on both platforms offers only insights a widget can show
+  (`InsightSummary.fitsWidget`).
+- Nothing is cached for widgets: every refresh loads again, and a failed refresh shows its error (a tap tries again
+  when that can help, or opens the app). The platforms refresh every 30 minutes as far as their budgets allow, on
+  the widget's refresh button, and at once when the key changes (signing in or out): `observeWidgetChanges` (`Snout.kt`,
+  on `ObserveWidgetChanges`) reloads them, through `reloadAll` on Android (`startWidgets`, which also hands the
+  picker its previews) and WidgetKit's `reloadAllTimelines` on iOS. Without it, a widget would go on showing the
+  account that signed out, or asking to sign in, until its next refresh.
+- Android: Glance widgets in `androidApp/.../appwidget`, in the app's process and graph, drawn for their exact size
+  (`SizeMode.Exact`; the sparkline bitmap is drawn at the size it is shown). Each widget kind has a `WidgetResults`
+  (`AnalyticsResults`, `InsightResults`, in `WidgetReloads.kt`) holding how it reads its settings and the `widgets`
+  loader it loads with. `provide` loads before the session draws, which Glance doesn't time, so the launcher keeps
+  the previous drawing (or Glance's loading layout for a new widget) instead of an empty frame; `reload` (refresh
+  button, saved settings, sign-in or out) shows a spinner on what is drawn, loads in `WidgetScope`, outside the
+  session, then redraws. Glance cancels a session 45 seconds after its first drawing (a tap adds 5) and an insight
+  can take PostHog up to 90, so a load running in it could be cut short with the spinner still drawn; nor can a
+  session be closed to load again before its first drawing. That is all the store is for: it holds each widget's
+  last load in memory only, like a view model's state, and drops it when the widget is removed. A second refresh
+  cancels the first. Each widget has a configuration activity (`WidgetConfigurationActivity`)
+  showing a Compose screen from `composeApp/.../features/widgets` (`AnalyticsWidgetSettings`,
+  `InsightWidgetPicker`), each setting a dropdown that opens a menu under it (`WidgetDropdownRow`,
+  `WidgetProjectRow`); the picked project, stat and range, or the project and the insight's id and name, are the
+  widgets' only Glance state. A widget placed before it had a project shows "tap to
+  set up" until it gets one. Home screen only (`not_keyguard`). Colours copy the Ember tokens (`WidgetColors`, and
+  `widget_colors.xml` for the frame before Android 12), since Glance can't use the Compose theme. There is no XML
+  layout: the widget picker's previews are the widgets' own UI with sample numbers (`providePreview`,
+  `WidgetPreviews.kt`), handed to Android at start (Android 15 and later; earlier pickers show the app's icon). The
+  refresh icon is a vector drawable, since RemoteViews take images by resource, not as `ImageVector`s.
+- iOS: the `SnoutWidgets` extension is SwiftUI, with App Intents to pick the project (`ProjectEntity`) and then the
+  stat and range or the insight (whose list depends on the picked project). Its text is in `Localizable.xcstrings`,
+  under keys named as Android's `widget_*` strings, read through `Strings`; App Intents read their titles at build
+  time, so they name their keys in place, and their summaries use the English text as the key. It links `SnoutWidgetKit`
+  (`:widgets`' framework; no Compose, no PostHog SDK) and runs its own graph (`SnoutWidgets.start`:
+  `WidgetSharedModule` and `WidgetsModule`). It reads what the app shares and never writes it (the project list it fetches for the settings goes into its own
+  database, not the app's), and reads it again before every load, since WidgetKit keeps the extension's process
+  for several refreshes while the app may sign out or in:
+  - The DataStore preferences live in the App Group container (`group.com.nightcode.snout`; the app moves them
+    there from Documents once). The extension doesn't open a DataStore on them (one reads its file once and serves it
+    from memory): `AppPreferencesReader` reads the file on every collection.
+  - The personal API key is the shared Keychain item (see `PersonalApiKeyStore` above), read again before every load
+    (`WidgetSession` makes `AuthDataStore` drop the key it holds in memory). Nothing else in the secure store is
+    shared: the extension's `SecureStore` (`WidgetSecureStore`) is empty, and it never opens the app's KSafe file.
+  - The groups are in both targets' entitlements, and each target's Info.plist resolves the Keychain group's team
+    prefix (`SnoutKeychainAccessGroup`). Values are `privacySensitive`, so they hide on a locked device when the person
+  doesn't allow widgets there.
 
 ## Design system
 
