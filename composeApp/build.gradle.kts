@@ -30,6 +30,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(projects.shared.common.format)
+            implementation(projects.widgets)
             implementation(libs.aboutlibraries.core)
             // Compose
             implementation(libs.compose.runtime)

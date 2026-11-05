@@ -80,10 +80,13 @@ internal fun <T> FilterMenuChip(
     }
 }
 
-/** The menu's single group of checkable options; split out so previews can show it without a popup. */
+/**
+ * The menu's single group of checkable options, for a [DropdownMenuPopup]; split out so previews can show it without
+ * a popup, and so other dropdowns (a widget's settings) share the chip's menu.
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun <T> FilterMenuOptions(options: List<MenuOption<T>>, selected: T, onSelect: (T) -> Unit) {
+internal fun <T> FilterMenuOptions(options: List<MenuOption<T>>, selected: T?, onSelect: (T) -> Unit) {
     // Material's menus mark the checked item with tertiary, which is Ember's info blue; Snout selects with secondary.
     val colors = MenuDefaults.selectableItemColors(
         selectedContainerColor = SnoutTheme.colors.secondaryContainer,

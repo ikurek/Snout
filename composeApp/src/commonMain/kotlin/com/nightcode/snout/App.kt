@@ -23,17 +23,7 @@ import org.koin.compose.koinInject
  */
 @Composable
 fun App(startup: Startup) {
-    val observeThemeMode = koinInject<ObserveThemeMode>()
-    val themeModes = remember(observeThemeMode) { observeThemeMode() }
-    val themeMode by themeModes.collectAsStateWithLifecycle(startup.themeMode)
-    val darkTheme = when (themeMode) {
-        ThemeMode.System -> isSystemInDarkTheme()
-        ThemeMode.Light -> false
-        ThemeMode.Dark -> true
-    }
-    PlatformThemeEffects(themeMode = themeMode, darkTheme = darkTheme)
-
-    SnoutTheme(darkTheme = darkTheme) {
+    AppTheme(initialThemeMode = startup.themeMode) {
         // Paint the theme background edge to edge: screens that pad themselves away from the system bars
         // (login, project selection) would otherwise show the host's default white on iOS.
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -45,4 +35,19 @@ fun App(startup: Startup) {
             }
         }
     }
+}
+
+/** The theme the person chose in settings, starting from [initialThemeMode] and following later changes. */
+@Composable
+internal fun AppTheme(initialThemeMode: ThemeMode, content: @Composable () -> Unit) {
+    val observeThemeMode = koinInject<ObserveThemeMode>()
+    val themeModes = remember(observeThemeMode) { observeThemeMode() }
+    val themeMode by themeModes.collectAsStateWithLifecycle(initialThemeMode)
+    val darkTheme = when (themeMode) {
+        ThemeMode.System -> isSystemInDarkTheme()
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+    }
+    PlatformThemeEffects(themeMode = themeMode, darkTheme = darkTheme)
+    SnoutTheme(darkTheme = darkTheme, content = content)
 }
