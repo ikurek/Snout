@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every 30 minutes, the shortest period Android allows; the app also reloads it when the account
+     changes. The picker opens when the widget is added and from the launcher's "Reconfigure". -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.nightcode.snout.appwidget.InsightWidgetConfigurationActivity"
+    android:description="@string/widget_insight_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="40dp"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen|not_keyguard"
+    android:widgetFeatures="reconfigurable" />

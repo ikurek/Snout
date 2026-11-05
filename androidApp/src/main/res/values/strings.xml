@@ -1,3 +1,40 @@
 <resources>
     <string name="app_name">Snout</string>
+
+    <!-- Home-screen widgets -->
+    <string name="widget_analytics_name">Analytics</string>
+    <string name="widget_analytics_description">A stat of your choice from a project\'s analytics, websites and apps alike, with its trend and the change since the previous period</string>
+    <string name="widget_preview_project">Website</string>
+    <string name="widget_insight_name">Insight</string>
+    <string name="widget_insight_description">The latest number of a saved insight, its top breakdowns or its funnel conversion</string>
+    <string name="widget_insight_preview_name">Daily active users</string>
+    <string name="widget_range_today">Today</string>
+    <string name="widget_range_7d">Last 7 days</string>
+    <string name="widget_range_30d">Last 30 days</string>
+    <string name="widget_range_90d">Last 90 days</string>
+    <string name="widget_metric_visitors">Visitors</string>
+    <string name="widget_metric_views">Page views</string>
+    <string name="widget_metric_sessions">Sessions</string>
+    <string name="widget_metric_session_duration">Session duration</string>
+    <string name="widget_metric_bounce_rate">Bounce rate</string>
+    <string name="widget_metric_wau">Weekly active users</string>
+    <string name="widget_metric_mau">Monthly active users</string>
+    <string name="widget_metric_other">Other</string>
+    <string name="widget_signed_out">Open Snout to connect your PostHog.</string>
+    <string name="widget_insight_not_chosen">Tap to choose the project and insight to show.</string>
+    <string name="widget_analytics_not_set_up">Tap to choose the project and stat to show.</string>
+    <string name="widget_insight_unsupported">This result doesn\'t fit a widget. Tap to open it in Snout.</string>
+    <string name="widget_error_unauthorized">PostHog rejected the key. Open Snout to connect again.</string>
+    <string name="widget_error_forbidden">The key can\'t read this. Check its scopes in Snout.</string>
+    <string name="widget_error_payment_required">This needs a paid PostHog plan.</string>
+    <string name="widget_error_not_found">Not found. It may have been deleted.</string>
+    <string name="widget_error_rate_limited">PostHog is limiting requests from this key.</string>
+    <string name="widget_error_offline">You\'re offline.</string>
+    <string name="widget_error_unexpected">Couldn\'t load from PostHog.</string>
+    <string name="widget_retry">Tap to try again</string>
+    <string name="widget_open_app">Tap to open Snout</string>
+    <string name="widget_refresh">Refresh</string>
+    <string name="widget_updated">Updated %1$s</string>
+    <!-- Two parts of a widget's title or caption, such as the project and the range. -->
+    <string name="widget_title_with_range">%1$s · %2$s</string>
 </resources>

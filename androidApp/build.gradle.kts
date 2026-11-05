@@ -81,7 +81,10 @@ tasks.withType<Test>().matching { it.name.endsWith("ScreenshotTest") }.configure
 
 dependencies {
     implementation(projects.composeApp)
+    implementation(projects.widgets)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.koin.core)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)

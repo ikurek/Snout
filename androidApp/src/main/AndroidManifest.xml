@@ -58,6 +58,53 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <!-- Home-screen widgets (Glance). Data from the person's PostHog shows on the home screen only, never the lock screen. -->
+        <receiver
+            android:name=".appwidget.AnalyticsWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_analytics_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/analytics_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".appwidget.InsightWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_insight_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/insight_widget_info" />
+        </receiver>
+        <!-- The launcher opens these to set a widget up, so they have to be exported. -->
+        <activity
+            android:name=".appwidget.AnalyticsWidgetConfigurationActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Snout">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".appwidget.InsightWidgetConfigurationActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Snout">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

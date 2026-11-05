@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widgets' background before Android 12, which can't round a Glance frame (widget_background.xml); keep it in
+     step with WidgetColors.background. -->
+<resources>
+    <color name="widget_background">#FF15120E</color>
+</resources>
