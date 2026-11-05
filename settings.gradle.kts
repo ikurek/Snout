@@ -34,6 +34,7 @@ include(":androidApp")
 include(":composeApp")
 include(":shared")
 include(":konsist")
+include(":widgets")
 
 // API
 include(":shared:api")
@@ -129,3 +130,4 @@ include(":shared:telemetry:sdk")
 
 // Composition roots below :shared (the app's): everything but the telemetry SDK, and the widget extension's
 include(":shared:core")
+include(":shared:widgets")
