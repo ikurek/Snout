@@ -203,14 +203,22 @@ four entries the package needs are already there.
 ## Widgets
 
 Home-screen widgets show one analytics stat over a range (wide widgets add the other stats) and one saved insight
-(its latest number and line, its top breakdowns, or its funnel conversion). The analytics widget is called
+(its latest number and line, its top breakdowns, or its funnel conversion), and a project's highlights: up to six
+metrics picked per widget from four sources, each queried only when a metric needs it (`LoadProjectHighlights`):
+PostHog's web overview, active users (one trends query; daily users are the last whole day's, since today's isn't over),
+revenue analytics (MRR and revenue to date from `persons_revenue_analytics`, which totals every revenue source, in the
+project's `base_currency`; "Not set up" without any) and app health (the newest `$app_version` of the last week by its
+numbers, and `$exception` events over the range, both HogQL). A source that fails marks its tiles, not the widget, which
+shows the error only when they all did. The analytics widget is called
 "Analytics", like the tab, not "Web analytics": PostHog's web analytics queries count `$screen` as well as `$pageview`
 (`shared/api/analytics/Queries.kt`), so it works for mobile apps too.
 
 Each widget has its own project, picked in its settings and independent of the app's selected project. A new widget
 starts on none, so the person picks it rather than inheriting whatever the app shows. Both platforms ask the same
-things in the same order (analytics: project, stat, range; insight: project, then insight) with the same defaults
-(Visitors, last 7 days). Every widget heads itself with its project's name, kept with its settings as it was when
+things in the same order (analytics: project, stat, range; insight: project, then insight; highlights: project, range,
+metrics) with the same defaults (Visitors, last 7 days; daily and monthly users, session duration and exceptions). The
+highlights widget draws a grid of tiles (name, value, change), two or three to a row and as many rows as fit; its
+metrics keep the settings' order (`HighlightMetric`), which iOS's multi-value parameter caps per size. Every widget heads itself with its project's name, kept with its settings as it was when
 picked (Android's Glance state, iOS's `ProjectEntity`), so widgets of different projects can be told apart. Both
 lay a stat or insight out the same way: the header (title, caption and a refresh button; on iOS `RefreshWidgetIntent`,
 which WidgetKit answers by reloading that widget), the number and its change (on wide widgets with the next stats
@@ -222,7 +230,7 @@ height allows.
 
 Compose Multiplatform can't draw widgets on either platform, so the UI is native and everything below it is shared:
 
-- `widgets/` holds the loaders (`AnalyticsWidgetLoader`, `InsightWidgetLoader`, and `WidgetProjects` for the
+- `widgets/` holds the loaders (`AnalyticsWidgetLoader`, `InsightWidgetLoader`, `HighlightsWidgetLoader`, and `WidgetProjects` for the
   settings' project list): they call the use cases, as a view model would, naming the widget's project (the
   project-scoped use cases take an optional `projectId`, the selected project's otherwise), and return a
   `WidgetState` (signed out per `IsSignedIn`, failed with a `DataError`, or loaded) with the values already formatted (`shared/common/format`, the same

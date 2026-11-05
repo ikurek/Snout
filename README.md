@@ -57,7 +57,8 @@ be switched off in Settings → Privacy (see the [privacy policy](PRIVACY.md)).
   every bundled library with its version, author and license, and opens each for its full license text and website.
   A Privacy screen switches usage and error reports off and links the privacy policy.
 - **Widgets**: an analytics stat (from websites and apps alike) with its trend and the change since the previous period (wide widgets add the
-  other stats), and a saved insight's latest number and line, top breakdowns or funnel conversion, each for a project
+  other stats), a saved insight's latest number and line, top breakdowns or funnel conversion, and a project's
+  highlights (up to six of its web stats, active users, MRR and revenue, latest app version and exceptions), each for a project
   picked per widget and named on it, on the Android home screen and the iOS Home and Lock Screens. They refresh about every 30
   minutes or on their refresh button and show an error when a refresh fails; tap one to open it in Snout.
 - Every screen that loads from PostHog has loading, empty, error, permission-denied and rate-limited states, pull to
