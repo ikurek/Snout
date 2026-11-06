@@ -23,6 +23,7 @@ kotlin {
         api(projects.shared.domain.model.logs)
         api(projects.shared.domain.model.user)
         api(projects.shared.domain.model.organization)
+        api(projects.shared.domain.model.persons)
         api(projects.shared.domain.model.telemetry)
         api(projects.shared.domain.usecase.analytics)
         api(projects.shared.domain.usecase.experiments)
@@ -36,6 +37,7 @@ kotlin {
         api(projects.shared.domain.usecase.logs)
         api(projects.shared.domain.usecase.user)
         api(projects.shared.domain.usecase.organization)
+        api(projects.shared.domain.usecase.persons)
         api(projects.shared.domain.usecase.appstate)
         api(projects.shared.domain.usecase.telemetry)
         // Every data and use case module, through CoreModule; implementation, so the UI never sees the data layer.

@@ -26,6 +26,7 @@ kotlin {
         api(projects.shared.domain.model.logs)
         api(projects.shared.domain.model.user)
         api(projects.shared.domain.model.organization)
+        api(projects.shared.domain.model.persons)
         api(projects.shared.domain.model.telemetry)
         api(projects.shared.domain.usecase.analytics)
         api(projects.shared.domain.usecase.experiments)
@@ -39,6 +40,7 @@ kotlin {
         api(projects.shared.domain.usecase.logs)
         api(projects.shared.domain.usecase.user)
         api(projects.shared.domain.usecase.organization)
+        api(projects.shared.domain.usecase.persons)
         api(projects.shared.domain.usecase.appstate)
         api(projects.shared.domain.usecase.telemetry)
         api(projects.shared.data.activitylog)
@@ -54,6 +56,7 @@ kotlin {
         api(projects.shared.data.links)
         api(projects.shared.data.logs)
         api(projects.shared.data.organization)
+        api(projects.shared.data.persons)
         api(projects.shared.data.telemetry)
         api(projects.shared.data.user)
         api(projects.shared.api.activitylog)
@@ -65,6 +68,7 @@ kotlin {
         api(projects.shared.api.insights)
         api(projects.shared.api.logs)
         api(projects.shared.api.organizations)
+        api(projects.shared.api.persons)
         api(projects.shared.api.users)
     }
 }

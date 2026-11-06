@@ -13,6 +13,7 @@ import com.nightcode.snout.shared.data.insights.InsightsDataModule
 import com.nightcode.snout.shared.data.links.LinksDataModule
 import com.nightcode.snout.shared.data.logs.LogsDataModule
 import com.nightcode.snout.shared.data.organization.OrganizationDataModule
+import com.nightcode.snout.shared.data.persons.PersonsDataModule
 import com.nightcode.snout.shared.data.telemetry.TelemetryDataModule
 import com.nightcode.snout.shared.data.user.UserDataModule
 import com.nightcode.snout.shared.domain.usecase.activitylog.ActivityLogUseCaseModule
@@ -27,6 +28,7 @@ import com.nightcode.snout.shared.domain.usecase.insights.InsightsUseCaseModule
 import com.nightcode.snout.shared.domain.usecase.links.LinksUseCaseModule
 import com.nightcode.snout.shared.domain.usecase.logs.LogsUseCaseModule
 import com.nightcode.snout.shared.domain.usecase.organization.OrganizationUseCaseModule
+import com.nightcode.snout.shared.domain.usecase.persons.PersonsUseCaseModule
 import com.nightcode.snout.shared.domain.usecase.telemetry.TelemetryUseCaseModule
 import com.nightcode.snout.shared.domain.usecase.user.UserUseCaseModule
 import org.koin.core.annotation.Module
@@ -52,6 +54,7 @@ import org.koin.core.annotation.Module
         LinksDataModule::class,
         LogsDataModule::class,
         OrganizationDataModule::class,
+        PersonsDataModule::class,
         TelemetryDataModule::class,
         UserDataModule::class,
         ActivityLogUseCaseModule::class,
@@ -66,6 +69,7 @@ import org.koin.core.annotation.Module
         LinksUseCaseModule::class,
         LogsUseCaseModule::class,
         OrganizationUseCaseModule::class,
+        PersonsUseCaseModule::class,
         TelemetryUseCaseModule::class,
         UserUseCaseModule::class,
     ],
