@@ -2,6 +2,7 @@ package com.nightcode.snout.shared.data.errortracking
 
 import com.nightcode.snout.shared.api.errortracking.ErrorTrackingApi
 import com.nightcode.snout.shared.data.testutils.FakePostHog
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.data.testutils.emitsDuring
 import com.nightcode.snout.shared.data.testutils.jsonBody
 import com.nightcode.snout.shared.data.testutils.respondError
@@ -24,7 +25,7 @@ private fun issuesJson(vararg ids: String) = ids.joinToString(",", """{"results"
 class ErrorTrackingRepositoryImplTest :
     ShouldSpec({
         val postHog = FakePostHog()
-        val repository = ErrorTrackingRepositoryImpl(ErrorTrackingApi(postHog.client, postHog.authDataStore))
+        val repository = ErrorTrackingRepositoryImpl(ErrorTrackingApi(postHog.client, postHog.authDataStore, TestJson))
         postHog.onRequest { request ->
             when (request.method) {
                 HttpMethod.Post -> when (request.jsonBody().getValue("status").jsonPrimitive.content) {

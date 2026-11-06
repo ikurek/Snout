@@ -10,6 +10,7 @@ import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesResponseDto
+import com.nightcode.snout.shared.api.errortracking.model.ExceptionDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLQueryDto
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
 import com.nightcode.snout.shared.api.errortracking.model.UpdateErrorTrackingIssueRequestDto
@@ -23,6 +24,11 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.decodeURLPart
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import org.koin.core.annotation.Single
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -76,7 +82,11 @@ private val OccurrenceWindow = 1.seconds
  * Requires the `error_tracking:read` scope.
  */
 @Single
-class ErrorTrackingApi(private val client: HttpClient, private val authDataStore: AuthDataStore) {
+class ErrorTrackingApi(
+    private val client: HttpClient,
+    private val authDataStore: AuthDataStore,
+    private val json: Json,
+) {
 
     /**
      * [status] is one of active, resolved, suppressed, archived, pending_release or all. [appVersion] keeps only
@@ -154,7 +164,7 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
     suspend fun getOccurrences(projectId: Long, issueId: String) =
         hogQl(projectId, OccurrencesQuery, mapOf("issueId" to issueId))
 
-    /** One row holding the occurrence's `${'$'}exception_list`, or no rows when the event is gone. */
+    /** The occurrence's `${'$'}exception_list`; null when the event is gone. */
     suspend fun getOccurrenceExceptions(projectId: Long, eventId: String, timestamp: Instant) = hogQl(
         projectId,
         OccurrenceExceptionsQuery,
@@ -163,7 +173,7 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
             "from" to (timestamp - OccurrenceWindow).toString(),
             "to" to (timestamp + OccurrenceWindow).toString(),
         ),
-    )
+    ).map { response -> response.results.firstOrNull()?.firstOrNull()?.let(::decodeExceptionList) }
 
     /**
      * Assigns the issue to the organization member with user id [userId], or unassigns it when null. Requires the
@@ -175,6 +185,12 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
             AssignErrorTrackingIssueRequestDto(assignee = userId?.let { ErrorTrackingAssigneeRequestDto(it, "user") }),
         )
         Unit
+    }
+
+    /** HogQL hands the property back as the JSON text it was stored as; an array is taken as it is. */
+    private fun decodeExceptionList(cell: JsonElement): List<ExceptionDto> = when (cell) {
+        is JsonPrimitive -> cell.contentOrNull?.let { json.decodeFromString<List<ExceptionDto>>(it) }.orEmpty()
+        else -> json.decodeFromJsonElement<List<ExceptionDto>>(cell)
     }
 
     /** [values] fill the query's `{placeholders}`, so nothing from outside is pasted into the HogQL itself. */

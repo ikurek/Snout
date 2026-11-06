@@ -2,13 +2,16 @@ package com.nightcode.snout.shared.api.errortracking
 
 import com.nightcode.snout.shared.data.testutils.FakePostHog
 import com.nightcode.snout.shared.data.testutils.TestInstanceUrl
+import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.data.testutils.jsonBody
 import com.nightcode.snout.shared.data.testutils.parseJson
 import com.nightcode.snout.shared.data.testutils.respondJson
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.http.HttpMethod
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Instant
@@ -19,7 +22,7 @@ private const val ProjectId = 1L
 class ErrorTrackingApiTest :
     ShouldSpec({
         val postHog = FakePostHog()
-        val api = ErrorTrackingApi(postHog.client, postHog.authDataStore)
+        val api = ErrorTrackingApi(postHog.client, postHog.authDataStore, TestJson)
         postHog.onRequest { respondJson("""{"id":"issue-1","results":[]}""") }
 
         suspend fun shouldHaveSent(method: HttpMethod, path: String, body: String) {
@@ -137,7 +140,7 @@ class ErrorTrackingApiTest :
                 """{"query":{"kind":"HogQLQuery","query":"$hogQl"}}""",
             )
         }
-    
+
         should("query an issue's occurrences with the issue id as a placeholder value") {
             api.getOccurrences(ProjectId, issueId = "issue-1")
 
@@ -159,6 +162,21 @@ class ErrorTrackingApiTest :
             query.getValue("values") shouldBe parseJson(
                 """{"eventId":"event-1","from":"2026-11-06T10:23:57.815Z","to":"2026-11-06T10:23:59.815Z"}""",
             )
+        }
+
+        should("decode the exception list HogQL sends back as JSON text") {
+            val list = """[{"type":"TypeError","stacktrace":{"frames":[{"resolved_name":"f","in_app":true}]}}]"""
+            postHog.onRequest { respondJson("""{"results":[[${JsonPrimitive(list)}]]}""") }
+
+            val exceptions = api.getOccurrenceExceptions(ProjectId, "event-1", Instant.parse("2026-11-06T10:00:00Z"))
+
+            exceptions.shouldBeRight()?.single()?.stacktrace?.frames?.single()?.resolvedName shouldBe "f"
+        }
+
+        should("answer null when the occurrence is gone") {
+            postHog.onRequest { respondJson("""{"results":[]}""") }
+
+            api.getOccurrenceExceptions(ProjectId, "event-1", Instant.parse("2026-11-06T10:00:00Z")) shouldBeRight null
         }
 
         should("assign an issue to a user") {
