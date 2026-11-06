@@ -43,7 +43,10 @@ be switched off in Settings → Privacy (see the [privacy policy](PRIVACY.md)).
   a key without the write scope gets a clear explanation instead of a failure.
 - **Errors**: error tracking issues with search, an active / resolved / suppressed filter and an app version filter
   (versions that reported exceptions this week), each with its occurrences, users and a 7-day sparkline; open one
-  for its impact chart, where it happened and the latest release, and resolve, suppress or reopen it with undo.
+  for its impact chart, the latest release and the latest occurrence: its exceptions with their stack traces (app
+  frames highlighted, library frames folded away, the source lines around a frame when PostHog has resolved them)
+  and where it happened (OS, app version, browser, URL or screen, person). Switch between its recent occurrences,
+  resolve, suppress or reopen it, and assign it to a member of the organization, each change with undo.
   Instances without the error tracking API get an "unavailable" state.
 - **Logs**: services sending OpenTelemetry logs to PostHog with their volume, error rate and a sparkline for the
   last hour, day or week; open one for its latest lines with search, a level filter and older pages on scroll, and
@@ -78,8 +81,8 @@ Snout isn't in the app stores yet; build it from source (see [Building](#buildin
 
 Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `feature_flag`, `experiment`,
 `annotation`, `activity_log`. Add `error_tracking:read` for Errors and `logs:read` for Logs. Add `feature_flag:write` to toggle flags,
-`annotation:write` to add annotations, `error_tracking:write` to resolve or suppress errors and `insight:write`
-to favorite insights. The login screen lists which scope each feature needs.
+`annotation:write` to add annotations, `error_tracking:write` to resolve, suppress or assign errors (assigning also
+needs `organization_member:read`, to list who to assign) and `insight:write` to favorite insights. The login screen lists which scope each feature needs.
 PostHog rate-limits personal keys (for example 240 requests a minute and 1,200 an hour on analytics endpoints); the
 app surfaces this instead of failing silently.
 
