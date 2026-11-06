@@ -1,6 +1,7 @@
 package com.nightcode.snout.shared.data.errortracking
 
 import arrow.core.Either
+import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.nightcode.snout.shared.api.errortracking.ErrorTrackingApi
@@ -9,12 +10,16 @@ import com.nightcode.snout.shared.data.errortracking.mapper.apiValue
 import com.nightcode.snout.shared.data.errortracking.mapper.toAppVersions
 import com.nightcode.snout.shared.data.errortracking.mapper.toIssue
 import com.nightcode.snout.shared.data.errortracking.mapper.toIssueStatus
+import com.nightcode.snout.shared.data.errortracking.mapper.toOccurrenceException
+import com.nightcode.snout.shared.data.errortracking.mapper.toOccurrences
 import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.errortracking.ExceptionOccurrence
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
+import com.nightcode.snout.shared.domain.model.errortracking.OccurrenceException
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Single
 
@@ -58,4 +63,20 @@ internal class ErrorTrackingRepositoryImpl(private val api: ErrorTrackingApi) : 
 
     override suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>> =
         api.getAppVersions(projectId).map { it.toAppVersions() }
+
+    override suspend fun getOccurrences(
+        projectId: Long,
+        issueId: String,
+    ): Either<DataError, List<ExceptionOccurrence>> = api.getOccurrences(projectId, issueId).map { it.toOccurrences() }
+
+    override suspend fun getOccurrenceExceptions(
+        projectId: Long,
+        occurrence: ExceptionOccurrence,
+    ): Either<DataError, List<OccurrenceException>> =
+        api.getOccurrenceExceptions(projectId, occurrence.id, occurrence.timestamp).flatMap { exceptions ->
+            exceptions?.map { it.toOccurrenceException() }?.right() ?: DataError.NotFound.left()
+        }
+
+    override suspend fun assign(projectId: Long, issueId: String, userId: Long?): Either<DataError, Unit> =
+        api.assign(projectId, issueId, userId).onRight { changeSignal.emit() }
 }

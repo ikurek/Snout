@@ -5,6 +5,7 @@ import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssuesRes
 import com.nightcode.snout.shared.api.errortracking.model.HogQLResultsDto
 import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
+import com.nightcode.snout.shared.domain.model.errortracking.IssueAssignee
 import com.nightcode.snout.shared.domain.model.errortracking.IssueRelease
 import com.nightcode.snout.shared.domain.model.errortracking.IssueSeverity
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
@@ -36,6 +37,17 @@ class ErrorTrackingIssueMapperTest :
             issue.users shouldBe 312
             issue.sessions shouldBe 407
             issue.volume shouldBe listOf(1L, 0L, 3L)
+            issue.assignee shouldBe IssueAssignee.User(3)
+        }
+
+        should("map a role assignee and drop one without an id") {
+            fun assigneeOf(json: String) = TestJson.decodeFromString<ErrorTrackingIssueDto>(
+                """{"id":"0189-c","assignee":$json}""",
+            ).toIssue().assignee
+
+            assigneeOf("""{"id":"0190-role","type":"role"}""") shouldBe IssueAssignee.Role("0190-role")
+            assigneeOf("""{"id":null,"type":"user"}""").shouldBeNull()
+            assigneeOf("null").shouldBeNull()
         }
 
         should("map the detail response's impact, sparkline, frame and release") {

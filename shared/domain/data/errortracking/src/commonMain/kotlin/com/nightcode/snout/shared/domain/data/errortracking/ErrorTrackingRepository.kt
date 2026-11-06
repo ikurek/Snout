@@ -4,8 +4,10 @@ import arrow.core.Either
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.AppVersion
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.errortracking.ExceptionOccurrence
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
+import com.nightcode.snout.shared.domain.model.errortracking.OccurrenceException
 import kotlinx.coroutines.flow.Flow
 
 interface ErrorTrackingRepository {
@@ -29,4 +31,15 @@ interface ErrorTrackingRepository {
     /** Changes the issue's status, which moves it to another status filter's list. */
     suspend fun setStatus(projectId: Long, issueId: String, status: IssueStatusFilter): Either<DataError, IssueStatus>
     suspend fun getAppVersions(projectId: Long): Either<DataError, List<AppVersion>>
+
+    /** The issue's latest occurrences of the last 30 days, newest first. */
+    suspend fun getOccurrences(projectId: Long, issueId: String): Either<DataError, List<ExceptionOccurrence>>
+
+    /** The exceptions of [occurrence], outermost first; [DataError.NotFound] once the event is gone. */
+    suspend fun getOccurrenceExceptions(
+        projectId: Long,
+        occurrence: ExceptionOccurrence,
+    ): Either<DataError, List<OccurrenceException>>
+
+    suspend fun assign(projectId: Long, issueId: String, userId: Long?): Either<DataError, Unit>
 }

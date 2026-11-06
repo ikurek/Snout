@@ -33,6 +33,12 @@ data class StackFrame(val function: String?, val source: String?, val line: Int?
 
 data class IssueRelease(val version: String?, val commitId: String?, val branch: String?)
 
+sealed interface IssueAssignee {
+    data class User(val userId: Long) : IssueAssignee
+
+    data class Role(val roleId: String) : IssueAssignee
+}
+
 /** A group of exceptions PostHog considers the same bug, with its impact over the last seven days. */
 data class ErrorTrackingIssue(
     val id: String,
@@ -54,6 +60,7 @@ data class ErrorTrackingIssue(
     val volume: List<Long>,
     val topFrame: StackFrame? = null,
     val latestRelease: IssueRelease? = null,
+    val assignee: IssueAssignee? = null,
 )
 
 /** A version of the app, from the `$app_version` PostHog SDKs attach, that reported exceptions this week. */
@@ -76,6 +83,7 @@ val TestErrorTrackingIssue = ErrorTrackingIssue(
     volume = listOf(96, 120, 154, 210, 188, 236, 280),
     topFrame = StackFrame(function = "CartSummary", source = "src/checkout/CartSummary.tsx", line = 42, column = 17),
     latestRelease = IssueRelease(version = "2.14.0", commitId = "9f3c2ab", branch = "main"),
+    assignee = IssueAssignee.User(userId = 7),
 )
 
 @TestData
@@ -94,6 +102,7 @@ val TestResolvedErrorTrackingIssue = TestErrorTrackingIssue.copy(
     volume = listOf(6, 5, 4, 2, 1, 0, 0),
     topFrame = null,
     latestRelease = null,
+    assignee = null,
 )
 
 @TestData

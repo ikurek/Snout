@@ -1,6 +1,7 @@
 package com.nightcode.snout.shared.data.errortracking
 
 import com.nightcode.snout.shared.api.errortracking.ErrorTrackingApi
+import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.data.testutils.FakePostHog
 import com.nightcode.snout.shared.data.testutils.TestJson
 import com.nightcode.snout.shared.data.testutils.emitsDuring
@@ -10,6 +11,7 @@ import com.nightcode.snout.shared.data.testutils.respondJson
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
+import com.nightcode.snout.shared.domain.model.errortracking.TestExceptionOccurrences
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.ShouldSpec
@@ -22,6 +24,7 @@ private const val ProjectId = 1L
 
 private fun issuesJson(vararg ids: String) = ids.joinToString(",", """{"results":[""", "]}") { """{"id":"$it"}""" }
 
+@OptIn(TestData::class)
 class ErrorTrackingRepositoryImplTest :
     ShouldSpec({
         val postHog = FakePostHog()
@@ -58,5 +61,18 @@ class ErrorTrackingRepositoryImplTest :
             repository.changes.emitsDuring {
                 repository.setStatus(ProjectId, "a", IssueStatusFilter.Resolved) shouldBeLeft DataError.Forbidden
             } shouldBe false
+        }
+
+        should("signal a change after assigning an issue") {
+            repository.changes.emitsDuring {
+                repository.assign(ProjectId, "a", userId = 7).shouldBeRight()
+            } shouldBe true
+        }
+
+        should("report an occurrence whose event is gone as not found") {
+            postHog.onRequest { respondJson("""{"results":[]}""") }
+
+            repository.getOccurrenceExceptions(ProjectId, TestExceptionOccurrences.first()) shouldBeLeft
+                DataError.NotFound
         }
     })
