@@ -16,6 +16,24 @@ private const val Phone = "spec:width=411dp,height=891dp"
 @Preview(name = "light", showBackground = true, device = Phone)
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
+fun ExceptionStackTraceLibraryFramesPreviewShot() = ScreenshotEnvironment { ExceptionStackTraceLibraryFramesPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ExceptionStackTraceNoFramesPreviewShot() = ScreenshotEnvironment { ExceptionStackTraceNoFramesPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun ExceptionStackTracePreviewShot() = ScreenshotEnvironment { ExceptionStackTracePreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
 fun IssueSeverityTagPreviewShot() = ScreenshotEnvironment { IssueSeverityTagPreview() }
 
 @PreviewTest
@@ -23,3 +41,40 @@ fun IssueSeverityTagPreviewShot() = ScreenshotEnvironment { IssueSeverityTagPrev
 @Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun IssueStatusPillPreviewShot() = ScreenshotEnvironment { IssueStatusPillPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun OccurrenceSectionGonePreviewShot() = ScreenshotEnvironment { OccurrenceSectionGonePreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun OccurrenceSectionLoadingPreviewShot() = ScreenshotEnvironment { OccurrenceSectionLoadingPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun OccurrenceSectionPreviewShot() = ScreenshotEnvironment { OccurrenceSectionPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun RecentOccurrencesSectionEmptyPreviewShot() = ScreenshotEnvironment { RecentOccurrencesSectionEmptyPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun RecentOccurrencesSectionForbiddenPreviewShot() =
+    ScreenshotEnvironment { RecentOccurrencesSectionForbiddenPreview() }
+
+@PreviewTest
+@Preview(name = "light", showBackground = true, device = Phone)
+@Preview(name = "dark", showBackground = true, device = Phone, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun RecentOccurrencesSectionPreviewShot() = ScreenshotEnvironment { RecentOccurrencesSectionPreview() }
