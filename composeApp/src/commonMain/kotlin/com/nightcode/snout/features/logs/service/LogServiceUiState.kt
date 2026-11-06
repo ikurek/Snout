@@ -1,5 +1,6 @@
 package com.nightcode.snout.features.logs.service
 
+import com.nightcode.snout.designsystem.organisms.LoadMoreStatus
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.logs.LogEntry
@@ -7,19 +8,6 @@ import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.model.logs.LogVolume
 import com.nightcode.snout.shared.domain.model.logs.TestLogEntries
 import com.nightcode.snout.shared.domain.model.logs.TestLogVolume
-
-/** Loading the page after the ones on screen. */
-internal sealed interface LoadMoreStatus {
-    /** More pages exist and none is loading. */
-    data object Idle : LoadMoreStatus
-
-    data object Loading : LoadMoreStatus
-
-    data class Failed(val error: DataError) : LoadMoreStatus
-
-    /** The last page is on screen. */
-    data object Done : LoadMoreStatus
-}
 
 internal data class LogServiceUiState(
     val query: String = "",

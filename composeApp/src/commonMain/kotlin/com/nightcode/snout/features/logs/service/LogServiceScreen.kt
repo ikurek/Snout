@@ -24,16 +24,15 @@ import com.nightcode.snout.common.compose.withoutBottom
 import com.nightcode.snout.common.format.formatChartTime
 import com.nightcode.snout.common.format.formatLogTime
 import com.nightcode.snout.designsystem.atoms.SectionLabel
-import com.nightcode.snout.designsystem.atoms.SkeletonRows
 import com.nightcode.snout.designsystem.atoms.textfields.SearchField
 import com.nightcode.snout.designsystem.charts.BarChart
 import com.nightcode.snout.designsystem.charts.ChartSeries
 import com.nightcode.snout.designsystem.molecules.EntityRow
 import com.nightcode.snout.designsystem.molecules.FilterMenuChip
-import com.nightcode.snout.designsystem.molecules.InlineErrorBanner
 import com.nightcode.snout.designsystem.molecules.MenuOption
 import com.nightcode.snout.designsystem.molecules.MetaText
 import com.nightcode.snout.designsystem.molecules.Placeholder
+import com.nightcode.snout.designsystem.organisms.LoadMoreFooter
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
 import com.nightcode.snout.designsystem.organisms.NoSearchResultsPlaceholder
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
@@ -58,7 +57,6 @@ import snout.composeapp.generated.resources.ic_subject_24dp
 import snout.composeapp.generated.resources.logs_empty_subtitle
 import snout.composeapp.generated.resources.logs_empty_title
 import snout.composeapp.generated.resources.logs_load_more_failed
-import snout.composeapp.generated.resources.logs_load_more_retry
 import snout.composeapp.generated.resources.logs_search_empty_title
 import snout.composeapp.generated.resources.logs_search_placeholder
 import snout.composeapp.generated.resources.logs_volume_section
@@ -66,7 +64,6 @@ import snout.composeapp.generated.resources.placeholder_nothing_found_retry
 
 /** Log bodies can be stack traces; three lines tell entries apart, the sheet shows the rest. */
 private const val BodyPreviewLines = 3
-private const val LoadingMoreRows = 2
 
 @Composable
 internal fun LogServiceScreen(
@@ -157,7 +154,11 @@ private fun LogList(
             LogRow(entry = entry, divider = index < logs.lastIndex, onClick = { onOpenEntry(entry) })
         }
         item(key = "load-more", contentType = "load-more") {
-            LoadMoreFooter(status = state.loadMore, onLoadMore = onLoadMore)
+            LoadMoreFooter(
+                status = state.loadMore,
+                failedText = stringResource(Res.string.logs_load_more_failed),
+                onLoadMore = onLoadMore,
+            )
         }
     }
 }
@@ -222,25 +223,6 @@ private fun LogRow(entry: LogEntry, divider: Boolean, onClick: () -> Unit) {
             MetaText(entry.timestamp.formatLogTime())
         },
     )
-}
-
-/** Composing the footer means the list reached its end, which is the cue to fetch the next page. */
-@Composable
-private fun LoadMoreFooter(status: LoadMoreStatus, onLoadMore: () -> Unit) {
-    when (status) {
-        LoadMoreStatus.Idle -> LaunchedEffect(Unit) { onLoadMore() }
-
-        LoadMoreStatus.Loading -> SkeletonRows(count = LoadingMoreRows)
-
-        is LoadMoreStatus.Failed -> InlineErrorBanner(
-            text = stringResource(Res.string.logs_load_more_failed),
-            actionLabel = stringResource(Res.string.logs_load_more_retry),
-            onAction = onLoadMore,
-            modifier = Modifier.padding(Spacing.large),
-        )
-
-        LoadMoreStatus.Done -> Unit
-    }
 }
 
 @OptIn(TestData::class)

@@ -1,6 +1,7 @@
 package com.nightcode.snout.features.logs.service
 
 import arrow.core.Either
+import com.nightcode.snout.designsystem.organisms.LoadMoreStatus
 import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.common.testutils.MainDispatcherExtension

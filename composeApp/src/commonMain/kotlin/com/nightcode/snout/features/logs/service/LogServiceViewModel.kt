@@ -2,6 +2,7 @@ package com.nightcode.snout.features.logs.service
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nightcode.snout.designsystem.organisms.LoadMoreStatus
 import com.nightcode.snout.navigation.LogServiceNavKey
 import com.nightcode.snout.shared.domain.model.logs.LogSeverityFilter
 import com.nightcode.snout.shared.domain.usecase.logs.GetServiceLogVolume

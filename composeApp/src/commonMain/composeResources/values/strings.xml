@@ -424,7 +424,7 @@
     <string name="logs_severity_warnings">Warnings and errors</string>
     <string name="logs_severity_errors">Errors</string>
     <string name="logs_load_more_failed">Couldn't load older logs.</string>
-    <string name="logs_load_more_retry">Try again</string>
+    <string name="load_more_retry">Try again</string>
     <string name="logs_entry_message">Message</string>
     <string name="logs_entry_span">Span ID</string>
     <string name="logs_entry_logger">Logger</string>
