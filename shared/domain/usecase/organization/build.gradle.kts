@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.snout.multiplatform.library)
     alias(libs.plugins.snout.multiplatform.koin)
+    alias(libs.plugins.snout.multiplatform.unittest)
 }
 
 kotlin {
@@ -11,5 +12,7 @@ kotlin {
     sourceSets.commonMain.dependencies {
         api(projects.shared.domain.model.organization)
         implementation(projects.shared.domain.data.organization)
+        implementation(projects.shared.domain.data.appstate)
+        api(projects.shared.domain.usecase.appstate)
     }
 }
