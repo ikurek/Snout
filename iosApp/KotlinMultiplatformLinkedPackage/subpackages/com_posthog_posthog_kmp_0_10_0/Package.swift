@@ -1,15 +1,15 @@
 // swift-tools-version: 5.9
 import PackageDescription
 let package = Package(
-  name: "com_posthog_posthog_kmp_0_9_0",
+  name: "com_posthog_posthog_kmp_0_10_0",
   platforms: [
     .iOS("15.0")
   ],
   products: [
     .library(
-      name: "com_posthog_posthog_kmp_0_9_0",
+      name: "com_posthog_posthog_kmp_0_10_0",
       type: .none,
-      targets: ["com_posthog_posthog_kmp_0_9_0"]
+      targets: ["com_posthog_posthog_kmp_0_10_0"]
     )
   ],
   dependencies: [
@@ -20,7 +20,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "com_posthog_posthog_kmp_0_9_0",
+      name: "com_posthog_posthog_kmp_0_10_0",
       dependencies: [
         .product(
           name: "PostHog",
