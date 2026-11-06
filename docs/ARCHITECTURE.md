@@ -59,7 +59,8 @@ Layers, with dependencies pointing inwards:
   `{"query": …}` (`QueryRequestDto`) is `XQueryDto`, with its constant `kind` as an `@EncodeDefault` property.
   Optional request fields default to null and are left out, since `ApiJson` doesn't encode defaults.
 - HogQL queries (`HogQLQueryDto` through `query/`) pass anything that comes from outside the query, such as an issue
-  or event id, as `values` that fill its `{placeholders}`, never pasted into the query text.
+  or event id, as `values` that fill its `{placeholders}`, never pasted into the query text. Queries on `events`
+  always bound `timestamp`, since the table is sorted by time.
 - Secrets and personal data live in `SecureStore` (`storage/securestore`), never in DataStore. It is backed by
   [KSafe](https://github.com/ioannisa/KSafe): values encrypted with AES-256-GCM in KSafe's own `secure` file, under
   a key held in the Keychain on iOS (`AfterFirstUnlockThisDeviceOnly`, so it stays out of backups and device

@@ -51,6 +51,10 @@ be switched off in Settings → Privacy (see the [privacy policy](PRIVACY.md)).
 - **Logs**: services sending OpenTelemetry logs to PostHog with their volume, error rate and a sparkline for the
   last hour, day or week; open one for its latest lines with search, a level filter and older pages on scroll, and
   tap a line for its full message, trace ID and attributes.
+- **Persons**: find the person behind a support email by email, name or distinct ID (the newest persons show until
+  you search). Their screen shows who they are (every distinct ID and when they were created) and, a tab each, their
+  properties, their events of the last 30 days with older pages on scroll, the feature flags they get now and why, and
+  the exceptions they hit, each opening its error tracking issue. PostHog person links open there too.
 - **Experiments**: status, variants, metrics and conclusion (read-only).
 - **Annotations**: timeline of project annotations and a sheet to add one.
 - **Activity log**: who changed what in the project, with before/after values.

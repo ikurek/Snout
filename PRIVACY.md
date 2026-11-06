@@ -18,8 +18,9 @@ websites.
 - **Your PostHog instance URL and personal API key.** You enter them to connect. The key is stored encrypted on your
   device (in the iOS Keychain or with the Android Keystore) and is sent only to the instance you entered, to
   authenticate your requests. The instance URL is stored on your device.
-- **What you look at.** Analytics, dashboards, insights, feature flags, errors, logs, experiments, annotations,
-  the activity log, your account details and your organizations' logos are requested from your instance and shown in
+- **What you look at.** Analytics, dashboards, insights, feature flags, errors, logs, the persons in your project
+  (their properties, events, flags and errors, which can include your own users' personal data), experiments,
+  annotations, the activity log, your account details and your organizations' logos are requested from your instance and shown in
   the app. Apart from your account, organizations and projects, which are kept on the device so the app opens
   quickly, this data is held only in memory while you use it; images may be kept in the app's cache.
 - **Changes you make.** When you toggle a feature flag, resolve or suppress an error, add an annotation or favorite an
