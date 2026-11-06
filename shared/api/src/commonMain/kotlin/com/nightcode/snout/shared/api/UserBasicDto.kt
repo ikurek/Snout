@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 /** `created_by` style user reference returned by most PostHog resources. */
 @Serializable
 data class UserBasicDto(
+    @SerialName("id") val id: Long? = null,
     @SerialName("first_name") val firstName: String? = null,
     @SerialName("last_name") val lastName: String? = null,
     @SerialName("email") val email: String? = null,
