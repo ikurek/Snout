@@ -47,6 +47,7 @@ include(":shared:api:featureflags")
 include(":shared:api:insights")
 include(":shared:api:logs")
 include(":shared:api:organizations")
+include(":shared:api:persons")
 include(":shared:api:users")
 
 // Data
