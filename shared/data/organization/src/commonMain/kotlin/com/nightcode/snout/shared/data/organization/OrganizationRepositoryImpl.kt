@@ -5,15 +5,18 @@ import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.nightcode.snout.shared.api.organizations.OrganizationsApi
 import com.nightcode.snout.shared.data.organization.mapper.toEntity
+import com.nightcode.snout.shared.data.organization.mapper.toMember
 import com.nightcode.snout.shared.data.organization.mapper.toOrganization
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.organization.Organization
+import com.nightcode.snout.shared.domain.model.organization.OrganizationMember
 import com.nightcode.snout.shared.storage.database.OrganizationsDatabase
 import com.nightcode.snout.shared.storage.datastore.AuthDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
+import kotlin.uuid.Uuid
 
 @Single(binds = [OrganizationRepository::class])
 internal class OrganizationRepositoryImpl(
@@ -35,4 +38,9 @@ internal class OrganizationRepositoryImpl(
         database.observe().map { entities -> entities.map { it.toOrganization() } }
 
     override suspend fun clear() = database.replaceAll(emptyList())
+
+    override suspend fun getMembers(organizationId: Uuid): Either<DataError, List<OrganizationMember>> =
+        api.getMembers(organizationId).map { response ->
+            response.results.mapNotNull { it.toMember() }.sortedBy { it.name.lowercase() }
+        }
 }
