@@ -43,6 +43,7 @@
     <string name="login_scopes_experiments">Experiments</string>
     <string name="login_scopes_errors">Errors</string>
     <string name="login_scopes_logs">Logs</string>
+    <string name="login_scopes_persons">Persons</string>
     <string name="login_scopes_annotations">Annotations</string>
     <string name="login_scopes_activity_log">Activity log</string>
     <string name="login_scopes_toggle_flags">Turn flags on or off</string>

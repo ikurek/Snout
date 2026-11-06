@@ -80,7 +80,8 @@ Snout isn't in the app stores yet; build it from source (see [Building](#buildin
 ### Personal API key scopes
 
 Read: `user`, `organization`, `project`, `dashboard`, `insight`, `query`, `feature_flag`, `experiment`,
-`annotation`, `activity_log`. Add `error_tracking:read` for Errors and `logs:read` for Logs. Add `feature_flag:write` to toggle flags,
+`annotation`, `activity_log`. Add `error_tracking:read` for Errors, `logs:read` for Logs and `person:read` for
+Persons. Add `feature_flag:write` to toggle flags,
 `annotation:write` to add annotations, `error_tracking:write` to resolve, suppress or assign errors (assigning also
 needs `organization_member:read`, to list who to assign) and `insight:write` to favorite insights. The login screen lists which scope each feature needs.
 PostHog rate-limits personal keys (for example 240 requests a minute and 1,200 an hour on analytics endpoints); the

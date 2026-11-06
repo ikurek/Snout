@@ -59,6 +59,7 @@ import snout.composeapp.generated.resources.login_scopes_group_sections
 import snout.composeapp.generated.resources.login_scopes_group_sign_in
 import snout.composeapp.generated.resources.login_scopes_insights
 import snout.composeapp.generated.resources.login_scopes_logs
+import snout.composeapp.generated.resources.login_scopes_persons
 import snout.composeapp.generated.resources.login_scopes_resolve_errors
 import snout.composeapp.generated.resources.login_scopes_toggle_flags
 import snout.composeapp.generated.resources.login_screen_scopes_toggle
@@ -86,6 +87,7 @@ private val ScopeGroups = listOf(
             ScopedFeature(Res.string.login_scopes_experiments, listOf("experiment:read")),
             ScopedFeature(Res.string.login_scopes_errors, listOf("error_tracking:read", "query:read")),
             ScopedFeature(Res.string.login_scopes_logs, listOf("logs:read")),
+            ScopedFeature(Res.string.login_scopes_persons, listOf("person:read", "query:read", "feature_flag:read")),
             ScopedFeature(Res.string.login_scopes_annotations, listOf("annotation:read")),
             ScopedFeature(Res.string.login_scopes_activity_log, listOf("activity_log:read")),
         ),
