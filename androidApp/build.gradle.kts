@@ -84,6 +84,7 @@ dependencies {
     implementation(projects.widgets)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.work.runtime)
     implementation(libs.koin.core)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.compose.uiToolingPreview)
