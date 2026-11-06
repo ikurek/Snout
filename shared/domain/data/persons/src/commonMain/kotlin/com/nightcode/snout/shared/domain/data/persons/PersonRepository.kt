@@ -13,8 +13,8 @@ interface PersonRepository {
 
     suspend fun getPerson(projectId: Long, uuid: String): Either<DataError, Person>
 
-    /** The person with exactly [distinctId]; [DataError.NotFound] when there is none. */
-    suspend fun findPersonByDistinctId(projectId: Long, distinctId: String): Either<DataError, Person>
+    /** The person with exactly this distinct ID, percent-encoded as links carry it; [DataError.NotFound] when none. */
+    suspend fun findPersonByDistinctId(projectId: Long, encodedDistinctId: String): Either<DataError, Person>
 
     suspend fun getEvents(projectId: Long, uuid: String, before: Instant?): Either<DataError, PersonEventPage>
 

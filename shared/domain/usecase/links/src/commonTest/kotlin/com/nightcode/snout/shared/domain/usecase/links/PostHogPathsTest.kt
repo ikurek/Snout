@@ -30,6 +30,7 @@ private val EveryResource = listOf(
     PostHogResource.Logs,
     PostHogResource.Persons,
     PostHogResource.Person("0190f0a2-1c2d-7e3f-8a9b-0c1d2e3f4a5b"),
+    PostHogResource.PersonByDistinctId("user%40example.com%2F1"),
     PostHogResource.Experiments,
     PostHogResource.Experiment(42),
     PostHogResource.Annotations,

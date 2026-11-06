@@ -27,10 +27,12 @@ internal class PersonRepositoryImpl(private val api: PersonsApi) : PersonReposit
     override suspend fun getPerson(projectId: Long, uuid: String): Either<DataError, Person> =
         api.getPerson(projectId, uuid).map { it.toPerson() }
 
-    override suspend fun findPersonByDistinctId(projectId: Long, distinctId: String): Either<DataError, Person> =
-        api.getPersonsByDistinctId(projectId, distinctId).flatMap { page ->
-            page.results.firstOrNull()?.toPerson()?.right() ?: DataError.NotFound.left()
-        }
+    override suspend fun findPersonByDistinctId(
+        projectId: Long,
+        encodedDistinctId: String,
+    ): Either<DataError, Person> = api.getPersonsByDistinctId(projectId, encodedDistinctId).flatMap { page ->
+        page.results.firstOrNull()?.toPerson()?.right() ?: DataError.NotFound.left()
+    }
 
     override suspend fun getEvents(
         projectId: Long,

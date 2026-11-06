@@ -21,11 +21,13 @@ kotlin {
             implementation(projects.shared.domain.usecase.errortracking)
             implementation(projects.shared.domain.usecase.insights)
             implementation(projects.shared.domain.usecase.organization)
+            implementation(projects.shared.domain.usecase.persons)
         }
         commonTest.dependencies {
             implementation(projects.shared.domain.data.errortracking)
             implementation(projects.shared.domain.data.insights)
             implementation(projects.shared.domain.data.organization)
+            implementation(projects.shared.domain.data.persons)
         }
     }
 }

@@ -46,8 +46,8 @@ class PersonsApiTest :
             lastUrl() shouldBe "$TestInstanceUrl/api/projects/$ProjectId/persons/?search=jane%40example.com&limit=50"
         }
 
-        should("look a person up by an exact distinct ID") {
-            api.getPersonsByDistinctId(ProjectId, "user 42")
+        should("look a person up by the decoded distinct ID of a link") {
+            api.getPersonsByDistinctId(ProjectId, "user%2042")
 
             lastUrl() shouldBe "$TestInstanceUrl/api/projects/$ProjectId/persons/?distinct_id=user+42"
         }

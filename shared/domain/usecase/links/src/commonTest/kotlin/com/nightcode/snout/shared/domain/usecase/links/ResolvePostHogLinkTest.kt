@@ -7,6 +7,7 @@ import com.nightcode.snout.shared.domain.data.auth.AuthRepository
 import com.nightcode.snout.shared.domain.data.errortracking.ErrorTrackingRepository
 import com.nightcode.snout.shared.domain.data.insights.InsightRepository
 import com.nightcode.snout.shared.domain.data.organization.OrganizationRepository
+import com.nightcode.snout.shared.domain.data.persons.PersonRepository
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.appstate.TestSelectedProject
 import com.nightcode.snout.shared.domain.model.common.DataError
@@ -14,6 +15,7 @@ import com.nightcode.snout.shared.domain.model.links.DeepLinkDestination
 import com.nightcode.snout.shared.domain.model.links.LinkResolution
 import com.nightcode.snout.shared.domain.model.organization.Project
 import com.nightcode.snout.shared.domain.model.organization.TestOrganization
+import com.nightcode.snout.shared.domain.model.persons.TestPerson
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProject
 import com.nightcode.snout.shared.domain.usecase.appstate.GetSelectedProjectId
 import com.nightcode.snout.shared.domain.usecase.appstate.SaveSelectedProject
@@ -22,6 +24,7 @@ import com.nightcode.snout.shared.domain.usecase.errortracking.FindIssueIdByFing
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
+import com.nightcode.snout.shared.domain.usecase.persons.FindPersonIdByDistinctId
 import dev.mokkery.MockMode.autoUnit
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -47,6 +50,7 @@ class ResolvePostHogLinkTest :
         val organizationRepository = mock<OrganizationRepository>()
         val insightRepository = mock<InsightRepository>()
         val errorTrackingRepository = mock<ErrorTrackingRepository>()
+        val personRepository = mock<PersonRepository>()
 
         val subject = ResolvePostHogLink(
             getInstanceUrl = GetInstanceUrl(authRepository),
@@ -61,6 +65,10 @@ class ResolvePostHogLinkTest :
             findIssueIdByFingerprint = FindIssueIdByFingerprint(
                 GetSelectedProjectId(appStateRepository),
                 errorTrackingRepository,
+            ),
+            findPersonIdByDistinctId = FindPersonIdByDistinctId(
+                GetSelectedProjectId(appStateRepository),
+                personRepository,
             ),
         )
 
@@ -97,6 +105,25 @@ class ResolvePostHogLinkTest :
             everySuspend { errorTrackingRepository.findIssueIdByFingerprint(1L, "gone") } returns Either.Right(null)
             subject("$Instance/project/1/error-tracking/fingerprint/gone") shouldBe
                 LinkResolution.Browser("$Instance/project/1/error-tracking/fingerprint/gone")
+        }
+
+        should("open a person by uuid, or by the distinct ID PostHog's person pages use") {
+            everySuspend { personRepository.findPersonByDistinctId(1L, "user%40example.com") } returns
+                Either.Right(TestPerson)
+
+            subject("$Instance/project/1/persons/${TestPerson.uuid}") shouldBe
+                LinkResolution.InApp(DeepLinkDestination.Person(TestPerson.uuid))
+            subject("$Instance/project/1/person/user%40example.com#activeTab=events") shouldBe
+                LinkResolution.InApp(DeepLinkDestination.Person(TestPerson.uuid))
+            subject("$Instance/project/1/persons") shouldBe
+                LinkResolution.InApp(DeepLinkDestination.Section(HomeSection.Persons))
+        }
+
+        should("send a distinct ID nobody has to the browser") {
+            everySuspend { personRepository.findPersonByDistinctId(1L, "gone") } returns Either.Left(DataError.NotFound)
+            subject(
+                "$Instance/project/1/person/gone",
+            ) shouldBe LinkResolution.Browser("$Instance/project/1/person/gone")
         }
 
         should("open a list page as its section and the project root as Home") {

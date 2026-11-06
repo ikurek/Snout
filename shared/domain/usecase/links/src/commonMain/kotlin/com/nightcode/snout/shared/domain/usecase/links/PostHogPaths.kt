@@ -26,13 +26,14 @@ internal fun PostHogResource.path(): String = when (this) {
     PostHogResource.Logs -> "logs"
     PostHogResource.Persons -> "persons"
     is PostHogResource.Person -> "persons/$uuid"
+    is PostHogResource.PersonByDistinctId -> "person/$distinctId"
     PostHogResource.Experiments -> "experiments"
     is PostHogResource.Experiment -> "experiments/$id"
     PostHogResource.Annotations -> "data-management/annotations"
     PostHogResource.ActivityLog -> "activity/explore"
 }
 
-/** Inverse of [path]: null for pages Snout has no screen for (replays, persons, "new" forms…). */
+/** Inverse of [path]: null for pages Snout has no screen for (replays, cohorts, "new" forms…). */
 @Suppress("CyclomaticComplexMethod")
 internal fun parsePath(segments: List<String>): PostHogResource? {
     val id = segments.getOrNull(1)
@@ -65,6 +66,8 @@ internal fun parsePath(segments: List<String>): PostHogResource? {
         "persons" -> parseListOrItem(segments, PostHogResource.Persons) {
             id?.takeIf { Uuid.parseOrNull(it) != null }?.let(PostHogResource::Person)
         }
+
+        "person" -> id?.takeIf { segments.size == 2 }?.let(PostHogResource::PersonByDistinctId)
 
         "experiments" -> parseListOrItem(segments, PostHogResource.Experiments) {
             id?.toLongOrNull()?.let(PostHogResource::Experiment)

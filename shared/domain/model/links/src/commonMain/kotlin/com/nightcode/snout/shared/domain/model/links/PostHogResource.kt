@@ -21,6 +21,12 @@ sealed interface PostHogResource {
     data object Logs : PostHogResource
     data object Persons : PostHogResource
     data class Person(val uuid: String) : PostHogResource
+
+    /**
+     * A person by one of their distinct IDs, as PostHog's own person pages link them. [distinctId] stays
+     * percent-encoded as in the link's path.
+     */
+    data class PersonByDistinctId(val distinctId: String) : PostHogResource
     data object Experiments : PostHogResource
     data class Experiment(val id: Long) : PostHogResource
     data object Annotations : PostHogResource

@@ -14,6 +14,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.decodeURLPart
 import org.koin.core.annotation.Single
 
 private const val PersonsPageSize = 50
@@ -64,10 +65,13 @@ class PersonsApi(private val client: HttpClient, private val authDataStore: Auth
         }.body()
     }
 
-    /** The person with exactly this distinct ID, as PostHog's own person links name them. */
-    suspend fun getPersonsByDistinctId(projectId: Long, distinctId: String) = networkCall<PersonsResponseDto> {
+    /**
+     * The person with exactly this distinct ID, as PostHog's own person links name them. [encodedDistinctId] comes
+     * percent-encoded from a link's path.
+     */
+    suspend fun getPersonsByDistinctId(projectId: Long, encodedDistinctId: String) = networkCall<PersonsResponseDto> {
         client.get(authDataStore.projectUrl(projectId, "persons/")) {
-            parameter("distinct_id", distinctId)
+            parameter("distinct_id", encodedDistinctId.decodeURLPart())
         }.body()
     }
 

@@ -14,6 +14,7 @@ import com.nightcode.snout.shared.domain.usecase.errortracking.FindIssueIdByFing
 import com.nightcode.snout.shared.domain.usecase.insights.FindInsightIdByShortId
 import com.nightcode.snout.shared.domain.usecase.organization.ObserveOrganizations
 import com.nightcode.snout.shared.domain.usecase.organization.RefreshOrganizations
+import com.nightcode.snout.shared.domain.usecase.persons.FindPersonIdByDistinctId
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 
@@ -31,6 +32,7 @@ class ResolvePostHogLink(
     private val saveSelectedProject: SaveSelectedProject,
     private val findInsightIdByShortId: FindInsightIdByShortId,
     private val findIssueIdByFingerprint: FindIssueIdByFingerprint,
+    private val findPersonIdByDistinctId: FindPersonIdByDistinctId,
 ) {
     suspend operator fun invoke(url: String): LinkResolution {
         val link = parsePostHogLink(url)
@@ -57,7 +59,10 @@ class ResolvePostHogLink(
     private suspend fun findOrganization(projectId: Long): Organization? =
         observeOrganizations().first().firstOrNull { organization -> organization.projects.any { it.id == projectId } }
 
-    /** Null when the resource can't be shown after all (an insight short id or fingerprint the API doesn't know). */
+    /**
+     * Null when the resource can't be shown after all (an insight short id, fingerprint or distinct ID the API doesn't
+     * know).
+     */
     private suspend fun PostHogResource.toDestination(): DeepLinkDestination? = when (this) {
         PostHogResource.Project -> DeepLinkDestination.Home
 
@@ -73,6 +78,9 @@ class ResolvePostHogLink(
         is PostHogResource.Experiment -> DeepLinkDestination.Experiment(id)
 
         is PostHogResource.Person -> DeepLinkDestination.Person(uuid)
+
+        is PostHogResource.PersonByDistinctId ->
+            findPersonIdByDistinctId(distinctId).getOrNull()?.let(DeepLinkDestination::Person)
 
         is PostHogResource.Insight -> findInsightIdByShortId(shortId).getOrNull()?.let(DeepLinkDestination::Insight)
 
