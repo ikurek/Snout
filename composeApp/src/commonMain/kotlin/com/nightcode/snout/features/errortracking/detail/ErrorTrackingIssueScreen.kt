@@ -7,15 +7,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.compose.ui.unit.dp
 import com.nightcode.snout.common.compose.ThemePreviewWrapper
 import com.nightcode.snout.common.compose.bottomOnly
 import com.nightcode.snout.common.compose.withoutBottom
@@ -29,33 +38,42 @@ import com.nightcode.snout.designsystem.atoms.buttons.SecondaryButton
 import com.nightcode.snout.designsystem.charts.BarChart
 import com.nightcode.snout.designsystem.charts.ChartSeries
 import com.nightcode.snout.designsystem.charts.chartColor
-import com.nightcode.snout.designsystem.molecules.InfoBanner
 import com.nightcode.snout.designsystem.molecules.KeyValueRow
 import com.nightcode.snout.designsystem.molecules.StatCard
 import com.nightcode.snout.designsystem.organisms.DetailLoadingRowCount
 import com.nightcode.snout.designsystem.organisms.LoadingOrErrorContent
+import com.nightcode.snout.designsystem.organisms.OptionPickerSheet
+import com.nightcode.snout.designsystem.organisms.PickerOption
 import com.nightcode.snout.designsystem.organisms.PushedScreenScaffold
 import com.nightcode.snout.designsystem.organisms.RefreshableContent
 import com.nightcode.snout.designsystem.tokens.SnoutTheme
 import com.nightcode.snout.designsystem.tokens.Spacing
 import com.nightcode.snout.features.errortracking.components.IssueSeverityTag
 import com.nightcode.snout.features.errortracking.components.IssueStatusPill
+import com.nightcode.snout.features.errortracking.components.OccurrenceSection
+import com.nightcode.snout.features.errortracking.components.RecentOccurrencesSection
 import com.nightcode.snout.shared.common.format.formatCompact
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.common.DataError
 import com.nightcode.snout.shared.domain.model.errortracking.ErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.errortracking.IssueAssignee
 import com.nightcode.snout.shared.domain.model.errortracking.IssueRelease
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatus
 import com.nightcode.snout.shared.domain.model.errortracking.IssueStatusFilter
 import com.nightcode.snout.shared.domain.model.errortracking.StackFrame
-import com.nightcode.snout.shared.domain.model.errortracking.TestErrorTrackingIssue
 import com.nightcode.snout.shared.domain.model.errortracking.TestResolvedErrorTrackingIssue
+import com.nightcode.snout.shared.domain.model.organization.OrganizationMember
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import snout.composeapp.generated.resources.Res
 import snout.composeapp.generated.resources.error_tracking_action_reopen
 import snout.composeapp.generated.resources.error_tracking_action_resolve
 import snout.composeapp.generated.resources.error_tracking_action_suppress
+import snout.composeapp.generated.resources.error_tracking_assignee
+import snout.composeapp.generated.resources.error_tracking_assignee_member
+import snout.composeapp.generated.resources.error_tracking_assignee_picker_title
+import snout.composeapp.generated.resources.error_tracking_assignee_role
 import snout.composeapp.generated.resources.error_tracking_file
 import snout.composeapp.generated.resources.error_tracking_first_seen
 import snout.composeapp.generated.resources.error_tracking_function
@@ -72,8 +90,8 @@ import snout.composeapp.generated.resources.error_tracking_release_section
 import snout.composeapp.generated.resources.error_tracking_release_version
 import snout.composeapp.generated.resources.error_tracking_sessions
 import snout.composeapp.generated.resources.error_tracking_severity_label
-import snout.composeapp.generated.resources.error_tracking_stack_trace_note
 import snout.composeapp.generated.resources.error_tracking_status_label
+import snout.composeapp.generated.resources.error_tracking_unassigned
 import snout.composeapp.generated.resources.error_tracking_users
 import snout.composeapp.generated.resources.ic_check_24dp
 
@@ -85,6 +103,11 @@ internal fun ErrorTrackingIssueScreen(
     onRefresh: () -> Unit,
     onChangeStatus: (IssueStatusFilter) -> Unit,
     onOpenInPostHog: () -> Unit,
+    onOccurrenceSelected: (String) -> Unit,
+    onExceptionsRetried: () -> Unit,
+    onAssigneeClicked: () -> Unit,
+    onAssigneeSelected: (Long?) -> Unit,
+    onAssigneePickerDismissed: () -> Unit,
 ) {
     val issue = state.issue
     PushedScreenScaffold(
@@ -111,27 +134,46 @@ internal fun ErrorTrackingIssueScreen(
             ) {
                 IssueContent(
                     issue = issue,
-                    updatingTo = state.updatingTo,
+                    state = state,
                     onChangeStatus = onChangeStatus,
+                    onRefresh = onRefresh,
+                    onOccurrenceSelected = onOccurrenceSelected,
+                    onExceptionsRetried = onExceptionsRetried,
+                    onAssigneeClicked = onAssigneeClicked,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = innerPadding.bottomOnly(),
                 )
             }
         }
     }
+    AssigneePicker(
+        isVisible = state.isAssigneePickerVisible,
+        members = state.members.orEmpty(),
+        assignee = issue?.assignee,
+        onSelect = onAssigneeSelected,
+        onDismiss = onAssigneePickerDismissed,
+    )
 }
 
+@Suppress("LongParameterList")
 @Composable
 private fun IssueContent(
     issue: ErrorTrackingIssue,
-    updatingTo: IssueStatusFilter?,
+    state: ErrorTrackingIssueUiState,
     onChangeStatus: (IssueStatusFilter) -> Unit,
+    onRefresh: () -> Unit,
+    onOccurrenceSelected: (String) -> Unit,
+    onExceptionsRetried: () -> Unit,
+    onAssigneeClicked: () -> Unit,
     modifier: Modifier,
     contentPadding: PaddingValues,
 ) {
+    val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    var occurrenceSectionY by remember { mutableIntStateOf(0) }
     Column(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(contentPadding)
             .padding(bottom = Spacing.xxLarge),
     ) {
@@ -145,17 +187,40 @@ private fun IssueContent(
         }
         TriageActions(
             status = issue.status,
-            updatingTo = updatingTo,
+            updatingTo = state.updatingTo,
             onChangeStatus = onChangeStatus,
             modifier = Modifier.padding(horizontal = Spacing.large, vertical = Spacing.small),
         )
         ImpactSection(issue)
-        OverviewSection(issue)
-        issue.topFrame?.let { LocationSection(it) }
+        OverviewSection(
+            issue = issue,
+            assigneeName = issue.assignee?.let { assigneeName(it, state.members) },
+            isAssigning = state.isAssigning,
+            onAssigneeClicked = onAssigneeClicked,
+        )
+        Column(modifier = Modifier.onGloballyPositioned { occurrenceSectionY = it.positionInParent().y.toInt() }) {
+            state.selectedOccurrence?.let { occurrence ->
+                OccurrenceSection(
+                    occurrence = occurrence,
+                    exceptions = state.exceptions,
+                    error = state.exceptionsError,
+                    onRefresh = onRefresh,
+                    onRetry = onExceptionsRetried,
+                )
+            }
+        }
+        // The stack trace above stands in for the top frame; it shows again when the trace can't.
+        if (state.exceptions.isNullOrEmpty()) issue.topFrame?.let { LocationSection(it) }
         issue.latestRelease?.let { ReleaseSection(it) }
-        InfoBanner(
-            text = stringResource(Res.string.error_tracking_stack_trace_note),
-            modifier = Modifier.padding(start = Spacing.large, end = Spacing.large, top = Spacing.xLarge),
+        RecentOccurrencesSection(
+            occurrences = state.occurrences,
+            error = state.occurrencesError,
+            selectedOccurrenceId = state.selectedOccurrenceId,
+            onRetry = onRefresh,
+            onOccurrenceSelected = { id ->
+                onOccurrenceSelected(id)
+                scope.launch { scrollState.animateScrollTo(occurrenceSectionY) }
+            },
         )
     }
 }
@@ -229,7 +294,12 @@ private fun ImpactSection(issue: ErrorTrackingIssue) {
 }
 
 @Composable
-private fun OverviewSection(issue: ErrorTrackingIssue) {
+private fun OverviewSection(
+    issue: ErrorTrackingIssue,
+    assigneeName: String?,
+    isAssigning: Boolean,
+    onAssigneeClicked: () -> Unit,
+) {
     SectionLabel(stringResource(Res.string.error_tracking_overview_section))
     KeyValueRow(
         label = stringResource(Res.string.error_tracking_status_label),
@@ -243,6 +313,16 @@ private fun OverviewSection(issue: ErrorTrackingIssue) {
             trailing = { IssueSeverityTag(it) },
         )
     }
+    KeyValueRow(
+        label = stringResource(Res.string.error_tracking_assignee),
+        value = assigneeName ?: stringResource(Res.string.error_tracking_unassigned),
+        onClick = onAssigneeClicked.takeUnless { isAssigning },
+        trailing = if (isAssigning) {
+            { CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp) }
+        } else {
+            null
+        },
+    )
     issue.lastSeen?.let {
         KeyValueRow(label = stringResource(Res.string.error_tracking_last_seen), value = it.formatRelative())
     }
@@ -284,6 +364,48 @@ private fun ReleaseSection(release: IssueRelease) {
     }
 }
 
+/** A role assignee can't be picked here, so nothing is checked. */
+@Composable
+private fun AssigneePicker(
+    isVisible: Boolean,
+    members: List<OrganizationMember>,
+    assignee: IssueAssignee?,
+    onSelect: (Long?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val unassigned = stringResource(Res.string.error_tracking_unassigned)
+    OptionPickerSheet(
+        isVisible = isVisible,
+        title = stringResource(Res.string.error_tracking_assignee_picker_title),
+        options = listOf(PickerOption(AssigneeChoice(null), unassigned)) +
+            members.map {
+                PickerOption(
+                    AssigneeChoice(it.userId),
+                    it.name,
+                    it.email?.takeIf { email -> email != it.name },
+                )
+            },
+        selected = when (assignee) {
+            null -> AssigneeChoice(null)
+            is IssueAssignee.User -> AssigneeChoice(assignee.userId)
+            is IssueAssignee.Role -> null
+        },
+        onSelect = { onSelect(it.userId) },
+        onDismiss = onDismiss,
+    )
+}
+
+/** Wraps the user id so null means "Unassigned" rather than "nothing selected". */
+private data class AssigneeChoice(val userId: Long?)
+
+@Composable
+private fun assigneeName(assignee: IssueAssignee, members: List<OrganizationMember>?): String = when (assignee) {
+    is IssueAssignee.User -> members?.firstOrNull { it.userId == assignee.userId }?.name
+        ?: stringResource(Res.string.error_tracking_assignee_member)
+
+    is IssueAssignee.Role -> stringResource(Res.string.error_tracking_assignee_role)
+}
+
 private fun Long.compact(): String = toDouble().formatCompact()
 
 @OptIn(TestData::class)
@@ -291,12 +413,17 @@ private fun Long.compact(): String = toDouble().formatCompact()
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingIssueScreenPreview() = ErrorTrackingIssueScreen(
-    state = ErrorTrackingIssueUiState(issue = TestErrorTrackingIssue),
+    state = TestErrorTrackingIssueUiState,
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRefresh = {},
     onChangeStatus = {},
     onOpenInPostHog = {},
+    onOccurrenceSelected = {},
+    onExceptionsRetried = {},
+    onAssigneeClicked = {},
+    onAssigneeSelected = {},
+    onAssigneePickerDismissed = {},
 )
 
 @OptIn(TestData::class)
@@ -310,6 +437,11 @@ fun ErrorTrackingIssueScreenResolvedPreview() = ErrorTrackingIssueScreen(
     onRefresh = {},
     onChangeStatus = {},
     onOpenInPostHog = {},
+    onOccurrenceSelected = {},
+    onExceptionsRetried = {},
+    onAssigneeClicked = {},
+    onAssigneeSelected = {},
+    onAssigneePickerDismissed = {},
 )
 
 @PreviewLightDark
@@ -322,6 +454,11 @@ fun ErrorTrackingIssueScreenForbiddenPreview() = ErrorTrackingIssueScreen(
     onRefresh = {},
     onChangeStatus = {},
     onOpenInPostHog = {},
+    onOccurrenceSelected = {},
+    onExceptionsRetried = {},
+    onAssigneeClicked = {},
+    onAssigneeSelected = {},
+    onAssigneePickerDismissed = {},
 )
 
 @OptIn(TestData::class)
@@ -329,13 +466,15 @@ fun ErrorTrackingIssueScreenForbiddenPreview() = ErrorTrackingIssueScreen(
 @PreviewWrapper(ThemePreviewWrapper::class)
 @Composable
 fun ErrorTrackingIssueScreenResolvingPreview() = ErrorTrackingIssueScreen(
-    state = ErrorTrackingIssueUiState(
-        issue = TestErrorTrackingIssue,
-        updatingTo = IssueStatusFilter.Resolved,
-    ),
+    state = TestErrorTrackingIssueUiState.copy(updatingTo = IssueStatusFilter.Resolved),
     snackbarHostState = remember { SnackbarHostState() },
     onNavigateBack = {},
     onRefresh = {},
     onChangeStatus = {},
     onOpenInPostHog = {},
+    onOccurrenceSelected = {},
+    onExceptionsRetried = {},
+    onAssigneeClicked = {},
+    onAssigneeSelected = {},
+    onAssigneePickerDismissed = {},
 )

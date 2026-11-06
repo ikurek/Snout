@@ -17,11 +17,18 @@ import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import snout.composeapp.generated.resources.Res
+import snout.composeapp.generated.resources.error_tracking_assign_error_forbidden
+import snout.composeapp.generated.resources.error_tracking_assign_error_generic
+import snout.composeapp.generated.resources.error_tracking_assigned
+import snout.composeapp.generated.resources.error_tracking_assigned_to
+import snout.composeapp.generated.resources.error_tracking_members_error_forbidden
+import snout.composeapp.generated.resources.error_tracking_members_error_generic
 import snout.composeapp.generated.resources.error_tracking_status_changed_active
 import snout.composeapp.generated.resources.error_tracking_status_changed_resolved
 import snout.composeapp.generated.resources.error_tracking_status_changed_suppressed
 import snout.composeapp.generated.resources.error_tracking_status_error_forbidden
 import snout.composeapp.generated.resources.error_tracking_status_error_generic
+import snout.composeapp.generated.resources.error_tracking_unassigned_message
 import snout.composeapp.generated.resources.error_tracking_undo
 
 @Composable
@@ -34,24 +41,11 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
 
     LaunchedEffect(viewModel.sideEffects) {
         viewModel.sideEffects.collect { effect ->
-            when (effect) {
-                is ErrorTrackingIssueSideEffect.StatusChanged -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = getString(effect.status.changedMessage()),
-                        actionLabel = effect.undo?.let { getString(Res.string.error_tracking_undo) },
-                    )
-                    if (result == SnackbarResult.ActionPerformed) effect.undo?.let(viewModel::changeStatus)
-                }
-
-                is ErrorTrackingIssueSideEffect.StatusChangeFailed -> snackbarHostState.showSnackbar(
-                    getString(
-                        effect.error.actionFailedMessage(
-                            generic = Res.string.error_tracking_status_error_generic,
-                            forbidden = Res.string.error_tracking_status_error_forbidden,
-                        ),
-                    ),
-                )
-            }
+            snackbarHostState.show(
+                effect = effect,
+                onStatusUndone = viewModel::changeStatus,
+                onAssigneeUndone = viewModel::onAssigneeSelected,
+            )
         }
     }
 
@@ -62,11 +56,75 @@ internal fun ErrorTrackingIssueRoute(navKey: ErrorTrackingIssueNavKey, onNavigat
         onRefresh = viewModel::refresh,
         onChangeStatus = viewModel::changeStatus,
         onOpenInPostHog = { openInPostHog(PostHogResource.ErrorTrackingIssue(navKey.issueId)) },
+        onOccurrenceSelected = viewModel::onOccurrenceSelected,
+        onExceptionsRetried = viewModel::onExceptionsRetried,
+        onAssigneeClicked = viewModel::onAssigneeClicked,
+        onAssigneeSelected = viewModel::onAssigneeSelected,
+        onAssigneePickerDismissed = viewModel::onAssigneePickerDismissed,
     )
+}
+
+private suspend fun ErrorTrackingIssueSideEffect.AssigneeChanged.message(): String = when {
+    userId == null -> getString(Res.string.error_tracking_unassigned_message)
+    assigneeName != null -> getString(Res.string.error_tracking_assigned_to, assigneeName)
+    else -> getString(Res.string.error_tracking_assigned)
 }
 
 private fun IssueStatusFilter.changedMessage() = when (this) {
     IssueStatusFilter.Active -> Res.string.error_tracking_status_changed_active
     IssueStatusFilter.Resolved -> Res.string.error_tracking_status_changed_resolved
     IssueStatusFilter.Suppressed -> Res.string.error_tracking_status_changed_suppressed
+}
+
+private suspend fun SnackbarHostState.show(
+    effect: ErrorTrackingIssueSideEffect,
+    onStatusUndone: (IssueStatusFilter) -> Unit,
+    onAssigneeUndone: (Long?) -> Unit,
+) {
+    when (effect) {
+        is ErrorTrackingIssueSideEffect.StatusChanged -> {
+            val result = showSnackbar(
+                message = getString(effect.status.changedMessage()),
+                actionLabel = effect.undo?.let { getString(Res.string.error_tracking_undo) },
+            )
+            if (result == SnackbarResult.ActionPerformed) effect.undo?.let(onStatusUndone)
+        }
+
+        is ErrorTrackingIssueSideEffect.StatusChangeFailed -> showSnackbar(
+            getString(
+                effect.error.actionFailedMessage(
+                    generic = Res.string.error_tracking_status_error_generic,
+                    forbidden = Res.string.error_tracking_status_error_forbidden,
+                ),
+            ),
+        )
+
+        is ErrorTrackingIssueSideEffect.AssigneeChanged -> {
+            val result = showSnackbar(
+                message = effect.message(),
+                actionLabel = effect.undo?.let { getString(Res.string.error_tracking_undo) },
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                effect.undo?.let { onAssigneeUndone(it.userId) }
+            }
+        }
+
+        is ErrorTrackingIssueSideEffect.AssignFailed -> showSnackbar(
+            getString(
+                effect.error.actionFailedMessage(
+                    generic = Res.string.error_tracking_assign_error_generic,
+                    forbidden = Res.string.error_tracking_assign_error_forbidden,
+                ),
+            ),
+        )
+
+        is ErrorTrackingIssueSideEffect.MembersUnavailable -> showSnackbar(
+            getString(
+                effect.error.actionFailedMessage(
+                    generic = Res.string.error_tracking_members_error_generic,
+                    forbidden = Res.string.error_tracking_members_error_forbidden,
+                ),
+            ),
+        )
+    }
 }
