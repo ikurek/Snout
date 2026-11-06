@@ -45,6 +45,7 @@ import snout.composeapp.generated.resources.login_scopes_activity_log
 import snout.composeapp.generated.resources.login_scopes_add_annotations
 import snout.composeapp.generated.resources.login_scopes_analytics
 import snout.composeapp.generated.resources.login_scopes_annotations
+import snout.composeapp.generated.resources.login_scopes_assign_errors
 import snout.composeapp.generated.resources.login_scopes_collapsed
 import snout.composeapp.generated.resources.login_scopes_dashboards
 import snout.composeapp.generated.resources.login_scopes_errors
@@ -94,11 +95,18 @@ private val ScopeGroups = listOf(
         listOf(
             ScopedFeature(Res.string.login_scopes_toggle_flags, listOf("feature_flag:write")),
             ScopedFeature(Res.string.login_scopes_resolve_errors, listOf("error_tracking:write")),
+            ScopedFeature(
+                Res.string.login_scopes_assign_errors,
+                listOf("error_tracking:write", "organization_member:read"),
+            ),
             ScopedFeature(Res.string.login_scopes_add_annotations, listOf("annotation:write")),
             ScopedFeature(Res.string.login_scopes_favorite_insights, listOf("insight:write")),
         ),
     ),
 )
+
+/** The scopes' share of a row, against the feature's 1: room for the longest scope, `organization_member:read`. */
+private const val ScopesWeight = 1.3f
 
 private const val ChevronCollapsedRotation = 90f
 private const val ChevronExpandedRotation = 270f
@@ -181,7 +189,7 @@ private fun FeatureScopesRow(feature: ScopedFeature) {
     ) {
         Text(text = name, modifier = Modifier.weight(1f), style = SnoutTheme.typography.bodyMedium)
         FlowRow(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(ScopesWeight),
             horizontalArrangement = Arrangement.spacedBy(Spacing.xxSmall, Alignment.End),
             verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         ) {

@@ -47,6 +47,7 @@
     <string name="login_scopes_activity_log">Activity log</string>
     <string name="login_scopes_toggle_flags">Turn flags on or off</string>
     <string name="login_scopes_resolve_errors">Resolve, suppress and reopen errors</string>
+    <string name="login_scopes_assign_errors">Assign errors to members</string>
     <string name="login_scopes_add_annotations">Add annotations</string>
     <string name="login_scopes_favorite_insights">Favorite insights</string>
     <string name="login_scopes_footnote">Pick these when you create the key in PostHog. A section the key can't read shows "Access denied" instead, so a read-only key is a fine start.</string>
