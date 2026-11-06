@@ -7,7 +7,11 @@ import com.nightcode.snout.shared.data.testutils.parseJson
 import com.nightcode.snout.shared.data.testutils.respondJson
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.http.HttpMethod
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.time.Instant
 
 private const val ProjectId = 1L
 
@@ -132,5 +136,44 @@ class ErrorTrackingApiTest :
                 "query/",
                 """{"query":{"kind":"HogQLQuery","query":"$hogQl"}}""",
             )
+        }
+    
+        should("query an issue's occurrences with the issue id as a placeholder value") {
+            api.getOccurrences(ProjectId, issueId = "issue-1")
+
+            val query = postHog.requests.single().jsonBody().getValue("query").jsonObject
+            query.getValue("kind").jsonPrimitive.content shouldBe "HogQLQuery"
+            query.getValue("values") shouldBe parseJson("""{"issueId":"issue-1"}""")
+            query.getValue("query").jsonPrimitive.content shouldContain
+                "(issue_id = {issueId} OR properties.${'$'}exception_issue_id = {issueId})"
+        }
+
+        should("look an occurrence up by its id within a second of its timestamp") {
+            api.getOccurrenceExceptions(
+                ProjectId,
+                eventId = "event-1",
+                timestamp = Instant.parse("2026-11-06T10:23:58.815Z"),
+            )
+
+            val query = postHog.requests.single().jsonBody().getValue("query").jsonObject
+            query.getValue("values") shouldBe parseJson(
+                """{"eventId":"event-1","from":"2026-11-06T10:23:57.815Z","to":"2026-11-06T10:23:59.815Z"}""",
+            )
+        }
+
+        should("assign an issue to a user") {
+            api.assign(ProjectId, issueId = "issue-1", userId = 7)
+
+            shouldHaveSent(
+                HttpMethod.Patch,
+                "error_tracking/issues/issue-1/assign/",
+                """{"assignee":{"id":7,"type":"user"}}""",
+            )
+        }
+
+        should("send a null assignee to unassign an issue") {
+            api.assign(ProjectId, issueId = "issue-1", userId = null)
+
+            shouldHaveSent(HttpMethod.Patch, "error_tracking/issues/issue-1/assign/", """{"assignee":null}""")
         }
     })

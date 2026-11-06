@@ -3,6 +3,8 @@ package com.nightcode.snout.shared.api.errortracking
 import com.nightcode.snout.shared.api.DateRangeDto
 import com.nightcode.snout.shared.api.PropertyFilterDto
 import com.nightcode.snout.shared.api.QueryRequestDto
+import com.nightcode.snout.shared.api.errortracking.model.AssignErrorTrackingIssueRequestDto
+import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingAssigneeRequestDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingFingerprintDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueDto
 import com.nightcode.snout.shared.api.errortracking.model.ErrorTrackingIssueRequestDto
@@ -22,6 +24,8 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.decodeURLPart
 import org.koin.core.annotation.Single
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 /** PostHog caps a page of issues at 100. */
 private const val PageSize = 100
@@ -39,6 +43,33 @@ GROUP BY version
 ORDER BY max(timestamp) DESC
 LIMIT 20
 """
+
+/**
+ * Without their stacks, which can run to tens of kilobytes each. `issue_id` follows fingerprint overrides, so merged
+ * and split issues route right; the raw property catches events not yet overridden.
+ */
+private const val OccurrencesQuery = """
+SELECT uuid, timestamp, coalesce(properties.${'$'}os, properties.${'$'}os_name), properties.${'$'}os_version,
+    properties.${'$'}app_version, properties.${'$'}browser, properties.${'$'}browser_version,
+    properties.${'$'}device_model, properties.${'$'}current_url, properties.${'$'}screen_name, properties.${'$'}lib,
+    distinct_id, person.properties.email, person.properties.name
+FROM events
+WHERE event = '${'$'}exception' AND (issue_id = {issueId} OR properties.${'$'}exception_issue_id = {issueId})
+    AND timestamp > now() - INTERVAL 30 DAY
+ORDER BY timestamp DESC
+LIMIT 20
+"""
+
+/** The timestamp window lets ClickHouse skip straight to the event. */
+private const val OccurrenceExceptionsQuery = """
+SELECT properties.${'$'}exception_list
+FROM events
+WHERE event = '${'$'}exception' AND uuid = {eventId}
+    AND timestamp >= toDateTime({from}, 'UTC') AND timestamp <= toDateTime({to}, 'UTC')
+LIMIT 1
+"""
+
+private val OccurrenceWindow = 1.seconds
 
 /**
  * The compact error tracking endpoints, available on PostHog since mid-2026; older self-hosted instances answer 404.
@@ -117,10 +148,41 @@ class ErrorTrackingApi(private val client: HttpClient, private val authDataStore
      * App versions that reported exceptions in the last week, with their exception counts. Runs HogQL through the
      * query endpoint, so it needs `query:read` rather than an error tracking scope.
      */
-    suspend fun getAppVersions(projectId: Long) = networkCall<HogQLResultsDto> {
-        client.postJson(
-            authDataStore.projectUrl(projectId, "query/"),
-            QueryRequestDto(HogQLQueryDto(query = AppVersionsQuery.trimIndent())),
-        ).body()
+    suspend fun getAppVersions(projectId: Long) = hogQl(projectId, AppVersionsQuery)
+
+    /** HogQL through the query endpoint, so it needs `query:read`. */
+    suspend fun getOccurrences(projectId: Long, issueId: String) =
+        hogQl(projectId, OccurrencesQuery, mapOf("issueId" to issueId))
+
+    /** One row holding the occurrence's `${'$'}exception_list`, or no rows when the event is gone. */
+    suspend fun getOccurrenceExceptions(projectId: Long, eventId: String, timestamp: Instant) = hogQl(
+        projectId,
+        OccurrenceExceptionsQuery,
+        mapOf(
+            "eventId" to eventId,
+            "from" to (timestamp - OccurrenceWindow).toString(),
+            "to" to (timestamp + OccurrenceWindow).toString(),
+        ),
+    )
+
+    /**
+     * Assigns the issue to the organization member with user id [userId], or unassigns it when null. Requires the
+     * `error_tracking:write` scope; PostHog answers 403 otherwise.
+     */
+    suspend fun assign(projectId: Long, issueId: String, userId: Long?) = networkCall {
+        client.patchJson(
+            authDataStore.projectUrl(projectId, "error_tracking/issues/$issueId/assign/"),
+            AssignErrorTrackingIssueRequestDto(assignee = userId?.let { ErrorTrackingAssigneeRequestDto(it, "user") }),
+        )
+        Unit
     }
+
+    /** [values] fill the query's `{placeholders}`, so nothing from outside is pasted into the HogQL itself. */
+    private suspend fun hogQl(projectId: Long, query: String, values: Map<String, String>? = null) =
+        networkCall<HogQLResultsDto> {
+            client.postJson(
+                authDataStore.projectUrl(projectId, "query/"),
+                QueryRequestDto(HogQLQueryDto(query = query.trimIndent(), values = values)),
+            ).body()
+        }
 }

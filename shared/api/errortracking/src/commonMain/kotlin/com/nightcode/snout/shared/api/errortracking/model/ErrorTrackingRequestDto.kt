@@ -31,8 +31,19 @@ data class ErrorTrackingIssueRequestDto(
 @Serializable
 data class UpdateErrorTrackingIssueRequestDto(@SerialName("status") val status: String)
 
+/** The PATCH body of `error_tracking/issues/{id}/assign/`; a null [assignee] is sent, and unassigns the issue. */
 @Serializable
-data class HogQLQueryDto(@SerialName("query") val query: String) {
+data class AssignErrorTrackingIssueRequestDto(@SerialName("assignee") val assignee: ErrorTrackingAssigneeRequestDto?)
+
+@Serializable
+data class ErrorTrackingAssigneeRequestDto(@SerialName("id") val id: Long, @SerialName("type") val type: String)
+
+/** [values] fill the query's `{name}` placeholders. */
+@Serializable
+data class HogQLQueryDto(
+    @SerialName("query") val query: String,
+    @SerialName("values") val values: Map<String, String>? = null,
+) {
     @EncodeDefault
     @SerialName("kind")
     val kind: String = "HogQLQuery"

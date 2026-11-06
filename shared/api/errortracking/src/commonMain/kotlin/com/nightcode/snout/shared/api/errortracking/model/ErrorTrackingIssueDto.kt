@@ -31,6 +31,14 @@ data class ErrorTrackingIssueDto(
     @SerialName("sparkline") val sparkline: List<Double>? = null,
     @SerialName("top_in_app_frame") val topInAppFrame: ErrorTrackingFrameDto? = null,
     @SerialName("latest_release") val latestRelease: ErrorTrackingReleaseDto? = null,
+    @SerialName("assignee") val assignee: ErrorTrackingAssigneeDto? = null,
+)
+
+/** A user's numeric id or a role's UUID, by [type] (`user` or `role`). */
+@Serializable
+data class ErrorTrackingAssigneeDto(
+    @SerialName("id") val id: JsonElement? = null,
+    @SerialName("type") val type: String? = null,
 )
 
 @Serializable
