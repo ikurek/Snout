@@ -10,6 +10,7 @@ import snout.composeapp.generated.resources.ic_dashboard_24dp
 import snout.composeapp.generated.resources.ic_flag_24dp
 import snout.composeapp.generated.resources.ic_history_24dp
 import snout.composeapp.generated.resources.ic_insights_24dp
+import snout.composeapp.generated.resources.ic_person_24dp
 import snout.composeapp.generated.resources.ic_science_24dp
 import snout.composeapp.generated.resources.ic_sticky_note_24dp
 import snout.composeapp.generated.resources.ic_subject_24dp
@@ -31,6 +32,8 @@ import snout.composeapp.generated.resources.section_insights_description
 import snout.composeapp.generated.resources.section_insights_label
 import snout.composeapp.generated.resources.section_logs_description
 import snout.composeapp.generated.resources.section_logs_label
+import snout.composeapp.generated.resources.section_persons_description
+import snout.composeapp.generated.resources.section_persons_label
 
 /** Label used in the bottom bar, app bar and settings. */
 internal val HomeSection.label: StringResource
@@ -41,6 +44,7 @@ internal val HomeSection.label: StringResource
         HomeSection.FeatureFlags -> Res.string.section_feature_flags_label
         HomeSection.ErrorTracking -> Res.string.section_error_tracking_label
         HomeSection.Logs -> Res.string.section_logs_label
+        HomeSection.Persons -> Res.string.section_persons_label
         HomeSection.Experiments -> Res.string.section_experiments_label
         HomeSection.Annotations -> Res.string.section_annotations_label
         HomeSection.ActivityLog -> Res.string.section_activity_log_label
@@ -55,6 +59,7 @@ internal val HomeSection.description: StringResource
         HomeSection.FeatureFlags -> Res.string.section_feature_flags_description
         HomeSection.ErrorTracking -> Res.string.section_error_tracking_description
         HomeSection.Logs -> Res.string.section_logs_description
+        HomeSection.Persons -> Res.string.section_persons_description
         HomeSection.Experiments -> Res.string.section_experiments_description
         HomeSection.Annotations -> Res.string.section_annotations_description
         HomeSection.ActivityLog -> Res.string.section_activity_log_description
@@ -68,6 +73,7 @@ internal val HomeSection.icon: DrawableResource
         HomeSection.FeatureFlags -> Res.drawable.ic_flag_24dp
         HomeSection.ErrorTracking -> Res.drawable.ic_bug_report_24dp
         HomeSection.Logs -> Res.drawable.ic_subject_24dp
+        HomeSection.Persons -> Res.drawable.ic_person_24dp
         HomeSection.Experiments -> Res.drawable.ic_science_24dp
         HomeSection.Annotations -> Res.drawable.ic_sticky_note_24dp
         HomeSection.ActivityLog -> Res.drawable.ic_history_24dp

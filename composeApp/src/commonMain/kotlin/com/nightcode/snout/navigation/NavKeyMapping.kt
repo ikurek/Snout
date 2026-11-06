@@ -22,4 +22,5 @@ internal fun DeepLinkDestination.toNavKey(): SnoutNavKey? = when (this) {
     is DeepLinkDestination.FeatureFlag -> FeatureFlagDetailNavKey(id)
     is DeepLinkDestination.ErrorTrackingIssue -> ErrorTrackingIssueNavKey(id)
     is DeepLinkDestination.Experiment -> ExperimentDetailNavKey(id)
+    is DeepLinkDestination.Person -> PersonDetailNavKey(uuid)
 }

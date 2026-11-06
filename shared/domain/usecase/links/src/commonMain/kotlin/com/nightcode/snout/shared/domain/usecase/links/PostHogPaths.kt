@@ -24,6 +24,8 @@ internal fun PostHogResource.path(): String = when (this) {
     is PostHogResource.ErrorTrackingIssue -> "error_tracking/$id"
     is PostHogResource.ErrorTrackingFingerprint -> "error-tracking/fingerprint/$fingerprint"
     PostHogResource.Logs -> "logs"
+    PostHogResource.Persons -> "persons"
+    is PostHogResource.Person -> "persons/$uuid"
     PostHogResource.Experiments -> "experiments"
     is PostHogResource.Experiment -> "experiments/$id"
     PostHogResource.Annotations -> "data-management/annotations"
@@ -59,6 +61,10 @@ internal fun parsePath(segments: List<String>): PostHogResource? {
         "error_tracking", "error-tracking" -> parseErrorTracking(segments)
 
         "logs" -> PostHogResource.Logs.takeIf { segments.size == 1 }
+
+        "persons" -> parseListOrItem(segments, PostHogResource.Persons) {
+            id?.takeIf { Uuid.parseOrNull(it) != null }?.let(PostHogResource::Person)
+        }
 
         "experiments" -> parseListOrItem(segments, PostHogResource.Experiments) {
             id?.toLongOrNull()?.let(PostHogResource::Experiment)

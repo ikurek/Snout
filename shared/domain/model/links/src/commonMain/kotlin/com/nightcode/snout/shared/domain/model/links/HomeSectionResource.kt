@@ -11,6 +11,7 @@ val HomeSection.resource: PostHogResource
         HomeSection.FeatureFlags -> PostHogResource.FeatureFlags
         HomeSection.ErrorTracking -> PostHogResource.ErrorTracking
         HomeSection.Logs -> PostHogResource.Logs
+        HomeSection.Persons -> PostHogResource.Persons
         HomeSection.Experiments -> PostHogResource.Experiments
         HomeSection.Annotations -> PostHogResource.Annotations
         HomeSection.ActivityLog -> PostHogResource.ActivityLog

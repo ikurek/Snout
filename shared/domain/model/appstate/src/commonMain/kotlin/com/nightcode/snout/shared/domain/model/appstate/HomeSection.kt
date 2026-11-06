@@ -8,6 +8,7 @@ enum class HomeSection {
     FeatureFlags,
     ErrorTracking,
     Logs,
+    Persons,
     Experiments,
     Annotations,
     ActivityLog,

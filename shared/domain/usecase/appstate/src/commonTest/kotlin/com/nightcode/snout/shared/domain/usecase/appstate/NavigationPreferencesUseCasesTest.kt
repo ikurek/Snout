@@ -53,6 +53,7 @@ class NavigationPreferencesUseCasesTest :
                 HomeSection.Analytics,
                 HomeSection.ErrorTracking,
                 HomeSection.Logs,
+                HomeSection.Persons,
                 HomeSection.Experiments,
                 HomeSection.ActivityLog,
             )

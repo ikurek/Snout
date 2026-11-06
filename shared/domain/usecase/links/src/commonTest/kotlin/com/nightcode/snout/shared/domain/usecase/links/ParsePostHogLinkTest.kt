@@ -84,7 +84,7 @@ class ParsePostHogLinkTest :
         should("reject project pages Snout can't show") {
             listOf(
                 "https://us.posthog.com/project/1/replay/123",
-                "https://us.posthog.com/project/1/persons",
+                "https://us.posthog.com/project/1/persons/new",
                 "https://us.posthog.com/project/1/sql",
                 "https://us.posthog.com/project/1/insights/new",
                 "https://us.posthog.com/project/1/feature_flags/new",

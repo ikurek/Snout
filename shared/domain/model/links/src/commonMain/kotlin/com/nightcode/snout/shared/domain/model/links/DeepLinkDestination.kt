@@ -11,4 +11,5 @@ sealed interface DeepLinkDestination {
     data class FeatureFlag(val id: Long) : DeepLinkDestination
     data class ErrorTrackingIssue(val id: String) : DeepLinkDestination
     data class Experiment(val id: Long) : DeepLinkDestination
+    data class Person(val uuid: String) : DeepLinkDestination
 }

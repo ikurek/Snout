@@ -11,6 +11,7 @@ import com.nightcode.snout.features.experiments.ExperimentsRoute
 import com.nightcode.snout.features.featureflags.FeatureFlagsRoute
 import com.nightcode.snout.features.insights.InsightsRoute
 import com.nightcode.snout.features.logs.LogsRoute
+import com.nightcode.snout.features.persons.PersonsRoute
 import com.nightcode.snout.shared.domain.model.appstate.HomeSection
 import com.nightcode.snout.shared.domain.model.logs.LogsRange
 
@@ -40,6 +41,8 @@ internal fun HomeSectionContent(
 
         HomeSection.Logs -> LogsRoute(onOpenService = navigation.onOpenLogService, contentPadding = contentPadding)
 
+        HomeSection.Persons -> PersonsRoute(onOpenPerson = navigation.onOpenPerson, contentPadding = contentPadding)
+
         HomeSection.Experiments ->
             ExperimentsRoute(onOpenExperiment = navigation.onOpenExperiment, contentPadding = contentPadding)
 
@@ -56,5 +59,6 @@ internal data class SectionNavigation(
     val onOpenFeatureFlag: (flagId: Long) -> Unit,
     val onOpenErrorTrackingIssue: (issueId: String) -> Unit,
     val onOpenLogService: (service: String, range: LogsRange) -> Unit,
+    val onOpenPerson: (uuid: String) -> Unit,
     val onOpenExperiment: (experimentId: Long) -> Unit,
 )

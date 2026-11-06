@@ -19,6 +19,8 @@ sealed interface PostHogResource {
      */
     data class ErrorTrackingFingerprint(val fingerprint: String) : PostHogResource
     data object Logs : PostHogResource
+    data object Persons : PostHogResource
+    data class Person(val uuid: String) : PostHogResource
     data object Experiments : PostHogResource
     data class Experiment(val id: Long) : PostHogResource
     data object Annotations : PostHogResource

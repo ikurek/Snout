@@ -27,5 +27,6 @@ private fun LinkResolution.destination(): LinkDestination = when (this) {
         is DeepLinkDestination.FeatureFlag -> LinkDestination.FeatureFlag
         is DeepLinkDestination.ErrorTrackingIssue -> LinkDestination.ErrorTrackingIssue
         is DeepLinkDestination.Experiment -> LinkDestination.Experiment
+        is DeepLinkDestination.Person -> LinkDestination.Person
     }
 }

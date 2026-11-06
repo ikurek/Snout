@@ -72,6 +72,8 @@ class ResolvePostHogLink(
 
         is PostHogResource.Experiment -> DeepLinkDestination.Experiment(id)
 
+        is PostHogResource.Person -> DeepLinkDestination.Person(uuid)
+
         is PostHogResource.Insight -> findInsightIdByShortId(shortId).getOrNull()?.let(DeepLinkDestination::Insight)
 
         PostHogResource.WebAnalytics,
@@ -80,6 +82,7 @@ class ResolvePostHogLink(
         PostHogResource.FeatureFlags,
         PostHogResource.ErrorTracking,
         PostHogResource.Logs,
+        PostHogResource.Persons,
         PostHogResource.Experiments,
         PostHogResource.Annotations,
         PostHogResource.ActivityLog,

@@ -68,3 +68,6 @@ internal data class LogServiceNavKey(val service: String, val range: LogsRange) 
 /** A log line; [service] and [timestamp] let it be found again, since PostHog can't fetch one line by [id]. */
 @Serializable
 internal data class LogEntryNavKey(val service: String, val id: String, val timestamp: Instant) : SnoutNavKey
+
+@Serializable
+internal data class PersonDetailNavKey(val uuid: String) : SnoutNavKey

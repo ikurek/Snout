@@ -28,6 +28,7 @@ import com.nightcode.snout.features.insights.detail.InsightDetailRoute
 import com.nightcode.snout.features.logs.entry.LogEntryRoute
 import com.nightcode.snout.features.logs.service.LogServiceRoute
 import com.nightcode.snout.features.onboarding.OnboardingRoute
+import com.nightcode.snout.features.persons.detail.PersonDetailRoute
 import com.nightcode.snout.features.settings.SettingsRoute
 import com.nightcode.snout.features.settings.analytics.AnalyticsSettingsRoute
 import com.nightcode.snout.features.settings.libraries.LibrariesRoute
@@ -192,6 +193,7 @@ private fun EntryProviderScope<NavKey>.homeEntries(
         onOpenErrorTrackingIssue = { backStack.add(ErrorTrackingIssueNavKey(it)) },
         onOpenLogService = { service, range -> backStack.add(LogServiceNavKey(service, range)) },
         onOpenExperiment = { backStack.add(ExperimentDetailNavKey(it)) },
+        onOpenPerson = { backStack.add(PersonDetailNavKey(it)) },
     )
     entry<HomeNavKey> {
         HomeRoute(
@@ -225,7 +227,7 @@ private fun EntryProviderScope<NavKey>.settingsEntries(backStack: NavBackStack<N
     entry<LibraryDetailNavKey> { key -> LibraryDetailRoute(navKey = key, onNavigateBack = back) }
 }
 
-/** A single dashboard, insight, flag, issue or experiment, opened from a list or a link. */
+/** A single dashboard, insight, flag, issue, experiment or person, opened from a list or a link. */
 private fun EntryProviderScope<NavKey>.detailEntries(backStack: NavBackStack<NavKey>, back: () -> Unit) {
     entry<DashboardDetailNavKey> { key ->
         DashboardDetailRoute(
@@ -242,6 +244,13 @@ private fun EntryProviderScope<NavKey>.detailEntries(backStack: NavBackStack<Nav
             navKey = key,
             onNavigateBack = back,
             onOpenFeatureFlag = { backStack.add(FeatureFlagDetailNavKey(it)) },
+        )
+    }
+    entry<PersonDetailNavKey> { key ->
+        PersonDetailRoute(
+            navKey = key,
+            onNavigateBack = back,
+            onOpenIssue = { backStack.add(ErrorTrackingIssueNavKey(it)) },
         )
     }
 }

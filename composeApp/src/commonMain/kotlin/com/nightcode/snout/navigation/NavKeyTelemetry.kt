@@ -24,4 +24,5 @@ internal val SnoutNavKey.telemetryScreen: TelemetryScreen?
         is ExperimentDetailNavKey -> TelemetryScreen.ExperimentDetail
         is LogServiceNavKey -> TelemetryScreen.LogService
         is LogEntryNavKey -> TelemetryScreen.LogEntry
+        is PersonDetailNavKey -> TelemetryScreen.PersonDetail
     }

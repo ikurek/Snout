@@ -64,6 +64,7 @@ class NavigationPreferencesTest :
             default.hidden shouldBe listOf(
                 HomeSection.ErrorTracking,
                 HomeSection.Logs,
+                HomeSection.Persons,
                 HomeSection.Experiments,
                 HomeSection.Annotations,
                 HomeSection.ActivityLog,

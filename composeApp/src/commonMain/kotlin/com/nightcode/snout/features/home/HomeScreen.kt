@@ -127,5 +127,6 @@ fun HomeScreenPreview() = HomeScreen(
         onOpenErrorTrackingIssue = {},
         onOpenLogService = { _, _ -> },
         onOpenExperiment = {},
+        onOpenPerson = {},
     ),
 )

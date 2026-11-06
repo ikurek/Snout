@@ -13,6 +13,7 @@ enum class TelemetryScreen {
     FeatureFlags,
     ErrorTracking,
     Logs,
+    Persons,
     Experiments,
     Annotations,
     ActivityLog,
@@ -24,6 +25,7 @@ enum class TelemetryScreen {
     ExperimentDetail,
     LogService,
     LogEntry,
+    PersonDetail,
     Settings,
     NavigationSettings,
     AnalyticsSettings,
@@ -41,6 +43,7 @@ enum class TelemetryScreen {
             HomeSection.FeatureFlags -> FeatureFlags
             HomeSection.ErrorTracking -> ErrorTracking
             HomeSection.Logs -> Logs
+            HomeSection.Persons -> Persons
             HomeSection.Experiments -> Experiments
             HomeSection.Annotations -> Annotations
             HomeSection.ActivityLog -> ActivityLog

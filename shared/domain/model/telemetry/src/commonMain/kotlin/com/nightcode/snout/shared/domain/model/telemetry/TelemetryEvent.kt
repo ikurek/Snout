@@ -76,5 +76,6 @@ enum class LinkDestination {
     FeatureFlag,
     ErrorTrackingIssue,
     Experiment,
+    Person,
     Browser,
 }
