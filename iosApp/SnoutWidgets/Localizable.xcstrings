@@ -155,6 +155,17 @@
         }
       }
     },
+    "widget_highlight_no_subscriptions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No subscriptions"
+          }
+        }
+      }
+    },
     "widget_highlight_not_set_up": {
       "extractionState": "manual",
       "localizations": {
@@ -195,6 +206,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Project highlights"
+          }
+        }
+      }
+    },
+    "widget_highlights_range_more %@ %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · +%2$lld"
           }
         }
       }
@@ -397,6 +419,17 @@
         }
       }
     },
+    "widget_metric_paying_customers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paying customers"
+          }
+        }
+      }
+    },
     "widget_metric_revenue": {
       "extractionState": "manual",
       "localizations": {
@@ -426,6 +459,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sessions"
+          }
+        }
+      }
+    },
+    "widget_metric_stickiness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stickiness (DAU / MAU)"
+          }
+        }
+      }
+    },
+    "widget_metric_subscribers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subscribers"
+          }
+        }
+      }
+    },
+    "widget_metric_users_with_errors": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Users affected by errors"
           }
         }
       }
@@ -727,6 +793,17 @@
         }
       }
     },
+    "widget_tile_paying_customers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customers"
+          }
+        }
+      }
+    },
     "widget_tile_revenue": {
       "extractionState": "manual",
       "localizations": {
@@ -745,6 +822,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sessions"
+          }
+        }
+      }
+    },
+    "widget_tile_stickiness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stickiness"
+          }
+        }
+      }
+    },
+    "widget_tile_subscribers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subscribers"
+          }
+        }
+      }
+    },
+    "widget_tile_users_with_errors": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affected users"
           }
         }
       }

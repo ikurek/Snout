@@ -84,7 +84,10 @@ struct HighlightsDisplay {
             TileDisplay(label: Strings.tileSessionDuration, value: "2m 23s", change: ChangeDisplay(text: "↓ 1.2%", tone: .bad)),
             TileDisplay(label: Strings.tileExceptions, value: "206", change: ChangeDisplay(text: "↓ 10%", tone: .good)),
             TileDisplay(label: Strings.tileMrr, value: "$12.4k", change: nil),
+            TileDisplay(label: Strings.tileStickiness, value: "18%", change: ChangeDisplay(text: "↑ 2.1%", tone: .good)),
             TileDisplay(label: Strings.tileLatestAppVersion, value: "3.3.0", change: nil),
+            TileDisplay(label: Strings.tileSubscribers, value: "312", change: nil),
+            TileDisplay(label: Strings.tileUsersWithErrors, value: "41", change: ChangeDisplay(text: "↓ 8%", tone: .good)),
         ],
         link: nil
     ) }
@@ -156,7 +159,7 @@ extension HighlightsDisplay {
                     label: tile.metric.tileLabel,
                     value: tile.value,
                     change: tile.change.map(ChangeDisplay.init),
-                    note: tile.missing.map { $0 == .notsetup ? Strings.highlightNotSetUp : Strings.highlightFailed }
+                    note: tile.missing.map(\.note)
                 )
             },
             link: content.link.flatMap { SnoutLink.url(carrying: $0) }
@@ -233,10 +236,25 @@ extension HighlightMetric {
         case .dailyactiveusers: Strings.tileDailyActiveUsers
         case .weeklyactiveusers: Strings.tileWeeklyActiveUsers
         case .monthlyactiveusers: Strings.tileMonthlyActiveUsers
+        case .stickiness: Strings.tileStickiness
         case .mrr: Strings.tileMrr
         case .revenue: Strings.tileRevenue
+        case .subscribers: Strings.tileSubscribers
+        case .payingcustomers: Strings.tilePayingCustomers
         case .latestappversion: Strings.tileLatestAppVersion
+        case .userswitherrors: Strings.tileUsersWithErrors
         default: Strings.tileExceptions
+        }
+    }
+}
+
+extension HighlightMissing {
+    /// What a tile without a value says in its place.
+    var note: String {
+        switch self {
+        case .notsetup: Strings.highlightNotSetUp
+        case .nosubscriptions: Strings.highlightNoSubscriptions
+        default: Strings.highlightFailed
         }
     }
 }

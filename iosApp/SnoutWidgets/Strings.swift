@@ -10,6 +10,12 @@ enum Strings {
     static var highlightsDescription: String { String(localized: "widget_highlights_description") }
     static var highlightNotSetUp: String { String(localized: "widget_highlight_not_set_up") }
     static var highlightFailed: String { String(localized: "widget_highlight_failed") }
+    static var highlightNoSubscriptions: String { String(localized: "widget_highlight_no_subscriptions") }
+
+    /// The range, then how many of the widget's metrics don't fit: "Last 7 days · +2".
+    static func rangeMore(_ range: String, _ hidden: Int) -> String {
+        String(localized: "widget_highlights_range_more \(range) \(hidden)")
+    }
     static var insightDescription: String { String(localized: "widget_insight_description") }
 
     static var signedOut: String { String(localized: "widget_signed_out") }
@@ -68,6 +74,10 @@ enum Strings {
     static var tileRevenue: String { String(localized: "widget_tile_revenue") }
     static var tileLatestAppVersion: String { String(localized: "widget_tile_version") }
     static var tileExceptions: String { String(localized: "widget_tile_exceptions") }
+    static var tileStickiness: String { String(localized: "widget_tile_stickiness") }
+    static var tileSubscribers: String { String(localized: "widget_tile_subscribers") }
+    static var tilePayingCustomers: String { String(localized: "widget_tile_paying_customers") }
+    static var tileUsersWithErrors: String { String(localized: "widget_tile_users_with_errors") }
 
     /// The sample widgets' names, for the widget gallery and previews.
     static var previewProject: String { String(localized: "widget_preview_project") }

@@ -12,6 +12,8 @@ enum Ember {
     static let good = dynamic(light: 0x276B43, dark: 0x7FD79F)
     static let bad = dynamic(light: 0xB3261E, dark: 0xFFB4AB)
     static let divider = dynamic(light: 0xE8E0D4, dark: 0x2E2822)
+    /// A card on the background, such as a highlight's tile: the tokens' `surfaceContainer`.
+    static let surfaceContainer = dynamic(light: 0xEDE5DA, dark: 0x231E18)
 
     private static func dynamic(light: UInt32, dark: UInt32) -> Color {
         Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor(rgb: dark) : UIColor(rgb: light) })
@@ -60,7 +62,7 @@ struct WidgetHeader: View {
                 if let caption { WidgetTitle(text: caption) }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            if family == .systemSmall || family == .systemMedium {
+            if family == .systemSmall || family == .systemMedium || family == .systemLarge {
                 Button(intent: RefreshWidgetIntent()) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 14, weight: .semibold))
