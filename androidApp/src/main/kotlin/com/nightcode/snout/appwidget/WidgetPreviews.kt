@@ -62,8 +62,8 @@ internal fun highlightsPreview(
         HighlightTile(HighlightMetric.MonthlyActiveUsers, "41.2k", TrendChange("↑ 3.4%", ChangeTone.Good)),
         HighlightTile(HighlightMetric.SessionDuration, "2m 23s", TrendChange("↓ 1.2%", ChangeTone.Bad)),
         HighlightTile(HighlightMetric.Exceptions, "206", TrendChange("↓ 10%", ChangeTone.Good)),
-        HighlightTile(HighlightMetric.Mrr, "$12.4k", TrendChange("→ 0%", ChangeTone.Neutral)),
-        HighlightTile(HighlightMetric.LatestAppVersion, "3.3.0", null),
+        HighlightTile(HighlightMetric.Mrr, "$12.4k", null),
+        HighlightTile(HighlightMetric.Stickiness, "18%", TrendChange("↑ 2.1%", ChangeTone.Good)),
     )
     return WidgetLoad(
         config = HighlightsWidgetConfig(

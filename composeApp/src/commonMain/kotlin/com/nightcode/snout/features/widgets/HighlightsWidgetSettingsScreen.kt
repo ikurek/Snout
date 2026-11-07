@@ -1,12 +1,15 @@
 package com.nightcode.snout.features.widgets
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -37,7 +40,6 @@ import com.nightcode.snout.features.analytics.components.label
 import com.nightcode.snout.shared.common.testdata.TestData
 import com.nightcode.snout.shared.domain.model.analytics.AnalyticsRange
 import com.nightcode.snout.shared.domain.model.analytics.HighlightMetric
-import com.nightcode.snout.shared.domain.model.analytics.HighlightSource
 import com.nightcode.snout.shared.domain.model.appstate.ThemeMode
 import com.nightcode.snout.widgets.HighlightsWidgetConfig
 import org.jetbrains.compose.resources.StringResource
@@ -55,6 +57,8 @@ import snout.composeapp.generated.resources.analytics_metric_visitors
 import snout.composeapp.generated.resources.analytics_metric_wau
 import snout.composeapp.generated.resources.dialog_cancel
 import snout.composeapp.generated.resources.ic_analytics_24dp
+import snout.composeapp.generated.resources.ic_arrow_downward_24dp
+import snout.composeapp.generated.resources.ic_arrow_upward_24dp
 import snout.composeapp.generated.resources.widget_analytics_settings_add
 import snout.composeapp.generated.resources.widget_analytics_settings_range_section
 import snout.composeapp.generated.resources.widget_analytics_settings_save
@@ -62,14 +66,22 @@ import snout.composeapp.generated.resources.widget_highlight_app_version
 import snout.composeapp.generated.resources.widget_highlight_dau
 import snout.composeapp.generated.resources.widget_highlight_exceptions
 import snout.composeapp.generated.resources.widget_highlight_mrr
+import snout.composeapp.generated.resources.widget_highlight_paying_customers
 import snout.composeapp.generated.resources.widget_highlight_revenue
+import snout.composeapp.generated.resources.widget_highlight_stickiness
+import snout.composeapp.generated.resources.widget_highlight_subscribers
+import snout.composeapp.generated.resources.widget_highlight_users_with_errors
 import snout.composeapp.generated.resources.widget_highlights_group_app
 import snout.composeapp.generated.resources.widget_highlights_group_revenue
 import snout.composeapp.generated.resources.widget_highlights_group_users
 import snout.composeapp.generated.resources.widget_highlights_group_web
 import snout.composeapp.generated.resources.widget_highlights_metrics_hint
+import snout.composeapp.generated.resources.widget_highlights_move_down
+import snout.composeapp.generated.resources.widget_highlights_move_up
+import snout.composeapp.generated.resources.widget_highlights_order_section
 import snout.composeapp.generated.resources.widget_highlights_revenue_hint
 import snout.composeapp.generated.resources.widget_highlights_settings_title
+import snout.composeapp.generated.resources.widget_highlights_subscriptions_hint
 import snout.composeapp.generated.resources.widget_insight_picker_not_connected_message
 import snout.composeapp.generated.resources.widget_insight_picker_not_connected_title
 import snout.composeapp.generated.resources.widget_project_title
@@ -87,9 +99,19 @@ private val MetricGroups: List<Pair<StringResource, List<HighlightMetric>>> = li
         HighlightMetric.DailyActiveUsers,
         HighlightMetric.WeeklyActiveUsers,
         HighlightMetric.MonthlyActiveUsers,
+        HighlightMetric.Stickiness,
     ),
-    Res.string.widget_highlights_group_revenue to listOf(HighlightMetric.Mrr, HighlightMetric.Revenue),
-    Res.string.widget_highlights_group_app to listOf(HighlightMetric.LatestAppVersion, HighlightMetric.Exceptions),
+    Res.string.widget_highlights_group_revenue to listOf(
+        HighlightMetric.Mrr,
+        HighlightMetric.Revenue,
+        HighlightMetric.Subscribers,
+        HighlightMetric.PayingCustomers,
+    ),
+    Res.string.widget_highlights_group_app to listOf(
+        HighlightMetric.LatestAppVersion,
+        HighlightMetric.Exceptions,
+        HighlightMetric.UsersWithErrors,
+    ),
 )
 
 /**
@@ -120,11 +142,11 @@ fun HighlightsWidgetSettings(
                 onProjectSelected = viewModel::onProjectSelected,
                 onRetryProjects = viewModel::retryProjects,
                 onRangeSelected = { range = it },
-                // Kept in the settings' order, which the widget shows them in.
+                // In the order picked, which the widget shows them in: a new one goes last.
                 onMetricToggled = { metric, on ->
-                    val picked = if (on) metrics + metric else metrics - metric
-                    metricNames = HighlightMetric.entries.filter { it in picked }.map { it.name }
+                    metricNames = (if (on) metrics + metric else metrics - metric).distinct().map { it.name }
                 },
+                onMetricMoved = { from, to -> metricNames = metricNames.moved(from, to) },
                 onSave = {
                     val project = state.projects?.firstOrNull { it.id == state.projectId }
                     project?.let { onSave(HighlightsWidgetConfig(it.id, range, metrics, projectName = it.name)) }
@@ -145,6 +167,7 @@ internal fun HighlightsWidgetSettingsScreen(
     onRetryProjects: () -> Unit,
     onRangeSelected: (AnalyticsRange) -> Unit,
     onMetricToggled: (HighlightMetric, Boolean) -> Unit,
+    onMetricMoved: (from: Int, to: Int) -> Unit,
     onSave: () -> Unit,
     onClose: () -> Unit,
 ) {
@@ -187,6 +210,7 @@ internal fun HighlightsWidgetSettingsScreen(
                 )
 
                 MetricSwitches(metrics, onMetricToggled)
+                MetricOrder(metrics, onMetricMoved)
 
                 VerticalSpacer(Spacing.xxLarge)
                 val action = Res.string.run {
@@ -205,7 +229,7 @@ internal fun HighlightsWidgetSettingsScreen(
 
 /**
  * A switch per metric, under its group's label: up to [HighlightsWidgetConfig.MaxMetrics] on, at least one. The
- * widget shows them in this order, as many as fit.
+ * widget shows them in the order [MetricOrder] lists them, as many as fit.
  */
 @Composable
 private fun MetricSwitches(metrics: List<HighlightMetric>, onMetricToggled: (HighlightMetric, Boolean) -> Unit) {
@@ -223,11 +247,7 @@ private fun MetricSwitches(metrics: List<HighlightMetric>, onMetricToggled: (Hig
             val enabled = if (checked) metrics.size > 1 else !isFull
             EntityRow(
                 title = stringResource(metric.label),
-                subtitle = if (metric.source == HighlightSource.Revenue) {
-                    stringResource(Res.string.widget_highlights_revenue_hint)
-                } else {
-                    null
-                },
+                subtitle = metric.hint?.let { stringResource(it) },
                 titleStyle = SnoutTheme.typography.bodyLarge,
                 divider = index < groupMetrics.lastIndex,
                 onClick = if (enabled) ({ onMetricToggled(metric, !checked) }) else null,
@@ -239,6 +259,54 @@ private fun MetricSwitches(metrics: List<HighlightMetric>, onMetricToggled: (Hig
     }
 }
 
+/**
+ * The picked metrics in the order the widget shows them, each with buttons moving it up or down; nothing while one
+ * is picked, which has nowhere to go.
+ */
+@Composable
+private fun MetricOrder(metrics: List<HighlightMetric>, onMetricMoved: (from: Int, to: Int) -> Unit) {
+    if (metrics.size < 2) return
+    SectionLabel(stringResource(Res.string.widget_highlights_order_section))
+    metrics.forEachIndexed { index, metric ->
+        val name = stringResource(metric.label)
+        EntityRow(
+            title = "${index + 1}. $name",
+            titleStyle = SnoutTheme.typography.bodyLarge,
+            divider = index < metrics.lastIndex,
+            trailing = {
+                Row {
+                    IconButton(onClick = { onMetricMoved(index, index - 1) }, enabled = index > 0) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_arrow_upward_24dp),
+                            contentDescription = stringResource(Res.string.widget_highlights_move_up, name),
+                        )
+                    }
+                    IconButton(onClick = { onMetricMoved(index, index + 1) }, enabled = index < metrics.lastIndex) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_arrow_downward_24dp),
+                            contentDescription = stringResource(Res.string.widget_highlights_move_down, name),
+                        )
+                    }
+                }
+            },
+        )
+    }
+}
+
+/** This list with the item at [from] moved to [to]; unchanged when either is out of it. */
+internal fun <T> List<T>.moved(from: Int, to: Int): List<T> {
+    if (from !in indices || to !in indices) return this
+    return toMutableList().apply { add(to, removeAt(from)) }
+}
+
+/** What a metric needs set up in PostHog before it has a value, when that is more than its events. */
+private val HighlightMetric.hint: StringResource?
+    get() = when (this) {
+        HighlightMetric.Mrr, HighlightMetric.Subscribers -> Res.string.widget_highlights_subscriptions_hint
+        HighlightMetric.Revenue, HighlightMetric.PayingCustomers -> Res.string.widget_highlights_revenue_hint
+        else -> null
+    }
+
 internal val HighlightMetric.label: StringResource
     get() = when (this) {
         HighlightMetric.Visitors -> Res.string.analytics_metric_visitors
@@ -249,10 +317,14 @@ internal val HighlightMetric.label: StringResource
         HighlightMetric.DailyActiveUsers -> Res.string.widget_highlight_dau
         HighlightMetric.WeeklyActiveUsers -> Res.string.analytics_metric_wau
         HighlightMetric.MonthlyActiveUsers -> Res.string.analytics_metric_mau
+        HighlightMetric.Stickiness -> Res.string.widget_highlight_stickiness
         HighlightMetric.Mrr -> Res.string.widget_highlight_mrr
         HighlightMetric.Revenue -> Res.string.widget_highlight_revenue
+        HighlightMetric.Subscribers -> Res.string.widget_highlight_subscribers
+        HighlightMetric.PayingCustomers -> Res.string.widget_highlight_paying_customers
         HighlightMetric.LatestAppVersion -> Res.string.widget_highlight_app_version
         HighlightMetric.Exceptions -> Res.string.widget_highlight_exceptions
+        HighlightMetric.UsersWithErrors -> Res.string.widget_highlight_users_with_errors
     }
 
 @OptIn(TestData::class)
@@ -268,6 +340,7 @@ fun HighlightsWidgetSettingsScreenPreview() = HighlightsWidgetSettingsScreen(
     onRetryProjects = {},
     onRangeSelected = {},
     onMetricToggled = { _, _ -> },
+    onMetricMoved = { _, _ -> },
     onSave = {},
     onClose = {},
 )

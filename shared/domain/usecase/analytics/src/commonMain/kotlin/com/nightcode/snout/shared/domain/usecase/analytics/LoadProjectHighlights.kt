@@ -51,7 +51,6 @@ class LoadProjectHighlights(
             .map { mapOf(HighlightMetric.LatestAppVersion to it) }
 
         HighlightSource.Exceptions -> highlightsRepository.getExceptions(projectId, range)
-            .map { mapOf(HighlightMetric.Exceptions to it) }
     }
 }
 

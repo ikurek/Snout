@@ -27,8 +27,8 @@ data class HighlightsWidgetConfig(
     val projectName: String? = null,
 ) {
     companion object {
-        /** The most a widget shows: three by two on the widest. */
-        const val MaxMetrics = 6
+        /** The most a widget shows: three by three on the largest. */
+        const val MaxMetrics = 9
 
         /** What a new widget's settings start on: who comes, how many stay, and whether the app holds up. */
         val DefaultMetrics = listOf(
@@ -61,6 +61,9 @@ data class HighlightTile(
 enum class HighlightMissing {
     /** The project's PostHog doesn't collect it: revenue analytics isn't set up, or no event carries a version. */
     NotSetUp,
+
+    /** Revenue analytics is set up, but none of its revenue recurs, which MRR and subscribers count. */
+    NoSubscriptions,
 
     /** Its request failed; the other tiles stand. */
     Failed,
@@ -107,6 +110,9 @@ private fun Either<DataError, Highlight>.toTile(metric: HighlightMetric): Highli
             is Highlight.Money -> HighlightTile(metric, formatMoney(highlight.amount, highlight.currency), null)
 
             is Highlight.Version -> HighlightTile(metric, highlight.name, null)
+
+            Highlight.NoSubscriptions ->
+                HighlightTile(metric, value = null, change = null, missing = HighlightMissing.NoSubscriptions)
 
             // A web stat or a count with nothing in it is still a value: there was none.
             Highlight.None -> when (metric.source) {

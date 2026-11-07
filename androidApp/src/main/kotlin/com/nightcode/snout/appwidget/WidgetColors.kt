@@ -14,6 +14,9 @@ internal object WidgetColors {
     val onBackground: ColorProvider = ColorProvider(day = Color(0xFF1F1A14), night = Color(0xFFF1EAE0))
     val onSurfaceVariant: ColorProvider = ColorProvider(day = Color(0xFF5E554B), night = Color(0xFFB4A99A))
 
+    /** A card on the background, such as a highlight's tile: the tokens' `surfaceContainer`. */
+    val surfaceContainer: ColorProvider = ColorProvider(day = Color(0xFFEDE5DA), night = Color(0xFF231E18))
+
     /** The first chart series, as the app draws its lines. */
     val chart: ColorProvider = ColorProvider(day = Color(0xFFBC3D0A), night = Color(0xFFFF9466))
     val good: ColorProvider = ColorProvider(day = Color(0xFF276B43), night = Color(0xFF7FD79F))

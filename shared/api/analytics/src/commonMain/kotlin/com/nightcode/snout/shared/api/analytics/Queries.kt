@@ -58,10 +58,13 @@ internal fun trendsQuery(
 )
 
 /**
- * Every revenue source's MRR and revenue to date, and how many customers they come from: PostHog's revenue analytics
- * keeps both per person, whichever source (Stripe, revenue events) they came from. No customers means it isn't set up.
+ * Every revenue source's MRR and revenue to date, how many customers they come from, how many of those pay a
+ * subscription now and how many ever paid: PostHog's revenue analytics keeps both per person, whichever source (Stripe,
+ * revenue events) they came from. No customers means it isn't set up.
  */
-internal val RevenueTotalsQuery = HogQLQueryDto("SELECT sum(mrr), sum(revenue), count() FROM persons_revenue_analytics")
+internal val RevenueTotalsQuery = HogQLQueryDto(
+    "SELECT sum(mrr), sum(revenue), count(), countIf(mrr > 0), countIf(revenue > 0) FROM persons_revenue_analytics",
+)
 
 /** The app versions events carried over the last week, most used first. */
 internal val AppVersionsQuery = HogQLQueryDto(
@@ -75,12 +78,17 @@ internal val AppVersionsQuery = HogQLQueryDto(
     """.trimIndent(),
 )
 
-/** Exceptions in the range [dateFrom] names (as a trends query's), and in the same span just before it. */
+/**
+ * Exceptions in the range [dateFrom] names (as a trends query's) and in the same span just before it, then the users
+ * who ran into them in each.
+ */
 internal fun exceptionCountsQuery(dateFrom: String): HogQLQueryDto {
     val (start, previousStart, previousEnd) = window(dateFrom)
+    val previous = "timestamp >= $previousStart AND timestamp < $previousEnd"
     return HogQLQueryDto(
         """
-        SELECT countIf(timestamp >= $start), countIf(timestamp >= $previousStart AND timestamp < $previousEnd)
+        SELECT countIf(timestamp >= $start), countIf($previous),
+            uniqIf(person_id, timestamp >= $start), uniqIf(person_id, $previous)
         FROM events
         WHERE event = '${'$'}exception' AND timestamp >= $previousStart
         """.trimIndent(),

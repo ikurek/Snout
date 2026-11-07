@@ -63,8 +63,12 @@ class HighlightsWidgetLoaderTest :
         beforeEach {
             everySuspend { analyticsRepository.getOverview(any(), any()) } returns
                 Either.Right(TestAnalyticsSnapshot.overview)
-            everySuspend { highlightsRepository.getExceptions(any(), any()) } returns
-                Either.Right(Highlight.Figure(206.0, OverviewMetricKind.Count, -10.0, isIncreaseBad = true))
+            everySuspend { highlightsRepository.getExceptions(any(), any()) } returns Either.Right(
+                mapOf(
+                    HighlightMetric.Exceptions to
+                        Highlight.Figure(206.0, OverviewMetricKind.Count, -10.0, isIncreaseBad = true),
+                ),
+            )
             everySuspend { highlightsRepository.getRevenue(any()) } returns
                 Either.Right(mapOf(HighlightMetric.Mrr to Highlight.Money(12_430.0, "USD")))
             everySuspend { highlightsRepository.getLatestAppVersion(any()) } returns Either.Right(Highlight.None)
@@ -92,6 +96,14 @@ class HighlightsWidgetLoaderTest :
             val state = subject().load(config) as WidgetState.Loaded
             state.content.tiles[1] shouldBe HighlightTile(HighlightMetric.Mrr, null, null, HighlightMissing.Failed)
             state.content.tiles[0].value shouldBe "206"
+        }
+
+        should("say there are no subscriptions when PostHog has revenue but none of it recurs") {
+            everySuspend { highlightsRepository.getRevenue(any()) } returns
+                Either.Right(mapOf(HighlightMetric.Mrr to Highlight.NoSubscriptions))
+            val state = subject().load(config) as WidgetState.Loaded
+            state.content.tiles[1] shouldBe
+                HighlightTile(HighlightMetric.Mrr, null, null, HighlightMissing.NoSubscriptions)
         }
 
         should("show the error once when every request failed") {

@@ -5,7 +5,7 @@ import arrow.core.flatMap
 import arrow.core.raise.either
 import com.nightcode.snout.shared.api.analytics.AnalyticsApi
 import com.nightcode.snout.shared.data.analytics.mapper.toActiveUserHighlights
-import com.nightcode.snout.shared.data.analytics.mapper.toExceptionsHighlight
+import com.nightcode.snout.shared.data.analytics.mapper.toExceptionHighlights
 import com.nightcode.snout.shared.data.analytics.mapper.toLatestAppVersion
 import com.nightcode.snout.shared.data.analytics.mapper.toRevenueHighlights
 import com.nightcode.snout.shared.domain.data.analytics.HighlightsRepository
@@ -30,8 +30,11 @@ internal class HighlightsRepositoryImpl(private val api: AnalyticsApi, private v
     override suspend fun getLatestAppVersion(projectId: Long): Either<DataError, Highlight> =
         api.getAppVersions(projectId).mapping { it.toLatestAppVersion(json) }
 
-    override suspend fun getExceptions(projectId: Long, range: AnalyticsRange): Either<DataError, Highlight> =
-        api.getExceptionCounts(projectId, range.dateFrom).mapping { it.toExceptionsHighlight(json) }
+    override suspend fun getExceptions(
+        projectId: Long,
+        range: AnalyticsRange,
+    ): Either<DataError, Map<HighlightMetric, Highlight>> =
+        api.getExceptionCounts(projectId, range.dateFrom).mapping { it.toExceptionHighlights(json) }
 
     /** Maps a response, failing with [DataError.UnexpectedError] when PostHog answered with a shape it can't read. */
     private inline fun <T, R> Either<DataError, T>.mapping(crossinline map: (T) -> R): Either<DataError, R> =

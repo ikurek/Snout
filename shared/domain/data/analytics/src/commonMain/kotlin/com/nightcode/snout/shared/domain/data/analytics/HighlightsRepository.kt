@@ -8,15 +8,24 @@ import com.nightcode.snout.shared.domain.model.common.DataError
 
 /** The project highlights the Analytics tab doesn't load; [AnalyticsRepository.getOverview] has the web stats. */
 interface HighlightsRepository {
-    /** Daily (the last whole day), weekly and monthly active users, each compared with a week before. */
+    /**
+     * Daily (the last whole day), weekly and monthly active users, each compared with a week before, and the
+     * stickiness of that day.
+     */
     suspend fun getActiveUsers(projectId: Long): Either<DataError, Map<HighlightMetric, Highlight>>
 
-    /** MRR and revenue to date across every revenue source; [Highlight.None] when revenue analytics isn't set up. */
+    /**
+     * MRR, revenue to date, subscribers and paying customers across every revenue source; [Highlight.None] when
+     * revenue analytics isn't set up, [Highlight.NoSubscriptions] for MRR and subscribers when none of it recurs.
+     */
     suspend fun getRevenue(projectId: Long): Either<DataError, Map<HighlightMetric, Highlight>>
 
     /** The newest app version events carried in the last week; [Highlight.None] when none carried one. */
     suspend fun getLatestAppVersion(projectId: Long): Either<DataError, Highlight>
 
-    /** Exceptions over [range], compared with the period before. */
-    suspend fun getExceptions(projectId: Long, range: AnalyticsRange): Either<DataError, Highlight>
+    /** Exceptions over [range] and the users who ran into them, each compared with the period before. */
+    suspend fun getExceptions(
+        projectId: Long,
+        range: AnalyticsRange,
+    ): Either<DataError, Map<HighlightMetric, Highlight>>
 }
