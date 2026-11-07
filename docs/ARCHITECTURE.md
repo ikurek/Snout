@@ -203,13 +203,16 @@ four entries the package needs are already there.
 ## Widgets
 
 Home-screen widgets show one analytics stat over a range (wide widgets add the other stats) and one saved insight
-(its latest number and line, its top breakdowns, or its funnel conversion), and a project's highlights: up to six
-metrics picked per widget from four sources, each queried only when a metric needs it (`LoadProjectHighlights`):
-PostHog's web overview, active users (one trends query; daily users are the last whole day's, since today's isn't over),
-revenue analytics (MRR and revenue to date from `persons_revenue_analytics`, which totals every revenue source, in the
-project's `base_currency`; "Not set up" without any) and app health (the newest `$app_version` of the last week by its
-numbers, and `$exception` events over the range, both HogQL). A source that fails marks its tiles, not the widget, which
-shows the error only when they all did. The analytics widget is called
+(its latest number and line, its top breakdowns, or its funnel conversion), and a project's highlights: up to nine
+metrics picked per widget from five sources, each queried only when a metric needs it (`LoadProjectHighlights`):
+PostHog's web overview, active users (one trends query; daily users are the last whole day's, since today's isn't over,
+and stickiness is that day's daily over monthly users), revenue analytics (MRR, revenue to date, subscribers and paying
+customers from `persons_revenue_analytics`, which totals every revenue source, in the project's `base_currency`; "Not
+set up" without any customers) and app health (the newest `$app_version` of the last week by its numbers, and
+`$exception` events over the range with the users they hit, both HogQL). PostHog counts MRR only from subscriptions:
+revenue events add to it only once their revenue analytics config names a subscription property, so a project whose
+customers paid but none of it recurs shows "No subscriptions" for MRR and subscribers rather than zero. A source that
+fails marks its tiles, not the widget, which shows the error only when they all did. The analytics widget is called
 "Analytics", like the tab, not "Web analytics": PostHog's web analytics queries count `$screen` as well as `$pageview`
 (`shared/api/analytics/Queries.kt`), so it works for mobile apps too.
 
@@ -217,8 +220,12 @@ Each widget has its own project, picked in its settings and independent of the a
 starts on none, so the person picks it rather than inheriting whatever the app shows. Both platforms ask the same
 things in the same order (analytics: project, stat, range; insight: project, then insight; highlights: project, range,
 metrics) with the same defaults (Visitors, last 7 days; daily and monthly users, session duration and exceptions). The
-highlights widget draws a grid of tiles (name, value, change), two or three to a row and as many rows as fit; its
-metrics keep the settings' order (`HighlightMetric`), which iOS's multi-value parameter caps per size. Every widget heads itself with its project's name, kept with its settings as it was when
+highlights widget draws a grid of cards (name, value, change), as many as fit in the fewest columns that show them;
+on Android `highlightsLayout` works the grid out from the widget's size and font scale, measuring text with the font
+padding RemoteViews keep so no row is cut off, and drops the change to an arrow by the name before it would. Its
+header says how many metrics didn't fit ("Last 7 days · +2"). Its metrics keep the order picked (Android's settings
+list the picks to reorder; iOS's multi-value parameter is ordered and capped per size: four small, six medium, nine
+large). Every widget heads itself with its project's name, kept with its settings as it was when
 picked (Android's Glance state, iOS's `ProjectEntity`), so widgets of different projects can be told apart. Both
 lay a stat or insight out the same way: the header (title, caption and a refresh button; on iOS `RefreshWidgetIntent`,
 which WidgetKit answers by reloading that widget), the number and its change (on wide widgets with the next stats
