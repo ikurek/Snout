@@ -75,8 +75,10 @@ android {
 }
 
 // Previews show times in the system time zone, so screenshots render in UTC to come out the same on every machine.
+// Rendering and diffing every preview holds many image buffers, which overflows the default 512 MB test heap.
 tasks.withType<Test>().matching { it.name.endsWith("ScreenshotTest") }.configureEach {
     systemProperty("user.timezone", "UTC")
+    maxHeapSize = "2g"
 }
 
 dependencies {
