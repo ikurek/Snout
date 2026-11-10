@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="appicon/snout-icon-light.svg" alt="Snout app icon" width="112" height="112">
+<img src="docs/snout-icon-round.svg" alt="Snout app icon" width="112" height="112">
 
 # Snout
 
@@ -14,6 +14,9 @@ Your analytics, dashboards, feature flags, errors and logs, in a native Android 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-34A853.svg?logo=android&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-18.2%2B-000000.svg?logo=apple&logoColor=white)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-BC3D0A.svg)](CONTRIBUTING.md)
+
+<a href="https://play.google.com/store/apps/details?id=com.nightcode.snout"><img src="docs/badges/google-play.svg" alt="Get it on Google Play" width="162" height="48"></a>
+<a href="https://apps.apple.com/app/id6826932217"><img src="docs/badges/app-store.svg" alt="Download on the App Store" width="144" height="48"></a>
 
 <img src="docs/screenshots/analytics.png" alt="Web analytics overview" width="19%">
 <img src="docs/screenshots/dashboard.png" alt="A dashboard with a trend and a funnel" width="19%">
@@ -74,7 +77,8 @@ be switched off in Settings → Privacy (see the [privacy policy](PRIVACY.md)).
 
 ## Getting started
 
-Snout isn't in the app stores yet; build it from source (see [Building](#building)).
+Get Snout on [Google Play](https://play.google.com/store/apps/details?id=com.nightcode.snout) or the
+[App Store](https://apps.apple.com/app/id6826932217), or build it from source (see [Building](#building)).
 
 1. In PostHog, open **Settings → Personal API keys** and create a key with the scopes below.
 2. Open Snout, enter your instance URL and paste the key. It is kept encrypted on the device (Keychain on iOS,
